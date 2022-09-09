@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  url: https://argocd.galasa.dev
+#
+#
+#
+  accounts.galasa: "apiKey,login"
+  accounts.galasa.enabled: "true"
+#
+#
+#
+  resource.customizations: |
+    networking.k8s.io/Ingress:
+        health.lua: |
+          hs = {}
+          hs.status = "Healthy"
+          return hs
+#
+#
+#
+  dex.config: |
+    connectors:
+    - type: github
+      id: github
+      name: Github
+      config:
+        clientID: $GITHUB_CLIENT_ID
+        clientSecret: $GITHUB_CLIENT_SECRET
+        redirectURI: https://dex.galasa.dev/callback
+        orgs:
+        - name: galasa-dev
+          teams:
+          - code-admin
+          - code-committers
+        # Flag which indicates that all user groups and teams should be loaded.
+        loadAllGroups: false
+        useLoginAsID: true
