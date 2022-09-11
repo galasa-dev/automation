@@ -9767,17 +9767,6 @@ spec:
         image: ghcr.io/dexidp/dex:v2.32.0
         imagePullPolicy: Always
         name: dex
-        env:
-        - name: GITHUB_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              key: username
-              name: github 
-        - name: GITHUB_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              key: secret
-              name: github
         ports:
         - containerPort: 5556
         - containerPort: 5557
