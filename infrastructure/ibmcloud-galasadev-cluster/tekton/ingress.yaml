@@ -1,24 +1,24 @@
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: dex
-  namespace: dex
+  name: tekton
+  namespace: tekton-pipelines
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
   tls:
   - hosts:
-    - dex.galasa.dev
+    - tekton.galasa.dev
     secretName: galasa-wildcard-cert
   rules:
-  - host: dex.galasa.dev
+  - host: tekton.galasa.dev
     http:
       paths:
       - backend:
           service:
-            name: dex
+            name: tekton-dashboard
             port:
-              number: 5556
+              number: 9097
         path: /
         pathType: Prefix

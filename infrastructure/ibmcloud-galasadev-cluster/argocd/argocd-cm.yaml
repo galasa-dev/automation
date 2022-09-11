@@ -26,14 +26,20 @@ data:
 #
 #
   dex.config: |
+    staticClients:
+    - id: harbor
+      redirectURIs:
+      - 'https://harbor.galasa.dev/c/oidc/callback'
+      name: 'harbor'
+      secret: $dex.harbor.client.secret
+
     connectors:
     - type: github
       id: github
       name: Github
       config:
-        clientID: $GITHUB_CLIENT_ID
-        clientSecret: $GITHUB_CLIENT_SECRET
-        redirectURI: https://dex.galasa.dev/callback
+        clientID: $dex.github.clientid
+        clientSecret: $dex.github.clientsecret
         orgs:
         - name: galasa-dev
           teams:
@@ -42,3 +48,4 @@ data:
         # Flag which indicates that all user groups and teams should be loaded.
         loadAllGroups: false
         useLoginAsID: true
+    
