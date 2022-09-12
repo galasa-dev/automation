@@ -1,8 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: guthub-pr-review-builder-listener
-  namespace: galasa-pipelines
+  name: github-pr-builder-listener
 spec:
   serviceAccountName: tekton-trigger
   triggers:
@@ -17,19 +16,13 @@ spec:
               secretName: github-token
               secretKey: token
           - name: "eventTypes"
-            value: ["pull_request_review"]
-        - name: "CEL filter: when comments are submitted"
+            value: ["pull_request"]
+        - name: "CEL filter: only when PRs are opened"
           ref:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.action in ['submitted']"
-        - name: "CEL filter: When commented the rebuild phrase"
-          ref:
-            name: "cel"
-          params:
-          - name: "filter"
-            value: "body.review.body in ['Approved for building', 'approved for building']"
+            value: "body.action in ['opened', 'reopened']"
       bindings:
         - name: git-revision
           value: $(body.pull_request.head.sha)
@@ -47,7 +40,7 @@ spec:
                 generateName: show-parameter-triggered-pipeline-
               spec:
                 pipelineRef:
-                  name: triggered-from-review-comment
+                  name: triggered-from-pr-open
                 params:
                   - name: image
                     value: test-image-build-by-buildpack-and-triggered:latest
