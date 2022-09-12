@@ -10,4 +10,4 @@ data:
   policy.default: role:readonly
   policy.csv: |
     g, galasa, role:admin
-    g, core-admin, role:admin
+    g, galasa-dev:code-admin, role:admin
