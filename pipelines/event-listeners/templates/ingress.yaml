@@ -2,7 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: triggers-ingress
-  namespace: galasa-pipelines
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
@@ -17,7 +16,7 @@ spec:
       paths:
       - backend:
           service:
-            name: el-guthub-pr-builder-listener
+            name: el-github-pr-builder-listener
             port:
               number: 8080
         path: /pr
@@ -27,7 +26,7 @@ spec:
       paths:
       - backend:
           service:
-            name: el-guthub-pr-review-builder-listener
+            name: el-github-pr-review-builder-listener
             port:
               number: 8080
         path: /pr-review
