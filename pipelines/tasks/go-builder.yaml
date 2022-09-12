@@ -9,7 +9,7 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-    mountpath: /workspace/git
+    mountPath: /workspace/git
   params:
   - name: CGO_ENABLED
     type: string
