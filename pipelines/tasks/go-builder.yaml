@@ -36,7 +36,7 @@ spec:
     type: string
   steps:
   - name: docker-build
-    workingDir: /workspace/git/$(params.projectPath)
+    workingDir: /workspace/git/$(params.projectBasePath)
     image: golang:latest
     env:
     - name: CGO_ENABLED
@@ -53,5 +53,5 @@ spec:
     - go
     - build
     - -o
-    - /workspace/git/$(params.projectPath)/bin/$(params.binaryName)
-    - /workspace/git/$$(params.projectPath)/$(params.mainPath)
+    - /workspace/git/$(params.projectBasePath)/bin/$(params.binaryName)
+    - /workspace/git/$$(params.projectBasePath)/$(params.mainPath)
