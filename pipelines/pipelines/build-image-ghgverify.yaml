@@ -62,6 +62,8 @@ spec:
       value: automation/dockerfiles/build-images/ghgverify-dockerfile
     - name: imageName
       value: harbor.galasa.dev/build_images/ghgverify
+    - name: noPush
+      value: $(params.noPush)
     workspaces:
      - name: git-workspace
        workspace: git-workspace
