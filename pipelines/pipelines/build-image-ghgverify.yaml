@@ -20,10 +20,13 @@ spec:
   - name: imageName
     type: string
     default: nopushimage:latest
-  - name: isRelease
-    type: string
-    default: "false"
   tasks:
+  - name: git-clean
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: automation
   - name: git-clone
     taskRef: 
       name: git-clone
@@ -37,7 +40,7 @@ spec:
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: galasa-kubernetes-operator
+      value: automation
     workspaces:
      - name: output
        workspace: git-workspace
