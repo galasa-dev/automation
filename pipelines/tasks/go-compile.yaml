@@ -31,7 +31,7 @@ spec:
   - name: mainPath
     type: string
     default: "cmd/main.go"
-  - name: binaryName
+  - name: output
     type: string
   steps:
   - name: docker-build

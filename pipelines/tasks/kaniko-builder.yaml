@@ -1,0 +1,41 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: docker-build
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    optional: false
+    mountpath: /workspace/git
+  params:
+  - name: imageName
+    type: string
+  - name: dockerBuildRepo
+    type: string
+    default: harbor.galasa.dev
+  - name: context
+    type: string
+  - name: noPush
+    type: string
+    default: ""
+  steps:
+  - name: docker-build
+    workingDir: /workspace/git/$(params.context)
+    image: gcr.io/kaniko-project/executor
+    env:
+    - name: DOCKER_CONFIG
+      value: /tekton/home/.docker
+    command:
+    - /kaniko/executor
+    - --dockerfile=./Dockerfile
+    - --context=/workspace/git/$(params.context)
+    - --destination=$(params.imageName)
+    - --oci-layout-path=/workspace/git/$(params.context)image-digest
+    - --single-snapshot
+    - --verbosity=info
+    - $(params.noPush)
+    - --build-arg=dockerRepository=$(params.dockerBuildRepo)
