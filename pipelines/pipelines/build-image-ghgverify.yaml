@@ -21,6 +21,7 @@ spec:
     type: string
     default: nopushimage:latest
   tasks:
+  # - name: git-verify
   - name: git-clean
     taskRef: 
       name: git-clean
@@ -49,18 +50,17 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: go-compile
+  - name: build-ghgverify-image
     taskRef:
-      name: go-compile
+      name: docker-build
     runAfter:
     - git-clone
     params:
-    - name: projectBasePath
+    - name: context
       value: automation/build-images/github-verify
-    - name: mainPath
-      value: cmd/main
-    - name: output
-      value: ghgverify
+    - name: image-name
+      value: harbor.galasa.dev/build-images/ghgverify
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  # - name: git-status
