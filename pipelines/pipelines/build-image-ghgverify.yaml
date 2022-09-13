@@ -58,6 +58,8 @@ spec:
     params:
     - name: context
       value: automation/build-images/github-verify
+    - name: dockerfilePath
+      value: automation/dockerfiles/build-images/ghgverify-dockerfile
     - name: imageName
       value: harbor.galasa.dev/build-images/ghgverify
     workspaces:
