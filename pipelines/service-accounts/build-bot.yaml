@@ -3,6 +3,5 @@ kind: ServiceAccount
 metadata:
   name: build-bot
   namespace: galasa-pipelines
-# secrets:
-# - name: harbor-user-pass
-# - name: dockerext-user-pass
+secrets:
+- name: harbor-creds
