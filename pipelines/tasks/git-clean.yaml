@@ -15,7 +15,7 @@ spec:
     type: string
     default: "0"
   steps:
-  - name: clean subdirectort
+  - name: clean-subdirectory
     workingDir: /workspace/git/
     image: busybox:latest
     env:
