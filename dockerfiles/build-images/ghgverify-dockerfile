@@ -1,0 +1,24 @@
+############################
+# STEP 1 build executable binary
+############################
+FROM golang AS builder
+WORKDIR $GOPATH/src/github.com/automation/build-images
+COPY . /go/src/github.com/automation/build-images
+
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=amd64
+ENV GO111MODULE=auto
+ENV GOPATH=/go
+
+WORKDIR $GOPATH/src/github.com/automation/build-images
+COPY . /go/src/github.com/automation/build-images
+
+RUN go build -o /go/bin/ghgverify /go/src/github.com/automation/build-images/cmd/main.go
+
+############################
+# STEP 2 build a small image
+############################
+FROM alpine
+COPY --from=builder /go/bin/ghgverify /go/bin/ghgverify
+ENTRYPOINT ["/go/bin/ghgverify"]
