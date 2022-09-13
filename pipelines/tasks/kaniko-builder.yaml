@@ -29,7 +29,7 @@ spec:
       value: /tekton/home/.docker
     command:
     - /kaniko/executor
-    - --dockerfile=$(params.dockerfilePath)
+    - --dockerfile=/workspace/git/$(params.dockerfilePath)
     - --context=/workspace/git/$(params.context)
     - --destination=$(params.imageName)
     - --oci-layout-path=/workspace/git/$(params.context)image-digest
