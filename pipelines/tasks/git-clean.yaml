@@ -1,0 +1,25 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clean
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: subdirectory
+    type: string
+    default: "0"
+  steps:
+  - name: clean subdirectort
+    workingDir: /workspace/git/
+    image: busybox:latest
+    env:
+    command:
+    - rm
+    - -rf
+    - /workspace/git/$(params.subdirectory)
