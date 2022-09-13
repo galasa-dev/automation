@@ -13,14 +13,11 @@ spec:
   params:
   - name: imageName
     type: string
-  - name: dockerBuildRepo
-    type: string
-    default: harbor.galasa.dev
   - name: context
     type: string
   - name: noPush
     type: string
-    default: ""
+    default: "--no-push"
   steps:
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
@@ -37,4 +34,3 @@ spec:
     - --single-snapshot
     - --verbosity=info
     - $(params.noPush)
-    - --build-arg=dockerRepository=$(params.dockerBuildRepo)

@@ -19,6 +19,6 @@ spec:
     serviceAccountName: build-bot
     workspaces:
     - name: git-workspace
-      subPath: /git/workspace
+      # subPath: /git/workspace
       persistentVolumeClaim:
         claimName: tekton-build-workspace-pvc
