@@ -26,19 +26,19 @@ spec:
     command: 
     - /bin/ls
     - -al
-    - /
+    - /root
   - name: ls2
     image: busybox:latest
     command: 
     - /bin/ls
     - -al
-    - /tekton
+    - /root/tekton
   - name: ls3 
     image: busybox:latest
     command: 
     - /bin/ls
     - -al
-    - /tekton/home
+    - /root/tekton/home
   - name: ls5
     image: busybox:latest
     command: 
