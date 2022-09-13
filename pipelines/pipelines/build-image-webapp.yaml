@@ -1,0 +1,75 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-image-webapp
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: distBranch
+    type: string
+  - name: refspec
+    type: string
+  - name: noPush
+    type: string
+    default: "--no-push"
+  - name: imageName
+    type: string
+    default: nopushimage:latest
+  - name: context
+    value: simplatform/galasa-simplatform-application/galasa-simplatform-webapp   
+
+  tasks:
+  - name: clean-simplatform
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: simplatform
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: clone-simplatform
+    taskRef: 
+      name: git-clone
+    runAfter:
+    - clean-simplatform
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/simplatform
+    - name: revision
+      value: $(params.distBranch)
+    - name: refspec
+      value: $(params.refspec)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: simplatform
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+##### maven build task to be added #####
+
+  - name: build-webapp
+    taskRef: 
+      name: docker-build     
+    runAfter:
+    - clone-simplatform   
+    params:
+    - name: imageName
+      value: simbank-webapp
+    - name: dockerBuildRepo
+      value: harbor.galasa.dev/build_images/webapp
+    - name: context
+      value: $(params.context)
+    - name: noPush    
+      value: $(params.noPush)  
+    - name: dockerfilePath
+      value: $(params.context)/Dockerfile    
+ 
