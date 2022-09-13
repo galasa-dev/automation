@@ -9,8 +9,7 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-    optional: false
-    mountpath: /workspace/git
+    mountPath: /workspace/git
   params:
   - name: imageName
     type: string
