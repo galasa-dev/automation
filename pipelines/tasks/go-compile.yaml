@@ -9,7 +9,7 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-    mountPath: /workspace/git
+    mountPath: /workspace/git/src
   params:
   - name: CGO_ENABLED
     type: string
@@ -25,7 +25,7 @@ spec:
     default: "auto"
   - name: GOPATH
     type: string
-    default: "/go"
+    default: "/workspace/git"
   - name: projectBasePath
     type: string
   - name: mainPath
