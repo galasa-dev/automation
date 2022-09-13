@@ -18,7 +18,6 @@ spec:
   - name: clean-subdirectory
     workingDir: /workspace/git/
     image: busybox:latest
-    env:
     command:
     - rm
     - -rf
