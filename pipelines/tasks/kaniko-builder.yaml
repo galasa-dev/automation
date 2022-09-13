@@ -42,9 +42,7 @@ spec:
   - name: ls5
     image: busybox:latest
     command: 
-    - /bin/ls
-    - -al
-    - "~"
+    - /bin/env
   - name: ls4
     image: busybox:latest
     command: 
