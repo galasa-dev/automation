@@ -39,18 +39,19 @@ spec:
     - /bin/ls
     - -al
     - /tekton/home
-  - name: ls4
-    image: busybox:latest
-    command: 
-    - /bin/ls
-    - -al
-    - /tekton/home/.docker
   - name: ls5
     image: busybox:latest
     command: 
     - /bin/ls
     - -al
     - "~"
+  - name: ls4
+    image: busybox:latest
+    command: 
+    - /bin/ls
+    - -al
+    - "~/.docker"
+  
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
     image: gcr.io/kaniko-project/executor
