@@ -27,6 +27,9 @@ spec:
     params:
     - name: subdirectory
       value: automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: git-clone
     taskRef: 
       name: git-clone
