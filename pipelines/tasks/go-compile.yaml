@@ -34,7 +34,7 @@ spec:
   - name: output
     type: string
   steps:
-  - name: docker-build
+  - name: go-compile
     workingDir: /workspace/git/$(params.projectBasePath)
     image: golang:latest
     env:
@@ -53,4 +53,4 @@ spec:
     - build
     - -o
     - /workspace/git/$(params.projectBasePath)/bin/$(params.output)
-    - /workspace/git/$$(params.projectBasePath)/$(params.mainPath)
+    - /workspace/git/$(params.projectBasePath)/$(params.mainPath)

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-bot
+  namespace: galasa-pipelines
+# secrets:
+# - name: harbor-user-pass
+# - name: dockerext-user-pass
