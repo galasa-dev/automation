@@ -30,6 +30,8 @@ spec:
   - name: git-clone
     taskRef: 
       name: git-clone
+    runAfter:
+    - git-clean
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
