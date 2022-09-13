@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: harbor-creds
+  annotations:
+    tekton.dev/docker-0: https://harbor.galasa.dev 
+type: kubernetes.io/basic-auth
+stringData:
+  username: admin
+  password: cZcvXnBEPNKYcfxCmK8MFjBqbfFLsTFW

@@ -21,6 +21,36 @@ spec:
   - name: dockerfilePath
     type: string
   steps:
+  - name: ls1 
+    image: busybox:latest
+    command: 
+    - /bin/ls
+    - -al
+    - /
+  - name: ls2
+    image: busybox:latest
+    command: 
+    - /bin/ls
+    - -al
+    - /tekton
+  - name: ls3 
+    image: busybox:latest
+    command: 
+    - /bin/ls
+    - -al
+    - /tekton/home
+  - name: ls4
+    image: busybox:latest
+    command: 
+    - /bin/ls
+    - -al
+    - /tekton/home/.docker
+  - name: ls5
+    image: busybox:latest
+    command: 
+    - /bin/ls
+    - -al
+    - "~"
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
     image: gcr.io/kaniko-project/executor
