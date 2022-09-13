@@ -18,6 +18,8 @@ spec:
   - name: noPush
     type: string
     default: "--no-push"
+  - name: dockerfilePath
+    type: string
   steps:
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
@@ -27,7 +29,7 @@ spec:
       value: /tekton/home/.docker
     command:
     - /kaniko/executor
-    - --dockerfile=./Dockerfile
+    - --dockerfile=$(params.dockerfilePath)
     - --context=/workspace/git/$(params.context)
     - --destination=$(params.imageName)
     - --oci-layout-path=/workspace/git/$(params.context)image-digest
