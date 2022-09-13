@@ -61,7 +61,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/build-images/ghgverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/build-images/ghgverify
+      value: harbor.galasa.dev/build_images/ghgverify
     workspaces:
      - name: git-workspace
        workspace: git-workspace
