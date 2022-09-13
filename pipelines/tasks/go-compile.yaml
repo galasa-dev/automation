@@ -52,5 +52,5 @@ spec:
     - go
     - build
     - -o
-    - /workspace/git/$(params.projectBasePath)/bin/$(params.binaryName)
+    - /workspace/git/$(params.projectBasePath)/bin/$(params.output)
     - /workspace/git/$$(params.projectBasePath)/$(params.mainPath)
