@@ -22,15 +22,6 @@ spec:
     default: nopushimage:latest
   tasks:
   # - name: git-verify
-  - name: git-clean
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
   - name: git-clone
     taskRef: 
       name: git-clone
@@ -46,7 +37,7 @@ spec:
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: automation
+      value: $(context.pipelineRun.name)/automation
     workspaces:
      - name: output
        workspace: git-workspace
@@ -57,14 +48,24 @@ spec:
     - git-clone
     params:
     - name: context
-      value: automation/build-images/github-verify
+      value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: dockerfilePath
-      value: automation/dockerfiles/build-images/ghgverify-dockerfile
+      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghgverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/build_images/ghgverify
+      value: harbor.galasa.dev/build_images/ghgverify:latest
     - name: noPush
       value: $(params.noPush)
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  finally:
   # - name: git-status
+  - name: git-clean
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace

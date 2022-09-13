@@ -24,15 +24,15 @@ spec:
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
     image: gcr.io/kaniko-project/executor
-    # env:
-    # - name: DOCKER_CONFIG
-    #   value: /tekton/home/.docker
+    env:
+    - name: DOCKER_CONFIG
+      value: /tekton/home/.docker
     command:
     - /kaniko/executor
     - --dockerfile=/workspace/git/$(params.dockerfilePath)
     - --context=/workspace/git/$(params.context)
     - --destination=$(params.imageName)
-    - --oci-layout-path=/workspace/git/$(params.context)image-digest
+    - --oci-layout-path=/workspace/git/$(params.context)/image-digest
     - --single-snapshot
-    - --verbosity=info
+    - --verbosity=debug
     - $(params.noPush)
