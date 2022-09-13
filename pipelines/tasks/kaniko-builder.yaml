@@ -26,7 +26,7 @@ spec:
     image: gcr.io/kaniko-project/executor
     env:
     - name: DOCKER_CONFIG
-      value: /tekton/home/.docker
+      value: ~/.docker
     command:
     - /kaniko/executor
     - --dockerfile=/workspace/git/$(params.dockerfilePath)
