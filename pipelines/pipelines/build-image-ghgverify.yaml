@@ -58,7 +58,7 @@ spec:
     params:
     - name: context
       value: automation/build-images/github-verify
-    - name: image-name
+    - name: imageName
       value: harbor.galasa.dev/build-images/ghgverify
     workspaces:
      - name: git-workspace
