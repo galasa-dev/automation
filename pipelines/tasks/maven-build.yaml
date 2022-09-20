@@ -1,0 +1,39 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: maven-build
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: settingsPath
+    type: string  
+  - name: dockerRepo
+    type: string  
+  - name: build-args
+    type: array    
+  - name: command
+    type: string  
+  steps:
+  - name: maven-build
+    workingDir: /workspace/git/$(params.context)
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    command:
+      - mvn
+    args:
+      - $(params.build-args[*])
+      - --settings
+      - /workspace/git/$(params.settingsPath)
+      - --batch-mode
+      - --errors
+      - --fail-at-end
+      - $(params.command) 
+
+  
