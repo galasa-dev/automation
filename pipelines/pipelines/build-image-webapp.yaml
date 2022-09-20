@@ -54,13 +54,35 @@ spec:
      - name: output
        workspace: git-workspace
 
-##### maven build task to be added #####
+  - name: maven-build-simplatform
+    taskRef:
+      name: maven-build
+    runAfter:
+    - clone-simplatform    
+    params:
+    - name: context
+      value: simplatform/galasa-simplatform-application
+    - name: settingsPath
+      value: simplatform/settings.xml
+    - name: dockerRepo
+      value: harbor-cicsk8s.hursley.ibm.com 
+    - name: build-args
+      value:  
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.release.repo=file:/workspace/git/simplatfom/docker/repo/"
+        - "-Dgalasa.source.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-Dgalasa.central.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/" 
+    - name: command
+      value: deploy    
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
 
   - name: build-webapp
     taskRef: 
       name: docker-build     
     runAfter:
-    - clone-simplatform   
+    - maven-build-simplatform  
     params:
     - name: imageName
       value: simbank-webapp
