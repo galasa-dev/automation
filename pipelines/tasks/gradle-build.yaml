@@ -17,6 +17,8 @@ spec:
     type: string
   - name: dockerRepo
     type: string 
+  - name: build-args
+    type: array   
   - name: command
     type: string   
   steps:
