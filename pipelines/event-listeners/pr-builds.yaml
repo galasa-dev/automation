@@ -23,29 +23,55 @@ spec:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.action in ['opened', 'reopened']"
+            value: "body.action in ['opened', 'reopened', 'synchronize']"
       bindings:
-        - name: git-revision
-          value: $(body.pull_request.head.sha)
-        - name: git-repository-url
-          value: $(body.repository.html_url)
+        - name: git-repository-name
+          value: $(body.pull_request.head.repo.name)
+        - name: git-pull-request-url
+          value: $(body.pull_request.url)
+        - name: git-head-ref
+          value: $(body.pull_request.head.ref)
+        - name: git-base-ref
+          value: $(body.pull_request.head.ref)
+        - name: git-pr-number
+          value: $(body.number)
+        - name: git-userid
+          value: $(body.pull_request.user.id)
+        - name: git-action
+          value: $(body.action)
       template:
         spec:
           params:
-            - name: git-revision
-            - name: git-repository-url
+            - name: git-repository-name
+            - name: git-pull-request-url
+            - name: git-pr-number
+            - name: git-head-ref
+            - name: git-base-ref
+            - name: git-userid
+            - name: git-action
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
               metadata:
-                generateName: show-parameter-triggered-pipeline-
+                generateName: repo-$(tt.params.git-repository-name)-pr-$(tt.params.git-pr-number)-
               spec:
                 pipelineRef:
-                  name: triggered-from-pr-open
+                  name: pr-$(tt.params.git-repository-name)
+                serviceAccountName: build-bot
+                workspaces:
+                - name: git-workspace
+                  persistentVolumeClaim:
+                    claimName: tekton-build-workspace-pvc
                 params:
-                  - name: image
-                    value: test-image-build-by-buildpack-and-triggered:latest
-                  - name: git-repository-url
-                    value: $(tt.params.git-repository-url)
-                  - name: git-revision
-                    value: $(tt.params.git-revision)
+                  - name: head-ref
+                    value: $(tt.params.git-head-ref)
+                  - name: base-ref
+                    value: $(tt.params.git-base-ref) 
+                  - name: prUrl
+                    value: $(tt.params.git-pull-request-url)
+                  - name: userId
+                    value: $(tt.params.git-userid)
+                  - name: pr-number
+                    value: $(tt.params.git-pr-number)
+                  - name: action
+                    value: $(tt.params.git-action)
