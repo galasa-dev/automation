@@ -23,7 +23,7 @@ spec:
   steps:
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
-    image: gcr.io/kaniko-project/executor
+    image: harbor.galasa.dev/common/kaniko-executor:latest
     env:
     - name: DOCKER_CONFIG
       value: /root/.docker
@@ -34,5 +34,5 @@ spec:
     - --destination=$(params.imageName)
     - --oci-layout-path=/workspace/git/$(params.context)/image-digest
     - --single-snapshot
-    - --verbosity=debug
+    - --verbosity=trace
     - $(params.noPush)
