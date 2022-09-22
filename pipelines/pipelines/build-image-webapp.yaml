@@ -18,7 +18,8 @@ spec:
     type: string
     default: nopushimage:latest
   - name: context
-    value: simplatform/galasa-simplatform-application/galasa-simplatform-webapp   
+    type: string
+    default: simplatform/galasa-simplatform-application/galasa-simplatform-webapp   
 
   tasks:
   - name: clean-simplatform
