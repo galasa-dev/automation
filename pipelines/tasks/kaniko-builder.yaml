@@ -34,5 +34,5 @@ spec:
     - --destination=$(params.imageName)
     - --oci-layout-path=/workspace/git/$(params.context)/image-digest
     - --single-snapshot
-    - --verbosity=trace
+    - --verbosity=info
     - $(params.noPush)

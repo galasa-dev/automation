@@ -1,0 +1,39 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-verify
+  namespace: galasa-pipelines
+spec:
+  params:
+  - name: userId
+    type: string
+  - name: prUrl
+    type: string
+  - name: action
+    type: string
+  steps:
+  - name: github verify
+    workingDir: /workspace/git/
+    image: harbor.galasa.dev/common/ghgverify:latest
+    env:
+    - name: GITHUBTOKEN
+      valueFrom:
+        secretKeyRef:
+          name: guthub-token
+          key: token
+          optional: false
+    command:
+    - ghgverfiy
+    - --userid
+    - $(params.userId)
+    - --pr
+    - $(params.prUrl)
+    - --org
+    - galasa-dev
+    - --approved-groups
+    - code-admin,code-committers
+    - --action
+    - $(params.action)
