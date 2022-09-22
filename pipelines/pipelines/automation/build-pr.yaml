@@ -70,7 +70,12 @@ spec:
      - name: git-workspace
        workspace: git-workspace
   finally:
-  # - name: git-status
+  - name: git-status
+    taskRef:
+      name: git-status
+    params:
+    - name: thing
+      value: $(tasks.build-ghgverify-image.status)
   - name: git-clean
     taskRef: 
       name: git-clean
