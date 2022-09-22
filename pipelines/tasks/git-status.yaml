@@ -1,0 +1,22 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-status
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: thing
+    type: string
+  steps:
+  - name: clean-subdirectory
+    workingDir: /workspace/git/
+    image: busybox:latest
+    command:
+    - echo
+    - $(params.thing)
