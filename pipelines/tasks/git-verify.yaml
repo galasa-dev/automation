@@ -26,7 +26,7 @@ spec:
           key: token
           optional: false
     command:
-    - /go/bin/ghgverfiy
+    - /go/bin/ghgverify
     - --userid
     - $(params.userId)
     - --pr
