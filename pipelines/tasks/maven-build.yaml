@@ -14,9 +14,7 @@ spec:
   - name: context
     type: string
   - name: settingsPath
-    type: string  
-  - name: dockerRepo
-    type: string  
+    type: string   
   - name: build-args
     type: array    
   - name: command
@@ -24,7 +22,7 @@ spec:
   steps:
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
-    image: $(params.dockerRepo)/galasadev/galasa-build
+    image: docker.io/library/maven:3-openjdk-11 
     command:
       - mvn
     args:
