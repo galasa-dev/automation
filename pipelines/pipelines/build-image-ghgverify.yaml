@@ -50,7 +50,7 @@ spec:
     - name: dockerfilePath
       value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghgverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/build_images/ghgverify:latest
+      value: harbor.galasa.dev/common/ghgverify:latest
     - name: noPush
       value: $(params.noPush)
     workspaces:
