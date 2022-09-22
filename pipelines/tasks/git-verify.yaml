@@ -15,7 +15,7 @@ spec:
   - name: action
     type: string
   steps:
-  - name: github verify
+  - name: github-verify
     workingDir: /workspace/git/
     image: harbor.galasa.dev/common/ghgverify:latest
     env:
