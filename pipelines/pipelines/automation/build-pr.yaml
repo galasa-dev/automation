@@ -41,8 +41,8 @@ spec:
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
-    # - name: revision
-      # value: $(params.head-ref)
+    - name: revision
+      value: $(params.head-ref)
     - name: refspec
       value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
     - name: depth
