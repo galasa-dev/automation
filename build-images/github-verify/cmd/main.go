@@ -28,7 +28,6 @@ func main() {
 	org := flag.String("org", "", "which github org are we looking for users in")
 	approvedGroups := flag.String("approved-groups", "", "the github groups get auto-build on PRs")
 	action := flag.String("action", "", "what github action occured")
-	commentUserId := flag.Int("commentuserid", -1, "The user id of the rebuild comment")
 	flag.Parse()
 
 	// Get PR object
@@ -56,7 +55,7 @@ func main() {
 		updateStatus("pending", "Waiting admin approval", pr)
 		os.Exit(1)
 	case "submitted":
-		if CheckForIdInApprovedTeam(*commentUserId, *org, strings.Split(*approvedGroups, ",")) {
+		if CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ",")) {
 			updateStatus("pending", "Build submited", pr)
 			os.Exit(0)
 		}
