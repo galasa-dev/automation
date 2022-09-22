@@ -24,7 +24,7 @@ spec:
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
-    image: $(params.dockerRepo)/galasadev/galasa-build
+    image: docker.io/library/gradle:7.5-jdk11 
     command:
     - gradle
     args:
