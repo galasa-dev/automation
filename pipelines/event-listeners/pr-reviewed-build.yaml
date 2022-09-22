@@ -44,7 +44,7 @@ spec:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
               metadata:
-                generateName: show-parameter-triggered-pipeline-
+                generateName: show-parameter-triggered-pipeline-$(params.git-revision)-
               spec:
                 pipelineRef:
                   name: triggered-from-review-comment

@@ -13,7 +13,7 @@ spec:
   params:
   - name: subdirectory
     type: string
-    default: "0"
+    default: ""
   steps:
   - name: clean-subdirectory
     workingDir: /workspace/git/
