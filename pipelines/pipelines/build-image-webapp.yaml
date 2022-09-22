@@ -1,0 +1,92 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-image-webapp
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: distBranch
+    type: string
+  - name: refspec
+    type: string
+  - name: imageName
+    type: string
+    default: nopushimage:latest
+  - name: context
+    type: string
+    default: simplatform/galasa-simplatform-application/galasa-simplatform-webapp   
+
+  tasks:
+  - name: clean-simplatform
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: simplatform
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: clone-simplatform
+    taskRef: 
+      name: git-clone
+    runAfter:
+    - clean-simplatform
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/simplatform
+    - name: revision
+      value: $(params.distBranch)
+    - name: refspec
+      value: $(params.refspec)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: simplatform
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+  - name: maven-build-simplatform
+    taskRef:
+      name: maven-build
+    runAfter:
+    - clone-simplatform    
+    params:
+    - name: context
+      value: simplatform/galasa-simplatform-application
+    - name: settingsPath
+      value: simplatform/settings.xml
+    - name: dockerRepo
+      value: harbor-cicsk8s.hursley.ibm.com 
+    - name: build-args
+      value:  
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.release.repo=file:/workspace/git/simplatfom/docker/repo/"
+        - "-Dgalasa.source.repo=https://galasadev-cicsk8s.hursley.ibm.com/main/maven/obr/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2" 
+    - name: command
+      value: deploy    
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+
+  - name: build-webapp
+    taskRef: 
+      name: docker-build     
+    runAfter:
+    - maven-build-simplatform  
+    params:
+    - name: imageName
+      value: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-simplatform-application/simbank-webapp:$(params.distBranch)
+    - name: context
+      value: $(params.context) 
+    - name: noPush
+      value: "--no-push"  
+    - name: dockerfilePath
+      value: $(params.context)/Dockerfile
