@@ -44,7 +44,7 @@ spec:
     - name: revision
       value: $(params.head-ref)
     - name: refspec
-      value: refs/pull/$(params.pr-number):refs/heads/$(params.base-ref)
+      value: refs/pulls/$(params.pr-number):refs/heads/$(params.base-ref)
     - name: depth
       value: "99999999"
     - name: subdirectory
