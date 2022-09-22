@@ -22,7 +22,7 @@ spec:
     - name: GITHUBTOKEN
       valueFrom:
         secretKeyRef:
-          name: guthub-token
+          name: github-token
           key: token
           optional: false
     command:
