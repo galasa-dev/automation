@@ -20,24 +20,16 @@ func main() {
 	token = os.Getenv("GITHUBTOKEN")
 
 	status := flag.String("status", "", "Status of the Tekton build")
-	prUrl := flag.String("pr", "", "URL of the pr to verify")
+	prUrl := flag.String("prUrl", "", "URL of the pr to verify")
 	statusesUrl := flag.String("statusesUrl", "", "URL of status to send update request to")
 	issueUrl := flag.String("issueUrl", "", "URL of the issue")
 	pipelineRunName := flag.String("pipelineRunName", "", "The name of the Pipeline Run triggered by PR")
-
-	fmt.Println(status)
-	fmt.Println(prUrl)
-	fmt.Println(statusesUrl)
-	fmt.Println(issueUrl)
-	fmt.Println(pipelineRunName)
 
 	pull := &types.Pull{
 		Url:       *prUrl,
 		StatusUrl: *statusesUrl,
 		IssueUrl:  *issueUrl,
 	}
-
-	fmt.Println(pull)
 
 	if *status != "Succeeded" {
 		updateStatus("failure", "Build failed", *pull)
@@ -55,7 +47,6 @@ func updateStatus(status, message string, pr types.Pull) {
 	body := fmt.Sprintf("{\"state\":\"%s\", \"description\":\"%s\", \"context\":\"Tekton\"}", status, message)
 	req, _ := http.NewRequest("POST", pr.StatusUrl, strings.NewReader(body))
 	req.Header.Add("Accept", "application/vnd.github+json")
-	fmt.Println(req)
 	sendRequest(req)
 }
 
