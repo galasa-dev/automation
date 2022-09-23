@@ -69,6 +69,23 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: build-ghgstatus-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - git-clone
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-status
+    - name: dockerfilePath
+      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghgstatus-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghgstatus:latest
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   finally:
   - name: git-status
     taskRef:
