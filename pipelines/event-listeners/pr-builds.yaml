@@ -29,6 +29,10 @@ spec:
           value: $(body.pull_request.head.repo.name)
         - name: git-pull-request-url
           value: $(body.pull_request.url)
+        - name: git-statuses-url
+          value: $(body.pull_request.statuses_url)
+        - name: git-issue-url
+          value: $(body.pull_request.issue_url)
         - name: git-head-ref
           value: $(body.pull_request.head.ref)
         - name: git-base-ref
@@ -69,6 +73,10 @@ spec:
                     value: $(tt.params.git-base-ref) 
                   - name: prUrl
                     value: $(tt.params.git-pull-request-url)
+                  - name: statusesUrl
+                    value: $(tt.params.git-statuses-url)
+                  - name: issueUrl
+                    value: $(tt.params.git-issue-url)
                   - name: userId
                     value: $(tt.params.git-userid)
                   - name: pr-number

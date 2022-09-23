@@ -21,10 +21,14 @@ func main() {
 
 	status := flag.String("status", "", "Status of the Tekton build")
 	prUrl := flag.String("pr", "", "URL of the pr to verify")
+	statusesUrl := flag.String("statusesUrl", "", "URL of status to send update request to")
+	issueUrl := flag.String("issueUrl", "", "URL of the issue")
 	pipelineRunName := flag.String("pipelineRunName", "", "The name of the Pipeline Run triggered by PR")
 
 	pull := &types.Pull{
-		Url: *prUrl,
+		Url:       *prUrl,
+		StatusUrl: *statusesUrl,
+		IssueUrl:  *issueUrl,
 	}
 
 	if *status != "Succeeded" {
