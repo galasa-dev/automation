@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-automation
+  name: pr-wrapping
   namespace: galasa-pipelines
 spec:
   workspaces:
@@ -40,7 +40,7 @@ spec:
       - git-verify
     params:
     - name: url
-      value: https://github.com/galasa-dev/automation
+      value: https://github.com/galasa-dev/wrapping
     - name: revision
       value: $(params.base-ref)
     - name: refspec
@@ -48,7 +48,7 @@ spec:
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
+      value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: output
        workspace: git-workspace
@@ -59,9 +59,9 @@ spec:
     - git-clone
     params:
     - name: context
-      value: $(context.pipelineRun.name)/automation/build-images/github-verify
+      value: $(context.pipelineRun.name)/wrapping/build-images/github-verify
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghgverify-dockerfile
+      value: $(context.pipelineRun.name)/wrapping/dockerfiles/build-images/ghgverify-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/ghgverify:latest
     - name: noPush
@@ -85,7 +85,7 @@ spec:
       name: git-clean
     params:
     - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
+      value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: git-workspace
        workspace: git-workspace
