@@ -24,16 +24,16 @@ func main() {
 	pipelineRunName := flag.String("pipelineRunName", "", "The name of the Pipeline Run triggered by PR")
 
 	pull := &types.Pull{
-		Url: prUrl,
+		Url: *prUrl,
 	}
 
 	if *status != "Succeeded" {
-		updateStatus("failure", "Build failed", pull)
-		failureUrl := fmt.Sprintf("https://tekton.galasa.dev/#/namespaces/galasa-pipelines/pipelineruns/%s", pipelineRunName)
-		commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), pull)
+		updateStatus("failure", "Build failed", *pull)
+		failureUrl := fmt.Sprintf("https://tekton.galasa.dev/#/namespaces/galasa-pipelines/pipelineruns/%s", *pipelineRunName)
+		commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), *pull)
 	} else {
-		updateStatus("success", "Build successful", pull)
-		commentOnPr("Build successful", pull)
+		updateStatus("success", "Build successful", *pull)
+		commentOnPr("Build successful", *pull)
 	}
 
 	// Github: failure, success, error
