@@ -7,9 +7,6 @@ metadata:
   name: git-status
   namespace: galasa-pipelines
 spec:
-  workspaces:
-  - name: git-workspace
-    mountPath: /workspace/git
   params:
   - name: status
     type: string
@@ -18,9 +15,16 @@ spec:
   - name: pipelineRunName
     type: string
   steps:
-  - name: clean-subdirectory
+  - name: github-status
     workingDir: /workspace/git/
-    image: busybox:latest
+    image: harbor.galasa.dev/common/ghgstatus:latest
+    env:
+    - name: GITHUBTOKEN
+      valueFrom:
+        secretKeyRef:
+          name: github-token
+          key: token
+          optional: false
     command:
     - /go/bin/ghgstatus
     - --status
