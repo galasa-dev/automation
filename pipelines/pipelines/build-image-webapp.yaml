@@ -62,8 +62,6 @@ spec:
       value: simplatform/galasa-simplatform-application
     - name: settingsPath
       value: simplatform/settings.xml
-    - name: dockerRepo
-      value: harbor-cicsk8s.hursley.ibm.com 
     - name: build-args
       value:  
         - "-Dgpg.skip=true"
