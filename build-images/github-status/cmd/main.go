@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,9 +18,25 @@ var client = http.Client{
 
 func main() {
 	token = os.Getenv("GITHUBTOKEN")
-	// If not Succeeded, then we fail
 
-	// Gihub: failure, success, error
+	status := flag.String("status", "", "Status of the Tekton build")
+	prUrl := flag.String("pr", "", "URL of the pr to verify")
+	pipelineRunName := flag.String("pipelineRunName", "", "The name of the Pipeline Run triggered by PR")
+
+	pull := &types.Pull{
+		Url: prUrl,
+	}
+
+	if *status != "Succeeded" {
+		updateStatus("failure", "Build failed", pull)
+		failureUrl := fmt.Sprintf("https://tekton.galasa.dev/#/namespaces/galasa-pipelines/pipelineruns/%s", pipelineRunName)
+		commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), pull)
+	} else {
+		updateStatus("success", "Build successful", pull)
+		commentOnPr("Build successful", pull)
+	}
+
+	// Github: failure, success, error
 }
 
 func updateStatus(status, message string, pr types.Pull) {
