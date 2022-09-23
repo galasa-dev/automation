@@ -48,6 +48,8 @@ spec:
           params:
             - name: git-repository-name
             - name: git-pull-request-url
+            - name: git-statuses-url
+            - name: git-issue-url
             - name: git-pr-number
             - name: git-head-ref
             - name: git-base-ref

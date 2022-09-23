@@ -35,9 +35,9 @@ spec:
     - $(params.status)
     - --prUrl
     - $(params.prUrl)
-    - --pipelineRunName
-    - $(params.pipelineRunName)
     - --statusesUrl
     - $(params.statusesUrl)
     - --issueUrl
     - $(params.issueUrl)
+    - --pipelineRunName
+    - $(params.pipelineRunName)
