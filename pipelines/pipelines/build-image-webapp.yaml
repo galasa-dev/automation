@@ -62,8 +62,6 @@ spec:
       value: simplatform/galasa-simplatform-application
     - name: settingsPath
       value: simplatform/settings.xml
-    - name: dockerRepo
-      value: harbor-cicsk8s.hursley.ibm.com 
     - name: build-args
       value:  
         - "-Dgpg.skip=true"
@@ -83,7 +81,7 @@ spec:
     - maven-build-simplatform  
     params:
     - name: imageName
-      value: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-simplatform-application/simbank-webapp:$(params.distBranch)
+      value: harbor.galasa.dev/galasadev/simbank-webapp:$(params.distBranch)
     - name: context
       value: $(params.context) 
     - name: noPush
