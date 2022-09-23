@@ -12,6 +12,10 @@ spec:
     type: string
   - name: prUrl
     type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
   - name: pipelineRunName
     type: string
   steps:
@@ -33,3 +37,7 @@ spec:
     - $(params.prUrl)
     - --pipelineRunName
     - $(params.pipelineRunName)
+    - --statusesUrl
+    - $(params.statusesUrl)
+    - --issueUrl
+    - $(params.issueUrl)
