@@ -24,6 +24,7 @@ func main() {
 	statusesUrl := flag.String("statusesUrl", "", "URL of status to send update request to")
 	issueUrl := flag.String("issueUrl", "", "URL of the issue")
 	pipelineRunName := flag.String("pipelineRunName", "", "The name of the Pipeline Run triggered by PR")
+	flag.Parse()
 
 	pull := &types.Pull{
 		Url:       *prUrl,
@@ -31,34 +32,57 @@ func main() {
 		IssueUrl:  *issueUrl,
 	}
 
+	fmt.Println(pull)
+
 	if *status != "Succeeded" {
-		updateStatus("failure", "Build failed", *pull)
+		err := updateStatus("failure", "Build failed", *pull)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		failureUrl := fmt.Sprintf("https://tekton.galasa.dev/#/namespaces/galasa-pipelines/pipelineruns/%s", *pipelineRunName)
-		commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), *pull)
+		err = commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), *pull)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	} else {
-		updateStatus("success", "Build successful", *pull)
-		commentOnPr("Build successful", *pull)
+		err := updateStatus("success", "Build successful", *pull)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		err = commentOnPr("Build successful", *pull)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
 	// Github: failure, success, error
 }
 
-func updateStatus(status, message string, pr types.Pull) {
+func updateStatus(status, message string, pr types.Pull) error {
 	body := fmt.Sprintf("{\"state\":\"%s\", \"description\":\"%s\", \"context\":\"Tekton\"}", status, message)
 	req, _ := http.NewRequest("POST", pr.StatusUrl, strings.NewReader(body))
 	req.Header.Add("Accept", "application/vnd.github+json")
-	sendRequest(req)
+	_, err := sendRequest(req)
+	return err
 }
 
-func commentOnPr(message string, pr types.Pull) {
+func commentOnPr(message string, pr types.Pull) error {
 	body := fmt.Sprintf("{\"body\": \"%s\"}", message)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/comments", pr.IssueUrl), strings.NewReader(body))
-	sendRequest(req)
+	_, err := sendRequest(req)
+	return err
 }
 
 func sendRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	if resp.StatusCode == http.StatusAccepted {
 		return resp, err
 	}
