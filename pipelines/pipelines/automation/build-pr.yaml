@@ -92,6 +92,10 @@ spec:
        workspace: git-workspace
   finally:
   - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
     taskRef:
       name: git-status
     params:
