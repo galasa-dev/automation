@@ -96,7 +96,7 @@ spec:
       name: git-status
     params:
     - name: status
-      value: $(tasks.build-ghgverify-image.status)
+      value: $(tasks.status)
     - name: prUrl
       value: $(params.prUrl)
     - name: statusesUrl

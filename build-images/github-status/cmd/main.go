@@ -32,34 +32,30 @@ func main() {
 		IssueUrl:  *issueUrl,
 	}
 
-	fmt.Println(pull)
-
 	if *status != "Succeeded" {
 		err := updateStatus("failure", "Build failed", *pull)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("Error updating PR status: %s\n", err)
 			os.Exit(1)
 		}
 		failureUrl := fmt.Sprintf("https://tekton.galasa.dev/#/namespaces/galasa-pipelines/pipelineruns/%s", *pipelineRunName)
-		err = commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), *pull)
-		if err != nil {
-			fmt.Println(err)
+		err1 := commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), *pull)
+		if err1 != nil {
+			fmt.Println("Error commenting on PR: %s\n", err)
 			os.Exit(1)
 		}
 	} else {
 		err := updateStatus("success", "Build successful", *pull)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("Error updating PR status: %s\n", err)
 			os.Exit(1)
 		}
-		err = commentOnPr("Build successful", *pull)
-		if err != nil {
-			fmt.Println(err)
+		err1 := commentOnPr("Build successful", *pull)
+		if err1 != nil {
+			fmt.Println("Error commenting on PR: %s\n", err)
 			os.Exit(1)
 		}
 	}
-
-	// Github: failure, success, error
 }
 
 func updateStatus(status, message string, pr types.Pull) error {
