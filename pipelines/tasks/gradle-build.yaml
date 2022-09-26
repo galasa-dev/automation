@@ -13,10 +13,6 @@ spec:
   params:
   - name: context
     type: string
-  - name: baseRepo
-    type: string
-  - name: dockerRepo
-    type: string 
   - name: build-args
     type: array   
   - name: command
