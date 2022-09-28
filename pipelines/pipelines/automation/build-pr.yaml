@@ -86,7 +86,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghgstatus:latest
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace
