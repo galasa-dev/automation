@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+# 
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
@@ -35,6 +38,8 @@ spec:
           value: $(body.pull_request.issue_url)
         - name: git-head-ref
           value: $(body.pull_request.head.ref)
+        - name: git-head-sha
+          value: $(body.pull_request.head.sha)
         - name: git-base-ref
           value: $(body.pull_request.base.ref)
         - name: git-pr-number
@@ -52,6 +57,7 @@ spec:
             - name: git-issue-url
             - name: git-pr-number
             - name: git-head-ref
+            - name: git-head-sha
             - name: git-base-ref
             - name: git-userid
             - name: git-action
@@ -71,6 +77,8 @@ spec:
                 params:
                   - name: head-ref
                     value: $(tt.params.git-head-ref)
+                  - name: head-sha
+                    value: $(tt.params.git-head-sha)
                   - name: base-ref
                     value: $(tt.params.git-base-ref) 
                   - name: prUrl
