@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-wrapping
+  name: pr-managers
   namespace: galasa-pipelines
 spec:
   workspaces:
@@ -58,14 +58,14 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-wrapping
+  - name: clone-managers
     taskRef: 
       name: git-clone
     runAfter:
       - clone-automation
     params:
     - name: url
-      value: https://github.com/galasa-dev/wrapping
+      value: https://github.com/galasa-dev/managers
     - name: revision
       value: $(params.base-ref)
     - name: refspec
@@ -73,46 +73,45 @@ spec:
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/managers
     workspaces:
      - name: output
-       workspace: git-workspace  
-  - name: maven-build-wrapping
+       workspace: git-workspace
+  - name: gradle-build-managers
     taskRef:
-      name: maven-build
+      name: gradle-build
     runAfter:
-    - clone-wrapping
+    - clone-managers
     params:
     - name: context
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/managers/galasa-managers-parent
     - name: build-args
       value: 
-        - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
-        - "-Dgalasa.central.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-PsourceMaven=http://galasadev-cicsk8s.hursley.ibm.com/main/maven/extensions/"
+        - "-PcentralMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
     - name: command
-      value: deploy
+      value: publish
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: docker-build-wrapping
+  - name: docker-build-managers
     taskRef:
       name: docker-build
     runAfter:
-    - maven-build-wrapping
+    - gradle-build-managers
     params:
     - name: context
-      value: $(context.pipelineRun.name)/wrapping/docker
+      value: $(context.pipelineRun.name)/managers/docker
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/wrapping/wrapping-dockerfile
+      value: $(context.pipelineRun.name)/automation/dockerfiles/managers/managers-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.head-sha)
+      value: harbor.galasa.dev/galasadev/galasa-managers:$(params.head-sha)
     - name: noPush
       value: ""
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=baseVersion=latest"
+        - "--build-arg=branch=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -144,12 +143,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: git-clean-wrapping
+  - name: git-clean-managers
     taskRef: 
       name: git-clean
     params:
     - name: subdirectory
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/managers
     workspaces:
      - name: git-workspace
        workspace: git-workspace

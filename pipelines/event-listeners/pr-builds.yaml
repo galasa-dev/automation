@@ -70,6 +70,17 @@ spec:
                 pipelineRef:
                   name: pr-$(tt.params.git-repository-name)
                 serviceAccountName: build-bot
+                podTemplate:
+                  volumes:
+                  - name: gradle-properties
+                    secret:
+                      secretName: gradle-properties
+                  - name: gpgkey
+                    secret:
+                      secretName: gpgkey
+                  - name: mavengpg
+                    secret:
+                      secretName: mavengpg
                 workspaces:
                 - name: git-workspace
                   persistentVolumeClaim:
