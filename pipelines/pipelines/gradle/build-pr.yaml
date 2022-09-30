@@ -1,0 +1,159 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pr-gradle
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: head-ref
+    type: string
+  - name: head-sha
+    type: string
+  - name: base-ref
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: pr-number
+    type: string
+  - name: action
+    type: string
+  tasks:
+  - name: git-verify
+    taskRef:
+      name: git-verify
+    params:
+    - name: userId
+      value: $(params.userId)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: action
+      value: $(params.action)
+
+   - name: clone-automation
+    taskRef: 
+      name: git-clone
+    runAfter:
+      - git-verify
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+  - name: clone-gradle
+    taskRef: 
+      name: git-clone
+    runAfter:
+      - clone-automation
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/gradle
+    - name: revision
+      value: $(params.base-ref)
+    - name: refspec
+      value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/gradle
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+  - name: gradle-build-gradle
+    taskRef:
+      name: gradle-build
+    runAfter: 
+      - clone-gradle
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/gradle
+    - name: build-args
+      value:
+        - "-PsourceMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-PcentralMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+    - name: command
+      value: publish
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+
+  - name: docker-build-gradle
+    taskRef:
+      name: docker-build
+    runAfter: 
+      - gradle-build-gradle 
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/gradle/docker
+    - name: dockerfilePath
+      value: $(context.pipelineRun.name)/automation/dockerfiles/gradle/gradle-dockerfile 
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.head-sha)  
+    - name: noPush  
+      value: ""
+    - name: build-args
+        value:
+          - "--build-arg=dockerRepository=harbor.galasa.dev"
+          - "--build-arg=baseVersion=latest"
+      workspaces:
+      - name: git-workspace
+        workspace: git-workspace  
+
+  finally:
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
+    taskRef:
+      name: git-status
+    params:
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+  - name: git-clean-automation
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: git-clean-gradle
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
