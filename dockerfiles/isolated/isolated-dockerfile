@@ -1,0 +1,6 @@
+ARG dockerRepository
+ARG branch
+FROM ${dockerRepository}/galasadev/galasa-eclipse:${branch}
+
+COPY repo/ /usr/local/apache2/htdocs/
+COPY isolated.githash /usr/local/apache2/htdocs/isolated.githash

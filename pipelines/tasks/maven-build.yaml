@@ -12,14 +12,44 @@ spec:
     mountPath: /workspace/git
   params:
   - name: context
-    type: string
-  - name: settingsPath
-    type: string   
+    type: string 
   - name: build-args
     type: array    
   - name: command
     type: string  
   steps:
+  - name: gpgdirectory
+    workingDir: /workspace/git/$(params.context)
+    image: docker.io/library/busybox:latest
+    command:
+    - mkdir
+    - /workspace/git/$(params.context)/gpg
+  - name: import-gpg
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/common/gpg:latest
+    command:
+    - gpg
+    - --homedir
+    - /workspace/git/$(params.context)/gpg
+    - --pinentry-mode
+    - loopback
+    - --passphrase-file
+    - /root/mavengpg/galasa.passphrase
+    - --import
+    - /root/mavengpg/galasa.gpg
+    volumeMounts:
+    - name: mavengpg
+      mountPath: /root/mavengpg
+  - name: copy-settings
+    workingDir: /workspace/git/$(params.context)
+    image: docker.io/library/busybox:latest
+    command:
+    - cp
+    - /root/mavengpg/settings.xml
+    - /workspace/git/$(params.context)/gpg/settings.xml
+    volumeMounts:
+    - name: mavengpg
+      mountPath: /root/mavengpg 
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
     image: docker.io/library/maven:3-openjdk-11 
@@ -28,7 +58,7 @@ spec:
     args:
       - $(params.build-args[*])
       - --settings
-      - /workspace/git/$(params.settingsPath)
+      - /workspace/git/$(params.context)/gpg/settings.xml
       - --batch-mode
       - --errors
       - --fail-at-end

@@ -20,6 +20,9 @@ spec:
     default: "--no-push"
   - name: dockerfilePath
     type: string
+  - name: build-args
+    type: array
+    default: [""]
   steps:
   - name: docker-build
     workingDir: /workspace/git/$(params.context)
@@ -36,3 +39,4 @@ spec:
     - --single-snapshot
     - --verbosity=info
     - $(params.noPush)
+    - $(params.build-args[*])
