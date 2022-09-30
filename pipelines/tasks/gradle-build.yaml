@@ -16,7 +16,7 @@ spec:
   - name: build-args
     type: array   
   - name: command
-    type: string   
+    type: string
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
@@ -30,11 +30,11 @@ spec:
       - $(params.build-args[*])
       - $(params.command)
     volumeMounts:
-    - mountPath: /opt/gradle/gradle-6.8.2/galasa.gpg
-      name: gpgkey
+    - name: gpgkey
+      mountPath: /opt/gradle/gradle-6.8.2/galasa.gpg
       subPath: galasa.gpg
-    - mountPath: /opt/gradle/gradle-6.8.2/gradle.properties
-      name: gpggradle
+    - name: gradle-properties
+      mountPath: /opt/gradle/gradle-6.8.2/gradle.properties
       subPath: gradle.properties
 
     
