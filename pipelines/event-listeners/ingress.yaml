@@ -32,3 +32,13 @@ spec:
               number: 8080
         path: /pr-review
         pathType: Prefix
+  - host: triggers.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: el-github-main-builder-listener
+            port:
+              number: 8080
+        path: /main
+        pathType: Prefix
