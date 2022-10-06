@@ -52,7 +52,7 @@ spec:
       mountPath: /root/mavengpg 
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
-    image: docker.io/library/maven:3-openjdk-11 
+    image: docker.io/library/maven:3.8.6-openjdk-11 
     command:
       - mvn
     args:
