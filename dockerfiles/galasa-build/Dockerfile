@@ -67,22 +67,22 @@ ENV PATH=$PATH:/opt/node/node-v12.21.0-linux-x64/bin
 # Install angular cli
 RUN npm install -g @angular/cli@9.1.12
 
-# Installing kubectl
-RUN mkdir -p /opt/k8s/bin
-RUN curl -L https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl -o /opt/k8s/bin/kubectl
-RUN chmod +x /opt/k8s/bin/kubectl
-ENV PATH=$PATH:/opt/k8s/bin
+# # Installing kubectl
+# RUN mkdir -p /opt/k8s/bin
+# RUN curl -L https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl -o /opt/k8s/bin/kubectl
+# RUN chmod +x /opt/k8s/bin/kubectl
+# ENV PATH=$PATH:/opt/k8s/bin
 
-RUN mkdir -p /opt/maven/preload
-COPY pom.xml /opt/maven/preload
-WORKDIR /opt/maven/preload
-RUN mvn -B deploy && rm -rf /opt/maven/preload/target && rm -rf /opt/maven/preload/repo && rm -rf /root/.m2/repository/dev/galasa
+# RUN mkdir -p /opt/maven/preload
+# COPY pom.xml /opt/maven/preload
+# WORKDIR /opt/maven/preload
+# RUN mvn -B deploy && rm -rf /opt/maven/preload/target && rm -rf /opt/maven/preload/repo && rm -rf /root/.m2/repository/dev/galasa
 
-# Installing galasabld
-RUN mkdir -p /opt/galasa/bin
-COPY galasabld-linux-amd64 /opt/galasa/bin/galasabld
-RUN chmod +x /opt/galasa/bin/galasabld
-ENV PATH=$PATH:/opt/galasa/bin
+# # Installing galasabld
+# RUN mkdir -p /opt/galasa/bin
+# COPY galasabld-linux-amd64 /opt/galasa/bin/galasabld
+# RUN chmod +x /opt/galasa/bin/galasabld
+# ENV PATH=$PATH:/opt/galasa/bin
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
