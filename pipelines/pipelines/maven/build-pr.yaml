@@ -10,17 +10,23 @@ spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: userId
-    type: string
-  - name: prUrl
-    type: string
-  - name: action
-    type: string
   - name: head-ref
+    type: string
+  - name: head-sha
     type: string
   - name: base-ref
     type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
   - name: pr-number
+    type: string
+  - name: action
     type: string
   tasks:
   - name: git-verify
