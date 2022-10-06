@@ -1,0 +1,50 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: main-wrapping
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: head-ref
+    type: string
+  - name: head-sha
+    type: string
+  - name: base-ref
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: pr-number
+    type: string
+  - name: action
+    type: string
+  - name: merged-status
+    type: string
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
