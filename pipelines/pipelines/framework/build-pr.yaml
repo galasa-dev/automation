@@ -40,7 +40,7 @@ spec:
     - name: action
       value: $(params.action)
 
-   - name: clone-automation
+  - name: clone-automation
     taskRef: 
       name: git-clone
     runAfter:
@@ -90,7 +90,7 @@ spec:
       value: $(context.pipelineRun.name)/framework/galasa-parent
     - name: build-args
       value:
-        - "-PsourceMaven=http://galasadev-cicsk8s.hursley.ibm.com/$(params.distBranch)/maven/maven"
+        - "-PsourceMaven=http://galasadev-cicsk8s.hursley.ibm.com/main/maven/maven"
         - "-PcentralMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"  
     - name: command
       value: publish
@@ -102,7 +102,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter: 
-    - build-framework-repo  
+    - gradle-build-framework
     params:
     - name: context
       value: $(context.pipelineRun.name)/framework/docker
