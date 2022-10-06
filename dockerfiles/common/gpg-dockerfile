@@ -5,3 +5,13 @@ RUN apt-get update && apt-get install -y unzip \
     apt-get install ca-certificates \ 
     curl \
     gpg && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install ca-certificates    
+
+RUN mkdir /certs
+COPY ibmca.pem /certs
+COPY ibminter.pem /certs
+
+RUN  cat /certs/ibmca.pem >> /etc/ssl/certs/ca-certificates.crt
+RUN  cat /certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
+
+RUN update-ca-certificates
