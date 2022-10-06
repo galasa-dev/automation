@@ -35,37 +35,37 @@ RUN keytool -import -trustcacerts -alias ibminter -file /usr/local/java/ibminter
 RUN  cat /usr/local/java/ibmca.pem >> /etc/ssl/certs/ca-certificates.crt
 RUN  cat /usr/local/java/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
 
-RUN java -version
+# RUN java -version
 
-# Installing maven
-RUN mkdir /opt/maven
-RUN curl -L https://downloads.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -o /opt/maven/apache-maven-3.8.6-bin.tar.gz && tar -zxvf /opt/maven/apache-maven-3.8.6-bin.tar.gz -C /opt/maven/ && rm /opt/maven/apache-maven-3.8.6-bin.tar.gz
-ENV PATH=$PATH:/opt/maven/apache-maven-3.8.6/bin
+# # Installing maven
+# RUN mkdir /opt/maven
+# RUN curl -L https://downloads.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -o /opt/maven/apache-maven-3.8.6-bin.tar.gz && tar -zxvf /opt/maven/apache-maven-3.8.6-bin.tar.gz -C /opt/maven/ && rm /opt/maven/apache-maven-3.8.6-bin.tar.gz
+# ENV PATH=$PATH:/opt/maven/apache-maven-3.8.6/bin
 
-RUN mvn -v
+# RUN mvn -v
 
-# Installing Github CLI
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-RUN apt update && apt install -y git \
-    gh && apt-get clean && rm -rf /var/lib/apt/lists/*
+# # Installing Github CLI
+# RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+# RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+# RUN apt update && apt install -y git \
+#     gh && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Installing 6.8.2 version of gradle
-RUN mkdir /opt/gradle
-RUN curl -L https://services.gradle.org/distributions/gradle-6.8.2-bin.zip -o /tmp/gradle-6.8.2-bin.zip && unzip -d /opt/gradle /tmp/gradle-6.8.2-bin.zip && rm /tmp/gradle-6.8.2-bin.zip
-ENV PATH=$PATH:/opt/gradle/gradle-6.8.2/bin
+# # Installing 6.8.2 version of gradle
+# RUN mkdir /opt/gradle
+# RUN curl -L https://services.gradle.org/distributions/gradle-6.8.2-bin.zip -o /tmp/gradle-6.8.2-bin.zip && unzip -d /opt/gradle /tmp/gradle-6.8.2-bin.zip && rm /tmp/gradle-6.8.2-bin.zip
+# ENV PATH=$PATH:/opt/gradle/gradle-6.8.2/bin
 
-# Retrieving the openapi jar
-RUN mkdir /opt/openapi
-RUN curl -L https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.0.1/openapi-generator-cli-6.0.1.jar -o /opt/openapi/openapi-generator-cli.jar
+# # Retrieving the openapi jar
+# RUN mkdir /opt/openapi
+# RUN curl -L https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.0.1/openapi-generator-cli-6.0.1.jar -o /opt/openapi/openapi-generator-cli.jar
 
-# Installing node and npm
-RUN mkdir /opt/node
-RUN curl -L https://nodejs.org/dist/v12.21.0/node-v12.21.0-linux-x64.tar.xz -o /opt/node/node-v12.21.0-linux-x64.tar.xz && tar xf /opt/node/node-v12.21.0-linux-x64.tar.xz -C /opt/node/ && rm /opt/node/node-v12.21.0-linux-x64.tar.xz
-ENV PATH=$PATH:/opt/node/node-v12.21.0-linux-x64/bin
+# # Installing node and npm
+# RUN mkdir /opt/node
+# RUN curl -L https://nodejs.org/dist/v12.21.0/node-v12.21.0-linux-x64.tar.xz -o /opt/node/node-v12.21.0-linux-x64.tar.xz && tar xf /opt/node/node-v12.21.0-linux-x64.tar.xz -C /opt/node/ && rm /opt/node/node-v12.21.0-linux-x64.tar.xz
+# ENV PATH=$PATH:/opt/node/node-v12.21.0-linux-x64/bin
 
-# Install angular cli
-RUN npm install -g @angular/cli@9.1.12
+# # Install angular cli
+# RUN npm install -g @angular/cli@9.1.12
 
 # # Installing kubectl
 # RUN mkdir -p /opt/k8s/bin
@@ -84,5 +84,5 @@ RUN npm install -g @angular/cli@9.1.12
 # RUN chmod +x /opt/galasa/bin/galasabld
 # ENV PATH=$PATH:/opt/galasa/bin
 
-RUN mkdir -p /workspace
-WORKDIR /workspace
+# RUN mkdir -p /workspace
+# WORKDIR /workspace
