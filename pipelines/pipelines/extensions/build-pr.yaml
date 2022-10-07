@@ -88,7 +88,7 @@ spec:
     - name: build-args
       value: 
         - "-PsourceMaven=http://galasadev-cicsk8s.hursley.ibm.com/main/maven/framework/"
-        - "-PcentralMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/"JADEJADEJADE
     - name: command
       value: publish

@@ -90,8 +90,8 @@ spec:
       value: $(context.pipelineRun.name)/gradle
     - name: build-args
       value:
-        - "-PsourceMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
-        - "-PcentralMaven=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
     - name: command
       value: publish
     workspaces:
