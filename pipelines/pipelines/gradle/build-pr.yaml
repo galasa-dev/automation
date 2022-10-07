@@ -98,16 +98,32 @@ spec:
      - name: git-workspace
        workspace: git-workspace  
 
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - maven-build-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: wrapping
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
   - name: docker-build-gradle
     taskRef:
       name: docker-build
     runAfter: 
-      - gradle-build-gradle 
+      - get-commit
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/gradle/docker
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/gradle/gradle-dockerfile 
+      value: automation/dockerfiles/gradle/gradle-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.head-sha)  
     - name: noPush  
@@ -115,7 +131,7 @@ spec:
     - name: build-args
         value:
           - "--build-arg=dockerRepository=harbor.galasa.dev"
-          - "--build-arg=baseVersion=latest"
+          - "--build-arg=tag=5adcc4abebb2beaacd0f5c2459f3687fd82fc902"
       workspaces:
       - name: git-workspace
         workspace: git-workspace  
