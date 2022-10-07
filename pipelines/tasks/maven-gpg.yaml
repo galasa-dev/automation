@@ -1,0 +1,48 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: maven-build
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string  
+  steps:
+  - name: gpgdirectory
+    workingDir: /workspace/git/$(params.context)
+    image: docker.io/library/busybox:latest
+    command:
+    - mkdir
+    - /workspace/git/$(params.context)/gpg
+  - name: import-gpg
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/common/gpg:latest
+    command:
+    - gpg
+    - --homedir
+    - /workspace/git/$(params.context)/gpg
+    - --pinentry-mode
+    - loopback
+    - --passphrase-file
+    - /root/mavengpg/galasa.passphrase
+    - --import
+    - /root/mavengpg/galasa.gpg
+    volumeMounts:
+    - name: mavengpg
+      mountPath: /root/mavengpg
+  - name: copy-settings
+    workingDir: /workspace/git/$(params.context)
+    image: docker.io/library/busybox:latest
+    command:
+    - cp
+    - /root/mavengpg/settings.xml
+    - /workspace/git/$(params.context)/gpg/settings.xml
+    volumeMounts:
+    - name: mavengpg
+      mountPath: /root/mavengpg 
