@@ -95,11 +95,24 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - maven-build-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: wrapping
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: docker-build-wrapping
     taskRef:
       name: docker-build
     runAfter:
-    - maven-build-wrapping
+    - get-commit
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
