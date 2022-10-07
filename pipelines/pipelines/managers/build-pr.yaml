@@ -62,7 +62,7 @@ spec:
     taskRef: 
       name: git-clone
     runAfter:
-      - clone-automation
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/managers
@@ -84,26 +84,42 @@ spec:
     - clone-managers
     params:
     - name: context
-      value: $(context.pipelineRun.name)/managers/galasa-managers-parent
+      value: $(context.pipelineRun.name)/managers
     - name: build-args
       value: 
-        - "-PsourceMaven=http://galasadev-cicsk8s.hursley.ibm.com/main/maven/extensions/"
+        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
     - name: command
-      value: publish
+      value: build
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-gradle
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
   - name: docker-build-managers
     taskRef:
       name: docker-build
     runAfter:
+    - get-commit
     - gradle-build-managers
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/managers/docker
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/managers/managers-dockerfile
+      value: automation/dockerfiles/managers/managers-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-managers:$(params.head-sha)
     - name: noPush
@@ -111,7 +127,7 @@ spec:
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=main"
+        - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace

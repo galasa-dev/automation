@@ -1,6 +1,6 @@
 ARG dockerRepository
-ARG branch
-FROM ${dockerRepository}/galasadev/galasa-extensions:${branch}
+ARG tag
+FROM ${dockerRepository}/galasadev/galasa-extensions:${tag}
 
 COPY repo/ /usr/local/apache2/htdocs/
 COPY managers.githash /usr/local/apache2/htdocs/managers.githash

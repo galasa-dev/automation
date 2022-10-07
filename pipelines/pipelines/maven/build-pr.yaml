@@ -39,7 +39,6 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
-
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -59,12 +58,11 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
   - name: clone-maven
     taskRef: 
       name: git-clone
     runAfter:
-      - clone-automation
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/maven
@@ -79,7 +77,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
   - name: maven-build-maven
     taskRef:
       name: maven-build
@@ -94,21 +91,36 @@ spec:
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
     - name: command
-      value: deploy
+      value: install
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: wrapping
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
   - name: docker-build-maven
     taskRef:
       name: docker-build
     runAfter: 
+      - get-commit
       - maven-build-maven  
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/maven/docker
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/maven/maven-dockerfile 
+      value: automation/dockerfiles/maven/maven-dockerfile 
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-maven:$(params.head-sha)  
     - name: noPush  
@@ -116,11 +128,10 @@ spec:
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=main"
+        - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   finally:
   - name: git-status
     when:
