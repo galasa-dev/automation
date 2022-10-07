@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: maven-build
+  name: maven-gpg
   namespace: galasa-pipelines
 spec:
   workspaces:
