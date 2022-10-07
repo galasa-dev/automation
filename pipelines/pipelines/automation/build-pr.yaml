@@ -79,10 +79,12 @@ spec:
     runAfter:
     - git-clone
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-status
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/common/ghgstatus-dockerfile
+      value: automation/dockerfiles/common/ghgstatus-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/ghgstatus:latest
     - name: noPush

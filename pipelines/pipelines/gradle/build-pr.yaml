@@ -39,8 +39,7 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
-
-   - name: clone-automation
+  - name: clone-automation
     taskRef: 
       name: git-clone
     runAfter:
@@ -59,12 +58,11 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
   - name: clone-gradle
     taskRef: 
       name: git-clone
     runAfter:
-      - clone-automation
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/gradle
@@ -79,7 +77,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
   - name: gradle-build-gradle
     taskRef:
       name: gradle-build
@@ -93,30 +90,29 @@ spec:
         - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
     - name: command
-      value: publish
+      value: build
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - maven-build-wrapping
+    - clone-gradle
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: wrapping
+      value: gradle
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: docker-build-gradle
     taskRef:
       name: docker-build
     runAfter: 
       - get-commit
+      - gradle-build-gradle
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -129,13 +125,12 @@ spec:
     - name: noPush  
       value: ""
     - name: build-args
-        value:
-          - "--build-arg=dockerRepository=harbor.galasa.dev"
-          - "--build-arg=tag=5adcc4abebb2beaacd0f5c2459f3687fd82fc902"
-      workspaces:
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=tag=5adcc4abebb2beaacd0f5c2459f3687fd82fc902"
+    workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
   finally:
   - name: git-status
     when:

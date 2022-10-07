@@ -62,7 +62,7 @@ spec:
     taskRef: 
       name: git-clone
     runAfter:
-      - clone-automation
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/wrapping
@@ -99,7 +99,7 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - maven-build-wrapping
+    - clone-wrapping
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -113,6 +113,7 @@ spec:
       name: docker-build
     runAfter:
     - get-commit
+    - maven-build-wrapping
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
