@@ -2,5 +2,5 @@ ARG dockerRepository
 ARG tag
 FROM ${dockerRepository}/galasadev/galasa-managers:${tag}
 
-COPY repo/ /usr/local/apache2/htdocs/
+COPY ./ /usr/local/apache2/htdocs/
 COPY obr.githash /usr/local/apache2/htdocs/obr.githash
