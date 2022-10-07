@@ -28,27 +28,17 @@ spec:
   steps:
   - name: docker-build
     workingDir: /workspace/git/$(params.pipelineRunName)
-    image: docker.io/library/busybox:latest
+    image: harbor.galasa.dev/common/kaniko-executor:latest
     env:
     - name: DOCKER_CONFIG
       value: /root/.docker
     command:
-    - pwd
-  - name: print
-    workingDir: /workspace/git/$(params.pipelineRunName)
-    image: docker.io/library/busybox:latest
-    env:
-    - name: DOCKER_CONFIG
-      value: /root/.docker
-    command:
-    - cat
-    - ./automation/dockerfiles/wrapping/wrapping-dockerfile
-    # - /kaniko/executor
-    # - --dockerfile=./$(params.dockerfilePath)
-    # - --context=/workspace/git/$(params.context)
-    # - --destination=$(params.imageName)
-    # - --oci-layout-path=/workspace/git/$(params.context)/image-digest
-    # - --single-snapshot
-    # - --verbosity=info
-    # - $(params.noPush)
-    # - $(params.build-args[*])
+    - /kaniko/executor
+    - --dockerfile=./$(params.dockerfilePath)
+    - --context=/workspace/git/$(params.context)
+    - --destination=$(params.imageName)
+    - --oci-layout-path=/workspace/git/$(params.context)/image-digest
+    - --single-snapshot
+    - --verbosity=info
+    - $(params.noPush)
+    - $(params.build-args[*])
