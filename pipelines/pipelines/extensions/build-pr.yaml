@@ -62,7 +62,7 @@ spec:
     taskRef: 
       name: git-clone
     runAfter:
-      - clone-automation
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/extensions
@@ -84,27 +84,42 @@ spec:
     - clone-extensions
     params:
     - name: context
-      value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
+      value: $(context.pipelineRun.name)/extensions
     - name: build-args
       value: 
-        - "-PsourceMaven=http://galasadev-cicsk8s.hursley.ibm.com/main/maven/framework/"
+        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/"JADEJADEJADE
     - name: command
-      value: publish
+      value: build
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-gradle
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
   - name: docker-build-extensions
     taskRef:
       name: docker-build
     runAfter:
+    - get-commit
     - gradle-build-extensions
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/extensions/docker
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/extensions/extensions-dockerfile
+      value: automation/dockerfiles/extensions/extensions-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-extensions:$(params.head-sha)
     - name: noPush
@@ -112,7 +127,7 @@ spec:
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=main"
+        - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
