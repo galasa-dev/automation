@@ -11,6 +11,8 @@ spec:
   - name: git-workspace
     mountPath: /workspace/git
   params:
+  - name: pipelineRunName
+    type: string
   - name: imageName
     type: string
   - name: context
@@ -25,18 +27,28 @@ spec:
     default: [""]
   steps:
   - name: docker-build
-    workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/kaniko-executor:latest
+    workingDir: /workspace/git/$(params.pipelineRunName)
+    image: docker.io/library/busybox:latest
     env:
     - name: DOCKER_CONFIG
       value: /root/.docker
     command:
-    - /kaniko/executor
-    - --dockerfile=/workspace/git/$(params.dockerfilePath)
-    - --context=/workspace/git/$(params.context)
-    - --destination=$(params.imageName)
-    - --oci-layout-path=/workspace/git/$(params.context)/image-digest
-    - --single-snapshot
-    - --verbosity=info
-    - $(params.noPush)
-    - $(params.build-args[*])
+    - pwd
+  - name: print
+    workingDir: /workspace/git/$(params.pipelineRunName)
+    image: docker.io/library/busybox:latest
+    env:
+    - name: DOCKER_CONFIG
+      value: /root/.docker
+    command:
+    - cat
+    - ./automation/dockerfiles/wrapping/wrapping-dockerfile
+    # - /kaniko/executor
+    # - --dockerfile=./$(params.dockerfilePath)
+    # - --context=/workspace/git/$(params.context)
+    # - --destination=$(params.imageName)
+    # - --oci-layout-path=/workspace/git/$(params.context)/image-digest
+    # - --single-snapshot
+    # - --verbosity=info
+    # - $(params.noPush)
+    # - $(params.build-args[*])

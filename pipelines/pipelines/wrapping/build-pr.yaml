@@ -88,10 +88,10 @@ spec:
     - name: build-args
       value: 
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
-        - "-Dgalasa.central.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
     - name: command
-      value: deploy
+      value: install
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -101,10 +101,12 @@ spec:
     runAfter:
     - maven-build-wrapping
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/wrapping/docker
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/wrapping/wrapping-dockerfile
+      value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.head-sha)
     - name: noPush

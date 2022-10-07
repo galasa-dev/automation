@@ -91,8 +91,8 @@ spec:
     - name: build-args
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
-        - "-Dgalasa.central.repo=https://artifactory-cicsk8s.hursley.ibm.com/artifactory/maven-proxy/"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
     - name: command
       value: deploy
     workspaces:
