@@ -91,7 +91,9 @@ spec:
       value: harbor.galasa.dev/common/ghgstatus:latest
     - name: noPush
       value: --no-push
-
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: build-gpg-image
     taskRef:
       name: docker-build
@@ -108,7 +110,9 @@ spec:
       value: harbor.galasa.dev/common/gpg:latest
     - name: noPush
       value: --no-push
-
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: build-kubectl-image
     taskRef:
       name: docker-build
