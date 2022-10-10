@@ -86,6 +86,9 @@ spec:
     params:
     - name: context 
       value: $(context.pipelineRun.name)/wrapping
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   - name: maven-build-wrapping
     taskRef:
