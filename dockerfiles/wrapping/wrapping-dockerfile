@@ -3,5 +3,5 @@ ARG dockerRepository
 FROM ${dockerRepository}/galasadev/galasa-base:${baseVersion}
 
 
-COPY ./ /usr/local/apache2/htdocs/
+COPY repo/ /usr/local/apache2/htdocs/
 COPY wrapping.githash /usr/local/apache2/htdocs/wrapping.githash
