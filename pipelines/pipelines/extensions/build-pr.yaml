@@ -84,7 +84,7 @@ spec:
     - clone-extensions
     params:
     - name: context
-      value: $(context.pipelineRun.name)/extensions
+      value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
     - name: build-args
       value: 
         - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
@@ -98,12 +98,12 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-gradle
+    - clone-extensions
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: gradle
+      value: extensions
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
