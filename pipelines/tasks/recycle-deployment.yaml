@@ -1,0 +1,38 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: recycle-deployment
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: namespace
+    type: string
+  - name: deployment
+    type: string
+  steps:
+  - name: start-recycle
+    image: harbor.galasa.dev/
+    command:
+    - kubectl
+    - -n
+    - $(params.namespace)
+    - rollout
+    - restart
+    - deployment/$(params.deployment)
+  - name: wait-recycle
+    image: harbor.galasa.dev/
+    command:
+    - kubectl
+    - -n
+    - $(params.namespace)
+    - rollout
+    - status
+    - deployment/$(params.deployment)
+    - -w
+    - --timeout=3m
