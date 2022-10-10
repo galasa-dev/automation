@@ -12,9 +12,7 @@ spec:
     mountPath: /workspace/git
   params:
   - name: context
-    type: string
-  - name: settingsPath
-    type: string   
+    type: string 
   - name: build-args
     type: array    
   - name: command
@@ -22,13 +20,13 @@ spec:
   steps:
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
-    image: docker.io/library/maven:3-openjdk-11 
+    image: docker.io/library/maven:3.8.6-openjdk-11 
     command:
       - mvn
     args:
       - $(params.build-args[*])
       - --settings
-      - /workspace/git/$(params.settingsPath)
+      - /workspace/git/$(params.context)/gpg/settings.xml
       - --batch-mode
       - --errors
       - --fail-at-end
