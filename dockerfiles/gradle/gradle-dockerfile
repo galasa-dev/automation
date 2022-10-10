@@ -2,5 +2,5 @@ ARG tag
 ARG dockerRepository
 FROM ${dockerRepository}/galasadev/galasa-wrapping:${tag}
 
-COPY ./ /usr/local/apache2/htdocs/
+COPY repo/ /usr/local/apache2/htdocs/
 COPY gradle.githash /usr/local/apache2/htdocs/gradle.githash

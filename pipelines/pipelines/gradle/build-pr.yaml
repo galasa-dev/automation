@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-wrapping
+  name: pr-gradle
   namespace: galasa-pipelines
 spec:
   workspaces:
@@ -58,14 +58,14 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-wrapping
+  - name: clone-gradle
     taskRef: 
       name: git-clone
     runAfter:
       - git-verify
     params:
     - name: url
-      value: https://github.com/galasa-dev/wrapping
+      value: https://github.com/galasa-dev/gradle
     - name: revision
       value: $(params.base-ref)
     - name: refspec
@@ -73,79 +73,64 @@ spec:
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/gradle
     workspaces:
      - name: output
-       workspace: git-workspace  
-
-  - name: maven-gpg
-    taskRef:
-      name: maven-gpg
-    runAfter:
-    - clone-wrapping 
-    params:
-    - name: context 
-      value: $(context.pipelineRun.name)/wrapping
-    workspaces:
-     - name: git-workspace
        workspace: git-workspace
-
-  - name: maven-build-wrapping
+  - name: gradle-build-gradle
     taskRef:
-      name: maven-build
-    runAfter:
-    - maven-gpg
+      name: gradle-build
+    runAfter: 
+      - clone-gradle
     params:
     - name: context
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/gradle
     - name: build-args
-      value: 
-        - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
+      value:
+        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
     - name: command
-      value: deploy
+      value: build
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
+       workspace: git-workspace  
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - clone-wrapping
+    - clone-gradle
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: wrapping
+      value: gradle
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: docker-build-wrapping
+  - name: docker-build-gradle
     taskRef:
       name: docker-build
-    runAfter:
-    - get-commit
-    - maven-build-wrapping
+    runAfter: 
+      - get-commit
+      - gradle-build-gradle
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/gradle/docker
     - name: dockerfilePath
-      value: automation/dockerfiles/wrapping/wrapping-dockerfile
+      value: automation/dockerfiles/gradle/gradle-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.head-sha)
-    - name: noPush
+      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.head-sha)  
+    - name: noPush  
       value: --no-push
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=baseVersion=latest"
+        - "--build-arg=tag=5adcc4abebb2beaacd0f5c2459f3687fd82fc902"
     workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+      - name: git-workspace
+        workspace: git-workspace  
   finally:
   - name: git-status
     when:
@@ -174,12 +159,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: git-clean-wrapping
+  - name: git-clean-gradle
     taskRef: 
       name: git-clean
     params:
     - name: subdirectory
-      value: $(context.pipelineRun.name)/wrapping
+      value: $(context.pipelineRun.name)/gradle
     workspaces:
      - name: git-workspace
        workspace: git-workspace
