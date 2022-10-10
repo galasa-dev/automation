@@ -62,6 +62,8 @@ spec:
     runAfter:
     - git-clone
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: dockerfilePath

@@ -77,14 +77,25 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-maven 
+    params:
+    - name: context 
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: maven-build-maven
     taskRef:
       name: maven-build
     runAfter: 
-      - clone-maven
+      - maven-gpg
     params:
     - name: context
-      value: $(context.pipelineRun.name)/maven
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
     - name: build-args
       value:
         - "-Dgpg.skip=true"
@@ -99,12 +110,12 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-wrapping
+    - clone-maven
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: wrapping
+      value: maven
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
@@ -124,7 +135,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-maven:$(params.head-sha)  
     - name: noPush  
-      value: ""
+      value: --no-push
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"

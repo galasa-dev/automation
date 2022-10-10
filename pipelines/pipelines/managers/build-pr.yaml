@@ -84,7 +84,7 @@ spec:
     - clone-managers
     params:
     - name: context
-      value: $(context.pipelineRun.name)/managers
+      value: $(context.pipelineRun.name)/managers/galasa-managers-parent
     - name: build-args
       value: 
         - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
@@ -98,12 +98,12 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-gradle
+    - clone-managers
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: gradle
+      value: managers
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
