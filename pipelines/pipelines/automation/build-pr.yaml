@@ -67,7 +67,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/common/ghgverify-dockerfile
+      value: automation/dockerfiles/common/ghgverify-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/ghgverify:latest
     - name: noPush
