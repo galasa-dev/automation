@@ -23,5 +23,5 @@ spec:
       #!/bin/sh
       set +e
       COMMIT="$(git log --format="%H" -n 1)"
-      echo $COMMIT > /workspace/git/$(params.pipelineRunName)/$(params.repo)/docker/$(params.repo).githash
+      echo $COMMIT > /workspace/git/$(params.pipelineRunName)/$(params.repo)/$(params.repo).githash
       echo commit is $COMMIT
