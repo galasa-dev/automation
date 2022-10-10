@@ -91,6 +91,40 @@ spec:
       value: harbor.galasa.dev/common/ghgstatus:latest
     - name: noPush
       value: --no-push
+
+  - name: build-gpg-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - git-clone
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/gpg-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/gpg:latest
+    - name: noPush
+      value: --no-push
+
+  - name: build-kubectl-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - git-clone
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/kubectl-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/kubectl:latest
+    - name: noPush
+      value: ""
     workspaces:
      - name: git-workspace
        workspace: git-workspace
