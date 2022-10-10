@@ -20,50 +20,23 @@ spec:
               secretName: github-token
               secretKey: token
           - name: "eventTypes"
-            value: ["pull_request"]
+            value: ["push"]
         - name: "CEL filter: only when PRs are merged"
           ref:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.pull_request.merged in ['true']"
+            value: "body.ref in ['refs/heads/main']"
       bindings:
         - name: git-repository-name
-          value: $(body.pull_request.head.repo.name)
-        - name: git-pull-request-url
-          value: $(body.pull_request.url)
-        - name: git-statuses-url
-          value: $(body.pull_request.statuses_url)
-        - name: git-issue-url
-          value: $(body.pull_request.issue_url)
-        - name: git-head-ref
-          value: $(body.pull_request.head.ref)
-        - name: git-head-sha
-          value: $(body.pull_request.head.sha)
-        - name: git-base-ref
-          value: $(body.pull_request.base.ref)
-        - name: git-pr-number
-          value: $(body.number)
-        - name: git-userid
-          value: $(body.pull_request.user.id)
-        - name: git-action
-          value: $(body.action)
-        - name: git-merged-status
-          value: $(body.pull_request.merged)  
+          value: $(body.repository.name)
+        - name: git-after-commit-sha
+          value: $(body.after) 
       template:
         spec:
           params:
             - name: git-repository-name
-            - name: git-pull-request-url
-            - name: git-statuses-url
-            - name: git-issue-url
-            - name: git-pr-number
-            - name: git-head-ref
-            - name: git-head-sha
-            - name: git-base-ref
-            - name: git-userid
-            - name: git-action
-            - name: git-merged-status
+            - name: git-after-commit-sha
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
@@ -78,23 +51,5 @@ spec:
                   persistentVolumeClaim:
                     claimName: tekton-build-workspace-pvc
                 params:
-                  - name: head-ref
-                    value: $(tt.params.git-head-ref)
-                  - name: head-sha
-                    value: $(tt.params.git-head-sha)
-                  - name: base-ref
-                    value: $(tt.params.git-base-ref) 
-                  - name: prUrl
-                    value: $(tt.params.git-pull-request-url)
-                  - name: statusesUrl
-                    value: $(tt.params.git-statuses-url)
-                  - name: issueUrl
-                    value: $(tt.params.git-issue-url)
-                  - name: userId
-                    value: $(tt.params.git-userid)
-                  - name: pr-number
-                    value: $(tt.params.git-pr-number)
-                  - name: action
-                    value: $(tt.params.git-action)
-                  - name: merged-status
-                    value: $(tt.params.git-merged-status)  
+                  - name: commit-sha
+                    value: $(tt.params.git-after-commit-sha)
