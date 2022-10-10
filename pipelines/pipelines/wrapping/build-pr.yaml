@@ -100,8 +100,9 @@ spec:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
     - name: command
-      value: install
+      value: deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -128,7 +129,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/wrapping/docker
+      value: $(context.pipelineRun.name)/wrapping
     - name: dockerfilePath
       value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
