@@ -4,7 +4,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: github-pr-builder-listener
+  name: github-main-builder-listener
   namespace: galasa-pipelines
 spec:
   serviceAccountName: tekton-trigger
@@ -21,12 +21,12 @@ spec:
               secretKey: token
           - name: "eventTypes"
             value: ["pull_request"]
-        - name: "CEL filter: only when PRs are opened"
+        - name: "CEL filter: only when PRs are merged"
           ref:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.action in ['opened', 'reopened', 'synchronize']"
+            value: "body.pull_request.merged in ['true']"
       bindings:
         - name: git-repository-name
           value: $(body.pull_request.head.repo.name)
@@ -48,6 +48,8 @@ spec:
           value: $(body.pull_request.user.id)
         - name: git-action
           value: $(body.action)
+        - name: git-merged-status
+          value: $(body.pull_request.merged)  
       template:
         spec:
           params:
@@ -61,26 +63,16 @@ spec:
             - name: git-base-ref
             - name: git-userid
             - name: git-action
+            - name: git-merged-status
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
               metadata:
-                generateName: repo-$(tt.params.git-repository-name)-pr-$(tt.params.git-pr-number)-
+                generateName: repo-$(tt.params.git-repository-name)-main-
               spec:
                 pipelineRef:
-                  name: pr-$(tt.params.git-repository-name)
+                  name: main-$(tt.params.git-repository-name)
                 serviceAccountName: build-bot
-                podTemplate:
-                  volumes:
-                  - name: gradle-properties
-                    secret:
-                      secretName: gradle-properties
-                  - name: gpgkey
-                    secret:
-                      secretName: gpgkey
-                  - name: mavengpg
-                    secret:
-                      secretName: mavengpg
                 workspaces:
                 - name: git-workspace
                   persistentVolumeClaim:
@@ -104,3 +96,5 @@ spec:
                     value: $(tt.params.git-pr-number)
                   - name: action
                     value: $(tt.params.git-action)
+                  - name: merged-status
+                    value: $(tt.params.git-merged-status)  

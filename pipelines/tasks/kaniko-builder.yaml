@@ -11,6 +11,8 @@ spec:
   - name: git-workspace
     mountPath: /workspace/git
   params:
+  - name: pipelineRunName
+    type: string
   - name: imageName
     type: string
   - name: context
@@ -20,19 +22,23 @@ spec:
     default: "--no-push"
   - name: dockerfilePath
     type: string
+  - name: build-args
+    type: array
+    default: [""]
   steps:
   - name: docker-build
-    workingDir: /workspace/git/$(params.context)
+    workingDir: /workspace/git/$(params.pipelineRunName)
     image: harbor.galasa.dev/common/kaniko-executor:latest
     env:
     - name: DOCKER_CONFIG
       value: /root/.docker
     command:
     - /kaniko/executor
-    - --dockerfile=/workspace/git/$(params.dockerfilePath)
+    - --dockerfile=./$(params.dockerfilePath)
     - --context=/workspace/git/$(params.context)
     - --destination=$(params.imageName)
     - --oci-layout-path=/workspace/git/$(params.context)/image-digest
     - --single-snapshot
     - --verbosity=info
     - $(params.noPush)
+    - $(params.build-args[*])
