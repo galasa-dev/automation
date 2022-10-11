@@ -12,7 +12,7 @@ spec:
     mountPath: /workspace/git
   params:
   - name: pipelineRunName
-  - type: string
+    type: string
   - name: prImageName
     type: string
   - name: mainImageName
