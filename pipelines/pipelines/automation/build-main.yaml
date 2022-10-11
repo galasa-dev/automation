@@ -17,18 +17,29 @@ spec:
   # need to create new task for this
   # pass in commit-sha as paramater
   # find kaniko commands to retag image from commit sha > main
+  - name: retag-gpg
+    taskRef:
+      name: retag-image
+    params:
+    - name: prImageName
+      value: harbor.galasa.dev/common/gpg:$(params.commit-sha)
+    - name: mainImageName
+      value: harbor.galasa.dev/common/gpg:main
+    workspaces:
+    - name: output
+      workspace: git-workspace        
 
   # research Deployment objects and how they create the maven artifact repositories
   # check if the recycle-deployment step is needed for the automation main build, as don't think we deploy any maven artifacts for it? 
 
-  - name: recycle-deployment
-    taskRef: 
-      name: recycle-deployment
-    params:
-    - name: namespace
-      value: galasa-pipelines
-    - name: deployment
-      value: automation
-    workspaces:
-     - name: output
-       workspace: git-workspace
+  # - name: recycle-deployment
+  #   taskRef: 
+  #     name: recycle-deployment
+  #   params:
+  #   - name: namespace
+  #     value: galasa-pipelines
+  #   - name: deployment
+  #     value: automation
+  #   workspaces:
+  #    - name: output
+  #      workspace: git-workspace
