@@ -11,6 +11,8 @@ spec:
   - name: git-workspace
     mountPath: /workspace/git
   params:
+  - name: pipelineRunName
+  - type: string
   - name: prImageName
     type: string
   - name: mainImageName

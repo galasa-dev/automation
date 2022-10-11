@@ -21,6 +21,8 @@ spec:
     taskRef:
       name: retag-image
     params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)  
     - name: prImageName
       value: harbor.galasa.dev/common/gpg:$(params.commit-sha)
     - name: mainImageName
