@@ -18,7 +18,7 @@ spec:
   - name: mainImageName
     type: string
   steps:
-  - name: 
+  - name: retag-image
     workingDir: /workspace/git/$(params.pipelineRunName)
     image: harbor.galasa.dev/common/kaniko-executor:latest
     command:
