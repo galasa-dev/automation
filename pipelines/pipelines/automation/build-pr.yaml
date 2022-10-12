@@ -130,25 +130,25 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: build-kubectl-image
-    taskRef:
-      name: docker-build
-    runAfter:
-    - git-clone
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/automation/common
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/kubectl-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/kubectl:$(params.head-sha)
-    - name: noPush
-      value: ""
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+  # - name: build-kubectl-image
+  #   taskRef:
+  #     name: docker-build
+  #   runAfter:
+  #   - git-clone
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name)
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/automation/common
+  #   - name: dockerfilePath
+  #     value: automation/dockerfiles/common/kubectl-dockerfile
+  #   - name: imageName
+  #     value: harbor.galasa.dev/common/kubectl:$(params.head-sha)
+  #   - name: noPush
+  #     value: ""
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
   finally:
   - name: git-status
     when:
