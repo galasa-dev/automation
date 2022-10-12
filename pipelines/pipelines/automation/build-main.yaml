@@ -28,7 +28,7 @@ spec:
     - name: mainImageName
       value: harbor.galasa.dev/common/ghg-verify:main
     workspaces:
-    - name: output
+    - name: git-workspace
       workspace: git-workspace 
   - name: retag-ghgstatus
     taskRef:
@@ -41,7 +41,7 @@ spec:
     - name: mainImageName
       value: harbor.galasa.dev/common/ghgstatus:main
     workspaces:
-    - name: output
+    - name: git-workspace
       workspace: git-workspace 
   - name: retag-gpg
     taskRef:
@@ -54,7 +54,7 @@ spec:
     - name: mainImageName
       value: harbor.galasa.dev/common/gpg:main
     workspaces:
-    - name: output
+    - name: git-workspace
       workspace: git-workspace    
   - name: retag-kubectl
     taskRef:
@@ -67,7 +67,7 @@ spec:
     - name: mainImageName
       value: harbor.galasa.dev/common/kubectl:main
     workspaces:
-    - name: output
+    - name: git-workspace
       workspace: git-workspace     
 
   # research Deployment objects and how they create the maven artifact repositories
