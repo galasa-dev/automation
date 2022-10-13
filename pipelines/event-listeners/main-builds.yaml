@@ -21,15 +21,24 @@ spec:
               secretKey: token
           - name: "eventTypes"
             value: ["pull_request"]
+        - name: "CEL filter: only when PRs are closed"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter1"
+            value: "body.action in ['closed']"
         - name: "CEL filter: only when PRs are merged"
           ref:
             name: "cel"
           params:
-          - name: "filter"
-            value: 
-              - "body.action in ['closed']"
-              - "body.merged in ['true']"
-              - "body.base.ref in ['main']"
+          - name: "filter2"
+            value: "body.merged in ['true']"
+        - name: "CEL filter: only when PRs are merged into main"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter3"
+            value: "body.base.ref in ['main']"
       bindings:
         - name: git-pull-request-number
           value: $(body.pull_request.number) 
