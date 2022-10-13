@@ -18,18 +18,35 @@ spec:
   - name: mainImageName
     type: string
   steps:
-  - name: retag-image
+  # - name: test
+  #   workingDir: /workspace/git/$(params.pipelineRunName)
+  #   image: harbor.galasa.dev/common/kaniko-executor:latest
+  #   command:
+  #   - docker
+  # - name: start-docker-daemon
+  #   workingDir: /workspace/git/$(params.pipelineRunName)
+  #   image: docker.io/library/ubuntu:latest
+  #   command:
+  #   - dockerd
+  - name: docker-pull
     workingDir: /workspace/git/$(params.pipelineRunName)
-    image: harbor.galasa.dev/common/kaniko-executor:latest
+    image: docker.io/library/docker:latest
     command:
-    - echo "FROM $(params.prImageName)" | \
-    - /kaniko/executor 
-    - --dockerfile=/dev/stdin 
-    - --destination=$(params.mainImageName)
-        # script: |
-    #   #!/bin/sh
-    #   echo "FROM $(params.prImageName)" | \
-    #   /kaniko/executor
-    #   --dockerfile=/dev/stdin
-    #   --destination=$(params.mainImageName)
-   
+    - docker
+    - pull
+    - $(params.prImageName)
+  - name: docker-tag
+    workingDir: /workspace/git/$(params.pipelineRunName)
+    image: docker.io/library/docker:latest
+    command:
+    - docker
+    - tag
+    - $(params.prImageName)
+    - $(params.mainImageName)
+  - name: docker-push
+    workingDir: /workspace/git/$(params.pipelineRunName)
+    image: docker.io/library/docker:latest
+    command:
+    - docker
+    - push
+    - $(params.mainImageName)
