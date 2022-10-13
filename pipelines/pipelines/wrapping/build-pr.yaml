@@ -136,7 +136,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.head-sha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: build-args
       value:
         - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-base:latest"
