@@ -77,7 +77,19 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace  
-
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: wrapping
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -89,7 +101,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: maven-build-wrapping
     taskRef:
       name: maven-build
@@ -106,19 +117,6 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
     - name: command
       value: deploy
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: get-commit
-    taskRef:
-      name: get-commit
-    runAfter:
-    - clone-wrapping
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: repo
-      value: wrapping
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -142,8 +140,6 @@ spec:
     - name: build-args
       value:
         - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-base:latest"
-        # - "--build-arg=dockerRepository=harbor.galasa.dev"
-        # - "--build-arg=baseVersion=latest"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
