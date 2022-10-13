@@ -44,12 +44,18 @@ spec:
           value: $(body.pull_request.number) 
         - name: git-repository-name
           value: $(body.repository.name)
+        - name: git-commit-sha
+          value: $(body.pull_request.head.sha)
+        - name: git-merge-sha
+          value: $(body.pull_request.merge_commit_sha)
        
       template:
         spec:
           params:
             - name: git-pull-request-number
             - name: git-repository-name
+            - name: git-commit-sha
+            - name: git-merge-sha
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
@@ -66,3 +72,7 @@ spec:
                 params:
                   - name: pull-request-number
                     value: $(tt.params.git-pull-request-number)
+                  - name: commit-sha
+                    value: $(tt.params.git-commit-sha)
+                  - name: merge-sha
+                    value: $(tt.params.git-merge-sha)
