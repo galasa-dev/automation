@@ -1,6 +1,5 @@
-ARG dockerRepository
-ARG tag
-FROM ${dockerRepository}/galasadev/galasa-managers:${tag}
+ARG fromImage
+FROM ${fromImage}
 
 COPY repo/ /usr/local/apache2/htdocs/
 
