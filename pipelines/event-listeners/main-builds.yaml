@@ -20,23 +20,27 @@ spec:
               secretName: github-token
               secretKey: token
           - name: "eventTypes"
-            value: ["push"]
+            value: ["pull_request"]
         - name: "CEL filter: only when PRs are merged"
           ref:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.ref in ['refs/heads/main']"
+            value: 
+              - "body.action in ['closed']"
+              - "body.merged in ['true']"
+              - "body.base.ref in ['main']"
       bindings:
+        - name: git-pull-request-number
+          value: $(body.pull_request.number) 
         - name: git-repository-name
           value: $(body.repository.name)
-        - name: git-after-commit-sha
-          value: $(body.after) 
+       
       template:
         spec:
           params:
+            - name: git-pull-request-number
             - name: git-repository-name
-            - name: git-after-commit-sha
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
@@ -51,5 +55,5 @@ spec:
                   persistentVolumeClaim:
                     claimName: tekton-build-workspace-pvc
                 params:
-                  - name: commit-sha
-                    value: $(tt.params.git-after-commit-sha)
+                  - name: pull-request-number
+                    value: $(tt.params.git-pull-request-number)
