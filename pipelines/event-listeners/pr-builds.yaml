@@ -48,8 +48,6 @@ spec:
           value: $(body.pull_request.user.id)
         - name: git-action
           value: $(body.action)
-        - name: git-pull-request-number
-          value: $(body.pull_request.number)  
       template:
         spec:
           params:
@@ -63,7 +61,6 @@ spec:
             - name: git-base-ref
             - name: git-userid
             - name: git-action
-            - name: git-pull-request-number
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
@@ -107,5 +104,3 @@ spec:
                     value: $(tt.params.git-pr-number)
                   - name: action
                     value: $(tt.params.git-action)
-                  - name: pull-request-number
-                    value: $(tt.params.git-pull-request-number)  
