@@ -25,20 +25,20 @@ spec:
           ref:
             name: "cel"
           params:
-          - name: "filter1"
+          - name: "filter"
             value: "body.action in ['closed']"
         - name: "CEL filter: only when PRs are merged"
           ref:
             name: "cel"
           params:
-          - name: "filter2"
-            value: "body.merged in ['true']"
+          - name: "filter"
+            value: "body.pull_request.merged in [true]"
         - name: "CEL filter: only when PRs are merged into main"
           ref:
             name: "cel"
           params:
-          - name: "filter3"
-            value: "body.base.ref in ['main']"
+          - name: "filter"
+            value: "body.pull_request.base.ref in ['main']"
       bindings:
         - name: git-pull-request-number
           value: $(body.pull_request.number) 
