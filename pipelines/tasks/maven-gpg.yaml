@@ -22,7 +22,7 @@ spec:
     - /workspace/git/$(params.context)/gpg
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/gpg:latest
+    image: harbor.galasa.dev/common/gpg:main
     command:
     - gpg
     - --homedir
