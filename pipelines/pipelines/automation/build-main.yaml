@@ -10,77 +10,111 @@ spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: pull-request-number
+  - name: commit-sha
+    type: string
+  - name: merge-sha
     type: string
   tasks:
-  # - name: retag-image
-  # need to create new task for this
-  # pass in commit-sha as paramater
-  # find kaniko commands to retag image from commit sha > main
-  # - name: retag-ghgverify
-  #   taskRef:
-  #     name: retag-image
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)  
-  #   - name: prImageName
-  #     value: harbor.galasa.dev/common/ghg-verify:$(params.pull-request-number)
-  #   - name: mainImageName
-  #     value: harbor.galasa.dev/common/ghg-verify:main
-  #   workspaces:
-  #   - name: git-workspace
-  #     workspace: git-workspace 
-  # - name: retag-ghgstatus
-  #   taskRef:
-  #     name: retag-image
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)  
-  #   - name: prImageName
-  #     value: harbor.galasa.dev/common/ghg-status:$(params.pull-request-number)
-  #   - name: mainImageName
-  #     value: harbor.galasa.dev/common/ghgstatus:main
-  #   workspaces:
-  #   - name: git-workspace
-  #     workspace: git-workspace 
-  - name: retag-gpg
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: build-ghgverify-image
     taskRef:
-      name: retag-image
+      name: docker-build
+    runAfter:
+    - clone-automation
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name)  
-    - name: prImageName
-      value: harbor.galasa.dev/common/gpg:$(params.pull-request-number)
-    - name: mainImageName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-verify
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/ghgverify-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghgverify:main
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: build-ghgstatus-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-status
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/ghgstatus-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghgstatus:main
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: build-gpg-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/gpg-dockerfile
+    - name: imageName
       value: harbor.galasa.dev/common/gpg:main
+    - name: noPush
+      value: ""
     workspaces:
-    - name: git-workspace
-      workspace: git-workspace    
-  - name: retag-kubectl
+     - name: git-workspace
+       workspace: git-workspace
+  - name: build-kubectl-image
     taskRef:
-      name: retag-image
+      name: docker-build
+    runAfter:
+    - clone-automation
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name)  
-    - name: prImageName
-      value: harbor.galasa.dev/common/kubectl:$(params.pull-request-number)
-    - name: mainImageName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/kubectl-dockerfile
+    - name: imageName
       value: harbor.galasa.dev/common/kubectl:main
+    - name: noPush
+      value: ""
     workspaces:
-    - name: git-workspace
-      workspace: git-workspace     
-
-  # research Deployment objects and how they create the maven artifact repositories
-  # check if the recycle-deployment step is needed for the automation main build, as don't think we deploy any maven artifacts for it? 
-
-  # - name: recycle-deployment
-  #   taskRef: 
-  #     name: recycle-deployment
-  #   params:
-  #   - name: namespace
-  #     value: galasa-pipelines
-  #   - name: deployment
-  #     value: automation
-  #   workspaces:
-  #    - name: output
-  #      workspace: git-workspace
+     - name: git-workspace
+       workspace: git-workspace
+  finally:
+  - name: git-clean
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
