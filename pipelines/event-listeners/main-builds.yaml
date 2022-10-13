@@ -20,23 +20,42 @@ spec:
               secretName: github-token
               secretKey: token
           - name: "eventTypes"
-            value: ["push"]
+            value: ["pull_request"]
+        - name: "CEL filter: only when PRs are closed"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.action in ['closed']"
         - name: "CEL filter: only when PRs are merged"
           ref:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.ref in ['refs/heads/main']"
+            value: "body.pull_request.merged in [true]"
+        - name: "CEL filter: only when PRs are merged into main"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.pull_request.base.ref in ['main']"
       bindings:
+        - name: git-pull-request-number
+          value: $(body.pull_request.number) 
         - name: git-repository-name
           value: $(body.repository.name)
-        - name: git-after-commit-sha
-          value: $(body.after) 
+        - name: git-commit-sha
+          value: $(body.pull_request.head.sha)
+        - name: git-merge-sha
+          value: $(body.pull_request.merge_commit_sha)
+       
       template:
         spec:
           params:
+            - name: git-pull-request-number
             - name: git-repository-name
-            - name: git-after-commit-sha
+            - name: git-commit-sha
+            - name: git-merge-sha
           resourcetemplates:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
@@ -51,5 +70,9 @@ spec:
                   persistentVolumeClaim:
                     claimName: tekton-build-workspace-pvc
                 params:
+                  - name: pull-request-number
+                    value: $(tt.params.git-pull-request-number)
                   - name: commit-sha
-                    value: $(tt.params.git-after-commit-sha)
+                    value: $(tt.params.git-commit-sha)
+                  - name: merge-sha
+                    value: $(tt.params.git-merge-sha)
