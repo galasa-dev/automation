@@ -1,0 +1,35 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: retag-image
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: pipelineRunName
+    type: string
+  - name: prImageName
+    type: string
+  - name: mainImageName
+    type: string
+  steps:
+  - name: retag-image
+    workingDir: /workspace/git/$(params.pipelineRunName)
+    image: harbor.galasa.dev/common/kaniko-executor:latest
+    command:
+    - echo "FROM $(params.prImageName)" | \
+    - /kaniko/executor 
+    - --dockerfile=/dev/stdin 
+    - --destination=$(params.mainImageName)
+        # script: |
+    #   #!/bin/sh
+    #   echo "FROM $(params.prImageName)" | \
+    #   /kaniko/executor
+    #   --dockerfile=/dev/stdin
+    #   --destination=$(params.mainImageName)
+   
