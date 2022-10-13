@@ -17,32 +17,32 @@ spec:
   # need to create new task for this
   # pass in commit-sha as paramater
   # find kaniko commands to retag image from commit sha > main
-  - name: retag-ghgverify
-    taskRef:
-      name: retag-image
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)  
-    - name: prImageName
-      value: harbor.galasa.dev/common/ghg-verify:$(params.pull-request-number)
-    - name: mainImageName
-      value: harbor.galasa.dev/common/ghg-verify:main
-    workspaces:
-    - name: git-workspace
-      workspace: git-workspace 
-  - name: retag-ghgstatus
-    taskRef:
-      name: retag-image
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)  
-    - name: prImageName
-      value: harbor.galasa.dev/common/ghg-status:$(params.pull-request-number)
-    - name: mainImageName
-      value: harbor.galasa.dev/common/ghgstatus:main
-    workspaces:
-    - name: git-workspace
-      workspace: git-workspace 
+  # - name: retag-ghgverify
+  #   taskRef:
+  #     name: retag-image
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name)  
+  #   - name: prImageName
+  #     value: harbor.galasa.dev/common/ghg-verify:$(params.pull-request-number)
+  #   - name: mainImageName
+  #     value: harbor.galasa.dev/common/ghg-verify:main
+  #   workspaces:
+  #   - name: git-workspace
+  #     workspace: git-workspace 
+  # - name: retag-ghgstatus
+  #   taskRef:
+  #     name: retag-image
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name)  
+  #   - name: prImageName
+  #     value: harbor.galasa.dev/common/ghg-status:$(params.pull-request-number)
+  #   - name: mainImageName
+  #     value: harbor.galasa.dev/common/ghgstatus:main
+  #   workspaces:
+  #   - name: git-workspace
+  #     workspace: git-workspace 
   - name: retag-gpg
     taskRef:
       name: retag-image
