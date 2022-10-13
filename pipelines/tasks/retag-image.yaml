@@ -26,4 +26,10 @@ spec:
     - /kaniko/executor 
     - --dockerfile=/dev/stdin 
     - --destination=$(params.mainImageName)
+        # script: |
+    #   #!/bin/sh
+    #   echo "FROM $(params.prImageName)" | \
+    #   /kaniko/executor
+    #   --dockerfile=/dev/stdin
+    #   --destination=$(params.mainImageName)
    
