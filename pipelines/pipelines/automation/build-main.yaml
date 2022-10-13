@@ -10,7 +10,7 @@ spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: commit-sha
+  - name: pull-request-number
     type: string
   tasks:
   # - name: retag-image
@@ -24,7 +24,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)  
     - name: prImageName
-      value: harbor.galasa.dev/common/ghg-verify:$(params.commit-sha)
+      value: harbor.galasa.dev/common/ghg-verify:$(params.pull-request-number)
     - name: mainImageName
       value: harbor.galasa.dev/common/ghg-verify:main
     workspaces:
@@ -37,7 +37,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)  
     - name: prImageName
-      value: harbor.galasa.dev/common/ghg-status:$(params.commit-sha)
+      value: harbor.galasa.dev/common/ghg-status:$(params.pull-request-number)
     - name: mainImageName
       value: harbor.galasa.dev/common/ghgstatus:main
     workspaces:
@@ -50,7 +50,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)  
     - name: prImageName
-      value: harbor.galasa.dev/common/gpg:$(params.commit-sha)
+      value: harbor.galasa.dev/common/gpg:$(params.pull-request-number)
     - name: mainImageName
       value: harbor.galasa.dev/common/gpg:main
     workspaces:
@@ -63,7 +63,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)  
     - name: prImageName
-      value: harbor.galasa.dev/common/kubectl:$(params.commit-sha)
+      value: harbor.galasa.dev/common/kubectl:$(params.pull-request-number)
     - name: mainImageName
       value: harbor.galasa.dev/common/kubectl:main
     workspaces:
