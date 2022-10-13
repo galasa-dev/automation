@@ -90,7 +90,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghgverify:$(params.pull-request-number)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -109,7 +109,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghgstatus:$(params.pull-request-number)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace
