@@ -117,6 +117,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: recycle-deployment
+    runAfter:
+    - main-docker-build-wrapping
+    params:
+    - name: deployment
+      value: maven-wrapping
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   finally:
   - name: git-clean-automation
     taskRef: 
