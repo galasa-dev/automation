@@ -1,5 +1,6 @@
-ARG fromImage
-FROM ${fromImage}
+ARG dockerRepository
+ARG tag
+FROM ${dockerRepository}/galasadev/galasa-extensions:${tag}
 
 COPY repo/ /usr/local/apache2/htdocs/
 
