@@ -1,0 +1,6 @@
+ARG fromImage
+ARG repo
+
+FROM ${fromImage}
+
+COPY ${repo}.githash /usr/local/apache2/htdocs/${repo}.githash
