@@ -135,7 +135,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-maven:$(params.head-sha)  
     - name: noPush  
-      value: --no-push
+      value: ""
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
