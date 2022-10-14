@@ -13,11 +13,12 @@ spec:
   params:
   - name: namespace
     type: string
+    default: galasa-pipelines
   - name: deployment
     type: string
   steps:
   - name: start-recycle
-    image: harbor.galasa.dev/
+    image: harbor.galasa.dev/common/kubectl:main
     command:
     - kubectl
     - -n
@@ -26,7 +27,7 @@ spec:
     - restart
     - deployment/$(params.deployment)
   - name: wait-recycle
-    image: harbor.galasa.dev/
+    image: harbor.galasa.dev/common/kubectl:main
     command:
     - kubectl
     - -n
