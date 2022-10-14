@@ -123,7 +123,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.head-sha)  
     - name: noPush  
-      value: --no-push
+      value: ""
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
