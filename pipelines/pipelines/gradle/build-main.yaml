@@ -4,46 +4,20 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-gradle
+  name: main-gradle
   namespace: galasa-pipelines
 spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: head-ref
+  - name: commit-sha
     type: string
-  - name: head-sha
-    type: string
-  - name: base-ref
-    type: string
-  - name: prUrl
-    type: string
-  - name: statusesUrl
-    type: string
-  - name: issueUrl
-    type: string
-  - name: userId
-    type: string
-  - name: pr-number
-    type: string
-  - name: action
+  - name: merge-sha
     type: string
   tasks:
-  - name: git-verify
-    taskRef:
-      name: git-verify
-    params:
-    - name: userId
-      value: $(params.userId)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: action
-      value: $(params.action)
   - name: clone-automation
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
@@ -62,21 +36,21 @@ spec:
     taskRef: 
       name: git-clone
     runAfter:
-      - git-verify
+      - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/gradle
     - name: revision
-      value: $(params.base-ref)
+      value: main
     - name: refspec
-      value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/gradle
     workspaces:
      - name: output
-       workspace: git-workspace
+       workspace: git-workspace  
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,11 +64,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: gradle-build-gradle
+  - name: main-gradle-build-gradle
     taskRef:
       name: gradle-build
     runAfter: 
-      - clone-gradle
+    - clone-gradle
     params:
     - name: context
       value: $(context.pipelineRun.name)/gradle
@@ -107,13 +81,13 @@ spec:
       value: publish
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
-  - name: docker-build-gradle
+       workspace: git-workspace
+  - name: main-docker-build-gradle
     taskRef:
       name: docker-build
-    runAfter: 
-      - get-commit
-      - gradle-build-gradle
+    runAfter:
+    - get-commit
+    - main-gradle-build-gradle
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -122,34 +96,16 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/gradle/gradle-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.head-sha)  
-    - name: noPush  
-      value: ""
+      value: harbor.galasa.dev/galasadev/galasa-gradle:main
+    - name: noPush
+      value: --no-push
     - name: build-args
       value:
-        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-wrapping:main"
+        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-gradle:$(params.commit-sha)"
     workspaces:
-      - name: git-workspace
-        workspace: git-workspace  
+     - name: git-workspace
+       workspace: git-workspace
   finally:
-  - name: git-status
-    when:
-      - input: "$(tasks.git-verify.status)"
-        operator: in
-        values: ["Succeeded"]
-    taskRef:
-      name: git-status
-    params:
-    - name: status
-      value: $(tasks.status)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: statusesUrl
-      value: $(params.statusesUrl)
-    - name: issueUrl
-      value: $(params.issueUrl)
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
   - name: git-clean-automation
     taskRef: 
       name: git-clean
