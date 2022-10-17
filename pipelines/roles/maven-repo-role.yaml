@@ -1,0 +1,68 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: maven-repo-role
+  namespace: galasa-pipelines
+rules:
+  # - verbs:
+  #     - get
+  #     - list
+  #     - watch
+  #     - create
+  #     - update
+  #     - patch
+  #     - delete
+  #   apiGroups:
+  #     - ''
+  #   resources:
+  #     - pods
+  #     - pods/log
+  #     - containers
+  #     - services
+  #     - persistentvolumeclaims
+  #     - serviceaccounts
+  #     - secrets
+  #     - limitranges
+  - verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    apiGroups:
+      - extensions
+      - apps
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+  # - verbs:
+  #     - get
+  #     - list
+  #     - watch
+  #     - create
+  #     - update
+  #     - patch
+  #     - delete
+  #   apiGroups:
+  #     - extensions
+  #     - v1beta1
+  #   resources:
+  #     - ingresses
+  # - verbs:
+  #     - get
+  #     - list
+  #     - watch
+  #     - create
+  #     - update
+  #     - patch
+  #     - delete
+  #   apiGroups:
+  #     - tekton.dev
+  #   resources:
+  #     - pipelines
+  #     - pipelineruns
+  #     - pipelineresources
+  #     - taskruns
