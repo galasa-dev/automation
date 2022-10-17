@@ -136,10 +136,11 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.head-sha)
     - name: noPush
-      value: --no-push
+      value: ""
     - name: build-args
       value:
-        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-base:latest"
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
