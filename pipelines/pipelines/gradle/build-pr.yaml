@@ -127,7 +127,8 @@ spec:
       value: ""
     - name: build-args
       value:
-        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-wrapping:main"
+        - "--build-arg=tag=main"
+        - "--build-arg-dockerRepository=harbor.galasa.dev"
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
