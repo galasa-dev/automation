@@ -76,10 +76,14 @@ spec:
       value: $(context.pipelineRun.name)/gradle
     - name: dockerfilePath
 <<<<<<< HEAD
+<<<<<<< HEAD
       value: automation/dockerfiles/common/retag-dockerfile
 =======
       value: automation/dockerfiles/commmon/retag-dockerfile
 >>>>>>> 869194e (changes to wrapping,gradle,maven,framework builds)
+=======
+      value: automation/dockerfiles/common/retag-dockerfile
+>>>>>>> 7e6d8a7 (fix conflicts)
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-gradle:main
     - name: noPush
