@@ -1,0 +1,130 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: main-maven
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: commit-sha
+    type: string
+  - name: merge-sha
+    type: string
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-maven
+    taskRef: 
+      name: git-clone
+    runAfter:
+      - clone-automation
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/maven
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/maven
+    workspaces:
+     - name: output
+       workspace: git-workspace  
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-wrapping 
+    params:
+    - name: context 
+      value: $(context.pipelineRun.name)/maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: main-docker-build-maven
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/maven
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/retag-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-maven:main
+    - name: noPush
+      value: ""
+    - name: build-args
+      value:
+        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-maven:$(params.commit-sha)"
+        - "--build-arg=repo=maven"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: recycle-deployment
+    runAfter:
+    - main-docker-build-maven
+    params:
+    - name: deployment
+      value: maven-maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  finally:
+  - name: git-clean-automation
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: git-clean-maven
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
