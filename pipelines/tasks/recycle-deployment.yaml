@@ -21,8 +21,8 @@ spec:
     image: harbor.galasa.dev/common/kubectl:main
     command:
     - kubectl
-    - -n
-    - $(params.namespace)
+    # - -n
+    # - $(params.namespace)
     - rollout
     - restart
     - deployment/$(params.deployment)
@@ -30,8 +30,8 @@ spec:
     image: harbor.galasa.dev/common/kubectl:main
     command:
     - kubectl
-    - -n
-    - $(params.namespace)
+    # - -n
+    # - $(params.namespace)
     - rollout
     - status
     - deployment/$(params.deployment)
