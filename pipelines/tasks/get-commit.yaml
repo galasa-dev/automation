@@ -18,7 +18,7 @@ spec:
   steps:
   - name: get-commit
     workingDir: /workspace/git/$(params.pipelineRunName)/$(params.repo)
-    image: docker.io/library/busybox:latest
+    image: docker.io/alpine/git:latest
     script: |
       #!/bin/sh
       set +e
