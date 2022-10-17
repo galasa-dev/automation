@@ -64,30 +64,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-gradle-build-framework
-    taskRef:
-      name: gradle-build
-    runAfter: 
-    - clone-framework
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/framework
-    - name: build-args
-      value:
-        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
-        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
-    - name: command
-      value: publish
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
   - name: main-docker-build-framework
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
-    - main-gradle-build-framework
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -98,7 +79,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-framework:main
     - name: noPush
-      value: --no-push
+      value: ""
     - name: build-args
       value:
         - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-framework:$(params.commit-sha)"
