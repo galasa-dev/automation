@@ -127,18 +127,8 @@ spec:
       value: ""
     - name: build-args
       value:
-<<<<<<< HEAD
-<<<<<<< HEAD
-        - "--build-arg=tag=main"
-        - "--build-arg-dockerRepository=harbor.galasa.dev"
-=======
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=tag=main"
->>>>>>> 869194e (changes to wrapping,gradle,maven,framework builds)
-=======
         - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
->>>>>>> 7e6d8a7 (fix conflicts)
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
