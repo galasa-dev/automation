@@ -57,30 +57,7 @@ spec:
       value: $(context.pipelineRun.name)/automation
     workspaces:
      - name: output
-       workspace: git-workspace
-
-
-
-  - name: build-gitcli-image
-    taskRef:
-      name: docker-build
-    runAfter:
-    - git-clone
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/automation/common
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/gitcli-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/gitcli:$(params.head-sha)
-    - name: noPush
-      value: ""
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace     
-
+       workspace: git-workspace 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -94,7 +71,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: build-ghgverify-image
     taskRef:
       name: docker-build
@@ -171,6 +147,25 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: build-gitcli-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - git-clone
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/gitcli-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/gitcli:$(params.head-sha)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
   finally:
   - name: git-status
     when:
