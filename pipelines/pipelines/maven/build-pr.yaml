@@ -101,8 +101,9 @@ spec:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
     - name: command
-      value: install
+      value: deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -139,7 +140,7 @@ spec:
     - name: build-args
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=tag=1e3a26631300d48e94f192934c0dd7c0ee460bd5"
+        - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
