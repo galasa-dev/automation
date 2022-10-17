@@ -108,6 +108,25 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: build-gitcli-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/gitcli-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/gitcli:main
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
   finally:
   - name: git-clean
     taskRef: 
