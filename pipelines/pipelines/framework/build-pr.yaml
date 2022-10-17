@@ -97,7 +97,7 @@ spec:
       - clone-framework
     params:
     - name: context
-      value: $(context.pipelineRun.name)/framework
+      value: $(context.pipelineRun.name)/framework/galasa-parent
     - name: build-args
       value:
         - "-PsourceMaven=https://repo.maven.apache.org/maven2/"

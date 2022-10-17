@@ -75,31 +75,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-maven-build-maven
-    taskRef:
-      name: maven-build
-    runAfter:
-    - maven-gpg
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/maven
-    - name: build-args
-      value: 
-        - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
-    - name: command
-      value: deploy
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
   - name: main-docker-build-maven
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
-    - main-maven-build-maven
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -110,7 +90,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-maven:main
     - name: noPush
-      value: --no-push
+      value: ""
     - name: build-args
       value:
         - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-maven:$(params.commit-sha)"
