@@ -18,10 +18,11 @@ spec:
   steps:
   - name: get-commit
     workingDir: /workspace/git/$(params.pipelineRunName)/$(params.repo)
-    image: docker.io/alpine/git:latest
+    image: harbor.galasa.dev/common/gitcli:22b8f8e79de017bda9d633b0ea93f6f553d209a9
     script: |
       #!/bin/sh
       set +e
+      git config --global --add safe.directory /workspace/git/$(params.pipelineRunName)/$(params.repo)
       COMMIT="$(git log --format="%H" -n 1)"
       echo $COMMIT > /workspace/git/$(params.pipelineRunName)/$(params.repo)/$(params.repo).githash
       echo commit is $COMMIT
