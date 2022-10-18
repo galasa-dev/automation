@@ -1,0 +1,5 @@
+FROM alpine
+RUN mkdir -p /opt/galasa/bin
+COPY galasabld-linux-amd64 /opt/galasa/bin/galasabld
+RUN chmod +x /opt/galasa/bin/galasabld
+ENV PATH=$PATH:/opt/galasa/bin

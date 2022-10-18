@@ -166,6 +166,56 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
+
+
+  - name: clone-buildutils
+    taskRef: 
+      name: git-clone
+    runAfter:
+      - git-verify
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/buildutils
+    - name: revision
+      value: $(params.base-ref)
+    - name: refspec
+      value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/buildutils
+    workspaces:
+     - name: output
+       workspace: git-workspace 
+
+  - name: galasabld-build
+    workingDir: /workspace/git/buildutils
+    image: docker.io/library/golang:latest
+    command:
+    - make
+    - all     
+
+  - name: build-galasabld-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - git-clone
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/gitcli-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/gitcli:$(params.head-sha)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
+
+
   finally:
   - name: git-status
     when:
