@@ -68,7 +68,7 @@ spec:
     taskRef:
       name: maven-gpg
     runAfter:
-    - clone-wrapping 
+    - clone-maven 
     params:
     - name: context 
       value: $(context.pipelineRun.name)/maven
