@@ -1,5 +1,16 @@
-FROM alpine
-RUN mkdir -p /opt/galasa/bin
-COPY galasabld-linux-amd64 /opt/galasa/bin/galasabld
-RUN chmod +x /opt/galasa/bin/galasabld
-ENV PATH=$PATH:/opt/galasa/bin
+#
+# Copyright contributors to the Galasa project 
+#
+ARG dockerRepository
+FROM ${dockerRepository}/library/alpine:3.14
+
+ARG platform
+
+RUN addgroup galasa && \ 
+    adduser -D -G galasa -h /galasa -s /bin/sh galasa 
+
+COPY bin/galasabld-${platform} /bin/galasabld
+RUN chmod +x /bin/galasabld
+
+WORKDIR /galasa
+USER galasa
