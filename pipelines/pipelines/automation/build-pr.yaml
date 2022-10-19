@@ -211,6 +211,8 @@ spec:
       value: harbor.galasa.dev/common/galasabld:$(params.head-sha)
     - name: noPush
       value: ""
+    - build-args:  
+      - "--build-arg=platform=linux-amd64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
