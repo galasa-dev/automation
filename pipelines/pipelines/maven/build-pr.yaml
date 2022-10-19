@@ -77,6 +77,19 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-maven
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -106,20 +119,7 @@ spec:
       value: deploy
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
-  - name: get-commit
-    taskRef:
-      name: get-commit
-    runAfter:
-    - clone-maven
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: repo
-      value: maven
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace     
+       workspace: git-workspace 
   - name: docker-build-maven
     taskRef:
       name: docker-build
@@ -130,7 +130,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/maven/docker
+      value: $(context.pipelineRun.name)/maven
     - name: dockerfilePath
       value: automation/dockerfiles/maven/maven-dockerfile 
     - name: imageName
