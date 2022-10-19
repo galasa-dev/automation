@@ -9,11 +9,6 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  # params:
-  # - name: commit-sha
-  #   type: string
-  # - name: merge-sha
-  #   type: string
   tasks:
   - name: clone-automation
     taskRef: 
