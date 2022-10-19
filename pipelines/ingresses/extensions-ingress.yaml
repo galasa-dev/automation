@@ -1,0 +1,25 @@
+#
+# Copyright contributors to the Galasa project 
+#
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: maven-extensions
+  annotations:
+    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+spec:
+  tls:
+  - hosts:
+    - development.galasa.dev
+    secretName: galasa-wildcard-cert
+  rules:
+  - host: development.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: maven-extensions
+            port:
+              number: 80
+        path: /main/maven/extensions
+        pathType: Prefix

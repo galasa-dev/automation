@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: maven-extensions
+  labels:
+    app: maven-extensions
+spec:
+  type: ClusterIP
+  selector:
+    app: maven-extensions
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
