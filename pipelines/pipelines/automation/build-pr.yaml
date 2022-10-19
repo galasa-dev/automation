@@ -124,7 +124,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/gpg:$(params.head-sha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -143,7 +143,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/kubectl:$(params.head-sha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -162,7 +162,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/gitcli:$(params.head-sha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
