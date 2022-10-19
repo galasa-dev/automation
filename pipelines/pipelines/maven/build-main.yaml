@@ -66,7 +66,7 @@ spec:
     - clone-maven 
     params:
     - name: context 
-      value: $(context.pipelineRun.name)/maven
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
     workspaces:
      - name: git-workspace
        workspace: git-workspace
