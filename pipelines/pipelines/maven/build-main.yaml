@@ -9,11 +9,6 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  params:
-  - name: commit-sha
-    type: string
-  - name: merge-sha
-    type: string
   tasks:
   - name: clone-automation
     taskRef: 
@@ -75,26 +70,46 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: main-maven-build-maven
+    taskRef:
+      name: maven-build
+    runAfter:
+    - maven-gpg
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+    - name: build-args
+      value: 
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: main-docker-build-maven
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
+    - main-maven-build-maven
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/maven
     - name: dockerfilePath
-      value: automation/dockerfiles/common/retag-dockerfile
+      value: automation/dockerfiles/maven/maven-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-maven:main
     - name: noPush
       value: ""
     - name: build-args
       value:
-        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-maven:$(params.commit-sha)"
-        - "--build-arg=repo=maven"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
