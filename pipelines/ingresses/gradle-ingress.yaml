@@ -4,7 +4,7 @@
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: maven-wrapping
+  name: maven-gradle
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
 spec:
@@ -18,8 +18,8 @@ spec:
       paths:
       - backend:
           service:
-            name: maven-wrapping
+            name: maven-gradle
             port:
               number: 80
-        path: /main/maven/wrapping
+        path: /main/maven/gradle
         pathType: Prefix
