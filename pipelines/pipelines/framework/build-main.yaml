@@ -69,7 +69,7 @@ spec:
       value: $(context.pipelineRun.name)/framework/galasa-parent
     - name: build-args
       value:
-        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
+        - "-PsourceMaven=https://development.galasa.dev/main/maven/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
     - name: command
