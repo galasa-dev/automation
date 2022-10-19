@@ -9,11 +9,6 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  params:
-  - name: commit-sha
-    type: string
-  - name: merge-sha
-    type: string
   tasks:
   - name: clone-automation
     taskRef: 
@@ -64,26 +59,56 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: main-gradle-build-framework
+    taskRef:
+      name: gradle-build
+    runAfter: 
+      - clone-framework
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework/galasa-parent
+    - name: build-args
+      value:
+        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+    - name: command
+      value: publish
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
   - name: main-docker-build-framework
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
+    - main-gradle-build-framework
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/framework
     - name: dockerfilePath
-      value: automation/dockerfiles/common/retag-dockerfile
+      value: automation/dockerfiles/framework/framework-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-framework:main
     - name: noPush
       value: ""
     - name: build-args
       value:
-        - "--build-arg=fromImage=harbor.galasa.dev/galasadev/galasa-framework:$(params.commit-sha)"
-        - "--build-arg=repo=framework"
+        - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: recycle-deployment
+    runAfter:
+    - main-docker-build-framework
+    params:
+    - name: deployment
+      value: maven-framework
     workspaces:
      - name: git-workspace
        workspace: git-workspace
