@@ -101,6 +101,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: recycle-deployment
+    runAfter:
+    - main-docker-build-gradle
+    params:
+    - name: deployment
+      value: maven-gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   finally:
   - name: git-clean-automation
     taskRef: 
