@@ -206,9 +206,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation/common
     - name: dockerfilePath
-      value: automation/dockerfiles/common/gitcli-dockerfile
+      value: automation/dockerfiles/common/galasabld-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/gitcli:$(params.head-sha)
+      value: harbor.galasa.dev/common/galasabld:$(params.head-sha)
     - name: noPush
       value: ""
     workspaces:
