@@ -10,11 +10,11 @@ spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: head-ref
+  - name: headRef
     type: string
-  - name: head-sha
+  - name: headSha
     type: string
-  - name: base-ref
+  - name: baseRef
     type: string
   - name: prUrl
     type: string
@@ -24,7 +24,7 @@ spec:
     type: string
   - name: userId
     type: string
-  - name: pr-number
+  - name: prNumber
     type: string
   - name: action
     type: string
@@ -67,9 +67,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/wrapping
     - name: revision
-      value: $(params.base-ref)
+      value: $(params.baseRef)
     - name: refspec
-      value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -109,7 +109,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
-    - name: build-args
+    - name: buildArgs
       value: 
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
@@ -134,10 +134,10 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.head-sha)
+      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.headSha)
     - name: noPush
       value: ""
-    - name: build-args
+    - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"

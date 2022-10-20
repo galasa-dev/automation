@@ -22,7 +22,7 @@ spec:
     default: "--no-push"
   - name: dockerfilePath
     type: string
-  - name: build-args
+  - name: buildArgs
     type: array
     default: [""]
   steps:
@@ -41,4 +41,4 @@ spec:
     - --single-snapshot
     - --verbosity=info
     - $(params.noPush)
-    - $(params.build-args[*])
+    - $(params.buildArgs[*])

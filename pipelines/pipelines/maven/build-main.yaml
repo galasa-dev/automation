@@ -78,7 +78,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
-    - name: build-args
+    - name: buildArgs
       value: 
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
@@ -106,7 +106,7 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-maven:main
     - name: noPush
       value: ""
-    - name: build-args
+    - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=tag=main"

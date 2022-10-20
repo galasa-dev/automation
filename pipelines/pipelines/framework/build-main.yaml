@@ -67,7 +67,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/framework/galasa-parent
-    - name: build-args
+    - name: buildArgs
       value:
         - "-PsourceMaven=https://development.galasa.dev/main/maven/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
@@ -94,7 +94,7 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-framework:main
     - name: noPush
       value: ""
-    - name: build-args
+    - name: buildArgs
       value:
         - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
