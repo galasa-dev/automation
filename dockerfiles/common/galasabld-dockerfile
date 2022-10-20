@@ -1,8 +1,7 @@
 #
 # Copyright contributors to the Galasa project 
 #
-ARG dockerRepository
-FROM ${dockerRepository}/library/alpine:3.14
+FROM alpine
 
 ARG platform
 
