@@ -67,7 +67,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/gradle
-    - name: build-args
+    - name: buildArgs
       value:
         - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
@@ -94,7 +94,7 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-gradle:main
     - name: noPush
       value: ""
-    - name: build-args
+    - name: buildArgs
       value:
         - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"

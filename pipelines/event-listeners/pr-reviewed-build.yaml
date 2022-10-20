@@ -75,9 +75,9 @@ spec:
                   persistentVolumeClaim:
                     claimName: tekton-build-workspace-pvc
                 params:
-                  - name: head-ref
+                  - name: headRef
                     value: $(tt.params.git-head-ref)
-                  - name: base-ref
+                  - name: baseRef
                     value: $(tt.params.git-base-ref) 
                   - name: prUrl
                     value: $(tt.params.git-pull-request-url)
@@ -87,7 +87,7 @@ spec:
                     value: $(tt.params.git-issue-url)
                   - name: userId
                     value: $(tt.params.git-userid)
-                  - name: pr-number
+                  - name: prNumber
                     value: $(tt.params.git-pr-number)
                   - name: action
                     value: $(tt.params.git-action)

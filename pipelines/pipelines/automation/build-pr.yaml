@@ -10,11 +10,11 @@ spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: head-ref
+  - name: headRef
     type: string
-  - name: head-sha
+  - name: headSha
     type: string
-  - name: base-ref
+  - name: baseRef
     type: string
   - name: prUrl
     type: string
@@ -24,7 +24,7 @@ spec:
     type: string
   - name: userId
     type: string
-  - name: pr-number
+  - name: prNumber
     type: string
   - name: action
     type: string
@@ -48,9 +48,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/automation
     - name: revision
-      value: $(params.base-ref)
+      value: $(params.baseRef)
     - name: refspec
-      value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -84,7 +84,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghgverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghgverify:$(params.head-sha)
+      value: harbor.galasa.dev/common/ghgverify:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -103,7 +103,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghgstatus-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghgstatus:$(params.head-sha)
+      value: harbor.galasa.dev/common/ghgstatus:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -122,7 +122,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/gpg-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/gpg:$(params.head-sha)
+      value: harbor.galasa.dev/common/gpg:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -141,7 +141,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/kubectl-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/kubectl:$(params.head-sha)
+      value: harbor.galasa.dev/common/kubectl:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -160,7 +160,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/gitcli-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/gitcli:$(params.head-sha)
+      value: harbor.galasa.dev/common/gitcli:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
