@@ -62,7 +62,7 @@ spec:
       value: simplatform/galasa-simplatform-application
     - name: settingsPath
       value: simplatform/settings.xml
-    - name: build-args
+    - name: buildArgs
       value:  
         - "-Dgpg.skip=true"
         - "-Dgalasa.release.repo=file:/workspace/git/simplatfom/docker/repo/"

@@ -13,7 +13,7 @@ spec:
   params:
   - name: context
     type: string 
-  - name: build-args
+  - name: buildArgs
     type: array    
   - name: command
     type: string  
@@ -24,7 +24,7 @@ spec:
     command:
       - mvn
     args:
-      - $(params.build-args[*])
+      - $(params.buildArgs[*])
       - --settings
       - /workspace/git/$(params.context)/gpg/settings.xml
       - --batch-mode

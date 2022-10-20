@@ -13,7 +13,7 @@ spec:
   params:
   - name: context
     type: string
-  - name: build-args
+  - name: buildArgs
     type: array   
   - name: command
     type: string
@@ -28,7 +28,7 @@ spec:
       - --no-daemon 
       - --console 
       - plain
-      - $(params.build-args[*])
+      - $(params.buildArgs[*])
       - $(params.command)
     volumeMounts:
     - name: gpgkey
