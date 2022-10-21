@@ -177,9 +177,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/buildutils
     - name: revision
-      value: $(params.base-ref)
+      value: main
     - name: refspec
-      value: refs/pull/$(params.pr-number)/head:refs/heads/$(params.base-ref)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -188,12 +188,18 @@ spec:
      - name: output
        workspace: git-workspace 
 
-  - name: galasabld-build
-    workingDir: /workspace/git/buildutils
-    image: docker.io/library/golang:latest
-    command:
-    - make
-    - all     
+  - name: go-make
+    taskRef:
+      name: go-make
+    runAfter:
+      - clone-buildutils  
+    params:
+    - name: directory
+      value: $(context.pipelineRun.name)/buildutils
+    workspaces:
+    - name: output
+       workspace: git-workspace 
+
 
   - name: build-galasabld-image
     taskRef:
@@ -204,8 +210,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      ############    
-      value: $(context.pipelineRun.name)/
+      value: $(context.pipelineRun.name)/buildutils
     - name: dockerfilePath
       value: automation/dockerfiles/common/galasabld-dockerfile
     - name: imageName
