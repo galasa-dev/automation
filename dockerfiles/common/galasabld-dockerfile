@@ -1,6 +1,3 @@
-#
-# Copyright contributors to the Galasa project 
-#
 FROM alpine
 
 ARG platform
