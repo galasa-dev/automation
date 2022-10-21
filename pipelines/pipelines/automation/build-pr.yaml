@@ -199,12 +199,13 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - git-clone
+    - galasabld-build
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      ############    
+      value: $(context.pipelineRun.name)/
     - name: dockerfilePath
       value: automation/dockerfiles/common/galasabld-dockerfile
     - name: imageName
