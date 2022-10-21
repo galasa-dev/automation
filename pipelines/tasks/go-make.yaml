@@ -1,0 +1,22 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: go-make
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: directory
+    type: string  
+  steps:
+  - name: make
+    workingDir: /workspace/git/$(params.directory)
+    image: docker.io/library/golang:latest
+    command:
+    - make
+    - all  
