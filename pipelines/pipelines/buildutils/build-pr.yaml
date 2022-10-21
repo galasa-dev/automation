@@ -89,7 +89,7 @@ spec:
     - name: directory
       value: $(context.pipelineRun.name)/buildutils
     workspaces:
-     - name: output
+     - name: git-workspace
        workspace: git-workspace 
 
 
