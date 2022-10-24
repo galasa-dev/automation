@@ -52,7 +52,7 @@ spec:
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
-      value: "99999999"
+      value: "50"
     - name: subdirectory
       value: $(context.pipelineRun.name)/automation
     workspaces:
@@ -71,7 +71,7 @@ spec:
     - name: refspec
       value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
     - name: depth
-      value: "99999999"
+      value: "50"
     - name: subdirectory
       value: $(context.pipelineRun.name)/framework
     workspaces:
