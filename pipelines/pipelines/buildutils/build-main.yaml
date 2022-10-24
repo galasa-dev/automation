@@ -30,8 +30,6 @@ spec:
   - name: clone-buildutils
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/buildutils
