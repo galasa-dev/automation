@@ -97,6 +97,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
+    - clone-automation
     - go-make
     params:
     - name: pipelineRunName
