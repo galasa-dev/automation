@@ -31,7 +31,7 @@ b) what does the pipeline build and produce? So they all do either a Maven or Gr
 c) For PR pipelines, mention that git-status is the mechanism which sends back to the PR on Github whether the PR build was successful or failed
 d) automation will be slightly different as we are just building the docker images for each of our custom images, so just talk a little about what image does and what commands it allows us to run
 
-### pr-<repository>
+### pr-*repository*
 
 If a pr is opened in one of Galasa's repositories, the pr-build pipeline for that repository will be invoked.
 Every pr build follows similar a structure that make use of generic tasks that can be sibstituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
@@ -44,18 +44,6 @@ Then a docker build task is used to build the image of the repository with the p
 Finally, a 'git-status' task is always run which sends back to the PR on Github whether the PR build was successful or failed.
 A git-clean is then performed on the repositories that were cloned.
 
-### main-*repository*
-
-When there is a push to the main branch of a repository, the main build is for that repository is invoked.
-Every main build follows similar a structure that make use of generic tasks that can be sibstituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
-Every main build will incorporate the following tasks:
-The first task is to clone the repository where the push to main occurred and clone the automation repository. 
-Then the 'get-commit' task is called to get the latest commit of the repository.
-A maven or gradle build is then performed depending on the repository to build the repository artifact.
-Then a docker build task is used to build the image of the main branch of the repository including the recent pushed changes and is pushed to harbor with the tag 'main' and deployed to the remote maven repository. This is so we can distinguish the image from ones built from pull requests and will also be use to deploy to the remote maven repository.
-We then perform the 'recycle-deployment' task which ***************
-Finally, a git-clean is then performed on the repositories that were cloned.
-
 ### pr-automation
 
 The pr automation build is different to the other repositories.
@@ -63,13 +51,6 @@ This pipeline is triggered when  pr is opened in the automation repository.
 It still initially uses the tasks: 'git-verify', clones the automation repository and then 'get-commit'.
 However, we then do a series of docker-builds to build and push the custom images we need to [harbor](harbor.galasa.dev/common), tagged with the latest commit SHA of the pr. These images allow you to run certain commands in other pipelines. 
 For example the gpg-image is an image purely with the capabitlty to run gpg commands. This is needed in the generic 'maven-gpg' task whihc in turn is needed for the 'maven-build' task. This modularity of tasks makes pipelines much easier to compose as it can use tasks already made and pass in the specific parameters it requires.
-
-### main-automation
-
-The main automation build is different to the other repositories.
-This pipeline is triggered when there is a push to the main branch in the automation repository.
-We still initially clone the automation repository, but we then do a series of docker builds for the custom images which we then push to [harbor](harbor.galasa.dev/common), with the tag 'main'.
-Fianlly, we perform the task 'git-clean' 
 
 ### pr-wrapping
 
@@ -84,6 +65,50 @@ We then perform a docker build and the image is then pushed to [harbor](harbor.g
 
 Finally, the 'git-status' task is run which sends back to the PR on Github whether the PR build was successful or failed.
 We can then perform the 'git-clean' task on the Automation and Wrapping repositories.
+
+### pr-gradle
+
+This Pipeline is triggered when a pull request is opened in the [Gradle repository](https://github.com/galasa-dev/gradle).
+
+This pipeline will following the structure above. 
+It will have two 'git-clone' tasks, cloning the Automation and Gradle repositories.
+
+This build requires a gradle build. We use the generic task 'gradle-build' and pass in the necessary parameters revelant to the gradle repository.
+
+We then perform a docker build and the image is then pushed to [harbor](harbor.galasa.dev/galasadev/galasa-gradle) and is tagged with the latest commit SHA in the pr so the image is easily identifyable.
+
+### pr-maven
+
+This Pipeline is triggered when a pull request is opened in the [Maven repository](https://github.com/galasa-dev/maven).
+
+This pipeline will following the structure above. 
+It will have two 'git-clone' tasks, cloning the Maven and Wrapping repositories.
+
+This build requires a maven build. Therefore, another task is needed - 'maven-gpg' - prior to performing the 'maven-build' task.
+
+We then perform a docker build and the image is then pushed to [harbor](harbor.galasa.dev/galasadev/galasa-maven) and is tagged with the latest commit SHA in the pr so the image is easily identifyable.
+
+
+### main-*repository*
+
+When there is a push to the main branch of a repository, the main build is for that repository is invoked.
+Every main build follows similar a structure that make use of generic tasks that can be sibstituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
+Every main build will incorporate the following tasks:
+The first task is to clone the repository where the push to main occurred and clone the automation repository. 
+Then the 'get-commit' task is called to get the latest commit of the repository.
+A maven or gradle build is then performed depending on the repository to build the repository artifact.
+Then a docker build task is used to build the image of the main branch of the repository including the recent pushed changes and is pushed to harbor with the tag 'main' and deployed to the remote maven repository. This is so we can distinguish the image from ones built from pull requests and will also be use to deploy to the remote maven repository.
+We then perform the 'recycle-deployment' task which ***************
+Finally, a git-clean is then performed on the repositories that were cloned.
+
+
+### main-automation
+
+The main automation build is different to the other repositories.
+This pipeline is triggered when there is a push to the main branch in the automation repository.
+We still initially clone the automation repository, but we then do a series of docker builds for the custom images which we then push to [harbor](harbor.galasa.dev/common), with the tag 'main'.
+Fianlly, we perform the task 'git-clean' 
+
 
 ### main-wrapping
 
@@ -100,16 +125,6 @@ We then perform the 'recycle-deployment' task perform a rolling restart of the w
 
 Finally we perform the 'git-clean' task on the Automation and Wrapping repositories.
 
-### pr-gradle
-
-This Pipeline is triggered when a pull request is opened in the [Gradle repository](https://github.com/galasa-dev/gradle).
-
-This pipeline will following the structure above. 
-It will have two 'git-clone' tasks, cloning the Automation and Gradle repositories.
-
-This build requires a gradle build. We use the generic task 'gradle-build' and pass in the necessary parameters revelant to the gradle repository.
-
-We then perform a docker build and the image is then pushed to [harbor](harbor.galasa.dev/galasadev/galasa-gradle) and is tagged with the latest commit SHA in the pr so the image is easily identifyable.
 
 ### main-gradle
 
@@ -126,16 +141,6 @@ We then perform the 'recycle-deployment' task perform a rolling restart of the g
 
 Finally we perform the 'git-clean' task on the Automation and Gradle repositories.
 
-### pr-maven
-
-This Pipeline is triggered when a pull request is opened in the [Maven repository](https://github.com/galasa-dev/maven).
-
-This pipeline will following the structure above. 
-It will have two 'git-clone' tasks, cloning the Maven and Wrapping repositories.
-
-This build requires a maven build. Therefore, another task is needed - 'maven-gpg' - prior to performing the 'maven-build' task.
-
-We then perform a docker build and the image is then pushed to [harbor](harbor.galasa.dev/galasadev/galasa-maven) and is tagged with the latest commit SHA in the pr so the image is easily identifyable.
 
 ### main-maven
 
@@ -161,29 +166,38 @@ c) just an explanation of what the steps do, doesn't have to be super technical
 
 ### get-commit
 
+This task uses the custom gitcli image stored in [harbor](harbor.galasa.dev/common/gitcli). This image allows for git commands but also built on top of the custom gpg image stored in harbor as this task requires both commands.
+
 ### git-clean
+
+This task uses the latest busybox image.
 
 ### git-clone
 
-This task clones a repository given by a URL.
+This task clones a repository from the provided URL into the workspace.
 
 ### git-status
 
-This task provides that status of a pr build - whether it passed or failed.
+This task provides the status of a pr build - whether it passed or failed - and updates the pull request on GitHub with this status.
 
 Parameters:
 We pass the status of the tasks from a pipeline.
-We get the prUrl, statusesUrl and IssueUrl from the webhook that triggered the pipeline that uses this git-status task.
+We get the prUrl, statusesUrl and IssueUrl from the webhook. These are then passed as parameters to the Go program build-images/github-status/main.go that will then output the appropriate status on the pull request on GitHub.
 
-Uses the custom ghgstatus image from harbor
+This task uses the custom ghgstatus image stored in [harbor](harbor.galasa.dev/common/ghgstatus
 
 ### git-verify
 
-This task is to verify a user when they open a pr into a repository.
+This task is to verify that a user who opens a pr into a repository, is an approved code-committer or code-admin.
+
+Parameters:
+We get the userId, prUrl and action from the webhook. These are then passed as parameters to the Go program build-images/github-verify/main.go that will then output the appropriate status on the pull request on GitHub.
+
+This task uses the custom ghgverify image stored in [harbor](harbor.galasa.dev/common/ghgverify)
 
 ### go-make
 
-This task is to purely perform the command 'make'.
+This task is to purely perform the shell command 'make'.
 
 The task's only paramter is directory that we are performing the make command in.
 
@@ -210,7 +224,7 @@ The imageName is the name of the image that the task is going to build.
 The noPush parameter allows you to choose whether you want to push the image built to the given destination (imageName).
 We pass an array, 'build-args', to pass any arguments needed into the dockerfile.
 
-The task uses kaniko-executor image to perform kaniko commands.
+The task uses kaniko-executor image to perform kaniko commands. We store this in [harbor](harbor.galasa.dev/common/kaniko-executor).
 
 ### maven-build
 
@@ -229,7 +243,7 @@ The Maven build uses the Maven GPG Plugin to sign all of the built artifacts usi
 
  uses the ExternalSecret 'mavengpg' and maybe have a path to the yaml? maven-gpg task pulls out two bits of data (passphrase and gpg key) from our IBM Cloud Secrets Manager and puts them into a settings.xml file, for the Maven GPG Plugin to use.
 
-This task has three steps:
+This task uses the custom gpg image stored in [harbor](harbor.galasa.dev/common/gpg).
 
 
 ### recycle-deployment
@@ -240,4 +254,4 @@ It then outputs the status of the rolling restart #######after 3 minutes of wait
 Parameters:
 This task takes the deployment name that we want to perform the rollout restart commands on.
 
-We pull the custom kubectl image that is stored in harbor. We use the image that is tagged with main as we know this is the latest working version of this image.
+We pull the custom kubectl image that is stored in [harbor](harbor.galasa.dev/common/kubectl). We use the image that is tagged with main as we know this is the latest working version of this image.
