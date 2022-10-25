@@ -44,7 +44,7 @@ Then a docker build task is used to build the image of the repository with the p
 Finally, a 'git-status' task is always run which sends back to the PR on Github whether the PR build was successful or failed.
 A git-clean is then performed on the repositories that were cloned.
 
-### main-<repository>
+### main-<<repository>>
 
 When there is a push to the main branch of a repository, the main build is for that repository is invoked.
 Every main build follows similar a structure that make use of generic tasks that can be sibstituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
@@ -164,6 +164,8 @@ c) just an explanation of what the steps do, doesn't have to be super technical
 ### git-clean
 
 ### git-clone
+
+This task clones a repository given by a URL.
 
 ### git-status
 
