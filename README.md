@@ -49,7 +49,9 @@ A git-clean is then performed on the repositories that were cloned.
 The pr automation build is different to the other repositories.
 This pipeline is triggered when  pr is opened in the automation repository.
 It still initially uses the tasks: 'git-verify', clones the automation repository and then 'get-commit'.
+
 However, we then do a series of docker-builds to build and push the custom images we need to [harbor](harbor.galasa.dev/common), tagged with the latest commit SHA of the pr. These images allow you to run certain commands in other pipelines. 
+
 For example the gpg-image is an image purely with the capabitlty to run gpg commands. This is needed in the generic 'maven-gpg' task whihc in turn is needed for the 'maven-build' task. This modularity of tasks makes pipelines much easier to compose as it can use tasks already made and pass in the specific parameters it requires.
 
 ### pr-wrapping
@@ -106,7 +108,9 @@ Finally, a git-clean is then performed on the repositories that were cloned.
 
 The main automation build is different to the other repositories.
 This pipeline is triggered when there is a push to the main branch in the automation repository.
+
 We still initially clone the automation repository, but we then do a series of docker builds for the custom images which we then push to [harbor](harbor.galasa.dev/common), with the tag 'main'.
+
 Fianlly, we perform the task 'git-clean' 
 
 
