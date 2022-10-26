@@ -100,13 +100,20 @@ We can then perform the 'git-clean' task on the Automation and Maven repositorie
 ### main-*repository*
 
 When there is a push to the main branch of a repository, the main build is for that repository is invoked.
+
 Every main build follows similar a structure that make use of generic tasks that can be sibstituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
+
 Every main build will incorporate the following tasks:
 The first task is to clone the repository where the push to main occurred and clone the automation repository. 
+
 Then the 'get-commit' task is called to get the latest commit of the repository.
+
 A maven or gradle build is then performed depending on the repository to build the repository artifact.
+
 Then a docker build task is used to build the image of the main branch of the repository including the recent pushed changes and is pushed to harbor with the tag 'main' and deployed to the remote maven repository. This is so we can distinguish the image from ones built from pull requests and will also be use to deploy to the remote maven repository.
+
 We then perform the 'recycle-deployment' task which performs a kubectl rolling rstart to deploy the 'main' artifact to the remote maven repository.
+
 Finally, a git-clean is then performed on the repositories that were cloned.
 
 
