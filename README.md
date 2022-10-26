@@ -12,6 +12,18 @@ This repository is the single location for all the automation and CI/CD that occ
 
 ## Event Listeners
 
+Webhooks are set up on these Github repositories to trigger the three EventListeners:
+- Automation
+- Wrapping
+- Gradle
+- Maven
+- Framework
+- Extensions
+- Managers
+- OBR
+- Eclipse
+- Isolated
+
 
 ### github-pr-builder-listener
 
