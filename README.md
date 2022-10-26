@@ -52,7 +52,7 @@ Finally, a 'git-status' task is always run which sends back to the PR on Github 
 
 A git-clean is then performed on the repositories that were cloned.
 
-### pr-automation
+#### pr-automation
 
 The pr automation build is different to the other repositories.
 This pipeline is triggered when  pr is opened in the automation repository.
@@ -62,7 +62,7 @@ However, we then do a series of docker-builds to build and push the custom image
 
 For example the gpg-image is an image purely with the capabitlty to run gpg commands. This is needed in the generic 'maven-gpg' task whihc in turn is needed for the 'maven-build' task. This modularity of tasks makes pipelines much easier to compose as it can use tasks already made and pass in the specific parameters it requires.
 
-### pr-wrapping
+#### pr-wrapping
 
 This Pipeline is triggered when a pull request is opened in the [Wrapping repository](https://github.com/galasa-dev/wrapping).
 
@@ -76,7 +76,7 @@ We then perform a docker build and the image is then pushed to [harbor](harbor.g
 Finally, the 'git-status' task is run which sends back to the PR on Github whether the PR build was successful or failed.
 We can then perform the 'git-clean' task on the Automation and Wrapping repositories.
 
-### pr-gradle
+#### pr-gradle
 
 This Pipeline is triggered when a pull request is opened in the [Gradle repository](https://github.com/galasa-dev/gradle).
 
@@ -90,7 +90,7 @@ We then perform a docker build and the image is then pushed to [harbor](harbor.g
 Finally, the 'git-status' task is run which sends back to the PR on Github whether the PR build was successful or failed.
 We can then perform the 'git-clean' task on the Automation and Gradle repositories.
 
-### pr-maven
+#### pr-maven
 
 This Pipeline is triggered when a pull request is opened in the [Maven repository](https://github.com/galasa-dev/maven).
 
@@ -125,7 +125,7 @@ We then perform the 'recycle-deployment' task which performs a kubectl rolling r
 Finally, a git-clean is then performed on the repositories that were cloned.
 
 
-### main-automation
+#### main-automation
 
 The main automation build is different to the other repositories.
 This pipeline is triggered when there is a push to the main branch in the automation repository.
@@ -135,7 +135,7 @@ We still initially clone the automation repository, but we then do a series of d
 Fianlly, we perform the task 'git-clean' on the Automation repository.
 
 
-### main-wrapping
+#### main-wrapping
 
 This pipelines is triggered when there is a push to the main branch of the Wrapping repository.
 
@@ -151,7 +151,7 @@ We then perform the 'recycle-deployment' task perform a rolling restart of the w
 Finally we perform the 'git-clean' task on the Automation and Wrapping repositories.
 
 
-### main-gradle
+#### main-gradle
 
 This pipelines is triggered when there is a push to the main branch of the Gradle repository.
 
@@ -167,7 +167,7 @@ We then perform the 'recycle-deployment' task perform a rolling restart of the g
 Finally we perform the 'git-clean' task on the Automation and Gradle repositories.
 
 
-### main-maven
+#### main-maven
 
 This pipelines is triggered when there is a push to the main branch of the Maven repository.
 
