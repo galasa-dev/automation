@@ -67,16 +67,6 @@ spec:
               metadata:
                 generateName: repo-$(tt.params.git-repository-name)-pr-$(tt.params.git-pr-number)-
               spec:
-                taskRunSpecs:
-                  - pipelineTaskName: foo
-                    stepOverrides:
-                      - name: foo 
-                        resources:
-                          requests:
-                            cpu: 1 
-                    computeResources:
-                      requests:
-                        cpu: 2
                 pipelineRef:
                   name: pr-$(tt.params.git-repository-name)
                 serviceAccountName: build-bot
