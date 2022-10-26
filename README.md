@@ -18,6 +18,7 @@ If a pull request is opened by someone who is not part of an approved group (cod
 ### github-pr-review-builder-listener
 
 ???
+This EventListener is triggered via webhook when a code-admin submits the rebuild phrase comment on the pull request
 
 ### github-main-builder-listener
 
@@ -191,11 +192,15 @@ c) just an explanation of what the steps do, doesn't have to be super technical
 
 ### get-commit
 
+
+
 This task uses the custom gitcli image stored in [harbor](harbor.galasa.dev/common/gitcli). This image allows for git commands but also built on top of the custom gpg image stored in harbor as this task requires both commands.
 
 ### git-clean
 
-This task uses the latest busybox image.
+This task removes the provided subdirectory from the workspace.
+
+This task uses the latest busybox image to perform Unix commands.
 
 ### git-clone
 
