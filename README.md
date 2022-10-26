@@ -34,14 +34,22 @@ d) automation will be slightly different as we are just building the docker imag
 ### pr-*repository*
 
 If a pr is opened in one of Galasa's repositories, the pr-build pipeline for that repository will be invoked.
+
 Every pr build follows similar a structure that make use of generic tasks that can be sibstituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
+
 Every pr build will incorporate the following tasks:
 The pipeline will first use the 'git-verify' task to see if the pr author needs approval from a Galasa admin.
+
 The next task is to clone the repository where the pr is opened and clone the automation repository. 
+
 Then the 'get-commit' task is called to get the latest commit of the repository.
+
 A maven or gradle build is then performed depending on the repository to build the repository artifact.
+
 Then a docker build task is used to build the image of the repository with the pr's changes and is then pushed to harbor, tagging the image with the latest commit SHA in the pr.
+
 Finally, a 'git-status' task is always run which sends back to the PR on Github whether the PR build was successful or failed.
+
 A git-clean is then performed on the repositories that were cloned.
 
 ### pr-automation
