@@ -79,6 +79,9 @@ This build requires a gradle build. We use the generic task 'gradle-build' and p
 
 We then perform a docker build and the image is then pushed to [harbor](harbor.galasa.dev/galasadev/galasa-gradle) and is tagged with the latest commit SHA in the pr so the image is easily identifyable.
 
+Finally, the 'git-status' task is run which sends back to the PR on Github whether the PR build was successful or failed.
+We can then perform the 'git-clean' task on the Automation and Gradle repositories.
+
 ### pr-maven
 
 This Pipeline is triggered when a pull request is opened in the [Maven repository](https://github.com/galasa-dev/maven).
@@ -90,6 +93,9 @@ This build requires a maven build. Therefore, another task is needed - 'maven-gp
 
 We then perform a docker build and the image is then pushed to [harbor](harbor.galasa.dev/galasadev/galasa-maven) and is tagged with the latest commit SHA in the pr so the image is easily identifyable.
 
+Finally, the 'git-status' task is run which sends back to the PR on Github whether the PR build was successful or failed.
+We can then perform the 'git-clean' task on the Automation and Maven repositories.
+
 
 ### main-*repository*
 
@@ -100,7 +106,7 @@ The first task is to clone the repository where the push to main occurred and cl
 Then the 'get-commit' task is called to get the latest commit of the repository.
 A maven or gradle build is then performed depending on the repository to build the repository artifact.
 Then a docker build task is used to build the image of the main branch of the repository including the recent pushed changes and is pushed to harbor with the tag 'main' and deployed to the remote maven repository. This is so we can distinguish the image from ones built from pull requests and will also be use to deploy to the remote maven repository.
-We then perform the 'recycle-deployment' task which ***************
+We then perform the 'recycle-deployment' task which performs a kubectl rolling rstart to deploy the 'main' artifact to the remote maven repository.
 Finally, a git-clean is then performed on the repositories that were cloned.
 
 
@@ -111,7 +117,7 @@ This pipeline is triggered when there is a push to the main branch in the automa
 
 We still initially clone the automation repository, but we then do a series of docker builds for the custom images which we then push to [harbor](harbor.galasa.dev/common), with the tag 'main'.
 
-Fianlly, we perform the task 'git-clean' 
+Fianlly, we perform the task 'git-clean' on the Automation repository.
 
 
 ### main-wrapping
@@ -205,7 +211,7 @@ This task is to purely perform the shell command 'make'.
 
 The task's only paramter is directory that we are performing the make command in.
 
-It uses the official go image from DockerHub to be able to perform go commands.
+It uses the official GoLang image from DockerHub to be able to perform Go commands.
 
 ### gradle-build
 
@@ -245,9 +251,16 @@ We pull and use the offical maven image from DockerHub in order to perform the m
 
 The Maven build uses the Maven GPG Plugin to sign all of the built artifacts using GnuPG. The maven-gpg task uses the GnuPG CLI to put the correct secrets in place for the Maven GPG Plugin to use during the maven-build task.
 
+The first step makes a new directory within the provided working directory.
+
+We then perform gpg commands to import the passphrase and gpg key.
+
+In the last step, we copy
+
  uses the ExternalSecret 'mavengpg' and maybe have a path to the yaml? maven-gpg task pulls out two bits of data (passphrase and gpg key) from our IBM Cloud Secrets Manager and puts them into a settings.xml file, for the Maven GPG Plugin to use.
 
-This task uses the custom gpg image stored in [harbor](harbor.galasa.dev/common/gpg).
+This task uses the custom gpg image stored in [harbor](harbor.galasa.dev/common/gpg) to perform gpg commands.
+We also use the offical busybox image from DockerHub to perform Unix commands.
 
 
 ### recycle-deployment
