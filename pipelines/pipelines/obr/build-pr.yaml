@@ -138,11 +138,34 @@ spec:
      - name: output
        workspace: git-workspace
 
+  
+
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-automation
+    params:
+    - name: context 
+      value: $(context.pipelineRun.name)/obr
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
     - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -152,24 +175,12 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: maven-gpg
-    taskRef:
-      name: maven-gpg
-    runAfter:
-    - clone-obr 
-    params:
-    - name: context 
-      value: $(context.pipelineRun.name)/obr
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
-
   - name: generate-bom
     taskRef:
       name: galasabld
     runAfter:
     - maven-gpg
+    - get-commit
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
@@ -300,7 +311,6 @@ spec:
     taskRef:
       name: docker-build
     runAfter: 
-      - get-commit
       - maven-build-obr  
     params:
     - name: pipelineRunName
