@@ -9,6 +9,8 @@ This repository is the single location for all the automation and CI/CD that occ
 
 # Pipelines
 
+**This documentation is a work in progress and will continue being added to as new build pipelines are developed.**
+
 
 ## Event Listeners
 
@@ -17,12 +19,12 @@ Webhooks are set up on these Github repositories to trigger the three EventListe
 - Wrapping
 - Gradle
 - Maven
-- Framework
-- Extensions
-- Managers
-- OBR
-- Eclipse
-- Isolated
+- Framework (Pipeline not running yet)
+- Extensions (Pipeline not running yet)
+- Managers (Pipeline not running yet)
+- OBR (Pipeline not running yet)
+- Eclipse (Pipeline not running yet)
+- Isolated (Pipeline not running yet)
 
 
 ### github-pr-builder-listener
