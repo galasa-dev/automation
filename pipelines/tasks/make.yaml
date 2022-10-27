@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: go-make
+  name: make
   namespace: galasa-pipelines
 spec:
   workspaces:
