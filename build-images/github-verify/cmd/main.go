@@ -46,7 +46,15 @@ func main() {
 	// Decide on what action to take
 	fmt.Println("Starting check for action: " + *action)
 	switch *action {
-	case "opened":
+	case "opened", "reopened":
+		if CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ",")) {
+			updateStatus("pending", "Build submited", pr)
+			os.Exit(0)
+		}
+		commentOnPr(approvalRequest, pr)
+		updateStatus("pending", "Waiting admin approval", pr)
+		os.Exit(1)
+	case "synchronize":
 		if CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ",")) {
 			updateStatus("pending", "Build submited", pr)
 			os.Exit(0)
