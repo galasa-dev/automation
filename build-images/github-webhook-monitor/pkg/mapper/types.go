@@ -1,3 +1,6 @@
+/*
+ * Copyright contributors to the Galasa Project
+ */
 package mapper
 
 type Config struct {
