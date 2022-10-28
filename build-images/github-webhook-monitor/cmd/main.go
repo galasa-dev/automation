@@ -37,25 +37,33 @@ var client = http.Client{
 	Timeout: time.Second * 30,
 }
 
+/**
+This poll logic needs to is given a webhook id, then search all deliveries from the webhook cross referencing a mounted mapper config
+
+Arguments required:
+	String Github Org - which org we are watching
+	String Github Token - access token
+	String Hook ID - mostly to save api calls
+	String Config Map - yaml file for mapping webhooks to event listeners
+
+Poll frequency can be controlled from K8s Cron job of how often this is run. Also allows for simple manual trigger
+*/
 func main() {
-	/**
-	This poll logic needs to locate all the webhooks in an org, then search all deliveries from the webhooks cross referencing a mounted record of webhook
-
-	Arguments required:
-		String Github Org - which org we are watching
-		String Github Token - access token
-		String Hook ID - mostly to save api calls
-		String Config Map - yaml file for mapping webhooks to event listeners
-
-	Poll frequency can be controlled from K8s Cron job of how often this is run. Also allows for simple manual trigger
-	*/
 	parseArgsAndConfigs()
 
+	//Returns a list with the oldest relevant event first
+	orderedEventList := getEventList()
+
+	// Submits the events to any relevant webhook defined
+	submitEvents(orderedEventList)
+}
+
+func getEventList() []string {
 	var deliveries []jsontypes.Delivery
 	var eventQueue []string
 
 	page := 1
-	resp := GithubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries?per_page=50", *orgName, *hookId), nil)
+	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries?per_page=50", *orgName, *hookId), nil)
 	link := resp.Header["Link"][0]
 	segments := strings.Split(strings.TrimSpace(link), ";")
 
@@ -63,7 +71,7 @@ func main() {
 	if latestDeliveryId == "" {
 		f, err := os.Create(latestIdPath)
 		if err != nil {
-			log.Printf("Failed to create Id file", err)
+			log.Printf("Failed to create Id file: %s", err)
 		}
 		parseDeliveries(resp.Body, &deliveries)
 		f.WriteString(strconv.Itoa(deliveries[0].Id))
@@ -91,50 +99,50 @@ func main() {
 			break
 		}
 
-		resp = GithubGet(nextPage, nil)
+		resp = githubGet(nextPage, nil)
 		page++
 	}
 
 	if len(eventQueue) == 0 {
 		log.Printf("Nothing to do")
-		return
+		return eventQueue
 	}
 
 	for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
 		eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
 	}
 
-	log.Printf("%v found\n %v", len(eventQueue), eventQueue)
+	return eventQueue
+}
+
+func submitEvents(events []string) {
+	log.Printf("%v found\n %v", len(events), events)
 
 	// Now need to submit all events to event listener
-	for _, id := range eventQueue {
+	for _, id := range events {
 		log.Printf("Inspecting event: %s", id)
 		hookRequest, err := buildHookRequest(id)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if hookRequest == nil {
-			// Update the bookmark to the last checked, even if no actin=on
-			updateBookmark(id)
-			continue
-		}
-		resp, err := client.Do(hookRequest)
-		if err != nil {
-			log.Printf("WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
-		} else {
-			log.Printf("URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
+		if hookRequest != nil {
+			resp, err := client.Do(hookRequest)
+			if err != nil {
+				log.Printf("WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
+			} else {
+				log.Printf("URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
+			}
 		}
 
 		// We update the bookmark without ensuring 202 to prevent a backlog of missed events.
 		updateBookmark(id)
 	}
-
 }
 
 // Does a look up with the Github API to find the hook requests and payloads. Then creates new http request from output
 func buildHookRequest(id string) (*http.Request, error) {
 	var request jsontypes.WebhookRequest
-	resp := GithubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
+	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal("Failed retrieving webhook request body.", err)
@@ -175,7 +183,7 @@ func parseDeliveries(body io.ReadCloser, v interface{}) {
 }
 
 // Does an authenticated request to github API.
-func GithubGet(url string, headers map[string]string) *http.Response {
+func githubGet(url string, headers map[string]string) *http.Response {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/vnd.github+json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
