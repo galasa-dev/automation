@@ -236,7 +236,7 @@ Parameters:
 - statusesUrl, the URL to return the status of the build to the pull request via a POST request.
 - issueUrl, the URL to return comments to the pull request via a POST request.
 
-This task uses the custom ghgstatus image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghgstatus/artifacts-tab)
+This task uses the custom ghstatus image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghstatus/artifacts-tab)
 
 ### git-verify
 
@@ -249,9 +249,9 @@ Parameters:
 - The prUrl, the URL of the pull request on Github.
 - The action, describes whether the pull request is opened, closed, synchronized etc.
 
-This task uses the ghgverify Go program to first verify that the action is a supported one. It then checks if the userId is in the approved group. It then returns to the pull request whether the build has been submitted, or if an admin needs to approve.
+This task uses the ghverify Go program to first verify that the action is a supported one. It then checks if the userId is in the approved group. It then returns to the pull request whether the build has been submitted, or if an admin needs to approve.
 
-This task uses the custom ghgverify image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghgverify/artifacts-tab)
+This task uses the custom ghverify image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghverify/artifacts-tab)
 
 ### make
 

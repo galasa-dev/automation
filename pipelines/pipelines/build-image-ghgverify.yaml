@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: build-image-ghgverify
+  name: build-image-ghverify
   namespace: galasa-pipelines
 spec:
   workspaces:
@@ -39,7 +39,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: build-ghgverify-image
+  - name: build-ghverify-image
     taskRef:
       name: docker-build
     runAfter:
@@ -48,9 +48,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghgverify-dockerfile
+      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghgverify:latest
+      value: harbor.galasa.dev/common/ghverify:latest
     - name: noPush
       value: $(params.noPush)
     workspaces:
