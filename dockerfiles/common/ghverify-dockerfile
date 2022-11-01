@@ -1,0 +1,3 @@
+FROM alpine
+COPY bin/ghverify /go/bin/ghverify
+ENTRYPOINT ["/go/bin/ghverify"]

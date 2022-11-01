@@ -1,0 +1,3 @@
+FROM alpine
+COPY bin/ghstatus /go/bin/ghstatus
+ENTRYPOINT ["/go/bin/ghstatus"]
