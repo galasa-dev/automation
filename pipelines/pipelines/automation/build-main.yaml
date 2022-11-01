@@ -27,6 +27,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+       
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -56,7 +57,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: dockerfilePath
-      value: automation/dockerfiles/common/ghgverify-dockerfile
+      value: automation/dockerfiles/common/ghverify-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/ghverify:main
     - name: noPush
@@ -83,7 +84,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: build-ghgstatus-image
+  - name: build-ghstatus-image
     taskRef:
       name: docker-build
     runAfter:
@@ -94,7 +95,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-status
     - name: dockerfilePath
-      value: automation/dockerfiles/common/ghgstatus-dockerfile
+      value: automation/dockerfiles/common/ghstatus-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/ghstatus:main
     - name: noPush

@@ -71,41 +71,39 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: build-ghgverify-image
+  
+  - name: go-build-ghverify
     taskRef:
-      name: docker-build
+      name: go-build
     runAfter:
-    - git-clone
+      - clone-automation
     params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
+    - name: GOPATH
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/ghgverify-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/ghgverify:$(params.headSha)
-    - name: noPush
-      value: --no-push
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghverify
+      - cmd/main.go  
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: build-ghgstatus-image
+
+  - name: go-build-ghstatus
     taskRef:
-      name: docker-build
+      name: go-build
     runAfter:
-    - git-clone
+      - clone-automation
     params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
+    - name: GOPATH
       value: $(context.pipelineRun.name)/automation/build-images/github-status
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/ghgstatus-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/ghgstatus:$(params.headSha)
-    - name: noPush
-      value: --no-push
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghstatus
+      - cmd/main.go  
     workspaces:
      - name: git-workspace
        workspace: git-workspace
