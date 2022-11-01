@@ -5,7 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: recycle-deployment
-  namespace: galasa-pipelines
+  namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace
@@ -13,7 +13,7 @@ spec:
   params:
   - name: namespace
     type: string
-    default: galasa-pipelines
+    default: galasa-build
   - name: deployment
     type: string
   steps:
