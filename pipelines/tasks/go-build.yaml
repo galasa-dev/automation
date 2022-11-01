@@ -1,0 +1,30 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: go-build
+  namespace: galasa-pipelines
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string 
+  - name: goEnvs
+    type: array    
+  - name: goArgs
+    type: array  
+  steps:
+  - name: go-build
+    workingDir: /workspace/git/$(params.context)
+    image: golang:latest
+    command:
+      - $(params.goEnvs[*])
+      - go
+    args:
+      - $(params.goArgs[*])
+
+  
