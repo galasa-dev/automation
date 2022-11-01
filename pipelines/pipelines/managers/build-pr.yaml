@@ -5,7 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: pr-managers
-  namespace: galasa-pipelines
+  namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace
