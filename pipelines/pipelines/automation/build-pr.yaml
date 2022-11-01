@@ -39,9 +39,9 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
-  - name: git-clone
+  - name: clone-automation
     taskRef: 
-      name: git-clone
+      name: clone-automation
     runAfter:
       - git-verify
     params:
@@ -62,7 +62,7 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - git-clone
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -111,7 +111,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - git-clone
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -130,7 +130,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - git-clone
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -149,7 +149,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - git-clone
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
