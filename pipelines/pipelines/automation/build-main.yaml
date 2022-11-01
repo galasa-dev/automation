@@ -37,6 +37,7 @@ spec:
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: goArgs
       value:
+      - build
       - -o
       - bin/ghverify
       - cmd/main.go  
@@ -74,6 +75,7 @@ spec:
       value: $(context.pipelineRun.name)/automation/build-images/github-status
     - name: goArgs
       value:
+      - build
       - -o
       - bin/ghstatus
       - cmd/main.go  
