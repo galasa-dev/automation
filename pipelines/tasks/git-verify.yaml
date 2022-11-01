@@ -17,7 +17,7 @@ spec:
   steps:
   - name: github-verify
     workingDir: /workspace/git/
-    image: harbor.galasa.dev/common/ghgverify:latest
+    image: harbor.galasa.dev/common/ghverify:latest
     env:
     - name: GITHUBTOKEN
       valueFrom:
@@ -26,7 +26,7 @@ spec:
           key: token
           optional: false
     command:
-    - /go/bin/ghgverify
+    - /go/bin/ghverify
     - --userid
     - $(params.userId)
     - --pr
