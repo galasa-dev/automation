@@ -42,7 +42,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghgverify:main
     - name: noPush
-      value: --no-push
+      value: ""
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -61,7 +61,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghgstatus:main
     - name: noPush
-      value: --no-push
+      value: ""
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -80,7 +80,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/gpg:main
     - name: noPush
-      value: --no-push
+      value: ""
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -99,7 +99,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/kubectl:main
     - name: noPush
-      value: --no-push
+      value: ""
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -118,7 +118,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/gitcli:main
     - name: noPush
-      value: --no-push
+      value: ""
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
