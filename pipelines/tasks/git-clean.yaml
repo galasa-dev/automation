@@ -18,6 +18,7 @@ spec:
   - name: clean-subdirectory
     workingDir: /workspace/git/
     image: busybox:latest
+    imagePullPolicy: Always
     command:
     - rm
     - -rf

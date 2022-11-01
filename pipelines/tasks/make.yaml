@@ -17,6 +17,7 @@ spec:
   - name: make
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/golang:latest
+    imagePullPolicy: Always
     command:
     - make
     - all  

@@ -22,6 +22,7 @@ spec:
     workingDir: /workspace/git/$(params.context)
     # image: docker.io/library/gradle:7.5-jdk11
     image: docker.io/library/gradle:6.8.2-jdk11 
+    imagePullPolicy: Always
     command:
     - gradle
     args:

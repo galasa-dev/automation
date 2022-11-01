@@ -19,6 +19,7 @@ spec:
   steps:
   - name: start-recycle
     image: harbor.galasa.dev/common/kubectl:main
+    imagePullPolicy: Always
     command:
     - kubectl
     - -n
@@ -28,6 +29,7 @@ spec:
     - deployment/$(params.deployment)
   - name: wait-recycle
     image: harbor.galasa.dev/common/kubectl:main
+    imagePullPolicy: Always
     command:
     - kubectl
     - -n
