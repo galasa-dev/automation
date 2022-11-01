@@ -21,7 +21,7 @@ spec:
   steps:
   - name: github-status
     workingDir: /workspace/git/
-    image: harbor.galasa.dev/common/ghgstatus:latest
+    image: harbor.galasa.dev/common/ghstatus:latest
     env:
     - name: GITHUBTOKEN
       valueFrom:
@@ -30,7 +30,7 @@ spec:
           key: token
           optional: false
     command:
-    - /go/bin/ghgstatus
+    - /go/bin/ghstatus
     - --status
     - $(params.status)
     - --prUrl
