@@ -21,6 +21,7 @@ spec:
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
     image: docker.io/library/maven:3.8.6-openjdk-11 
+    imagePullPolicy: Always
     command:
       - mvn
     args:

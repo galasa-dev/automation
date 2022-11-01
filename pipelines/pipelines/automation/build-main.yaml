@@ -72,7 +72,7 @@ spec:
     runAfter:
       - clone-automation
     params:
-    - name: GOPATH
+    - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-status
     - name: goArgs
       value:
