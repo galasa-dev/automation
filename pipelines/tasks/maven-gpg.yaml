@@ -17,12 +17,14 @@ spec:
   - name: gpgdirectory
     workingDir: /workspace/git/$(params.context)
     image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
     command:
     - mkdir
     - /workspace/git/$(params.context)/gpg
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gpg:main
+    imagePullPolicy: Always
     command:
     - gpg
     - --homedir
@@ -39,6 +41,7 @@ spec:
   - name: copy-settings
     workingDir: /workspace/git/$(params.context)
     image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
     command:
     - cp
     - /root/mavengpg/settings.xml
