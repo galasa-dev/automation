@@ -27,11 +27,35 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: build-ghgverify-image
+  - name: go-build-ghverify
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-verify
+    - name: goEnvs
+      value:
+        - GOOS=linux
+        - CGO_ENABLED=0
+        - GOARCH=amd64
+        - GO111MODULE=auto
+        - GOPATH=/go
+    - name: goArgs
+      value:
+      - -o
+      - bin/ghverify
+      - cmd/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: build-ghverify-image
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation
+    - go-build-ghverify
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -46,6 +70,31 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  - name: go-build-ghstatus
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-status
+    - name: goEnvs
+      value:
+        - GOOS=linux
+        - CGO_ENABLED=0
+        - GOARCH=amd64
+        - GO111MODULE=auto
+        - GOPATH=/go
+    - name: goArgs
+      value:
+      - -o
+      - bin/ghstatus
+      - cmd/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
   - name: build-ghgstatus-image
     taskRef:
       name: docker-build
@@ -65,6 +114,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-gpg-image
     taskRef:
       name: docker-build
@@ -84,6 +134,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-kubectl-image
     taskRef:
       name: docker-build
@@ -103,6 +154,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-gitcli-image
     taskRef:
       name: docker-build
@@ -122,6 +174,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
+
   finally:
   - name: git-clean
     taskRef: 
