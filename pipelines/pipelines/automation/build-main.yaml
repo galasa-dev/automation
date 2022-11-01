@@ -33,15 +33,8 @@ spec:
     runAfter:
       - clone-automation
     params:
-    - name: context
+    - name: GOPATH
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
-    - name: goEnvs
-      value:
-        - GOOS=linux
-        - CGO_ENABLED=0
-        - GOARCH=amd64
-        - GO111MODULE=auto
-        - GOPATH=/go
     - name: goArgs
       value:
       - -o
@@ -77,15 +70,8 @@ spec:
     runAfter:
       - clone-automation
     params:
-    - name: context
+    - name: GOPATH
       value: $(context.pipelineRun.name)/automation/build-images/github-status
-    - name: goEnvs
-      value:
-        - GOOS=linux
-        - CGO_ENABLED=0
-        - GOARCH=amd64
-        - GO111MODULE=auto
-        - GOPATH=/go
     - name: goArgs
       value:
       - -o
