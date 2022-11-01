@@ -5,7 +5,6 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: github-main-builder-listener
-  namespace: galasa-pipelines
 spec:
   serviceAccountName: tekton-trigger
   triggers:
