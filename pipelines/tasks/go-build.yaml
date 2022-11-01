@@ -32,8 +32,16 @@ spec:
     workingDir: /workspace/git/$(params.GOPATH)
     image: golang:latest
     env:
-    - name: DOCKER_CONFIG
-      value: /root/.docker
+    - name: GOPATH
+      value: $(params.GOPATH)
+    - name: CGO_ENABLED
+      value: $(params.CGO_ENABLED)
+    - name: GOOS
+      value: $(params.GOOS)
+    - name: GOARCH
+      value: $(params.GOARCH)
+    - name: GO111MODULE
+      value: $(params.GO111MODULE)        
     command:
       - go
     args:
