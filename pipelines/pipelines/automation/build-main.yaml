@@ -27,7 +27,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-       
+
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -88,7 +88,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation
+    - go-build-ghstatus
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
