@@ -40,7 +40,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghgverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghgverify:main
+      value: harbor.galasa.dev/common/ghverify:main
     - name: noPush
       value: ""
     workspaces:
@@ -59,7 +59,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghgstatus-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghgstatus:main
+      value: harbor.galasa.dev/common/ghstatus:main
     - name: noPush
       value: ""
     workspaces:
