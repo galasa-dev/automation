@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: galasa-build-bot
+  namespace: galasa-build
+secrets:
+- name: harbor-creds
