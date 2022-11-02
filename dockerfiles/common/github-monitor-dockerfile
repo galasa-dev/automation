@@ -1,0 +1,21 @@
+############################
+# STEP 1 build executable binary
+############################
+FROM golang AS builder
+WORKDIR $GOPATH/src/github.com/automation/build-images/github-webhook-monitor
+COPY . /go/src/github.com/automation/build-images/github-webhook-monitor/
+
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=amd64
+ENV GO111MODULE=auto
+ENV GOPATH=/go
+
+RUN go build -o /go/bin/ghmonitor /go/src/github.com/automation/build-images/github-webhook-monitor/cmd/main.go
+
+############################
+# STEP 2 build a small image
+############################
+FROM alpine
+COPY --from=builder /go/bin/ghmonitor /go/bin/ghmonitor
+ENTRYPOINT ["/go/bin/ghmonitor"]
