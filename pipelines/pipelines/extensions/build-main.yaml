@@ -4,46 +4,15 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-extensions
-  namespace: galasa-build
+  name: main-extensions
+  namespace: galasa-pipelines
 spec:
   workspaces:
   - name: git-workspace
-  params:
-  - name: headRef
-    type: string
-  - name: headSha
-    type: string
-  - name: baseRef
-    type: string
-  - name: prUrl
-    type: string
-  - name: statusesUrl
-    type: string
-  - name: issueUrl
-    type: string
-  - name: userId
-    type: string
-  - name: prNumber
-    type: string
-  - name: action
-    type: string
   tasks:
-  - name: git-verify
-    taskRef:
-      name: git-verify
-    params:
-    - name: userId
-      value: $(params.userId)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: action
-      value: $(params.action)
   - name: clone-automation
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
@@ -62,21 +31,21 @@ spec:
     taskRef: 
       name: git-clone
     runAfter:
-      - git-verify
+      - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: $(params.baseRef)
+      value: main
     - name: refspec
-      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/extensions
     workspaces:
      - name: output
-       workspace: git-workspace
+       workspace: git-workspace  
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,16 +59,16 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: gradle-build-extensions
+  - name: main-gradle-build-extensions
     taskRef:
       name: gradle-build
-    runAfter:
-    - clone-extensions
+    runAfter: 
+      - clone-extensions
     params:
     - name: context
       value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
     - name: buildArgs
-      value: 
+      value:
         - "-PsourceMaven=https://development.galasa.dev/main/maven/framework"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/extensions/repo"
@@ -107,13 +76,13 @@ spec:
       value: publish
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
-  - name: docker-build-extensions
+       workspace: git-workspace  
+  - name: main-docker-build-extensions
     taskRef:
       name: docker-build
     runAfter:
-    - get-commit
-    - gradle-build-extensions
+      - get-commit
+      - main-gradle-build-extensions
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -122,35 +91,28 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/extensions/extensions-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-extensions:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-extensions:main
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: recycle-deployment
+    runAfter:
+    - main-docker-build-extensions
+    params:
+    - name: deployment
+      value: maven-extensions
     workspaces:
      - name: git-workspace
        workspace: git-workspace
   finally:
-  - name: git-status
-    when:
-      - input: "$(tasks.git-verify.status)"
-        operator: in
-        values: ["Succeeded"]
-    taskRef:
-      name: git-status
-    params:
-    - name: status
-      value: $(tasks.status)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: statusesUrl
-      value: $(params.statusesUrl)
-    - name: issueUrl
-      value: $(params.issueUrl)
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
   - name: git-clean-automation
     taskRef: 
       name: git-clean
