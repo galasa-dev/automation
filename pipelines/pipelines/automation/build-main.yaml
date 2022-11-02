@@ -34,7 +34,7 @@ spec:
     runAfter:
       - clone-automation
     params:
-    - name: GOPATH
+    - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: goArgs
       value:
