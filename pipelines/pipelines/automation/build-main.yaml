@@ -104,6 +104,45 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
+
+  - name: go-build-ghmonitor
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-monitor
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghmonitor
+      - cmd/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: build-ghmonitor-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghmonitor
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-monitor
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/github-monitor-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghmonitor:main
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
+
   - name: build-gpg-image
     taskRef:
       name: docker-build
