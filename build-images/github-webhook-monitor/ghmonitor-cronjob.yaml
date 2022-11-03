@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -13,15 +16,15 @@ spec:
         spec:
           restartPolicy: OnFailure
           containers:
-            - name: kubectl
+            - name: ghmonitor
               imagePullPolicy: Always
               image: harbor.galasa.dev/common/ghmonitor:main
               env:
                 - name: GITHUBTOKEN
                   valueFrom:
                   secretKeyRef:
-                    name: github_token
-                    key: token
+                    name: github-token
+                    key: password
                     optional: false
               args: ["-org=galasa-dev","-hook=<hook_id>","-trigger-map=/config.yaml"]
               volumeMounts:
