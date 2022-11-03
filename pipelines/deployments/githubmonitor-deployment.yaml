@@ -25,28 +25,49 @@ spec:
         image: harbor.galasa.dev/common/ghmonitor:main
         imagePullPolicy: Always
         env:
-        - name: EVENT_LISTENER_NAME # Unsure on this part
+        - name: PULL_REQUEST_EVENT_LISTENER
           valueFrom:
             configMapKeyRef:
               name: githubmonitor-configmap
               key: events.pull_request.eventListener 
-      # Need to mount PVC
-        ports:
-        - name: http
-          containerPort: 80
-          protocol: TCP
-        resources:
-          requests:
-            memory: 50Mi
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - githubmonitor-deployment
-              topologyKey: kubernetes.io/hostname
+        - name: PULL_REQUEST_REVIEW_EVENT_LISTENER
+          valueFrom:
+            configMapKeyRef:
+              name: githubmonitor-configmap
+              key: events.pull_request_review.eventListener 
+        - name: PUSH_EVENT_LISTENER 
+          valueFrom:
+            configMapKeyRef:
+              name: githubmonitor-configmap
+              key: events.push.eventListener 
+
+        volumeMounts:
+        - name: latestIdPvc
+          mountPath: /latestId
+          readOnly: true
+
+      volumes:
+      - name: latestIdPvc
+        
+
+        # From maven repo deployments - so don't think this is needed? 
+
+        # ports:
+        # - name: http
+        #   containerPort: 80
+        #   protocol: TCP
+        # resources:
+        #   requests:
+        #     memory: 50Mi
+      # affinity:
+      #   podAntiAffinity:
+      #     preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         labelSelector:
+      #           matchExpressions:
+      #           - key: app
+      #             operator: In
+      #             values:
+      #             - githubmonitor-deployment
+      #         topologyKey: kubernetes.io/hostname
