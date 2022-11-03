@@ -48,6 +48,8 @@ spec:
 
       volumes:
       - name: latestIdPvc
+        persistentVolumeClaim:
+          claimName: latestIdPvc
         
 
         # From maven repo deployments - so don't think this is needed? 
