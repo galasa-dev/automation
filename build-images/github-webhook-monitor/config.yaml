@@ -7,7 +7,10 @@ metadata:
   name: githubmonitor-configmap
 data:
   events: 
-  pull_request:
+    pull_request:
       eventListener: "something.namespace.svc.cluster.local"
-  pull_request_review:
+    pull_request_review:
       eventListener: "somethingElse.namespace.svc.cluster.local"
+    push:
+      eventListener: "somethingElse2.namespace.svc.cluster.local"
+  
