@@ -11,7 +11,7 @@ Pass the name of the github org with a flag: `-org=galasa-dev`
 Each defined webhook has a corresponding ID number. To reduce API call limits this monitor expects the id to be pass: `-hook=<hook_id>`
 You can find hook id's with this command:
 ```
-curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <TOKEN>"https://api.github.com/orgs/<ORG_NAME>/hooks
+curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <TOKEN>" https://api.github.com/orgs/<ORG_NAME>/hooks
 ```
 ##### Event Mapper config
 Passed as a yaml file, the event list ties a github event type to a corresponding event_listener URL.
