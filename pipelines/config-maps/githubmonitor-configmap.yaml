@@ -1,0 +1,13 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: githubmonitor-configmap
+data:
+  events: 
+  pull_request:
+      eventListener: "something.namespace.svc.cluster.local"
+  pull_request_review:
+      eventListener: "somethingElse.namespace.svc.cluster.local"

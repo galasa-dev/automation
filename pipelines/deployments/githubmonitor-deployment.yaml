@@ -1,0 +1,52 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: githubmonitor-deployment
+  labels:
+    app: githubmonitor-deployment
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: githubmonitor-deployment
+  template:
+    metadata:
+      labels:
+        app: githubmonitor-deployment
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+      - name: githubmonitor-deployment
+        image: harbor.galasa.dev/common/ghmonitor:main
+        imagePullPolicy: Always
+        env:
+        - name: EVENT_LISTENER_NAME # Unsure on this part
+          valueFrom:
+            configMapKeyRef:
+              name: githubmonitor-configmap
+              key: events.pull_request.eventListener 
+      # Need to mount PVC
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: 50Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - githubmonitor-deployment
+              topologyKey: kubernetes.io/hostname
