@@ -23,8 +23,8 @@ spec:
                 - name: GITHUBTOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: github-token
-                      key: password
+                      name: webhook-monitor
+                      key: token
                       optional: false
               args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/tmp/config.yaml"]
               volumeMounts:
