@@ -22,10 +22,10 @@ spec:
               env:
                 - name: GITHUBTOKEN
                   valueFrom:
-                  secretKeyRef:
-                    name: github-token
-                    key: password
-                    optional: false
+                    secretKeyRef:
+                      name: github-token
+                      key: password
+                      optional: false
               args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/config.yaml"]
               volumeMounts:
               - mountPath: /
