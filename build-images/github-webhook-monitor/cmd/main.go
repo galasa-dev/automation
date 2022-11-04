@@ -244,7 +244,7 @@ func parseArgsAndConfigs() {
 
 	b, err = ioutil.ReadFile(latestIdPath)
 	if err != nil {
-		log.Println("Failed to find lastestId file")
+		log.Println("Failed to find latestId file")
 		return
 	}
 	latestDeliveryId = string(b)
