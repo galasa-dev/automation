@@ -35,5 +35,6 @@ spec:
           - name: trigger-map
             configMap:
               name: githubmonitor-configmap
+              defaultMode: 666
           nodeSelector:
             kubernetes.io/arch: amd64
