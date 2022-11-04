@@ -26,9 +26,9 @@ spec:
                       name: github-token
                       key: password
                       optional: false
-              args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/config.yaml"]
+              args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/tmp/config.yaml"]
               volumeMounts:
-              - mountPath: /
+              - mountPath: /tmp
                 name: trigger-map
                 # subPath: config.yaml
           volumes:
