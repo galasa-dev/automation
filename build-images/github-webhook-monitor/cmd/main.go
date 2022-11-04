@@ -30,7 +30,7 @@ var hookId *string
 
 var latestDeliveryId string
 
-const latestIdPath = "/latestId"
+const latestIdPath = "/mnt/latestId"
 
 var client = http.Client{
 

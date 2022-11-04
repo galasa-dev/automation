@@ -28,9 +28,9 @@ spec:
                       optional: false
               args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/config.yaml"]
               volumeMounts:
-              - mountPath: /
+              - mountPath: /root
                 name: trigger-map
-                subPath: config.yaml
+                # subPath: config.yaml
           volumes:
           - name: trigger-map
             configMap:
