@@ -30,11 +30,15 @@ spec:
               volumeMounts:
               - mountPath: /tmp
                 name: trigger-map
-                # subPath: config.yaml
+              - mountPath: /mnt/latestId
+                name: latest-id
           volumes:
           - name: trigger-map
             configMap:
               name: githubmonitor-configmap
               defaultMode: 438
+          - name: latest-id
+            persistentVolumeClaim:
+              claimName: latest-id
           nodeSelector:
             kubernetes.io/arch: amd64
