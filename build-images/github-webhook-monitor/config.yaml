@@ -1,7 +1,13 @@
 #
 # Copyright contributors to the Galasa project 
 #
-events: 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: githubmonitor-configmap
+  namespace: galasa-build
+data: 
+  events: |
     pull_request:
       eventListener: "el-github-pr-builder-listener.galasa-build.svc.cluster.local"
     pull_request_review:
