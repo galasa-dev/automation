@@ -10,6 +10,7 @@ spec:
   # Every 2 mins
   schedule: "*/2 * * * *"
   concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
@@ -30,7 +31,7 @@ spec:
               volumeMounts:
               - mountPath: /tmp
                 name: trigger-map
-              - mountPath: /mnt/latestId
+              - mountPath: /mnt
                 name: latest-id
           volumes:
           - name: trigger-map
