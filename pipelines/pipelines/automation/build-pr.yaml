@@ -71,7 +71,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -89,7 +88,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: go-build-ghstatus
     taskRef:
       name: go-build
