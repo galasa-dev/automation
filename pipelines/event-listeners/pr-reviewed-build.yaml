@@ -66,7 +66,7 @@ spec:
               spec:
                 pipelineRef:
                   name: pr-$(tt.params.git-repository-name)
-                serviceAccountName: build-bot
+                serviceAccountName: galasa-build-bot
                 workspaces:
                 - name: git-workspace
                   volumeClaimTemplate:
