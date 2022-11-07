@@ -126,10 +126,6 @@ func submitEvents(events []string) {
 			log.Fatal(err)
 		}
 
-		log.Println(hookRequest)
-		log.Println(hookRequest.Header)
-		log.Println(hookRequest.Body)
-
 		if hookRequest != nil {
 			resp, err := client.Do(hookRequest)
 			if err != nil {
