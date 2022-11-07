@@ -167,7 +167,6 @@ func buildHookRequest(id string) (*http.Request, error) {
 		for k, v := range request.Request.Headers {
 			webhookRequest.Header.Add(k, v)
 		}
-		webhookRequest.Header.Set("Content-Type", "application/json")
 
 		return webhookRequest, nil
 	} else {
