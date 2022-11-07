@@ -21,7 +21,7 @@ spec:
   steps:
   - name: github-status
     workingDir: /workspace/git/
-    image: harbor.galasa.dev/common/ghstatus:latest
+    image: harbor.galasa.dev/common/ghstatus:main
     imagePullPolicy: Always
     env:
     - name: GITHUBTOKEN

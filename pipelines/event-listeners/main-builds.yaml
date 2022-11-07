@@ -16,10 +16,6 @@ spec:
           ref:
             name: "github"
           params:
-          - name: "secretRef"
-            value:
-              secretName: webhook-monitor
-              secretKey: token
           - name: "eventTypes"
             value: ["push"]
         - name: "CEL filter: only when pushed to main"
