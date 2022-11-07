@@ -24,7 +24,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: github-token
-          key: token
+          key: password
           optional: false
     command:
     - /go/bin/ghverify
