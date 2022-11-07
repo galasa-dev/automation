@@ -80,8 +80,14 @@ spec:
                       secretName: mavengpg
                 workspaces:
                 - name: git-workspace
-                  persistentVolumeClaim:
-                    claimName: tekton-build-workspace-pvc
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 1Gi
                 params:
                   - name: headRef
                     value: $(tt.params.git-head-ref)
