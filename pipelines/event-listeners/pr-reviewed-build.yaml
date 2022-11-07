@@ -2,6 +2,8 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: github-pr-review-builder-listener
+  annotations:
+    tekton.dev/payload-validation: "false"
 spec:
   serviceAccountName: tekton-trigger
   triggers:
