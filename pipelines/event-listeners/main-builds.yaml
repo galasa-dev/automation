@@ -41,7 +41,7 @@ spec:
               spec:
                 pipelineRef:
                   name: main-$(tt.params.git-repository-name)
-                serviceAccountName: build-bot
+                serviceAccountName: galasa-build-bot
                 podTemplate:
                   volumes:
                   - name: gradle-properties
