@@ -41,7 +41,7 @@ spec:
       value: $(params.action)
   - name: clone-automation
     taskRef: 
-      name: clone-automation
+      name: git-clone
     runAfter:
       - git-verify
     params:
