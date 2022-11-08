@@ -178,6 +178,7 @@ spec:
       name: docker-build
     runAfter:
     - clone-automation
+    - build-gpg-image
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
