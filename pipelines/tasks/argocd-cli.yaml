@@ -17,15 +17,13 @@ spec:
     image: harbor.galasa.dev/common/argocd-cli:main
     imagePullPolicy: Always
     env:
-    - name: TOKEN
+    - name: ARGOCD_AUTH_TOKEN
       valueFrom:
         secretKeyRef:
           name: argocd-token
           key: argocd-token
           optional: false
-    args: 
+    args:
     - $(params.command)
-    - "--auth-token"
-    - $TOKEN
     - "--server"
     - $(params.server)
