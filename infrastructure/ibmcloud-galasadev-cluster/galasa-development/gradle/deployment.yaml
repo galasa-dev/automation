@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradle
+  namespace: galasa-development
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradle
+  template:
+    metadata:
+      name: gradle
+      labels:
+        app: gradle
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-gradle:main
+          imagePullPolicy: Always
+          name: gradle
+          ports:
+            - containerPort: 443
+              name: gradle
