@@ -19,6 +19,9 @@ spec:
         - image: harbor.galasa.dev/galasadev/galasa-gradle:main
           imagePullPolicy: Always
           name: gradle
+          env:
+          - name: CONTEXTROOT
+            value: main/maven/gradle
           ports:
             - containerPort: 443
               name: gradle
