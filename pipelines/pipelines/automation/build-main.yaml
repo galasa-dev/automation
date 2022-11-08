@@ -27,7 +27,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -45,7 +44,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: build-ghverify-image
     taskRef:
       name: docker-build
@@ -65,7 +63,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: go-build-ghstatus
     taskRef:
       name: go-build
@@ -83,7 +80,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: build-ghstatus-image
     taskRef:
       name: docker-build
@@ -103,8 +99,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-
   - name: go-build-ghmonitor
     taskRef:
       name: go-build
@@ -122,7 +116,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: build-ghmonitor-image
     taskRef:
       name: docker-build
@@ -142,7 +135,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
   - name: build-gpg-image
     taskRef:
       name: docker-build
@@ -162,7 +154,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: build-kubectl-image
     taskRef:
       name: docker-build
@@ -182,7 +173,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: build-gitcli-image
     taskRef:
       name: docker-build
@@ -202,7 +192,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-
   finally:
   - name: git-clean
     taskRef: 
