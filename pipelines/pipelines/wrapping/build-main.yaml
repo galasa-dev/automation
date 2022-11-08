@@ -30,8 +30,6 @@ spec:
   - name: clone-wrapping
     taskRef: 
       name: git-clone
-    runAfter:
-      - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/wrapping
@@ -59,9 +57,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: maven-gpg
+  - name: gpg
     taskRef:
-      name: maven-gpg
+      name: gpg
     runAfter:
     - clone-wrapping 
     params:
@@ -74,7 +72,7 @@ spec:
     taskRef:
       name: maven-build
     runAfter:
-    - maven-gpg
+    - gpg
     params:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
@@ -115,15 +113,35 @@ spec:
        workspace: git-workspace
   - name: recycle-deployment
     taskRef:
-      name: recycle-deployment
+      name: argocd-cli
     runAfter:
     - main-docker-build-wrapping
     params:
-    - name: deployment
-      value: maven-wrapping
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - wrapping 
+      - restart 
+      - --kind 
+      - Deployment
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - wrapping 
+      - --health
   finally:
   - name: git-clean-automation
     taskRef: 
