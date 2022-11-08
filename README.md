@@ -7,6 +7,36 @@ This repository is the single location for all the automation and CI/CD that occ
 1. pipelines - all the tekton components
 
 
+# Build-images
+
+**This documentation is a work in progress**
+
+This directory holds the Go code for custom build images:
+
+Github-status
+
+This image provides the status of a pull request build - whether it passed or failed - and updates the pull request on GitHub with this status.
+
+Github-verify
+
+This image is used to verify that a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build.
+
+Github-monitor
+
+This image is used to monitor the organisation-wide webhook for any new deliveries, every 2 minutes. It will then trigger the appropriate EventListener for each delivery to then trigger the corresponding build pipeline.
+
+# Dockerfiles
+
+This directory is the single location for all the dockerfiles needed to build the images Galasa needs.
+
+The repositories that are needed in the core build (Wrapping, Gradle, Maven, Framework, Extensions, Managers, Obr, Eclipse, Isolated) all follow a similar structure.
+
+They two arguments:
+ - dockerRepository, the URL to the repostiory we are pushing the image to
+ - tag, to identify the image as an image from a main build with the tag 'main' or a pr build with the commit-SHA of the latest commit in the pr being the image tag.
+
+# Infrastructure
+
 # Pipelines
 
 **This documentation is a work in progress and will continue being added to as new build pipelines are developed.**
@@ -14,7 +44,7 @@ This repository is the single location for all the automation and CI/CD that occ
 
 ## Event Listeners
 
-Webhooks are set up on these Github repositories to trigger the three EventListeners:
+<!-- Webhooks are set up on these Github repositories to trigger the three EventListeners:
 - Automation
 - Wrapping
 - Gradle
@@ -24,8 +54,11 @@ Webhooks are set up on these Github repositories to trigger the three EventListe
 - Managers (Pipeline not running yet)
 - OBR (Pipeline not running yet)
 - Eclipse (Pipeline not running yet)
-- Isolated (Pipeline not running yet)
+- Isolated (Pipeline not running yet) -->
 
+An organisation wide webhook is set up and monitored by the 'github-monitor' that will check for events and trigger any of the three EventListeners where necessary.
+
+Currently, payload validation has been turned off with an annotation in the metadata for these EventListsners. This is beacuse the github-monitor currently cannot validate the payloads from Github. This will be turned on in the future once the github-monitor can validate payloads from Github.
 
 ### github-pr-builder-listener
 
@@ -62,6 +95,8 @@ This pipeline is triggered when a pull request is opened in the Automation repos
 
 1. Unlike the other pipelines, no Maven or Gradle build is required. A series of 'docker-build' tasks are ran to build and push the custom images needed in the pipelines to [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories). These images are tagged with the commit hash from the last commit in the pull request.
 
+Before building and pushing the github-status, github-verify and github-monitor images to harbor, the 'go-build' task is called to build the Go code that these images are based on.
+
 1. 'git-status' returns the status of the build to the pull request.
 
 1. 'git-clean' cleans the subdirectory that automation was cloned into.
@@ -74,6 +109,8 @@ This pipeline is triggered when there is a push to the main branch in the Automa
 1. The pipeline starts by cloning the Automation repository.
 
 1. A series of 'docker-build' tasks are ran concurrently to build the custom images which are then pushed to [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories). These images are tagged main.
+
+Before building and pushing the github-status, github-verify and github-monitor images to harbor, the 'go-build' task is called to build the Go code that these images are based on.
 
 1. 'git-clean' cleans up the subdirectory where automation was cloned.
 
@@ -253,6 +290,18 @@ This task uses the ghverify Go program to first verify that the action is a supp
 
 This task uses the custom ghverify image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghverify/artifacts-tab)
 
+
+### go-build
+
+This task is used to build Go code. 
+
+Parameters:
+- The context, describes the path of the go code to build.
+- goArgs include the go command to be executed such as build or install, and any other flags and arguments needed.
+- The other paramters are all environment variables which have default values and can be overwritten if necessary.
+
+This task uses the latest official GoLang image in order to perform Go commands.
+
 ### make
 
 This task is used to perform the shell command 'make all' and execute a Makefile.
@@ -283,7 +332,7 @@ Parameters:
 - The noPush parameter allows you to choose whether you want to push the image built to the given destination (imageName).
 - The array, 'buildArgs', is used to pass any arguments needed into the Dockerfile.
 
-The task uses kaniko-executor image to perform kaniko commands. This image is stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/kaniko-executor/artifacts-tab).
+The task uses kaniko-executor image to perform kaniko commands. This image is from gcr.io (Google Container Registry).
 
 ### maven-build
 
