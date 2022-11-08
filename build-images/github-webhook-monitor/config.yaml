@@ -10,9 +10,9 @@ data:
   config.yaml: |
     events:
       pull_request:
-        eventListener: "el-github-pr-builder-listener.galasa-build.svc.cluster.local"
+        eventListener: "http://el-github-pr-builder-listener.galasa-build.svc.cluster.local:8080"
       pull_request_review:
-        eventListener: "el-github-pr-review-builder-listener.galasa-build.svc.cluster.local"
+        eventListener: "http://el-github-pr-review-builder-listener.galasa-build.svc.cluster.local:8080"
       push:
-        eventListener: "el-github-main-builder-listener.galasa-build.svc.cluster.local"
+        eventListener: "http://el-github-main-builder-listener.galasa-build.svc.cluster.local:8080"
   

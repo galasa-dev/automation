@@ -5,6 +5,8 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: github-main-builder-listener
+  annotations:
+    tekton.dev/payload-validation: "false"
 spec:
   serviceAccountName: tekton-trigger
   triggers:
@@ -14,10 +16,6 @@ spec:
           ref:
             name: "github"
           params:
-          - name: "secretRef"
-            value:
-              secretName: github-token
-              secretKey: token
           - name: "eventTypes"
             value: ["push"]
         - name: "CEL filter: only when pushed to main"
@@ -43,7 +41,7 @@ spec:
               spec:
                 pipelineRef:
                   name: main-$(tt.params.git-repository-name)
-                serviceAccountName: build-bot
+                serviceAccountName: galasa-build-bot
                 podTemplate:
                   volumes:
                   - name: gradle-properties
@@ -57,5 +55,11 @@ spec:
                       secretName: mavengpg
                 workspaces:
                 - name: git-workspace
-                  persistentVolumeClaim:
-                    claimName: tekton-build-workspace-pvc
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 1Gi

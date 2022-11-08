@@ -17,14 +17,14 @@ spec:
   steps:
   - name: github-verify
     workingDir: /workspace/git/
-    image: harbor.galasa.dev/common/ghverify:latest
+    image: harbor.galasa.dev/common/ghverify:main
     imagePullPolicy: Always
     env:
     - name: GITHUBTOKEN
       valueFrom:
         secretKeyRef:
           name: github-token
-          key: token
+          key: password
           optional: false
     command:
     - /go/bin/ghverify
