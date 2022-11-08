@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wrapping
+  namespace: galasa-development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wrapping
+  template:
+    metadata:
+      name: wrapping
+      labels:
+        app: wrapping
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-wrapping:main
+          name: wrapping
+          ports:
+            - containerPort: 443
+              name: wrapping
