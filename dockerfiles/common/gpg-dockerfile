@@ -5,3 +5,11 @@ RUN apt-get update && apt-get install -y unzip \
     curl \
     gpg && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install ca-certificates    
+
+COPY ibmca.pem /usr/local/java
+COPY ibminter.pem /usr/local/java
+RUN keytool -import -trustcacerts -alias ibmca -file /usr/local/java/ibmca.pem -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
+RUN keytool -import -trustcacerts -alias ibminter -file /usr/local/java/ibminter.pem -keystore $JAVA_HOME/lib/security/cacerts  -storepass changeit -noprompt
+
+RUN  cat /usr/local/java/ibmca.pem >> /etc/ssl/certs/ca-certificates.crt
+RUN  cat /usr/local/java/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
