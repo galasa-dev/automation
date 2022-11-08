@@ -4,6 +4,7 @@ metadata:
   name: wrapping
   namespace: galasa-development
 spec:
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
@@ -16,6 +17,7 @@ spec:
     spec:
       containers:
         - image: harbor.galasa.dev/galasadev/galasa-wrapping:main
+          imagePullPolicy: Always
           name: wrapping
           ports:
             - containerPort: 443
