@@ -122,7 +122,14 @@ spec:
     - name: server
       value: argocd.galasa.dev
     - name: command
-      value: "app actions run wrapping restart --kind Deployment"
+      value: 
+      - app 
+      - actions 
+      - run 
+      - wrapping 
+      - restart 
+      - --kind 
+      - Deployment
   - name: wait-deployment
     taskRef:
       name: argocd-cli
