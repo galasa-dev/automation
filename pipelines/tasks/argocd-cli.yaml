@@ -1,0 +1,31 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: argocd-cli
+  namespace: galasa-build
+spec:
+  params:
+  - name: command
+    type: array   
+  - name: server
+    type: array    
+  steps:
+  - name: argocd-cli
+    image: harbor.galasa.dev/common/argocd-cli:main
+    imagePullPolicy: Always
+    env:
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: argocd-token
+          key: argocd-token
+          optional: false
+    args: 
+    - $(params.command)
+    - "--auth-token"
+    - $TOKEN
+    - "--server"
+    - $(params.server)
