@@ -144,7 +144,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/gpg-dockerfile
     - name: imageName
