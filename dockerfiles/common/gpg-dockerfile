@@ -6,6 +6,15 @@ RUN apt-get update && apt-get install -y unzip \
     gpg && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install ca-certificates    
 
+# Installing Java 11
+RUN mkdir /usr/local/java
+RUN curl -L https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk11u-2021-05-07-07-34/OpenJDK11U-jdk_x64_linux_openj9_2021-05-07-07-34.tar.gz \
+      -o /usr/local/java/OpenJDK11U-jdk_x64_linux_openj9_2021-05-07-07-34.tar.gz \ 
+     && tar -zxvf /usr/local/java/OpenJDK11U-jdk_x64_linux_openj9_2021-05-07-07-34.tar.gz -C /usr/local/java \
+     && rm /usr/local/java/OpenJDK11U-jdk_x64_linux_openj9_2021-05-07-07-34.tar.gz 
+ENV JAVA_HOME=/usr/local/java/jdk-11.0.12+1
+ENV PATH=$PATH:$JAVA_HOME/bin
+
 COPY ibmca.pem /usr/local/java
 COPY ibminter.pem /usr/local/java
 RUN keytool -import -trustcacerts -alias ibmca -file /usr/local/java/ibmca.pem -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
