@@ -132,7 +132,11 @@ spec:
     - name: server
       value: argocd.galasa.dev
     - name: command
-      value: "app wait wrapping --health"
+      value: 
+      - app 
+      - wait
+      - wrapping 
+      - --health
   finally:
   - name: git-clean-automation
     taskRef: 
