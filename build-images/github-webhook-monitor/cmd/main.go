@@ -125,6 +125,7 @@ func submitEvents(events []string) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		if hookRequest != nil {
 			resp, err := client.Do(hookRequest)
 			if err != nil {
@@ -153,16 +154,17 @@ func buildHookRequest(id string) (*http.Request, error) {
 	if eventType, ok := triggerMap.Events[request.Event]; ok {
 		url := eventType.EventListener
 		payload, _ := json.Marshal(request.Request.Payload)
-		webookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
+		webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 		if err != nil {
 			return nil, err
 		}
 
 		// Add headers
 		for k, v := range request.Request.Headers {
-			webookRequest.Header.Add(k, v)
+			webhookRequest.Header.Add(k, v)
 		}
-		return webookRequest, nil
+
+		return webhookRequest, nil
 	} else {
 		log.Printf("No action required for type: %s\n", request.Event)
 	}

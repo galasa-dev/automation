@@ -2,6 +2,8 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: github-pr-review-builder-listener
+  annotations:
+    tekton.dev/payload-validation: "false"
 spec:
   serviceAccountName: tekton-trigger
   triggers:
@@ -11,10 +13,6 @@ spec:
           ref:
             name: "github"
           params:
-          - name: "secretRef"
-            value:
-              secretName: github-token
-              secretKey: token
           - name: "eventTypes"
             value: ["pull_request_review"]
         - name: "CEL filter: when comments are submitted"
@@ -68,11 +66,17 @@ spec:
               spec:
                 pipelineRef:
                   name: pr-$(tt.params.git-repository-name)
-                serviceAccountName: build-bot
+                serviceAccountName: galasa-build-bot
                 workspaces:
                 - name: git-workspace
-                  persistentVolumeClaim:
-                    claimName: tekton-build-workspace-pvc
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 1Gi
                 params:
                   - name: headRef
                     value: $(tt.params.git-head-ref)
