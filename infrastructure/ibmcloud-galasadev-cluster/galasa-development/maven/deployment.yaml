@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maven
+  namespace: galasa-development
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maven
+  template:
+    metadata:
+      name: maven
+      labels:
+        app: maven
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-maven:main
+          imagePullPolicy: Always
+          name: maven
+          ports:
+            - containerPort: 443
+              name: maven

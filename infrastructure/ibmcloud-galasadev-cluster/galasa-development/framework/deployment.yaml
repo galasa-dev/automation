@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: framework
+  namespace: galasa-development
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: framework
+  template:
+    metadata:
+      name: framework
+      labels:
+        app: framework
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-framework:main
+          imagePullPolicy: Always
+          name: framework
+          ports:
+            - containerPort: 443
+              name: framework
