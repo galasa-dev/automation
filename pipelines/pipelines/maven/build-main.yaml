@@ -124,10 +124,12 @@ spec:
       - app 
       - actions 
       - run 
-      - maven 
-      - restart 
+      - development-repo-main
+      - restart
       - --kind 
       - Deployment
+      - --resource-name
+      - maven 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -140,7 +142,9 @@ spec:
       value: 
       - app 
       - wait
-      - maven 
+      - development-repo-main
+      - --resource
+      - apps:Deployment:maven 
       - --health
   finally:
   - name: git-clean-automation
