@@ -20,5 +20,5 @@ spec:
             name: extensions
             port:
               number: 80
-        path: /main/maven/extensions
+        path: /main/maven-repo/extensions
         pathType: Prefix
