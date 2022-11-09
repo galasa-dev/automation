@@ -112,10 +112,12 @@ spec:
       - app 
       - actions 
       - run 
-      - framework 
+      - development-repo-main 
       - restart 
       - --kind 
       - Deployment
+      - --resource-name
+      - framework
   - name: wait-deployment
     taskRef:
       name: argocd-cli
