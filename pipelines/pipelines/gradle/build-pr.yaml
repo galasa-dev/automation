@@ -107,11 +107,11 @@ spec:
       value: publish
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
+       workspace: git-workspace
   - name: docker-build-gradle
     taskRef:
       name: docker-build
-    runAfter: 
+    runAfter:
       - get-commit
       - gradle-build-gradle
     params:
@@ -122,8 +122,8 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/gradle/gradle-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.headSha)  
-    - name: noPush  
+      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.headSha)
+    - name: noPush
       value: ""
     - name: buildArgs
       value:
@@ -131,7 +131,7 @@ spec:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
       - name: git-workspace
-        workspace: git-workspace  
+        workspace: git-workspace
   finally:
   - name: git-status
     when:

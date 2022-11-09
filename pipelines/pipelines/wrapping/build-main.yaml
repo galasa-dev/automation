@@ -63,7 +63,7 @@ spec:
     runAfter:
     - clone-wrapping 
     params:
-    - name: context 
+    - name: context
       value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: git-workspace
@@ -77,7 +77,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     - name: buildArgs
-      value: 
+      value:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
