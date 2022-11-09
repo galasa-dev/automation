@@ -1,133 +1,151 @@
-# #
-# # Copyright contributors to the Galasa project 
-# # 
-# apiVersion: tekton.dev/v1beta1
-# kind: Pipeline
-# metadata:
-#   name: main-extensions
-#   namespace: galasa-pipelines
-# spec:
-#   workspaces:
-#   - name: git-workspace
-#   tasks:
-#   - name: clone-automation
-#     taskRef: 
-#       name: git-clone
-#     params:
-#     - name: url
-#       value: https://github.com/galasa-dev/automation
-#     - name: revision
-#       value: main
-#     - name: refspec
-#       value: refs/heads/main:refs/heads/main
-#     - name: depth
-#       value: "99999999"
-#     - name: subdirectory
-#       value: $(context.pipelineRun.name)/automation
-#     workspaces:
-#      - name: output
-#        workspace: git-workspace
-#   - name: clone-extensions
-#     taskRef: 
-#       name: git-clone
-#     runAfter:
-#       - clone-automation
-#     params:
-#     - name: url
-#       value: https://github.com/galasa-dev/extensions
-#     - name: revision
-#       value: main
-#     - name: refspec
-#       value: refs/heads/main:refs/heads/main
-#     - name: depth
-#       value: "99999999"
-#     - name: subdirectory
-#       value: $(context.pipelineRun.name)/extensions
-#     workspaces:
-#      - name: output
-#        workspace: git-workspace  
-#   - name: get-commit
-#     taskRef:
-#       name: get-commit
-#     runAfter:
-#     - clone-extensions
-#     params:
-#     - name: pipelineRunName
-#       value: $(context.pipelineRun.name)
-#     - name: repo
-#       value: extensions
-#     workspaces:
-#      - name: git-workspace
-#        workspace: git-workspace
-#   - name: main-gradle-build-extensions
-#     taskRef:
-#       name: gradle-build
-#     runAfter: 
-#       - clone-extensions
-#     params:
-#     - name: context
-#       value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
-#     - name: buildArgs
-#       value:
-#         - "-PsourceMaven=https://development.galasa.dev/main/maven/framework"
-#         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-#         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/extensions/repo"
-#     - name: command
-#       value: publish
-#     workspaces:
-#      - name: git-workspace
-#        workspace: git-workspace  
-#   - name: main-docker-build-extensions
-#     taskRef:
-#       name: docker-build
-#     runAfter:
-#       - get-commit
-#       - main-gradle-build-extensions
-#     params:
-#     - name: pipelineRunName
-#       value: $(context.pipelineRun.name)
-#     - name: context
-#       value: $(context.pipelineRun.name)/extensions
-#     - name: dockerfilePath
-#       value: automation/dockerfiles/extensions/extensions-dockerfile
-#     - name: imageName
-#       value: harbor.galasa.dev/galasadev/galasa-extensions:main
-#     - name: noPush
-#       value: ""
-#     - name: buildArgs
-#       value:
-#         - "--build-arg=tag=main"
-#         - "--build-arg=dockerRepository=harbor.galasa.dev"
-#     workspaces:
-#      - name: git-workspace
-#        workspace: git-workspace
-#   - name: recycle-deployment
-#     taskRef:
-#       name: recycle-deployment
-#     runAfter:
-#     - main-docker-build-extensions
-#     params:
-#     - name: deployment
-#       value: maven-extensions
-#     workspaces:
-#      - name: git-workspace
-#        workspace: git-workspace
-#   finally:
-#   - name: git-clean-automation
-#     taskRef: 
-#       name: git-clean
-#     params:
-#     - name: subdirectory
-#       value: $(context.pipelineRun.name)/automation
-#     workspaces:
-#      - name: git-workspace
-#        workspace: git-workspace
-#   - name: git-clean-extensions
-#     taskRef: 
-#       name: git-clean
-#     params:
-#     - name: subdirectory
-#       value: $(context.pipelineRun.name)/extensions
-#     workspaces:
-#      - name: git-workspace
-#        workspace: git-workspace
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: main-extensions
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-extensions
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/extensions
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/extensions
+    workspaces:
+     - name: output
+       workspace: git-workspace  
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-extensions
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: extensions
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: main-gradle-build-extensions
+    taskRef:
+      name: gradle-build
+    runAfter: 
+      - clone-extensions
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/framework"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/extensions/repo"
+    - name: command
+      value: publish
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+  - name: main-docker-build-extensions
+    taskRef:
+      name: docker-build
+    runAfter:
+      - get-commit
+      - main-gradle-build-extensions
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/extensions
+    - name: dockerfilePath
+      value: automation/dockerfiles/extensions/extensions-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-extensions:main
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - main-docker-build-extensions
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - extensions 
+      - restart 
+      - --kind 
+      - Deployment
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - extensions 
+      - --health
+  finally:
+  - name: git-clean-automation
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: git-clean-extensions
+    taskRef: 
+      name: git-clean
+    params:
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/extensions
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
