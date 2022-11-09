@@ -20,5 +20,5 @@ spec:
           imagePullPolicy: Always
           name: extensions
           ports:
-            - containerPort: 443
+            - containerPort: 80
               name: extensions
