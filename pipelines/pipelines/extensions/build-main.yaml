@@ -130,7 +130,9 @@ spec:
       value: 
       - app 
       - wait
-      - extensions 
+      - development-repo-main
+      - --resource
+      - apps:Deployment:extensions 
       - --health
   finally:
   - name: git-clean-automation
