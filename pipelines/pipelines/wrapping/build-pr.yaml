@@ -76,7 +76,7 @@ spec:
       value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: output
-       workspace: git-workspace  
+       workspace: git-workspace
   - name: get-commit
     taskRef:
       name: get-commit
@@ -96,7 +96,7 @@ spec:
     runAfter:
     - clone-wrapping 
     params:
-    - name: context 
+    - name: context
       value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: git-workspace
@@ -110,7 +110,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     - name: buildArgs
-      value: 
+      value:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
@@ -142,8 +142,8 @@ spec:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+      - name: git-workspace
+        workspace: git-workspace
   finally:
   - name: git-status
     when:
