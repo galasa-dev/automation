@@ -19,6 +19,9 @@ spec:
         - image: harbor.galasa.dev/galasadev/galasa-extensions:main
           imagePullPolicy: Always
           name: extensions
+          env:
+          - name: CONTEXTROOT
+            value: main/maven-repo/extensions
           ports:
             - containerPort: 80
               name: extensions
