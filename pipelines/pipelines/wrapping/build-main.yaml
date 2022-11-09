@@ -124,10 +124,12 @@ spec:
       - app 
       - actions 
       - run 
-      - wrapping 
-      - restart 
+      - development-repo-main
+      - restart
       - --kind 
       - Deployment
+      - --resource-name
+      - wrapping 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -140,7 +142,9 @@ spec:
       value: 
       - app 
       - wait
-      - wrapping 
+      - development-repo-main
+      - --resource
+      - apps:Deployment:wrapping 
       - --health
   finally:
   - name: git-clean-automation
