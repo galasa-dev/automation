@@ -142,7 +142,9 @@ spec:
       value: 
       - app 
       - wait
-      - maven 
+      - development-repo-main
+      - --resource
+      - apps:Deployment:maven 
       - --health
   finally:
   - name: git-clean-automation
