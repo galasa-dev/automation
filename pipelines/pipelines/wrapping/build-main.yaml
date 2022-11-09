@@ -124,10 +124,12 @@ spec:
       - app 
       - actions 
       - run 
-      - wrapping 
-      - restart 
+      - development-repo-main
+      - restart
       - --kind 
       - Deployment
+      - --resource-name
+      - wrapping 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
