@@ -96,7 +96,7 @@ spec:
     runAfter:
     - clone-maven 
     params:
-    - name: context 
+    - name: context
       value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
     workspaces:
      - name: git-workspace
@@ -104,8 +104,8 @@ spec:
   - name: maven-build-maven
     taskRef:
       name: maven-build
-    runAfter: 
-      - maven-gpg
+    runAfter:
+    - maven-gpg
     params:
     - name: context
       value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
@@ -119,31 +119,31 @@ spec:
       value: deploy
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
+       workspace: git-workspace
   - name: docker-build-maven
     taskRef:
       name: docker-build
-    runAfter: 
-      - get-commit
-      - maven-build-maven  
+    runAfter:
+    - get-commit
+    - maven-build-maven
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/maven
     - name: dockerfilePath
-      value: automation/dockerfiles/maven/maven-dockerfile 
+      value: automation/dockerfiles/maven/maven-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-maven:$(params.headSha)  
-    - name: noPush  
+      value: harbor.galasa.dev/galasadev/galasa-maven:$(params.headSha)
+    - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+      - name: git-workspace
+        workspace: git-workspace
   finally:
   - name: git-status
     when:

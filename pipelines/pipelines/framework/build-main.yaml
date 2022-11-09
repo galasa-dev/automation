@@ -30,8 +30,6 @@ spec:
   - name: clone-framework
     taskRef: 
       name: git-clone
-    runAfter:
-      - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/framework
@@ -69,14 +67,14 @@ spec:
       value: $(context.pipelineRun.name)/framework/galasa-parent
     - name: buildArgs
       value:
-        - "-PsourceMaven=https://development.galasa.dev/main/maven/maven"
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
     - name: command
       value: publish
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
+       workspace: git-workspace
   - name: main-docker-build-framework
     taskRef:
       name: docker-build
@@ -103,15 +101,35 @@ spec:
        workspace: git-workspace
   - name: recycle-deployment
     taskRef:
-      name: recycle-deployment
+      name: argocd-cli
     runAfter:
     - main-docker-build-framework
     params:
-    - name: deployment
-      value: maven-framework
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - framework 
+      - restart 
+      - --kind 
+      - Deployment
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - framework 
+      - --health
   finally:
   - name: git-clean-automation
     taskRef: 

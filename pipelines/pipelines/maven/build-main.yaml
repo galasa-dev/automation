@@ -30,8 +30,6 @@ spec:
   - name: clone-maven
     taskRef: 
       name: git-clone
-    runAfter:
-      - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/maven
@@ -108,22 +106,42 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
   - name: recycle-deployment
     taskRef:
-      name: recycle-deployment
+      name: argocd-cli
     runAfter:
     - main-docker-build-maven
     params:
-    - name: deployment
-      value: maven-maven
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - maven 
+      - restart 
+      - --kind 
+      - Deployment
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - maven 
+      - --health
   finally:
   - name: git-clean-automation
     taskRef: 

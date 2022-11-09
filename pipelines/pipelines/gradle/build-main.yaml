@@ -30,8 +30,6 @@ spec:
   - name: clone-gradle
     taskRef: 
       name: git-clone
-    runAfter:
-      - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/gradle
@@ -76,7 +74,7 @@ spec:
       value: publish
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
+       workspace: git-workspace
   - name: main-docker-build-gradle
     taskRef:
       name: docker-build
