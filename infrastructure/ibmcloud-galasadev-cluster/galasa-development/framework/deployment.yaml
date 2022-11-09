@@ -19,6 +19,9 @@ spec:
         - image: harbor.galasa.dev/galasadev/galasa-framework:main
           imagePullPolicy: Always
           name: framework
+          env:
+          - name: CONTEXTROOT
+            value: main/maven-repo/framework
           ports:
             - containerPort: 80
               name: framework
