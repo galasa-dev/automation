@@ -22,5 +22,5 @@ spec:
             name: gradle
             port:
               number: 443
-        path: /main/maven/gradle
+        path: /main/maven-repo/gradle
         pathType: Prefix
