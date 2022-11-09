@@ -130,7 +130,9 @@ spec:
       value: 
       - app 
       - wait
-      - gradle 
+      - development-repo-main
+      - --resource
+      - apps:Deployment:gradle 
       - --health
   finally:
   - name: git-clean-automation
