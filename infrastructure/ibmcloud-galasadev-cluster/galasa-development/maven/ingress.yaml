@@ -20,5 +20,5 @@ spec:
             name: maven
             port:
               number: 80
-        path: /main/maven/maven
+        path: /main/maven-repo/maven
         pathType: Prefix

@@ -20,5 +20,5 @@ spec:
             name: managers
             port:
               number: 80
-        path: /main/maven/managers
+        path: /main/maven-repo/managers
         pathType: Prefix
