@@ -23,5 +23,5 @@ spec:
           - name: CONTEXTROOT
             value: main/maven-repo/wrapping
           ports:
-            - containerPort: 443
+            - containerPort: 80
               name: wrapping
