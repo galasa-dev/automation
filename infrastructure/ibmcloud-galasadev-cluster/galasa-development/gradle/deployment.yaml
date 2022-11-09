@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wrapping
+  name: gradle
   namespace: galasa-development
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: wrapping
+      app: gradle
   template:
     metadata:
-      name: wrapping
+      name: gradle
       labels:
-        app: wrapping
+        app: gradle
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-wrapping:main
+        - image: harbor.galasa.dev/galasadev/galasa-gradle:main
           imagePullPolicy: Always
-          name: wrapping
+          name: gradle
           env:
           - name: CONTEXTROOT
-            value: main/maven-repo/wrapping
+            value: main/maven-repo/gradle
           ports:
-            - containerPort: 80
-              name: wrapping
+            - containerPort: 443
+              name: gradle

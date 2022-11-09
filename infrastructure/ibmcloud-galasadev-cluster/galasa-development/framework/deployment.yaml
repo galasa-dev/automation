@@ -1,27 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wrapping
+  name: framework
   namespace: galasa-development
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: wrapping
+      app: framework
   template:
     metadata:
-      name: wrapping
+      name: framework
       labels:
-        app: wrapping
+        app: framework
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-wrapping:main
+        - image: harbor.galasa.dev/galasadev/galasa-framework:main
           imagePullPolicy: Always
-          name: wrapping
-          env:
-          - name: CONTEXTROOT
-            value: main/maven-repo/wrapping
+          name: framework
           ports:
             - containerPort: 80
-              name: wrapping
+              name: framework
