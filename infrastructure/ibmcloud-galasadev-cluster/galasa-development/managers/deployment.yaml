@@ -19,6 +19,9 @@ spec:
         - image: harbor.galasa.dev/galasadev/galasa-managers:main
           imagePullPolicy: Always
           name: managers
+          env:
+          - name: CONTEXTROOT
+            value: main/maven-repo/managers
           ports:
             - containerPort: 80
               name: managers
