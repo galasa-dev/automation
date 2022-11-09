@@ -20,5 +20,5 @@ spec:
             name: framework
             port:
               number: 80
-        path: /main/maven/framework
+        path: /main/maven-repo/framework
         pathType: Prefix
