@@ -7,6 +7,6 @@ metadata:
   namespace: galasa-development
 spec:
   ports:
-    - port: 443
+    - port: 80
   selector:
     app: wrapping
