@@ -21,7 +21,7 @@ spec:
           name: gradle
           env:
           - name: CONTEXTROOT
-            value: main/maven/gradle
+            value: main/maven-repo/gradle
           ports:
             - containerPort: 443
               name: gradle
