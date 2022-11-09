@@ -142,7 +142,9 @@ spec:
       value: 
       - app 
       - wait
-      - wrapping 
+      - development-repo-main
+      - --resource
+      - apps:Deployment:wrapping 
       - --health
   finally:
   - name: git-clean-automation
