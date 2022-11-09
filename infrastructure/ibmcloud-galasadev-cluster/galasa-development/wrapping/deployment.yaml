@@ -19,6 +19,9 @@ spec:
         - image: harbor.galasa.dev/galasadev/galasa-wrapping:main
           imagePullPolicy: Always
           name: wrapping
+          env:
+          - name: CONTEXTROOT
+            value: main/maven/wrapping
           ports:
             - containerPort: 443
               name: wrapping
