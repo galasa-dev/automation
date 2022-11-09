@@ -57,9 +57,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: gpg
+  - name: maven-gpg
     taskRef:
-      name: gpg
+      name: maven-gpg
     runAfter:
     - clone-wrapping 
     params:
@@ -72,7 +72,7 @@ spec:
     taskRef:
       name: maven-build
     runAfter:
-    - gpg
+    - maven-gpg
     params:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
