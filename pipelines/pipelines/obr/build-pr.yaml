@@ -162,13 +162,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: generate-bom
     taskRef:
       name: galasabld
     runAfter:
     - maven-gpg
-    # - get-commit
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
@@ -202,7 +200,7 @@ spec:
     - name: command
       value: 
         - "cat"
-        - "/workspace/git/$(context.pipelineRun.name)/obr/galasa-bom/pom.xml"
+        - "pom.xml"
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
