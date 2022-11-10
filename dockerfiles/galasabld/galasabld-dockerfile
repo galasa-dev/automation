@@ -8,5 +8,5 @@ RUN addgroup galasa && \
 COPY bin/galasabld-${platform} /bin/galasabld
 RUN chmod +x /bin/galasabld
 
-WORKDIR /galasa
-USER galasa
+# WORKDIR /galasa
+# USER galasa
