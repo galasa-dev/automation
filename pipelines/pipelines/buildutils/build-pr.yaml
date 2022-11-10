@@ -78,9 +78,9 @@ spec:
      - name: output
        workspace: git-workspace 
 
-  - name: go-make
+  - name: make
     taskRef:
-      name: go-make
+      name: make
     runAfter:
       - clone-buildutils  
     params:
@@ -96,7 +96,7 @@ spec:
       name: docker-build
     runAfter:
     - clone-automation
-    - go-make
+    - make
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
