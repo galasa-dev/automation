@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: managers
-  namespace: galasa-development
+  name: managers-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: managers
+      app: managers-{{ .Values.branch }}
   template:
     metadata:
-      name: managers
+      name: managers-{{ .Values.branch }}
       labels:
-        app: managers
+        app: managers-{{ .Values.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-managers:main
+        - image: harbor.galasa.dev/galasadev/galasa-managers:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: managers
+          name: managers-{{ .Values.branch }}
           env:
           - name: CONTEXTROOT
-            value: main/maven-repo/managers
+            value: {{ .Values.branch }}/maven-repo/managers
           ports:
             - containerPort: 80
-              name: managers
+              name: managers-{{ .Values.branch }}

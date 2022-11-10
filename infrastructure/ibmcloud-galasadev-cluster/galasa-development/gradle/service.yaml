@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: gradle
-  name: gradle
-  namespace: galasa-development
+    app: gradle-{{ .Values.branch }}
+  name: gradle-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: gradle
+    app: gradle-{{ .Values.branch }}

@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wrapping
-  namespace: galasa-development
+  name: wrapping-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: wrapping
+      app: wrapping-{{ .Values.branch }}
   template:
     metadata:
-      name: wrapping
+      name: wrapping-{{ .Values.branch }}
       labels:
-        app: wrapping
+        app: wrapping-{{ .Values.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-wrapping:main
+        - image: harbor.galasa.dev/galasadev/galasa-wrapping:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: wrapping
+          name: wrapping-{{ .Values.branch }}
           env:
           - name: CONTEXTROOT
-            value: main/maven-repo/wrapping
+            value: {{ .Values.branch }}/maven-repo/wrapping
           ports:
             - containerPort: 80
-              name: wrapping
+              name: wrapping-{{ .Values.branch }}

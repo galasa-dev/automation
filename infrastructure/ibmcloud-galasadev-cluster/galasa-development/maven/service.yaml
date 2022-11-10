@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: maven
-  name: maven
-  namespace: galasa-development
+    app: maven-{{ .Values.branch }}
+  name: maven-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: maven
+    app: maven-{{ .Values.branch }}
