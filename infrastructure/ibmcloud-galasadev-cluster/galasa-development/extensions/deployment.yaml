@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: extensions
-  namespace: galasa-development
+  name: extensions-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: extensions
+      app: extensions-{{ .Values.branch }}
   template:
     metadata:
-      name: extensions
+      name: extensions-{{ .Values.branch }}
       labels:
-        app: extensions
+        app: extensions-{{ .Values.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-extensions:main
+        - image: harbor.galasa.dev/galasadev/galasa-extensions:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: extensions
+          name: extensions-{{ .Values.branch }}
           env:
           - name: CONTEXTROOT
-            value: main/maven-repo/extensions
+            value: {{ .Values.branch }}/maven-repo/extensions
           ports:
             - containerPort: 80
-              name: extensions
+              name: extensions-{{ .Values.branch }}
