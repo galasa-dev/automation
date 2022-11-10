@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: wrapping
-  name: wrapping
-  namespace: galasa-development
+    app: wrapping-{{ .Values.branch }}
+  name: wrapping-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: wrapping
+    app: wrapping-{{ .Values.branch }}

@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gradle
-  namespace: galasa-development
+  name: gradle-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: gradle
+      app: gradle-{{ .Values.branch }}
   template:
     metadata:
-      name: gradle
+      name: gradle-{{ .Values.branch }}
       labels:
-        app: gradle
+        app: gradle-{{ .Values.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-gradle:main
+        - image: harbor.galasa.dev/galasadev/galasa-gradle:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: gradle
+          name: gradle-{{ .Values.branch }}
           env:
           - name: CONTEXTROOT
-            value: main/maven-repo/gradle
+            value: {{ .Values.branch }}/maven-repo/gradle
           ports:
             - containerPort: 443
-              name: gradle
+              name: gradle-{{ .Values.branch }}
