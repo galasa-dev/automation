@@ -1,0 +1,30 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: obr
+  namespace: galasa-development
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: obr
+  template:
+    metadata:
+      name: obr
+      labels:
+        app: obr
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-obr:main
+          imagePullPolicy: Always
+          name: obr
+          env:
+          - name: CONTEXTROOT
+            value: main/maven-repo/obr
+          ports:
+            - containerPort: 80
+              name: obr
