@@ -13,6 +13,9 @@ spec:
   params:
   - name: context
     type: string 
+  - name: settingsLocation
+    type: string
+    default: /workspace/git/$(params.context)/gpg/settings.xml
   - name: buildArgs
     type: array    
   - name: command
@@ -27,7 +30,7 @@ spec:
     args:
       - $(params.buildArgs[*])
       - --settings
-      - /workspace/git/$(params.context)/gpg/settings.xml
+      - $(params.settingsLocation)
       - --batch-mode
       - --errors
       - --fail-at-end
