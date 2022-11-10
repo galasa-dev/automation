@@ -2,11 +2,5 @@ FROM alpine
 
 ARG platform
 
-RUN addgroup galasa && \ 
-    adduser -D -G galasa -h /galasa -s /bin/sh galasa 
-
 COPY bin/galasabld-${platform} /bin/galasabld
-RUN chmod +x /bin/galasabld
-
-# WORKDIR /galasa
-# USER galasa
+ENTRYPOINT ["/bin/galasabld"]
