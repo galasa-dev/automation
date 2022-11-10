@@ -178,7 +178,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
-    - name: settings
+    - name: settingsLocation
       value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
     - name: buildArgs
       value:
@@ -241,7 +241,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
-    - name: settings
+    - name: settingsLocation
       value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
     - name: buildArgs
       value:
