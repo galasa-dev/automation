@@ -153,10 +153,6 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    # - clone-automation
-    # - clone-framework
-    # - clone-extensions
-    # - clone-managers
     - clone-obr
     params:
     - name: pipelineRunName
@@ -171,7 +167,6 @@ spec:
       name: galasabld
     runAfter:
     - maven-gpg
-    # - get-commit
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
@@ -193,7 +188,7 @@ spec:
         - "--bom"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace 
   - name: list-bom
     taskRef: 
       name: unix-command
@@ -208,7 +203,7 @@ spec:
         - "pom.xml"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
+       workspace: git-workspace 
   - name: maven-build-bom
     taskRef:
       name: maven-build
@@ -217,6 +212,8 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
@@ -278,6 +275,8 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
