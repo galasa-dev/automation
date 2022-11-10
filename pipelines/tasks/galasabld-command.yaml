@@ -5,7 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: galasabld
-  namespace: galasa-pipelines
+  namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace
@@ -15,7 +15,6 @@ spec:
     type: string
   - name: command
     type: array
-  
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)

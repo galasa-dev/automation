@@ -5,7 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: unix-command
-  namespace: galasa-pipelines
+  namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace

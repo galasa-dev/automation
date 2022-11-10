@@ -5,7 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: pr-obr
-  namespace: galasa-pipelines
+  namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace
@@ -77,7 +77,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace     
-
   - name: clone-extensions
     taskRef: 
       name: git-clone
@@ -97,7 +96,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -117,7 +115,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace     
-
   - name: clone-obr
     taskRef: 
       name: git-clone
@@ -137,35 +134,30 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
-  
-
   - name: maven-gpg
     taskRef:
       name: maven-gpg
     runAfter:
-    - clone-obr
+    - clone-automation
     - clone-framework
     - clone-extensions
     - clone-managers
-    - clone-automation
+    - clone-obr
     params:
     - name: context 
       value: $(context.pipelineRun.name)/obr
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
+    # - clone-automation
+    # - clone-framework
+    # - clone-extensions
+    # - clone-managers
     - clone-obr
-    - clone-framework
-    - clone-extensions
-    - clone-managers
-    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -174,36 +166,34 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
   - name: generate-bom
     taskRef:
       name: galasabld
     runAfter:
     - maven-gpg
-    - get-commit
+    # - get-commit
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
     - name: command
       value:       
-        - template
-        - --releaseMetadata
-        - /workspace/git/framework/release.yaml
-        - --releaseMetadata
-        - /workspace/git/extensions/release.yaml
-        - --releaseMetadata
-        - /workspace/git/managers/release.yaml
-        - --releaseMetadata
-        - /workspace/git/obr/release.yaml
-        - --template
-        - pom.template
-        - --output
-        - pom.xml
-        - --bom
+        - "template"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
+        - "--template"
+        - "pom.template"
+        - "--output"
+        - "pom.xml"
+        - "--bom"
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
-
   - name: list-bom
     taskRef: 
       name: unix-command
@@ -214,13 +204,11 @@ spec:
       value: $(context.pipelineRun.name)/obr/galasa-bom
     - name: command
       value: 
-        - cat
-        - pom.xml  
+        - "cat"
+        - "pom.xml"
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-
-
   - name: maven-build-bom
     taskRef:
       name: maven-build
@@ -232,7 +220,7 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
@@ -240,8 +228,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
-
   - name: generate-obr
     taskRef:
       name: galasabld
@@ -252,26 +238,25 @@ spec:
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
     - name: command
       value:       
-        - template
-        - --releaseMetadata
-        - /workspace/git/framework/release.yaml
-        - --releaseMetadata
-        - /workspace/git/extensions/release.yaml
-        - --releaseMetadata
-        - /workspace/git/managers/release.yaml
-        - --releaseMetadata
-        - /workspace/git/obr/release.yaml
-        - --template
-        - pom.template
-        - --output
-        - pom.xml
-        - --obr
+        - "template"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
+        - "--template"
+        - "pom.template"
+        - "--output"
+        - "pom.xml"
+        - "--obr"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
-
+       workspace: git-workspace
   - name: list-obr
-    taskRef: 
+    taskRef:
       name: unix-command
     runAfter:
     - generate-obr
@@ -284,13 +269,11 @@ spec:
         - pom.xml  
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
-
-
+       workspace: git-workspace
   - name: maven-build-obr
     taskRef:
       name: maven-build
-    runAfter: 
+    runAfter:
       - list-obr
     params:
     - name: context
@@ -298,39 +281,37 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
       value: deploy
     workspaces:
      - name: git-workspace
-       workspace: git-workspace   
-
+       workspace: git-workspace
   - name: docker-build-obr
     taskRef:
       name: docker-build
-    runAfter: 
-      - maven-build-obr  
+    runAfter:
+      - maven-build-obr
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/obr
     - name: dockerfilePath
-      value: automation/dockerfiles/obr/obr-dockerfile 
+      value: automation/dockerfiles/obr/obr-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.headSha)  
-    - name: noPush  
+      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.headSha)
+    - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace        
-
+       workspace: git-workspace
   finally:
   - name: git-status
     when:
