@@ -1,0 +1,24 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: galasabld
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: command
+    type: array
+  steps:
+  - name: galasabld
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/galasadev/galasabld:main
+    command:
+    - galasabld
+    - $(params.command[*])
