@@ -114,10 +114,6 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    # - clone-automation
-    # - clone-framework
-    # - clone-extensions
-    # - clone-managers
     - clone-obr
     params:
     - name: pipelineRunName
@@ -132,7 +128,6 @@ spec:
       name: galasabld
     runAfter:
     - maven-gpg
-    # - get-commit
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
@@ -154,7 +149,7 @@ spec:
         - "--bom"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace 
   - name: list-bom
     taskRef: 
       name: unix-command
@@ -169,8 +164,8 @@ spec:
         - "pom.xml"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
-  - name: maven-build-bom
+       workspace: git-workspace 
+  - name: main-maven-build-bom
     taskRef:
       name: maven-build
     runAfter: 
@@ -195,7 +190,7 @@ spec:
     taskRef:
       name: galasabld
     runAfter:
-    - maven-build-bom
+    - main-maven-build-bom
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
@@ -233,7 +228,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: maven-build-obr
+  - name: main-maven-build-obr
     taskRef:
       name: maven-build
     runAfter:
@@ -254,11 +249,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: docker-build-obr
+  - name: main-docker-build-obr
     taskRef:
       name: docker-build
     runAfter:
-      - maven-build-obr
+      - main-maven-build-obr
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -277,6 +272,41 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - main-docker-build-obr
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - development-repo-main 
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - obr
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - development-repo-main
+      - --resource
+      - apps:Deployment:obr 
+      - --health
   finally:
   - name: git-clean-automation
     taskRef: 
