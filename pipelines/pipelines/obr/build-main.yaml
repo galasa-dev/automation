@@ -30,8 +30,6 @@ spec:
   - name: clone-framework
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/framework
@@ -49,8 +47,6 @@ spec:
   - name: clone-extensions
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/extensions
@@ -68,8 +64,6 @@ spec:
   - name: clone-managers
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/managers
@@ -87,8 +81,6 @@ spec:
   - name: clone-obr
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/obr
