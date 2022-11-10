@@ -166,6 +166,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: generate-bom
     taskRef:
       name: galasabld
@@ -193,7 +194,23 @@ spec:
         - "--bom"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace 
+
+  - name: ls
+    taskRef: 
+      name: unix-command
+    runAfter:
+    - generate-bom
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/obr/galasa-bom
+    - name: command
+      value: 
+        - "ls"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+
   - name: list-bom
     taskRef: 
       name: unix-command
@@ -205,10 +222,11 @@ spec:
     - name: command
       value: 
         - "cat"
-        - "pom.xml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/galasa-bom/pom.xml"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
+       workspace: git-workspace 
+
   - name: maven-build-bom
     taskRef:
       name: maven-build
