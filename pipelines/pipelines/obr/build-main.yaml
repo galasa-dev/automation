@@ -312,48 +312,12 @@ spec:
       - apps:Deployment:obr 
       - --health
   finally:
-  - name: git-clean-automation
+  - name: git-clean
     taskRef: 
       name: git-clean
     params:
     - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: git-clean-obr
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/obr
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: git-clean-framework
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/framework
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace   
-  - name: git-clean-extensions
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/extensions
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace    
-  - name: git-clean-managers
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/managers
+      value: $(context.pipelineRun.name)
     workspaces:
      - name: git-workspace
        workspace: git-workspace
