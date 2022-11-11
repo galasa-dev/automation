@@ -9,10 +9,10 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  # params:
-  # - name: imageTag
-  #   type: string
-  #   default: {{ .Values.imageTag }}
+  params:
+  - name: imageTag
+    type: string
+    default: {{ .Values.imageTag }}
   tasks:
   - name: clone-automation
     taskRef: 
@@ -266,12 +266,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/obr/obr-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr:main
+      value: harbor.galasa.dev/galasadev/galasa-obr:{{ .Values.imageTag }}
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag={{ .Values.imageTag }}"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
