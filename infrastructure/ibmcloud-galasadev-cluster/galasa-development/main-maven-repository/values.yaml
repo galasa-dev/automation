@@ -1,0 +1,9 @@
+#
+# Copyright contributors to the Galasa project 
+#
+
+namespace: galasa-development
+
+imageTag: main
+
+branch: main
