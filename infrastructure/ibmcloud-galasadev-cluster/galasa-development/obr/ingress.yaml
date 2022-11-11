@@ -4,8 +4,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: obr
-  namespace: galasa-development
+  name: obr-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
     
@@ -20,8 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: obr
+            name: obr-{{ .Values.branch }}
             port:
               number: 80
-        path: /main/maven-repo/obr
+        path: /{{ .Values.branch }}/maven-repo/obr
         pathType: Prefix
