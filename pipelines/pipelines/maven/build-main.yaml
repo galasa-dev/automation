@@ -9,10 +9,6 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  params:
-  - name: imageTag
-    type: string
-    default: {{ .Values.imageTag }}
   tasks:
   - name: clone-automation
     taskRef: 
@@ -105,12 +101,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/maven/maven-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-maven:{{ .Values.imageTag }}
+      value: harbor.galasa.dev/galasadev/galasa-maven:main
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag={{ .Values.imageTag }}"
+        - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -150,22 +146,15 @@ spec:
       - --resource
       - apps:Deployment:maven 
       - --health
-  finally:
-  - name: git-clean-automation
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: git-clean-maven
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/maven
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # finally:
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
