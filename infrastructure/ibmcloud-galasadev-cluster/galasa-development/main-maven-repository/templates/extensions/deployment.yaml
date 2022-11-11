@@ -1,0 +1,30 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: extensions-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: extensions-{{ .Values.branch }}
+  template:
+    metadata:
+      name: extensions-{{ .Values.branch }}
+      labels:
+        app: extensions-{{ .Values.branch }}
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-extensions:{{ .Values.imageTag }}
+          imagePullPolicy: Always
+          name: extensions-{{ .Values.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.branch }}/maven-repo/extensions
+          ports:
+            - containerPort: 80
+              name: extensions-{{ .Values.branch }}
