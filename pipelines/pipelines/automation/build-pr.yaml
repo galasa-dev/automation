@@ -94,7 +94,7 @@ spec:
     runAfter:
       - clone-automation
     params:
-    - name: GOPATH
+    - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-status
     - name: goArgs
       value:
@@ -182,12 +182,14 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-  - name: git-clean
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace

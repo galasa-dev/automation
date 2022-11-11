@@ -134,22 +134,15 @@ spec:
       - --resource
       - apps:Deployment:framework 
       - --health
-  finally:
-  - name: git-clean-automation
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: git-clean-framework
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/framework
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # finally:
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace

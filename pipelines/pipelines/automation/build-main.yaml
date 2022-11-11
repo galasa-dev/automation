@@ -27,6 +27,19 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: automation
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -193,13 +206,15 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-  finally:
-  - name: git-clean
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # finally:
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
