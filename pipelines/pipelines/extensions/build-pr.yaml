@@ -151,21 +151,14 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-  - name: git-clean-automation
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/automation
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: git-clean-extensions
-    taskRef: 
-      name: git-clean
-    params:
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/extensions
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
