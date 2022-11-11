@@ -1,8 +1,11 @@
+#
+# Copyright contributors to the Galasa project 
+# 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: wrapping
-  namespace: galasa-development
+  name: managers-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
     
@@ -17,8 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: wrapping
+            name: managers-{{ .Values.branch }}
             port:
               number: 80
-        path: /main/maven-repo/wrapping
+        path: /{{ .Values.branch }}/maven-repo/managers
         pathType: Prefix

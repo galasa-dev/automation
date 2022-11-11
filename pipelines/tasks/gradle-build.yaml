@@ -32,7 +32,7 @@ spec:
       - $(params.buildArgs[*])
       - $(params.command)
     volumeMounts:
-    - name: gpgkey
+    - name: gpg-key
       # mountPath: /opt/gradle/gradle-7.5/galasa.gpg
       mountPath: /opt/gradle/gradle-6.8.2/galasa.gpg
       subPath: galasa.gpg

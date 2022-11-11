@@ -72,9 +72,9 @@ spec:
                   - name: gradle-properties
                     secret:
                       secretName: gradle-properties
-                  - name: gpgkey
+                  - name: gpg-key
                     secret:
-                      secretName: gpgkey
+                      secretName: gpg-key
                   - name: mavengpg
                     secret:
                       secretName: mavengpg
