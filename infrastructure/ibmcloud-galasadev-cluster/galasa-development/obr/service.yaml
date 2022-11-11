@@ -5,11 +5,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: obr
-  name: obr
-  namespace: galasa-development
+    app: obr-{{ .Values.branch }}
+  name: obr-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: obr
+    app: obr-{{ .Values.branch }}
