@@ -15,7 +15,6 @@ spec:
     type: string 
   - name: settingsLocation
     type: string
-    default: /workspace/git/$(params.context)/gpg/settings.xml
   - name: buildArgs
     type: array    
   - name: command
