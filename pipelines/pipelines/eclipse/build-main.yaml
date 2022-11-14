@@ -1,0 +1,184 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: main-eclipse
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-eclipse
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/eclipse
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/eclipse
+    workspaces:
+     - name: output
+       workspace: git-workspace  
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-eclipse
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: eclipse
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-eclipse 
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: main-maven-build-eclipse
+    taskRef:
+      name: maven-build
+    runAfter:
+    - maven-gpg
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    - name: buildArgs
+      value:
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
+        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
+        - "-Dgalasa.runtime.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.simplatform.repo=https://repo.maven.apache.org/maven2/"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: main-docker-build-eclipse
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - main-maven-build-eclipse
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    - name: dockerfilePath
+      value: automation/dockerfiles/eclipse/eclipse-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.headSha)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
+
+  - name: main-docker-build-eclipse-p2
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - main-maven-build-eclipse
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/dev.galasa.eclipse.site
+    - name: dockerfilePath
+      value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.headSha)
+    - name: noPush
+      value: ""
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace  
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - main-docker-build-eclipse
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - development-repo-main
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - eclipse 
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - development-repo-main
+      - --resource
+      - apps:Deployment:eclipse 
+      - --health
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # finally:
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace

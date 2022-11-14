@@ -1,0 +1,200 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pr-eclipse
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+  tasks:
+  - name: git-verify
+    taskRef:
+      name: git-verify
+    params:
+    - name: userId
+      value: $(params.userId)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: action
+      value: $(params.action)
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    runAfter:
+      - git-verify
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-eclipse
+    taskRef: 
+      name: git-clone
+    runAfter:
+      - git-verify
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/eclipse
+    - name: revision
+      value: $(params.baseRef)
+    - name: refspec
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/eclipse
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-eclipse
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: eclipse
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-eclipse 
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: maven-build-eclipse
+    taskRef:
+      name: maven-build
+    runAfter:
+    - maven-gpg
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
+    - name: buildArgs
+      value:
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
+        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
+        - "-Dgalasa.runtime.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.simplatform.repo=https://repo.maven.apache.org/maven2/"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: docker-build-eclipse
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - maven-build-eclipse
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    - name: dockerfilePath
+      value: automation/dockerfiles/eclipse/eclipse-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.headSha)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
+
+  - name: docker-build-eclipse-p2
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - maven-build-eclipse
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/dev.galasa.eclipse.site
+    - name: dockerfilePath
+      value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.headSha)
+    - name: noPush
+      value: ""
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace      
+  finally:
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
+    taskRef:
+      name: git-status
+    params:
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
