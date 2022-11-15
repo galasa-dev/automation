@@ -75,7 +75,9 @@ spec:
     - maven-gpg
     params:
     - name: context
-      value: $(context.pipelineRun.name)/eclipse
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/gpg/settings.xml  
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
