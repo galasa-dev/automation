@@ -114,11 +114,10 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
-        - "-Dgalasa.runtime.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.simplatform.repo=https://repo.maven.apache.org/maven2/"
     - name: command
       value: deploy
