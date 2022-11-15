@@ -168,9 +168,9 @@ spec:
       value: 
       - app 
       - wait
-      - development-repo-main
+      - main-maven-repos
       - --resource
-      - apps:Deployment:eclipse 
+      - apps:Deployment:eclipse-main 
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
