@@ -112,12 +112,12 @@ spec:
       - app 
       - actions 
       - run 
-      - development-repo-main 
+      - main-maven-repos
       - restart 
       - --kind 
       - Deployment
       - --resource-name
-      - framework
+      - framework-main
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -130,9 +130,9 @@ spec:
       value: 
       - app 
       - wait
-      - development-repo-main
+      - main-maven-repos 
       - --resource
-      - apps:Deployment:framework 
+      - apps:Deployment:framework-main
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
