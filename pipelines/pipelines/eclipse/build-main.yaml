@@ -106,7 +106,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:main
     - name: noPush
       value: ""
     - name: buildArgs
@@ -131,7 +131,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse:main
+      value: harbor.galasa.dev/galasadev/galasa-eclipse-p2:main
     - name: noPush
       value: ""
     workspaces:
