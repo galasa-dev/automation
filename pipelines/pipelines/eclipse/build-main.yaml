@@ -64,7 +64,7 @@ spec:
     - clone-eclipse 
     params:
     - name: context
-      value: $(context.pipelineRun.name)/eclipse
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     workspaces:
      - name: git-workspace
        workspace: git-workspace
