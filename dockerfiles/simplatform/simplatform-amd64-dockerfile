@@ -1,7 +1,7 @@
-ARG dockerRepository
-ARG jdkImage
+# ARG dockerRepository
+# ARG jdkImage
 
-FROM ${dockerRepository}/${jdkImage}
+FROM docker.io/library/openjdk:11-jdk
 
 RUN mkdir /galasa
 
