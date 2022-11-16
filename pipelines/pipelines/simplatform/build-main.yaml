@@ -156,10 +156,10 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:main
     - name: noPush
       value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
+    # - name: buildArgs
+    #   value:
+    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
+    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
