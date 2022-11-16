@@ -27,4 +27,3 @@ spec:
             value: {{ .Values.branch }}/maven-repo/simplatform
           ports:
             - containerPort: 80
-              name: simplatform-{{ .Values.branch }}
