@@ -168,7 +168,7 @@ spec:
       value:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=???" # Unsure what you'd put here as is PR not main
+        - "--build-arg=branch=main" # Double check this value in future
     workspaces:
       - name: git-workspace
         workspace: git-workspace
