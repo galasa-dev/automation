@@ -1,0 +1,211 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: main-simplatform
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-simplatform
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/simplatform
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/simplatform
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-simplatform
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: simplatform
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  
+  # Current Simplatform pipeline does not have maven-gpg equivalent
+  # - name: maven-gpg
+  #   taskRef:
+  #     name: maven-gpg
+  #   runAfter:
+  #   - clone-simplatform 
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/simplatform
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
+
+  - name: main-maven-build-simplatform-application
+    taskRef:
+      name: maven-build
+    runAfter:
+    # - maven-gpg
+    - clone-simplatform
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
+    - name: buildArgs
+      value:
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: main-maven-build-simbank-tests
+    taskRef:
+      name: maven-build
+    runAfter:
+    - main-maven-build-simplatform-application
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/simplatform/galasa-simbank-tests
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
+    - name: buildArgs
+      value:
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: main-docker-build-simplatform-repo
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - main-maven-build-simbank-tests
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/simplatform
+    - name: dockerfilePath
+      value: automation/dockerfiles/simplatform/simplatform-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-simplatform:main
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=branch=main"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
+  - name: main-docker-build-simplatform-jar
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - main-docker-build-simplatform-repo
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-3270
+    - name: dockerfilePath
+      value: automation/dockerfiles/simplatform/simplatform-jar-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:main
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - main-docker-build-simplatform-repo
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - main-maven-repos
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - simplatform-main
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - main-maven-repos
+      - --resource
+      - apps:Deployment:simplatform-main
+      - --health
+
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
