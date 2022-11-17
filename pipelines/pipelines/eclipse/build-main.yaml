@@ -86,7 +86,7 @@ spec:
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
         - "-Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr"
-        - "-Dgalasa.simplatform.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform"
     - name: command
       value: deploy
     workspaces:
