@@ -150,12 +150,12 @@ spec:
       - app 
       - actions 
       - run 
-      - development-repo-main
+      - main-maven-repos
       - restart
       - --kind 
       - Deployment
       - --resource-name
-      - eclipse 
+      - eclipse-main 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
