@@ -164,7 +164,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-eclipse-p2:$(params.headSha)
     - name: noPush
       value: ""
     workspaces:
