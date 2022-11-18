@@ -157,13 +157,13 @@ spec:
       value:  
         - template 
         - --releaseMetadata
-        - /workspace/git/framework/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/framework/release.yaml 
         - --releaseMetadata
-        - /workspace/git/extensions/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/extensions/release.yaml 
         - --releaseMetadata
-        - /workspace/git/managers/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/managers/release.yaml 
         - --releaseMetadata
-        - /workspace/git/obr/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/obr/release.yaml 
         - --template
         - pom.template 
         - --output
@@ -633,13 +633,13 @@ spec:
       value:  
         - template 
         - --releaseMetadata
-        - /workspace/git/framework/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/framework/release.yaml 
         - --releaseMetadata
-        - /workspace/git/extensions/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/extensions/release.yaml 
         - --releaseMetadata
-        - /workspace/git/managers/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/managers/release.yaml 
         - --releaseMetadata
-        - /workspace/git/obr/release.yaml 
+        - /workspace/git/$(context.pipelineRun.name)/obr/release.yaml 
         - --template
         - pom.template 
         - --output
