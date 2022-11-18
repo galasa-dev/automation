@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-buildutils
+  name: branch-buildutils
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -34,9 +41,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/buildutils
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -69,7 +76,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld:main
+      value: harbor.galasa.dev/galasadev/galasabld:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
