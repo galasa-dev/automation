@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-gradle
+  name: branch-gradle
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -34,9 +41,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/gradle
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -57,7 +64,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-gradle-build-gradle
+  - name: branch-gradle-build-gradle
     taskRef:
       name: gradle-build
     runAfter: 
@@ -75,12 +82,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-docker-build-gradle
+  - name: branch-docker-build-gradle
     taskRef:
       name: docker-build
     runAfter:
       - get-commit
-      - main-gradle-build-gradle
+      - branch-gradle-build-gradle
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -89,12 +96,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/gradle/gradle-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-gradle:main
+      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.branch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -103,7 +110,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-gradle
+    - branch-docker-build-gradle
     params:
     - name: server
       value: argocd.galasa.dev
@@ -117,7 +124,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - gradle-main
+      - gradle-$(params.branch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -132,7 +139,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:gradle-main
+      - apps:Deployment:gradle-$(params.branch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
