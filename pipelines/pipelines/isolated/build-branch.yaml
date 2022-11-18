@@ -117,7 +117,7 @@ spec:
     - name: revision
       value: $(params.branch)
     - name: refspec
-      value: $(params.baseRef)
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
