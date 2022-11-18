@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-automation
+  name: branch-automation
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -17,9 +24,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/automation
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -70,7 +77,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghverify:main
+      value: harbor.galasa.dev/common/ghverify:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -106,7 +113,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghstatus-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghstatus:main
+      value: harbor.galasa.dev/common/ghstatus:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -142,7 +149,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/github-monitor-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghmonitor:main
+      value: harbor.galasa.dev/common/ghmonitor:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -161,7 +168,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/gpg-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/gpg:main
+      value: harbor.galasa.dev/common/gpg:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -180,7 +187,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/kubectl-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/kubectl:main
+      value: harbor.galasa.dev/common/kubectl:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -200,7 +207,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/gitcli-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/gitcli:main
+      value: harbor.galasa.dev/common/gitcli:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
