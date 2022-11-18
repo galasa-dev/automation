@@ -486,7 +486,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-isolated:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-isolated:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -506,7 +506,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-distibution:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-distibution:$(params.branch)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -564,7 +564,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfileZip
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-isolated-zip:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-isolated-zip:$(params.branch)
     - name: noPush
       value: ""  
     - name: buildArgs
@@ -962,7 +962,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-mvp:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-mvp:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -982,7 +982,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-distribution:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-distribution:$(params.branch)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -1040,7 +1040,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfileZip
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-mvp-zip:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-mvp-zip:$(params.branch)
     - name: noPush
       value: ""  
     - name: buildArgs
