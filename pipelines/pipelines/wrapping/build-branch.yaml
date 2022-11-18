@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-maven
+  name: branch-wrapping
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -27,20 +34,20 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-maven
+  - name: clone-wrapping
     taskRef: 
       name: git-clone
     params:
     - name: url
-      value: https://github.com/galasa-dev/maven
+      value: https://github.com/galasa-dev/wrapping
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/maven
+      value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: output
        workspace: git-workspace  
@@ -48,12 +55,12 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-maven
+    - clone-wrapping
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: maven
+      value: wrapping
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -61,54 +68,54 @@ spec:
     taskRef:
       name: maven-gpg
     runAfter:
-    - clone-maven 
+    - clone-wrapping 
     params:
-    - name: context 
-      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+    - name: context
+      value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-maven-build-maven
+  - name: branch-maven-build-wrapping
     taskRef:
       name: maven-build
     runAfter:
     - maven-gpg
     params:
     - name: context
-      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+      value: $(context.pipelineRun.name)/wrapping
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/maven/galasa-maven-plugin/gpg/settings.xml
+      value: /workspace/git/$(context.pipelineRun.name)/wrapping/gpg/settings.xml
     - name: buildArgs
-      value: 
+      value:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
     - name: command
       value: deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-docker-build-maven
+  - name: branch-docker-build-wrapping
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
-    - main-maven-build-maven
+    - branch-maven-build-wrapping
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/maven
+      value: $(context.pipelineRun.name)/wrapping
     - name: dockerfilePath
-      value: automation/dockerfiles/maven/maven-dockerfile
+      value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-maven:main
+      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -117,7 +124,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-maven
+    - branch-docker-build-wrapping
     params:
     - name: server
       value: argocd.galasa.dev
@@ -131,7 +138,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - maven-main
+      - wrapping-$(params.branch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -146,7 +153,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:maven-main
+      - apps:Deployment:wrapping-$(params.branch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
