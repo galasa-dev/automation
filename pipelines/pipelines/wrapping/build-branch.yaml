@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-wrapping
+  name: branch-wrapping
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -34,9 +41,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/wrapping
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -68,7 +75,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-maven-build-wrapping
+  - name: branch-maven-build-wrapping
     taskRef:
       name: maven-build
     runAfter:
@@ -89,12 +96,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-docker-build-wrapping
+  - name: branch-docker-build-wrapping
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
-    - main-maven-build-wrapping
+    - branch-maven-build-wrapping
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -103,7 +110,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-wrapping:main
+      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -117,7 +124,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-wrapping
+    - branch-docker-build-wrapping
     params:
     - name: server
       value: argocd.galasa.dev
@@ -131,7 +138,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - wrapping-main
+      - wrapping-$(params.branch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -146,7 +153,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:wrapping-main
+      - apps:Deployment:wrapping-$(params.branch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
