@@ -345,7 +345,7 @@ spec:
         - "pom.xml"
         - "--javadoc"
     workspaces:
-     - name: output
+     - name: git-workspace
        workspace: git-workspace
   - name: maven-build-javadocs
     taskRef: 
@@ -367,7 +367,7 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/repo"
         - "-Dmaven.javadoc.failOnError=false"
     workspaces:
-     - name: output
+     - name: git-workspace
        workspace: git-workspace
   - name: docker-build-javadocs-image
     taskRef: 
@@ -386,7 +386,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/javadocs/javadocs-image-dockerfile
     workspaces:
-     - name: output
+     - name: git-workspace
        workspace: git-workspace
   - name: docker-build-javadocs-repo
     taskRef: 
@@ -409,7 +409,7 @@ spec:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
-     - name: output
+     - name: git-workspace
        workspace: git-workspace
   - name: recycle-javadocs
     taskRef:
