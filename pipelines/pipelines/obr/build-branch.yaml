@@ -362,7 +362,7 @@ spec:
     - name: buildArgs
       value: 
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
@@ -378,7 +378,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadocs-image:main
+      value: harbor.galasa.dev/galasadev/galasa-javadocs-image:$(params.branch)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: noPush
@@ -397,7 +397,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadocs:main
+      value: harbor.galasa.dev/galasadev/galasa-javadocs:$(params.branch)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs/docker
     - name: noPush
@@ -429,7 +429,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - javadocs-main
+      - javadocs-$(params.branch)
   - name: wait-javadocs
     taskRef:
       name: argocd-cli
@@ -444,7 +444,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:javadocs-main
+      - apps:Deployment:javadocs-$(params.branch)
       - --health
   - name: recycle-apidocs
     taskRef:
@@ -464,7 +464,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - apidocs-main
+      - apidocs-$(params.branch)
   - name: wait-apidocs
     taskRef:
       name: argocd-cli
@@ -479,7 +479,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:apidocs-main
+      - apps:Deployment:apidocs-$(params.branch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
