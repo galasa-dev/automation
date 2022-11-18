@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-simplatform
+  name: branch-eclipse
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -27,147 +34,121 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-simplatform
+  - name: clone-eclipse
     taskRef: 
       name: git-clone
     params:
     - name: url
-      value: https://github.com/galasa-dev/simplatform
+      value: https://github.com/galasa-dev/eclipse
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/simplatform
+      value: $(context.pipelineRun.name)/eclipse
     workspaces:
      - name: output
-       workspace: git-workspace
+       workspace: git-workspace  
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - clone-simplatform
+    - clone-eclipse
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: simplatform
+      value: eclipse
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
-  # Current Simplatform pipeline does not have maven-gpg equivalent
-  # - name: maven-gpg
-  #   taskRef:
-  #     name: maven-gpg
-  #   runAfter:
-  #   - clone-simplatform 
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/simplatform
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-
-  - name: main-maven-build-simplatform-application
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-eclipse 
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: branch-maven-build-eclipse
     taskRef:
       name: maven-build
     runAfter:
-    # - maven-gpg
-    - clone-simplatform
+    - maven-gpg
     params:
     - name: context
-      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
+      value: /workspace/git/$(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/gpg/settings.xml  
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
+        - "-Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr"
+        - "-Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform"
     - name: command
       value: deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-maven-build-simbank-tests
-    taskRef:
-      name: maven-build
-    runAfter:
-    - main-maven-build-simplatform-application
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/simplatform/galasa-simbank-tests
-    - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
-    - name: buildArgs
-      value:
-        - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr"
-        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
-    - name: command
-      value: deploy
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: main-docker-build-simplatform-repo
+  - name: branch-docker-build-eclipse
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
-    - main-maven-build-simbank-tests
+    - branch-maven-build-eclipse
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/simplatform
+      value: $(context.pipelineRun.name)/eclipse
     - name: dockerfilePath
-      value: automation/dockerfiles/simplatform/simplatform-dockerfile
+      value: automation/dockerfiles/eclipse/eclipse-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-simplatform:main
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=main"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
-  - name: main-docker-build-simplatform-jar
+
+  - name: branch-docker-build-eclipse-p2
     taskRef:
       name: docker-build
     runAfter:
     - get-commit
-    - main-docker-build-simplatform-repo
+    - branch-maven-build-eclipse
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-3270
+      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/dev.galasa.eclipse.site
     - name: dockerfilePath
-      value: automation/dockerfiles/simplatform/simplatform-amd64-dockerfile
+      value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:main
+      value: harbor.galasa.dev/galasadev/galasa-eclipse-p2:$(params.branch)
     - name: noPush
       value: ""
-    # - name: buildArgs
-    #   value:
-    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
-    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
-        workspace: git-workspace
+        workspace: git-workspace  
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-simplatform-repo
+    - branch-docker-build-eclipse
     params:
     - name: server
       value: argocd.galasa.dev
@@ -177,11 +158,11 @@ spec:
       - actions 
       - run 
       - main-maven-repos
-      - restart 
+      - restart
       - --kind 
       - Deployment
       - --resource-name
-      - simplatform-main
+      - eclipse-$(params.branch) 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -196,10 +177,11 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:simplatform-main
+      - apps:Deployment:eclipse-$(params.branch) 
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # finally:
   # - name: git-clean
   #   taskRef: 
   #     name: git-clean

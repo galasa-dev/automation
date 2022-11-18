@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-extensions
+  name: branch-managers
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -27,20 +34,20 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-extensions
+  - name: clone-managers
     taskRef: 
       name: git-clone
     params:
     - name: url
-      value: https://github.com/galasa-dev/extensions
+      value: https://github.com/galasa-dev/managers
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/extensions
+      value: $(context.pipelineRun.name)/managers
     workspaces:
      - name: output
        workspace: git-workspace  
@@ -48,53 +55,53 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-extensions
+    - clone-managers
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: extensions
+      value: managers
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-gradle-build-extensions
+  - name: branch-gradle-build-managers
     taskRef:
       name: gradle-build
     runAfter: 
-      - clone-extensions
+      - clone-managers
     params:
     - name: context
-      value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
+      value: $(context.pipelineRun.name)/managers/galasa-managers-parent
     - name: buildArgs
       value:
-        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/framework"
+        - "-PsourceMaven=https://development.galasa.dev/$(params.branch)/maven-repo/extensions"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/extensions/repo"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
     - name: command
       value: publish
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-  - name: main-docker-build-extensions
+  - name: branch-docker-build-managers
     taskRef:
       name: docker-build
     runAfter:
       - get-commit
-      - main-gradle-build-extensions
+      - branch-gradle-build-managers
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/extensions
+      value: $(context.pipelineRun.name)/managers
     - name: dockerfilePath
-      value: automation/dockerfiles/extensions/extensions-dockerfile
+      value: automation/dockerfiles/managers/managers-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-extensions:main
+      value: harbor.galasa.dev/galasadev/galasa-managers:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.branch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -103,7 +110,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-extensions
+    - branch-docker-build-managers
     params:
     - name: server
       value: argocd.galasa.dev
@@ -117,7 +124,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - extensions-main
+      - managers-$(params.branch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -132,9 +139,9 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:extensions-main
+      - apps:Deployment:managers-$(params.branch)
       - --health
-  
+
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
   # - name: git-clean
