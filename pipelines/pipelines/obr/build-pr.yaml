@@ -311,6 +311,103 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+### JAVADOCS 
+  - name: generate-javadocs
+    taskRef: 
+      name: galasabld
+    runAfter:
+    - clone-automation
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-obr
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/obr/javadocs
+    - name: command
+      value: 
+        - "template"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "--releaseMetadata"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
+        - "--template"
+        - "pom.template"
+        - "--output"
+        - "pom.xml"
+        - "--javadoc"
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: maven-build-javadocs
+    taskRef: 
+      name: maven-build
+    runAfter: 
+    - galasabld-template-javadocs
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/obr/javadocs
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
+    - name: command
+      value: deploy
+    - name: buildArgs
+      value: 
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/repo"
+        - "-Dmaven.javadoc.failOnError=false"
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: docker-build-javadocs-image
+    taskRef: 
+      name: docker-build
+    runAfter:
+    - maven-build-javadocs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-javadocs-image:main
+    - name: context
+      value: $(context.pipelineRun.name)/obr/javadocs
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/javadocs/javadocs-image-dockerfile
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: docker-build-javadocs-repo
+    taskRef: 
+      name: docker-build
+    runAfter:
+    - docker-build-javadocs-image
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-javadocs:main
+    - name: context
+      value: $(context.pipelineRun.name)/obr/javadocs/docker
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/javadocs/javadocs-dockerfile
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: output
+       workspace: git-workspace
   finally:
   - name: git-status
     when:
