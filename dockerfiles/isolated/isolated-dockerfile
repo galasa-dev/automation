@@ -1,5 +1,6 @@
-ARG fromImage
-FROM ${fromImage}
+FROM docker.io/library/httpd:2.4
 
-COPY repo/ /usr/local/apache2/htdocs/
-COPY isolated.githash /usr/local/apache2/htdocs/isolated.githash
+RUN rm -v /usr/local/apache2/htdocs/*
+COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+
+COPY target/isolated/ /usr/local/apache2/htdocs/
