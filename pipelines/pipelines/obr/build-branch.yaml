@@ -364,7 +364,7 @@ spec:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/repo"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
     workspaces:
      - name: git-workspace
