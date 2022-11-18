@@ -26,5 +26,5 @@ spec:
           - name: CONTEXTROOT
             value: {{ .Values.branch }}/maven-repo/gradle
           ports:
-            - containerPort: 443
+            - containerPort: 80
               name: gradle-{{ .Values.branch }}
