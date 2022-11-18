@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-managers
+  name: branch-maven
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -27,20 +34,20 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-managers
+  - name: clone-maven
     taskRef: 
       name: git-clone
     params:
     - name: url
-      value: https://github.com/galasa-dev/managers
+      value: https://github.com/galasa-dev/maven
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/managers
+      value: $(context.pipelineRun.name)/maven
     workspaces:
      - name: output
        workspace: git-workspace  
@@ -48,53 +55,67 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-managers
+    - clone-maven
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: managers
+      value: maven
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-gradle-build-managers
+  - name: maven-gpg
     taskRef:
-      name: gradle-build
-    runAfter: 
-      - clone-managers
+      name: maven-gpg
+    runAfter:
+    - clone-maven 
     params:
-    - name: context
-      value: $(context.pipelineRun.name)/managers/galasa-managers-parent
-    - name: buildArgs
-      value:
-        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/extensions"
-        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
-    - name: command
-      value: publish
+    - name: context 
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
-  - name: main-docker-build-managers
+       workspace: git-workspace
+  - name: branch-maven-build-maven
+    taskRef:
+      name: maven-build
+    runAfter:
+    - maven-gpg
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/maven/galasa-maven-plugin/gpg/settings.xml
+    - name: buildArgs
+      value: 
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: branch-docker-build-maven
     taskRef:
       name: docker-build
     runAfter:
-      - get-commit
-      - main-gradle-build-managers
+    - get-commit
+    - branch-maven-build-maven
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/managers
+      value: $(context.pipelineRun.name)/maven
     - name: dockerfilePath
-      value: automation/dockerfiles/managers/managers-dockerfile
+      value: automation/dockerfiles/maven/maven-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-managers:main
+      value: harbor.galasa.dev/galasadev/galasa-maven:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.branch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -103,7 +124,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-managers
+    - branch-docker-build-maven
     params:
     - name: server
       value: argocd.galasa.dev
@@ -113,11 +134,11 @@ spec:
       - actions 
       - run 
       - main-maven-repos
-      - restart 
+      - restart
       - --kind 
       - Deployment
       - --resource-name
-      - managers-main
+      - maven-$(params.branch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -132,7 +153,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:managers-main
+      - apps:Deployment:maven-$(params.branch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
