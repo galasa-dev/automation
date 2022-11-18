@@ -4,46 +4,23 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-isolated
+  name: branch-isolated
   namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: headRef
+  - name: branch
     type: string
-  - name: headSha
+    default: main
+  - name: refspec
     type: string
-  - name: baseRef
-    type: string
-  - name: prUrl
-    type: string
-  - name: statusesUrl
-    type: string
-  - name: issueUrl
-    type: string
-  - name: userId
-    type: string
-  - name: prNumber
-    type: string
-  - name: action
-    type: string
+    default: refs/heads/main:refs/heads/main
+   
   tasks:
-  - name: git-verify
-    taskRef:
-      name: git-verify
-    params:
-    - name: userId
-      value: $(params.userId)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: action
-      value: $(params.action)
   - name: clone-automation
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
@@ -62,8 +39,6 @@ spec:
   - name: clone-obr
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/obr
@@ -82,8 +57,6 @@ spec:
   - name: clone-framework
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/framework
@@ -102,8 +75,6 @@ spec:
   - name: clone-extensions
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/extensions
@@ -122,8 +93,6 @@ spec:
   - name: clone-managers
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/managers
@@ -142,15 +111,13 @@ spec:
   - name: clone-isolated
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/isolated
     - name: revision
-      value: $(params.baseRef)
+      value: $(params.branch)
     - name: refspec
-      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
+      value: $(params.baseRef)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -220,12 +187,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -254,12 +221,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -288,12 +255,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -321,12 +288,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -355,12 +322,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -388,12 +355,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -421,12 +388,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -454,12 +421,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -564,12 +531,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -608,6 +575,41 @@ spec:
       - name: git-workspace
         workspace: git-workspace        
 
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build-isolated-zip
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - main-maven-repos
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - isolated-$(params.branch) 
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - main-maven-repos
+      - --resource
+      - apps:Deployment:isolated-$(params.branch) 
+      - --health
 
 
         ############## MVP ###############
@@ -661,12 +663,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -695,12 +697,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -729,12 +731,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -762,12 +764,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -796,12 +798,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -829,12 +831,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -862,12 +864,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -895,12 +897,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -1005,12 +1007,12 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/main/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -1047,28 +1049,47 @@ spec:
         - "--build-arg=dockerRepository=harbor.galasa.dev"  
     workspaces:
       - name: git-workspace
-        workspace: git-workspace            
+        workspace: git-workspace  
 
-
-  finally:
-  - name: git-status
-    when:
-      - input: "$(tasks.git-verify.status)"
-        operator: in
-        values: ["Succeeded"]
+  - name: recycle-deployment-mvp
     taskRef:
-      name: git-status
+      name: argocd-cli
+    runAfter:
+    - docker-build-mvp-zip
     params:
-    - name: status
-      value: $(tasks.status)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: statusesUrl
-      value: $(params.statusesUrl)
-    - name: issueUrl
-      value: $(params.issueUrl)
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - main-maven-repos
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - mvp-$(params.branch) 
+  - name: wait-deployment-mvp
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment-mvp
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - main-maven-repos
+      - --resource
+      - apps:Deployment:mvp-$(params.branch) 
+      - --health
+                
+
+
+      
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean
