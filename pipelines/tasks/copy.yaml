@@ -12,7 +12,7 @@ spec:
     mountPath: /workspace/git
   params:
   - name: context
-    value: string
+    type: string
   - name: source
     type: string  
   - name: destination
