@@ -4,9 +4,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-framework
+  name: branch-extensions
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
   tasks:
@@ -27,20 +34,20 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-framework
+  - name: clone-extensions
     taskRef: 
       name: git-clone
     params:
     - name: url
-      value: https://github.com/galasa-dev/framework
+      value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: main
+      value: $(params.branch)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
-      value: $(context.pipelineRun.name)/framework
+      value: $(context.pipelineRun.name)/extensions
     workspaces:
      - name: output
        workspace: git-workspace  
@@ -48,53 +55,53 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-framework
+    - clone-extensions
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: repo
-      value: framework
+      value: extensions
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: main-gradle-build-framework
+  - name: branch-gradle-build-extensions
     taskRef:
       name: gradle-build
     runAfter: 
-      - clone-framework
+      - clone-extensions
     params:
     - name: context
-      value: $(context.pipelineRun.name)/framework/galasa-parent
+      value: $(context.pipelineRun.name)/extensions/galasa-extensions-parent
     - name: buildArgs
       value:
-        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
+        - "-PsourceMaven=https://development.galasa.dev/$(params.branch)/maven-repo/framework"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/extensions/repo"
     - name: command
       value: publish
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
-  - name: main-docker-build-framework
+       workspace: git-workspace  
+  - name: branch-docker-build-extensions
     taskRef:
       name: docker-build
     runAfter:
-    - get-commit
-    - main-gradle-build-framework
+      - get-commit
+      - branch-gradle-build-extensions
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/framework
+      value: $(context.pipelineRun.name)/extensions
     - name: dockerfilePath
-      value: automation/dockerfiles/framework/framework-dockerfile
+      value: automation/dockerfiles/extensions/extensions-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-framework:main
+      value: harbor.galasa.dev/galasadev/galasa-extensions:$(params.branch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.branch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -103,7 +110,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - main-docker-build-framework
+    - branch-docker-build-extensions
     params:
     - name: server
       value: argocd.galasa.dev
@@ -117,7 +124,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - framework-main
+      - extensions-$(params.branch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -130,11 +137,11 @@ spec:
       value: 
       - app 
       - wait
-      - main-maven-repos 
+      - main-maven-repos
       - --resource
-      - apps:Deployment:framework-main
+      - apps:Deployment:extensions-$(params.branch)
       - --health
-
+  
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
   # - name: git-clean
