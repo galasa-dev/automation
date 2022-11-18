@@ -344,7 +344,7 @@ spec:
     taskRef: 
       name: maven-build
     runAfter: 
-    - galasabld-template-javadocs
+    - generate-javadocs
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
