@@ -741,7 +741,7 @@ spec:
         - -e
         - -fae
         - -f
-        - pom3xml
+        - pom3.xml
     - name: command    
       value: process-sources    
     workspaces:
