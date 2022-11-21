@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
     type: string
     default: main
   - name: refspec
@@ -41,7 +44,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/eclipse
     - name: revision
-      value: $(params.branch)
+      value: $(params.toBranch)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -92,8 +95,8 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
-        - "-Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr"
-        - "-Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform"
+        - "-Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
+        - "-Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/simplatform"
     - name: command
       value: deploy
     workspaces:
@@ -113,7 +116,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -138,7 +141,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse-p2:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-eclipse-p2:$(params.toBranch)
     - name: noPush
       value: ""
     workspaces:
@@ -162,7 +165,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - eclipse-$(params.branch) 
+      - eclipse-$(params.toBranch) 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -177,7 +180,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:eclipse-$(params.branch) 
+      - apps:Deployment:eclipse-$(params.toBranch) 
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC

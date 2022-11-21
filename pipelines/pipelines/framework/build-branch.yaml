@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
     type: string
     default: main
   - name: refspec
@@ -41,7 +44,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/framework
     - name: revision
-      value: $(params.branch)
+      value: $(params.toBranch)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -74,7 +77,7 @@ spec:
       value: $(context.pipelineRun.name)/framework/galasa-parent
     - name: buildArgs
       value:
-        - "-PsourceMaven=https://development.galasa.dev/$(params.branch)/maven-repo/maven"
+        - "-PsourceMaven=https://development.galasa.dev/$(params.fromBranch)/maven-repo/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
     - name: command
@@ -96,12 +99,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/framework/framework-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-framework:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-framework:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.branch)"
+        - "--build-arg=tag=$(params.toBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -124,7 +127,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - framework-$(params.branch)
+      - framework-$(params.toBranch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -139,7 +142,7 @@ spec:
       - wait
       - main-maven-repos 
       - --resource
-      - apps:Deployment:framework-$(params.branch)
+      - apps:Deployment:framework-$(params.toBranch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
