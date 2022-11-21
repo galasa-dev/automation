@@ -155,6 +155,26 @@ spec:
       - --resource
       - apps:Deployment:wrapping-$(params.branch)
       - --health
+  - name: trigger-gradle
+    taskRef:
+      name: tkn-cli
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/pipelines/templates
+    - name: command
+      value: 
+      - pipeline
+      - start 
+      - branch-gradle
+      - -n 
+      - galasa-build
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./git-workspace-template.yaml
+      - --pod-template
+      - ./pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
