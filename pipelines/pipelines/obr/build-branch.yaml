@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
     type: string
     default: main
   - name: refspec
@@ -92,7 +95,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: $(params.branch)
+      value: $(params.toBranch)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -185,7 +188,7 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/managers"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
@@ -248,7 +251,7 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/managers"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
@@ -269,12 +272,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/obr/obr-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.branch)"
+        - "--build-arg=tag=$(params.toBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -297,7 +300,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - obr-$(params.branch)
+      - obr-$(params.toBranch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -312,7 +315,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:obr-$(params.branch)
+      - apps:Deployment:obr-$(params.toBranch)
       - --health
 
 ### JAVADOCS
@@ -362,7 +365,7 @@ spec:
     - name: buildArgs
       value: 
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/managers"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
@@ -378,7 +381,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadocs-image:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-javadocs-image:$(params.toBranch)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: noPush
@@ -397,7 +400,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadocs:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-javadocs:$(params.toBranch)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs/docker
     - name: noPush
@@ -429,7 +432,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - javadocs-$(params.branch)
+      - javadocs-$(params.toBranch)
   - name: wait-javadocs
     taskRef:
       name: argocd-cli
@@ -444,7 +447,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:javadocs-$(params.branch)
+      - apps:Deployment:javadocs-$(params.toBranch)
       - --health
   - name: recycle-apidocs
     taskRef:
@@ -464,7 +467,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - apidocs-$(params.branch)
+      - apidocs-$(params.toBranch)
   - name: wait-apidocs
     taskRef:
       name: argocd-cli
@@ -479,7 +482,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:apidocs-$(params.branch)
+      - apps:Deployment:apidocs-$(params.toBranch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
