@@ -158,6 +158,8 @@ spec:
   - name: trigger-gradle
     taskRef:
       name: tkn-cli
+    runAfter:
+    - wait-deployment
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation/pipelines/templates
