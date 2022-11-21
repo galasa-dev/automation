@@ -1,0 +1,25 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: tkn-cli
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: command
+    type: array
+  steps:
+  - name: tkn-cli
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/common/tkn:main
+    imagePullPolicy: Always
+    command:
+      - tkn
+      - $(params.command[*])
