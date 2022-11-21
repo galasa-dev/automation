@@ -1,0 +1,10 @@
+volumes:
+- name: gradle-properties
+  secret:
+    secretName: gradle-properties
+- name: gpg-key
+  secret:
+    secretName: gpg-key
+- name: mavengpg
+  secret:
+    secretName: mavengpg
