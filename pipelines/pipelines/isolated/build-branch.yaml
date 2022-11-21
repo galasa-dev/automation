@@ -189,7 +189,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -223,7 +223,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -257,7 +257,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -290,7 +290,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -324,7 +324,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -357,7 +357,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -390,7 +390,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -423,7 +423,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -533,7 +533,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -665,7 +665,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -699,7 +699,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -733,7 +733,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -766,7 +766,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -800,7 +800,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -833,7 +833,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -866,7 +866,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -899,7 +899,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
@@ -1009,7 +1009,7 @@ spec:
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.branch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=$https://development.galasa.dev/$(params.branch)/maven-repo/javadoc
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.branch)/maven-repo/javadocs
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.branch)/maven-repo/eclipse
