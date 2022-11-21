@@ -40,7 +40,7 @@ spec:
                 generateName: repo-$(tt.params.git-repository-name)-main-
               spec:
                 pipelineRef:
-                  name: main-$(tt.params.git-repository-name)
+                  name: branch-$(tt.params.git-repository-name)
                 serviceAccountName: galasa-build-bot
                 podTemplate:
                   volumes:
