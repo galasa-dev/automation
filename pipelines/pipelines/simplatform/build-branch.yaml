@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
     type: string
     default: main
   - name: refspec
@@ -41,7 +44,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/simplatform
     - name: revision
-      value: $(params.branch)
+      value: $(params.toBranch)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -92,7 +95,7 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
     - name: command
@@ -113,7 +116,7 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
     - name: command
@@ -135,14 +138,14 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/simplatform/simplatform-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-simplatform:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-simplatform:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=$(params.branch)"
+        - "--build-arg=branch=$(params.toBranch)"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
@@ -160,7 +163,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/simplatform/simplatform-amd64-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:$(params.toBranch)
     - name: noPush
       value: ""
     # - name: buildArgs
@@ -188,7 +191,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - simplatform-$(params.branch)
+      - simplatform-$(params.toBranch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -203,7 +206,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:simplatform-$(params.branch)
+      - apps:Deployment:simplatform-$(params.toBranch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
