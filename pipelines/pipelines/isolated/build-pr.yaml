@@ -545,6 +545,7 @@ spec:
     - name: buildArgs
       value:
         - "--tar-path"
+        - "/workspace/git/$(context.pipelineRun.name)/isolated/full/target/isolated/isolated.tar"
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
@@ -986,6 +987,7 @@ spec:
     - name: buildArgs
       value:
         - "--tar-path"
+        - "/workspace/git/$(context.pipelineRun.name)/isolated/mvp/target/isolated/isolated.tar"
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
