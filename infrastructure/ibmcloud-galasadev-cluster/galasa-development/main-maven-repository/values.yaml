@@ -7,3 +7,9 @@ namespace: galasa-development
 imageTag: main
 
 branch: main
+
+galasa:
+  managers: true
+  extensions: true
+  framework: true
+  obr: true
