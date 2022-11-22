@@ -535,6 +535,7 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
+        - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/full/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/simplatform
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/javadocs
@@ -1012,6 +1013,7 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
+        - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/mvp/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/simplatform
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/javadocs
