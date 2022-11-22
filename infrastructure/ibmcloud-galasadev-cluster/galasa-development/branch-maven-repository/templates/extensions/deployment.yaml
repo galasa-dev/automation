@@ -20,7 +20,7 @@ spec:
         app: extensions-{{ .Values.extensions.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-extensions:{{ .Values.imageTag }}
+        - image: harbor.galasa.dev/galasadev/galasa-extensions:{{ .Values.extensions.imageTag }}
           imagePullPolicy: Always
           name: extensions-{{ .Values.extensions.branch }}
           env:
