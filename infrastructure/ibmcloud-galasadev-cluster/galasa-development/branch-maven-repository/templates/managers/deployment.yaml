@@ -1,32 +1,32 @@
 #
 # Copyright contributors to the Galasa project 
 # 
-{{ if .Values.galasa.managers }}
+{{ if .Values.managers.deploy }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: managers-{{ .Values.branch }}
+  name: managers-{{ .Values.managers.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: managers-{{ .Values.branch }}
+      app: managers-{{ .Values.managers.branch }}
   template:
     metadata:
-      name: managers-{{ .Values.branch }}
+      name: managers-{{ .Values.managers.branch }}
       labels:
-        app: managers-{{ .Values.branch }}
+        app: managers-{{ .Values.managers.branch }}
     spec:
       containers:
         - image: harbor.galasa.dev/galasadev/galasa-managers:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: managers-{{ .Values.branch }}
+          name: managers-{{ .Values.managers.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/managers
+            value: {{ .Values.managers.branch }}/maven-repo/managers
           ports:
             - containerPort: 80
-              name: managers-{{ .Values.branch }}
+              name: managers-{{ .Values.managers.branch }}
 {{ end }}

@@ -8,8 +8,15 @@ imageTag: main
 
 branch: main
 
-galasa:
-  managers: true
-  extensions: true
-  framework: true
-  obr: true
+managers:
+  deploy: true
+  branch: main
+extensions:
+  deploy: true
+  branch: main
+framework:
+  deploy: true
+  branch: main
+obr:
+  deploy: true
+  branch: main
