@@ -11,12 +11,16 @@ branch: main
 managers:
   deploy: true
   branch: main
+  imageTag: main
 extensions:
   deploy: true
   branch: main
+  imageTag: main
 framework:
   deploy: true
   branch: main
+  imageTag: main
 obr:
   deploy: true
   branch: main
+  imageTag: main
