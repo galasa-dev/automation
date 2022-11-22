@@ -1,6 +1,7 @@
 #
 # Copyright contributors to the Galasa project 
 # 
+{{ if .Values.galasa.obr }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,3 +29,4 @@ spec:
           ports:
             - containerPort: 80
               name: obr-{{ .Values.branch }}
+{{ end }}
