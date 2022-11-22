@@ -1,32 +1,32 @@
 #
 # Copyright contributors to the Galasa project 
 # 
-{{ if .Values.galasa.obr }}
+{{ if .Values.obr.deploy }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: obr-{{ .Values.branch }}
+  name: obr-{{ .Values.obr.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: obr-{{ .Values.branch }}
+      app: obr-{{ .Values.obr.branch }}
   template:
     metadata:
-      name: obr-{{ .Values.branch }}
+      name: obr-{{ .Values.obr.branch }}
       labels:
-        app: obr-{{ .Values.branch }}
+        app: obr-{{ .Values.obr.branch }}
     spec:
       containers:
         - image: harbor.galasa.dev/galasadev/galasa-obr:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: obr-{{ .Values.branch }}
+          name: obr-{{ .Values.obr.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/obr
+            value: {{ .Values.obr.branch }}/maven-repo/obr
           ports:
             - containerPort: 80
-              name: obr-{{ .Values.branch }}
+              name: obr-{{ .Values.obr.branch }}
 {{ end }}
