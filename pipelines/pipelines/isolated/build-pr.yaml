@@ -545,6 +545,7 @@ spec:
     - name: buildArgs
       value:
         - "--tar-path"
+        - "/workspace/git/$(context.pipelineRun.name)/isolated/full/target/isolated/isolated.tar"
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
@@ -564,6 +565,7 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
+        - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/full/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/main/maven-repo/javadocs
@@ -986,6 +988,7 @@ spec:
     - name: buildArgs
       value:
         - "--tar-path"
+        - "/workspace/git/$(context.pipelineRun.name)/isolated/mvp/target/isolated/isolated.tar"
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
@@ -1005,6 +1008,7 @@ spec:
       value:
         - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
+        - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/mvp/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/main/maven-repo/javadocs
