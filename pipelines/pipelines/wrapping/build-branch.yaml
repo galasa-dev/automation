@@ -162,21 +162,22 @@ spec:
     - wait-deployment
     params:
     - name: context
-      value: $(context.pipelineRun.name)/automation/pipelines/templates
+      value: $(context.pipelineRun.name)/automation
     - name: command
       value: 
       - pipeline
       - start 
-      - branch-gradle
-      - -n 
-      - galasa-build
+      - --filename
+      - ./pipelines/pipelines/gradle/build-branch.yaml # Change to Pipeline name in future
       - --use-param-defaults
       - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./git-workspace-template.yaml
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
-      - ./pod-template.yaml
+      - ./pipelines/templates/pod-template.yaml
       - --serviceaccount
       - galasa-build-bot
+      # - --kubeconfig
+      # - location
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
