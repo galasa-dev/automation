@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.eclipse.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eclipse-{{ .Values.eclipse.branch }}
+  name: eclipse-{{ .Values.eclipse.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: eclipse-{{ .Values.eclipse.branch }}
+{{ end }}

@@ -1,0 +1,54 @@
+#
+# Copyright contributors to the Galasa project 
+#
+
+namespace: galasa-development
+
+managers:
+  deploy: false
+  branch: main
+  imageTag: main
+extensions:
+  deploy: false
+  branch: main
+  imageTag: main
+framework:
+  deploy: false
+  branch: main
+  imageTag: main
+obr:
+  deploy: false
+  branch: main
+  imageTag: main
+maven:
+  deploy: false
+  branch: main
+  imageTag: main
+gradle:
+  deploy: false
+  branch: main
+  imageTag: main
+eclipse:
+  deploy: false
+  branch: main
+  imageTag: main
+isolated:
+  deploy: false
+  branch: main
+  imageTag: main
+javadoc:
+  deploy: false
+  branch: main
+  imageTag: main
+mvp:
+  deploy: false
+  branch: main
+  imageTag: main
+simplatform:
+  deploy: false
+  branch: main
+  imageTag: main
+wrapping:
+  deploy: false
+  branch: main
+  imageTag: main
