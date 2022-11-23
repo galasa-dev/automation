@@ -4,7 +4,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: wrapping-{{ .Values.branch }}
+  name: wrapping-{{ .Values.wrapping.branch }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
@@ -20,8 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: wrapping-{{ .Values.branch }}
+            name: wrapping-{{ .Values.wrapping.branch }}
             port:
               number: 80
-        path: /{{ .Values.branch }}/maven-repo/wrapping
+        path: /{{ .Values.wrapping.branch }}/maven-repo/wrapping
         pathType: Prefix

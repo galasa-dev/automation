@@ -5,11 +5,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: javadocs-{{ .Values.branch }}
-  name: javadocs-{{ .Values.branch }}
+    app: javadocs-{{ .Values.javadoc.branch }}
+  name: javadocs-{{ .Values.javadoc.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: javadocs-{{ .Values.branch }}
+    app: javadocs-{{ .Values.javadoc.branch }}
