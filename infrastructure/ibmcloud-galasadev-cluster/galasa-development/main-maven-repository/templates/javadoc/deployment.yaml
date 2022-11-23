@@ -4,27 +4,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: javadocs-{{ .Values.branch }}
+  name: javadoc-{{ .Values.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: javadocs-{{ .Values.branch }}
+      app: javadoc-{{ .Values.branch }}
   template:
     metadata:
-      name: javadocs-{{ .Values.branch }}
+      name: javadoc-{{ .Values.branch }}
       labels:
-        app: javadocs-{{ .Values.branch }}
+        app: javadoc-{{ .Values.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-javadocs:{{ .Values.imageTag }}
+        - image: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: javadocs-{{ .Values.branch }}
+          name: javadoc-{{ .Values.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/javadocs
+            value: {{ .Values.branch }}/maven-repo/javadoc
           ports:
             - containerPort: 80
-              name: javadocs-{{ .Values.branch }}
+              name: javadoc-{{ .Values.branch }}
