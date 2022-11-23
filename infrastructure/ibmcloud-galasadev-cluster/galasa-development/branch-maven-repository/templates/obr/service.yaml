@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.obr.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: obr-{{ .Values.obr.branch }}
+  name: obr-{{ .Values.obr.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: obr-{{ .Values.obr.branch }}
+{{ end }}

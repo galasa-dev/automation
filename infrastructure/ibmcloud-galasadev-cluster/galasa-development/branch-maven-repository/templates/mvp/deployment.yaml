@@ -1,0 +1,29 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mvp-{{ .Values.mvp.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mvp-{{ .Values.mvp.branch }}
+  template:
+    metadata:
+      name: mvp-{{ .Values.mvp.branch }}
+      labels:
+        app: mvp-{{ .Values.mvp.branch }}
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-mvp:{{ .Values.mvp.imageTag }}
+          imagePullPolicy: Always
+          name: mvp-{{ .Values.mvp.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.mvp.branch }}/maven-repo/mvp
+          ports:
+            - containerPort: 80
