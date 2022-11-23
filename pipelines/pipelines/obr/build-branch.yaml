@@ -414,7 +414,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: recycle-javadoc
+  - name: recycle-javadoc-maven-repo
     taskRef:
       name: argocd-cli
     runAfter:
@@ -433,11 +433,11 @@ spec:
       - Deployment
       - --resource-name
       - javadoc-$(params.toBranch)
-  - name: wait-javadoc
+  - name: wait-javadoc-maven-repo
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-javadoc
+    - recycle-javadoc-maven-repo
     params:
     - name: server
       value: argocd.galasa.dev
@@ -449,11 +449,11 @@ spec:
       - --resource
       - apps:Deployment:javadoc-$(params.toBranch)
       - --health
-  - name: recycle-apidocs
+  - name: recycle-javadoc-site
     taskRef:
       name: argocd-cli
     runAfter:
-    - wait-javadoc
+    - wait-javadoc-maven-repo
     params:
     - name: server
       value: argocd.galasa.dev
@@ -467,12 +467,12 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - apidocs-$(params.toBranch)
-  - name: wait-apidocs
+      - javadoc-site
+  - name: wait-javadoc-site
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-apidocs
+    - recycle-javadoc-site
     params:
     - name: server
       value: argocd.galasa.dev
@@ -482,7 +482,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:apidocs-$(params.toBranch)
+      - apps:Deployment:javadoc-site
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
