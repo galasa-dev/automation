@@ -1,48 +1,48 @@
-#
-# Copyright contributors to the Galasa project 
-#
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: maven-gradle
-  labels:
-    app: maven-gradle
-spec:
-  replicas: 1
-  revisionHistoryLimit: 0
-  selector:
-    matchLabels:
-      app: maven-gradle
-  template:
-    metadata:
-      labels:
-        app: maven-gradle
-    spec:
-      nodeSelector:
-        kubernetes.io/arch: amd64
-      containers:
-      - name: maven-gradle
-        image: harbor.galasa.dev/galasadev/galasa-gradle:main
-        imagePullPolicy: Always
-        env:
-        - name: CONTEXTROOT
-          value: main/maven/gradle 
-        ports:
-        - name: http
-          containerPort: 80
-          protocol: TCP
-        resources:
-          requests:
-            memory: 50Mi
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - maven-gradle
-              topologyKey: kubernetes.io/hostname
+# #
+# # Copyright contributors to the Galasa project 
+# #
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: maven-gradle
+#   labels:
+#     app: maven-gradle
+# spec:
+#   replicas: 1
+#   revisionHistoryLimit: 0
+#   selector:
+#     matchLabels:
+#       app: maven-gradle
+#   template:
+#     metadata:
+#       labels:
+#         app: maven-gradle
+#     spec:
+#       nodeSelector:
+#         kubernetes.io/arch: amd64
+#       containers:
+#       - name: maven-gradle
+#         image: harbor.galasa.dev/galasadev/galasa-gradle:main
+#         imagePullPolicy: Always
+#         env:
+#         - name: CONTEXTROOT
+#           value: main/maven/gradle 
+#         ports:
+#         - name: http
+#           containerPort: 80
+#           protocol: TCP
+#         resources:
+#           requests:
+#             memory: 50Mi
+#       affinity:
+#         podAntiAffinity:
+#           preferredDuringSchedulingIgnoredDuringExecution:
+#           - weight: 100
+#             podAffinityTerm:
+#               labelSelector:
+#                 matchExpressions:
+#                 - key: app
+#                   operator: In
+#                   values:
+#                   - maven-gradle
+#               topologyKey: kubernetes.io/hostname
