@@ -1,17 +1,17 @@
-#
-# Copyright contributors to the Galasa project 
-#
-apiVersion: v1
-kind: Service
-metadata:
-  name: maven-framework
-  labels:
-    app: maven-framework
-spec:
-  type: ClusterIP
-  selector:
-    app: maven-framework
-  ports:
-  - port: 80
-    targetPort: 80
-    protocol: TCP
+# #
+# # Copyright contributors to the Galasa project 
+# #
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: maven-framework
+#   labels:
+#     app: maven-framework
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: maven-framework
+#   ports:
+#   - port: 80
+#     targetPort: 80
+#     protocol: TCP
