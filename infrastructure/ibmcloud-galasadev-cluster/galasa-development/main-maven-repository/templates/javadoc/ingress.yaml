@@ -4,7 +4,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: javadocs-{{ .Values.branch }}
+  name: javadoc-{{ .Values.branch }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
@@ -20,8 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: javadocs-{{ .Values.branch }}
+            name: javadoc-{{ .Values.branch }}
             port:
               number: 80
-        path: /{{ .Values.branch }}/maven-repo/javadocs
+        path: /{{ .Values.branch }}/maven-repo/javadoc
         pathType: Prefix

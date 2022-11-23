@@ -318,8 +318,8 @@ spec:
       - apps:Deployment:obr-$(params.toBranch)
       - --health
 
-### JAVADOCS
-  - name: generate-javadocs
+### JAVADOC
+  - name: generate-javadoc
     taskRef: 
       name: galasabld
     runAfter:
@@ -350,11 +350,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: maven-build-javadocs
+  - name: maven-build-javadoc
     taskRef: 
       name: maven-build
     runAfter: 
-    - generate-javadocs
+    - generate-javadoc
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
@@ -372,41 +372,41 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: docker-build-javadocs-image
+  - name: docker-build-javadoc-site
     taskRef: 
       name: docker-build
     runAfter:
-    - maven-build-javadocs
+    - maven-build-javadoc
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadocs-image:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.toBranch)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: noPush
       value: ""
     - name: dockerfilePath
-      value: automation/dockerfiles/javadocs/javadocs-image-dockerfile
+      value: automation/dockerfiles/javadoc/javadoc-site-dockerfile
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: docker-build-javadocs-repo
+  - name: docker-build-javadoc-maven-repo
     taskRef: 
       name: docker-build
     runAfter:
-    - docker-build-javadocs-image
+    - docker-build-javadoc-site
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadocs:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:$(params.toBranch)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs/docker
     - name: noPush
       value: ""
     - name: dockerfilePath
-      value: automation/dockerfiles/javadocs/javadocs-dockerfile
+      value: automation/dockerfiles/javadoc/javadoc-maven-repo-dockerfile
     - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"
@@ -414,11 +414,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: recycle-javadocs
+  - name: recycle-javadoc
     taskRef:
       name: argocd-cli
     runAfter:
-    - docker-build-javadocs-repo
+    - docker-build-javadoc-maven-repo
     params:
     - name: server
       value: argocd.galasa.dev
@@ -432,12 +432,12 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - javadocs-$(params.toBranch)
-  - name: wait-javadocs
+      - javadoc-$(params.toBranch)
+  - name: wait-javadoc
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-javadocs
+    - recycle-javadoc
     params:
     - name: server
       value: argocd.galasa.dev
@@ -447,13 +447,13 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:javadocs-$(params.toBranch)
+      - apps:Deployment:javadoc-$(params.toBranch)
       - --health
   - name: recycle-apidocs
     taskRef:
       name: argocd-cli
     runAfter:
-    - wait-javadocs
+    - wait-javadoc
     params:
     - name: server
       value: argocd.galasa.dev
