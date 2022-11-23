@@ -1,6 +1,7 @@
 #
 # Copyright contributors to the Galasa project 
 # 
+{{ if .Values.managers.deploy }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -13,3 +14,4 @@ spec:
     - port: 80
   selector:
     app: managers-{{ .Values.managers.branch }}
+{{ end }}
