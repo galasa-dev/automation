@@ -4,23 +4,51 @@
 
 namespace: galasa-development
 
-imageTag: main
-
-branch: main
-
 managers:
-  deploy: true
+  deploy: false
   branch: main
   imageTag: main
 extensions:
-  deploy: true
+  deploy: false
   branch: main
   imageTag: main
 framework:
-  deploy: true
+  deploy: false
   branch: main
   imageTag: main
 obr:
-  deploy: true
+  deploy: false
+  branch: main
+  imageTag: main
+maven:
+  deploy: false
+  branch: main
+  imageTag: main
+gradle:
+  deploy: false
+  branch: main
+  imageTag: main
+eclipse:
+  deploy: false
+  branch: main
+  imageTag: main
+isolated:
+  deploy: false
+  branch: main
+  imageTag: main
+javadoc:
+  deploy: false
+  branch: main
+  imageTag: main
+mvp:
+  deploy: false
+  branch: main
+  imageTag: main
+simplatform:
+  deploy: false
+  branch: main
+  imageTag: main
+wrapping:
+  deploy: false
   branch: main
   imageTag: main
