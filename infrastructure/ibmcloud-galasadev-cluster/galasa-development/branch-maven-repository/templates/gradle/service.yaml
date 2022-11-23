@@ -5,11 +5,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: gradle-{{ .Values.branch }}
-  name: gradle-{{ .Values.branch }}
+    app: gradle-{{ .Values.gradle.branch }}
+  name: gradle-{{ .Values.gradle.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: gradle-{{ .Values.branch }}
+    app: gradle-{{ .Values.gradle.branch }}

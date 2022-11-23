@@ -4,7 +4,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mvp-{{ .Values.branch }}
+  name: mvp-{{ .Values.mvp.branch }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
@@ -20,8 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: mvp-{{ .Values.branch }}
+            name: mvp-{{ .Values.mvp.branch }}
             port:
               number: 80
-        path: /{{ .Values.branch }}/maven-repo/mvp
+        path: /{{ .Values.mvp.branch }}/maven-repo/mvp
         pathType: Prefix

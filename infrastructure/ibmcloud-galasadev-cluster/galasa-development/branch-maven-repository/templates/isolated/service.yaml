@@ -5,11 +5,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: isolated-{{ .Values.branch }}
-  name: isolated-{{ .Values.branch }}
+    app: isolated-{{ .Values.isolated.branch }}
+  name: isolated-{{ .Values.isolated.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: isolated-{{ .Values.branch }}
+    app: isolated-{{ .Values.isolated.branch }}

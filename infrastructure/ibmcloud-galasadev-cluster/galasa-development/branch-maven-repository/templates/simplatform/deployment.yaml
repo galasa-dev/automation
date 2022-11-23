@@ -4,26 +4,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simplatform-{{ .Values.branch }}
+  name: simplatform-{{ .Values.simplatform.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: simplatform-{{ .Values.branch }}
+      app: simplatform-{{ .Values.simplatform.branch }}
   template:
     metadata:
-      name: simplatform-{{ .Values.branch }}
+      name: simplatform-{{ .Values.simplatform.branch }}
       labels:
-        app: simplatform-{{ .Values.branch }}
+        app: simplatform-{{ .Values.simplatform.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-simplatform:{{ .Values.imageTag }}
+        - image: harbor.galasa.dev/galasadev/galasa-simplatform:{{ .Values.simplatform.imageTag }}
           imagePullPolicy: Always
-          name: simplatform-{{ .Values.branch }}
+          name: simplatform-{{ .Values.simplatform.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/simplatform
+            value: {{ .Values.simplatform.branch }}/maven-repo/simplatform
           ports:
             - containerPort: 80

@@ -4,27 +4,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: maven-{{ .Values.branch }}
+  name: maven-{{ .Values.maven.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: maven-{{ .Values.branch }}
+      app: maven-{{ .Values.maven.branch }}
   template:
     metadata:
-      name: maven-{{ .Values.branch }}
+      name: maven-{{ .Values.maven.branch }}
       labels:
-        app: maven-{{ .Values.branch }}
+        app: maven-{{ .Values.maven.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-maven:{{ .Values.imageTag }}
+        - image: harbor.galasa.dev/galasadev/galasa-maven:{{ .Values.maven.imageTag }}
           imagePullPolicy: Always
-          name: maven-{{ .Values.branch }}
+          name: maven-{{ .Values.maven.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/maven
+            value: {{ .Values.maven.branch }}/maven-repo/maven
           ports:
             - containerPort: 80
-              name: maven-{{ .Values.branch }}
+              name: maven-{{ .Values.maven.branch }}

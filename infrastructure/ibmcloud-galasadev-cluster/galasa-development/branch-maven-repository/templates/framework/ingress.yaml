@@ -4,7 +4,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: framework-{{ .Values.branch }}
+  name: framework-{{ .Values.framework.branch }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
@@ -20,8 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: framework-{{ .Values.branch }}
+            name: framework-{{ .Values.framework.branch }}
             port:
               number: 80
-        path: /{{ .Values.branch }}/maven-repo/framework
+        path: /{{ .Values.framework.branch }}/maven-repo/framework
         pathType: Prefix

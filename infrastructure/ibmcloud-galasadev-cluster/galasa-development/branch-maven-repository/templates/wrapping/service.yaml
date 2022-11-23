@@ -5,11 +5,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: wrapping-{{ .Values.branch }}
-  name: wrapping-{{ .Values.branch }}
+    app: wrapping-{{ .Values.wrapping.branch }}
+  name: wrapping-{{ .Values.wrapping.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: wrapping-{{ .Values.branch }}
+    app: wrapping-{{ .Values.wrapping.branch }}

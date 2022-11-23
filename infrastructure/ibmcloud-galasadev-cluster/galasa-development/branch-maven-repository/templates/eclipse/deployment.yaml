@@ -1,29 +1,31 @@
 #
 # Copyright contributors to the Galasa project 
 # 
+{{ if .Values.eclipse.deploy }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eclipse-{{ .Values.branch }}
+  name: eclipse-{{ .Values.eclipse.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: eclipse-{{ .Values.branch }}
+      app: eclipse-{{ .Values.eclipse.branch }}
   template:
     metadata:
-      name: eclipse-{{ .Values.branch }}
+      name: eclipse-{{ .Values.eclipse.branch }}
       labels:
-        app: eclipse-{{ .Values.branch }}
+        app: eclipse-{{ .Values.eclipse.branch }}
     spec:
       containers:
         - image: harbor.galasa.dev/galasadev/galasa-eclipse:{{ .Values.imageTag }}
           imagePullPolicy: Always
-          name: eclipse-{{ .Values.branch }}
+          name: eclipse-{{ .Values.eclipse.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/eclipse
+            value: {{ .Values.eclipse.branch }}/maven-repo/eclipse
           ports:
             - containerPort: 80
+{{ end }}
