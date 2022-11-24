@@ -9,56 +9,50 @@ This repository is the single location for all the automation and CI/CD that occ
 
 # Build-images
 
-**This documentation is a work in progress**
+This directory holds the Go code for custom build images.
 
-This directory holds the Go code for custom build images:
-
-Github-status
+github-status:
 
 This image provides the status of a pull request build - whether it passed or failed - and updates the pull request on GitHub with this status.
 
-Github-verify
+github-verify:
 
 This image is used to verify that a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build.
 
-Github-monitor
+github-monitor:
 
-This image is used to monitor the organisation-wide webhook for any new deliveries, every 2 minutes. It will then trigger the appropriate EventListener for each delivery to then trigger the corresponding build pipeline.
+This image is used to monitor the galasa-dev organisation-wide webhook for any new deliveries, every 2 minutes. It will then trigger the appropriate EventListener for each delivery to then trigger the corresponding build pipeline.
+
 
 # Dockerfiles
 
-This directory is the single location for all the dockerfiles needed to build the images Galasa needs.
+This directory is the single location for all Dockerfiles needed to build the images Galasa needs.
 
-The repositories that are needed in the core build (Wrapping, Gradle, Maven, Framework, Extensions, Managers, Obr, Eclipse, Isolated) all follow a similar structure.
+| Category | Dockerfiles |
+|----------|-------------|
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _common_ directory) | argocd, gitcli, gpg, kubectl, tkn | 
+| Go programs | ghstatus, ghverify, github-monitor |
+| Base image (All other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
+| Galasa core repositories | wrapping, gradle, maven, framework, extensions, managers, obr |
+| Galasa Eclipse plug-in | eclipse |
+| Galasa Isolated build | isolated, isolatedZip |
+| Galasa CLI tools | galasabld | 
+| Galasa Javadoc | javadoc-maven-repo, javadoc-site |
+| Galasa Simplatform | simplatform, simplatform-amd64 |
 
-They two arguments:
- - dockerRepository, the URL to the repostiory we are pushing the image to
- - tag, to identify the image as an image from a main build with the tag 'main' or a pr build with the commit-SHA of the latest commit in the pr being the image tag.
 
 # Infrastructure
 
+Documentation to be written.
+
+
 # Pipelines
-
-**This documentation is a work in progress and will continue being added to as new build pipelines are developed.**
-
 
 ## Event Listeners
 
-<!-- Webhooks are set up on these Github repositories to trigger the three EventListeners:
-- Automation
-- Wrapping
-- Gradle
-- Maven
-- Framework (Pipeline not running yet)
-- Extensions (Pipeline not running yet)
-- Managers (Pipeline not running yet)
-- OBR (Pipeline not running yet)
-- Eclipse (Pipeline not running yet)
-- Isolated (Pipeline not running yet) -->
+A webhook is set up for the galasa-dev organisation on GitHub. Every 2-minutes, the github-monitor checks for new events and triggers one of the three EventListeners where necessary.
 
-An organisation wide webhook is set up and monitored by the 'github-monitor' that will check for events and trigger any of the three EventListeners where necessary.
-
-Currently, payload validation has been turned off with an annotation in the metadata for these EventListsners. This is beacuse the github-monitor currently cannot validate the payloads from Github. This will be turned on in the future once the github-monitor can validate payloads from Github.
+_Currently, payload validation has been turned off with an annotation in the metadata for these EventListeners. This is because the github-monitor currently cannot validate the payloads from GitHub. This will be turned on in the future once the github-monitor can validate payloads from GitHub._
 
 ### github-pr-builder-listener
 
@@ -66,229 +60,488 @@ This EventListener is triggered via webhook when a pull request is opened in a r
 
 If a pull request is opened by someone who is not part of an approved group (code admins or code committers), building of the PR will be blocked, until a code admin has commented on the PR 'Approved for building'. Otherwise, this will trigger a PR build.
 
-
 ### github-pr-review-builder-listener
 
 This EventListener is triggered via webhook when a code-admin submits the 'Approved for building' comment on a pull request that was blocked from building. This will then trigger a PR build.
 
-
 ### github-main-builder-listener
 
-This EventListener is triggered via webhook when code is pushed into the main branch of a repository, and triggers a Main build of that repository.
+This EventListener is triggered via webhook when code is pushed into the main branch of a repository, and triggers a main build of that repository.
 
 
 ## Pipelines
 
-### Automation repository
+Galasa's architecture means that components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping.
 
-The build pipelines for the Automation repository are different to the build pipelines for the other repositories, as the Automation repository stores resources for the automation and CI/CD within Galasa, not source code. 
+In the pipelines, you will see that during some of the Maven or Gradle builds, the Maven source is pointed at the Maven artifact repository of the previous component. So, Framework's Gradle build has the build argument _-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven_ so it can use artifacts from Maven's build.
 
-### pr-automation
+You will also notice that the Dockerfiles for some components are FROM the previous component.
 
-This pipeline is triggered when a pull request is opened in the Automation repository.
+![](./docs-images/repo-links.png)
 
-1. The pipeline starts by running the task 'git-verify'.
+### PR builds (_pr-REPO-NAME_)
 
-1. The pipeline then clones the Automation repository.
+PR builds are triggered when a pull request has been opened in one of Galasa's GitHub repositories. The build is done to check that all of the source code submitted in that PR compiles, builds, and that the unit tests pass. 
 
-1. The 'get-commit' task is ran.
+To ensure that code from an unknown source is not built, PR builds start by verifying if the author of the PR is in an approved group. If they are, the pipeline will proceed, but, if not, the pipeline will stop and an approved user will need to approve the PR for building.
 
-1. Unlike the other pipelines, no Maven or Gradle build is required. A series of 'docker-build' tasks are ran to build and push the custom images needed in the pipelines to [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories). These images are tagged with the commit hash from the last commit in the pull request.
+A docker image of the component is also built and pushed to [harbor](harbor.galasa.dev), and the image is tagged with the latest commit sha in the PR.
 
-Before building and pushing the github-status, github-verify and github-monitor images to harbor, the 'go-build' task is called to build the Go code that these images are based on.
+Finally, the pipeline returns the status of the build, Success, Failure or Error, to the pull request on GitHub.
 
-1. 'git-status' returns the status of the build to the pull request.
+### Main builds (_branch-REPO-NAME_)
 
-1. 'git-clean' cleans the subdirectory that automation was cloned into.
+Main builds are triggered when code has been merged or pushed into the main branch on one of Galasa's GitHub repositories. The build checks that the source code compiles, builds, and that the unit tests pass. It also builds a docker image of the repository and pushes it to harbor, this time with the tag "main".
 
+Any deployments that host images built as part of this pipeline are also recycled so that the changes are reflected.
 
-### main-automation
+Each Main build also triggers the Main build of the next component in the chain.
 
-This pipeline is triggered when there is a push to the main branch in the Automation repository.
+As well as being triggered from pushes/merges into main, a Main build can occur when a full Branch build of Galasa is started. _More information on this to come._
 
-1. The pipeline starts by cloning the Automation repository.
 
-1. A series of 'docker-build' tasks are ran concurrently to build the custom images which are then pushed to [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories). These images are tagged main.
+_For more information about the Tasks used in the Pipelines, see the **Tasks** section of this README._
 
-Before building and pushing the github-status, github-verify and github-monitor images to harbor, the 'go-build' task is called to build the Go code that these images are based on.
 
-1. 'git-clean' cleans up the subdirectory where automation was cloned.
+**Automation**
 
-The custom images that are built as part of this pipeline give the capability to run certain commands in other pipelines. 
+These pipelines build all of the images used for Galasa's build pipelines, which are stored in the [Automation repository](https://github.com/galasa-dev/automation).
 
-For example, the gpg image is an image made purely for the capability to run GnuPG CLI commands. This is needed for the 'maven-gpg' task which in turn is needed for the 'maven-build' task. This modularity of tasks makes pipelines much easier to compose as it can use tasks already made and pass in the specific parameters it requires.
+pr-automation:
+1. git-verify
+1. clone-automation
+1. get-commit
+1. go-build-ghverify
+1. go-build-ghstatus
+1. build-gpg-image
+1. build-kubectl-image
+1. build-gitcli-image
+1. build-tkn-image
+1. git-status
 
+branch-automation:
+1. clone-automation
+1. get-commit
+1. go-build-ghverify
+1. build-ghverify-image
+1. go-build-ghstatus
+1. build-ghstatus-image
+1. go-build-ghmonitor
+1. build-ghmonitor-image
+1. build-gpg-image
+1. build-kubectl-image
+1. build-gitcli-image
+1. build-tkn-image
 
-### Other repositories
+Docker images built by these pipelines are pushed [here](https://harbor.galasa.dev/harbor/projects/5/repositories).
 
-### PR builds (pr-*repository*)
 
-If a pull request is opened in one of Galasa's repositories on Github, the pr-build pipeline for that repository will be invoked.
+**Buildutils**
 
-Every PR build follows similar a structure that make use of generic tasks that can be substituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
+These pipelines build the binaries for the galasabld CLI tool, the code for which is in the [Buildutils repository](https://github.com/galasa-dev/buildutils).
 
-PR builds (excluding pr-automation) involve the following tasks:
+pr-buildutils:
+1. git-verify
+1. clone-automation
+1. clone-buildutils
+1. make
+1. build-galasabld-image
+1. git-status
 
-1. The pipeline will first run the 'git-verify' task to see if the pull request author is in the approved group.
+branch-buildutils:
+1. clone-automation
+1. clone-buildutils
+1. make
+1. build-galasabld-image
 
-1. The next task is a 'git-clone' to clone the Automation repository, as all resources used in the build pipelines are stored there.
+The Docker image for the galasabld CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasabld/artifacts-tab).
 
-1. The next task is a 'git-clone' to clone the repository where the pull request was opened.
 
-1. The 'get-commit' task outputs and stores the latest git commit hash of the repository.
+**Eclipse**
 
-1. **If the repository is built using Maven:** the 'maven-gpg' task is ran first to put in place the GPG key for signing artifacts, followed by the 'maven-build' task. **If the repository is built using Gradle:** the 'gradle-build' task is ran.
+These pipelines build the [Galasa Eclipse plug-in](https://github.com/galasa-dev/eclipse).
 
-1. The 'docker-build' task is used to build the docker image of the repository with the pull request's code and is then pushed to our image registry, [harbor](harbor.galasa.dev), tagging the image with the commit hash from the 'get-commit' task.
+pr-eclipse:
+1. git-verify
+1. clone-automation
+1. clone-eclipse
+1. get-commit
+1. maven-gpg
+1. maven-build-eclipse
+1. docker-build-eclipse
+1. docker-build-eclipse-p2
+1. git-status
 
-1. The 'git-status' task updates the status of the pull request on Github and comments whether the PR build was successful or failed.
+branch-eclipse:
+1. clone-automation
+1. clone-eclipse
+1. get-commit
+1. maven-gpg
+1. branch-maven-build-eclipse
+1. branch-docker-build-eclipse
+1. branch-docker-build-eclipse-p2
+1. recycle-deployment
+1. wait-deployment
 
-1. 'git-clean' is then performed in any subdirectories where repositories were cloned to keep the PVC clean.
+The Docker image for the Maven repo for Eclipse is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-eclipse/artifacts-tab) and the image for the Eclipse P2 site is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-eclipse-p2/artifacts-tab).
 
+The Eclipse Maven repository is [here](https://development.galasa.dev/main/maven-repo/eclipse).
 
-### pr-wrapping
 
-This pipeline is triggered when a pull request is opened in the [Wrapping repository](https://github.com/galasa-dev/wrapping).
+**Extensions**
 
-This pipeline follows the structure of a PR build as mentioned above. 
+These pipelines build the [Galasa Extensions](https://github.com/galasa-dev/extensions).
 
-The Wrapping repository requires a Maven build. Therefore, the 'maven-gpg' task is ran followed by a 'maven-build'.
+pr-extensions:
+1. git-verify
+1. clone-automation
+1. clone-extensions
+1. get-commit
+1. gradle-build-extensions
+1. docker-build-extensions
+1. git-status
 
-The 'docker-build' task builds the [galasa-wrapping image](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-wrapping/artifacts-tab) and pushes it to harbor. The image is tagged with the commit hash from the last commit in the pull request.
+branch-extensions:
+1. clone-automation
+1. clone-extensions
+1. get-commit
+1. branch-gradle-build-extensions
+1. branch-docker-build-extensions
+1. recycle-deployment
+1. wait-deployment
 
+The Docker image for the Extensions Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-extensions/artifacts-tab).
 
-### pr-gradle
+The Extensions Maven repository is [here](https://development.galasa.dev/main/maven-repo/extensions).
 
-This pipeline is triggered when a pull request is opened in the [Gradle repository](https://github.com/galasa-dev/gradle).
 
-This pipeline follows the structure of a PR build as mentioned above. 
+**Framework**
 
-The Gradle repository requred a Gradle build. Therefore, the 'gradle-build' task is ran in this pipeline.
+These pipelines build the [Galasa Framework](https://github.com/galasa-dev/framework)
 
-The 'docker-build' task builds the [galasa-gradle image](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-gradle/artifacts-tab) and pushes it to harbor. The image is tagged with the commit hash from the last commit in the pull request.
+pr-framework:
+1. git-verify
+1. clone-automation
+1. clone-framework
+1. get-commit
+1. gradle-build-framework
+1. docker-build-framework
+1. git-status
 
+branch-framework:
+1. clone-automation
+1. clone-framework
+1. get-commit
+1. branch-gradle-build-framework
+1. branch-docker-build-framework
+1. recycle-deployment
+1. wait-deployment
 
-### pr-maven
+The Docker image for the Framework Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-framework/artifacts-tab).
 
-This pipeline is triggered when a pull request is opened in the [Maven repository](https://github.com/galasa-dev/maven).
+The Framework Maven repository is [here](https://development.galasa.dev/main/maven-repo/framework).
 
-This pipeline follows the structure of a PR build as mentioned above. 
 
-The Maven repository requires a Maven build. Therefore, the 'maven-gpg' task is ran followed by a 'maven-build'.
+**Gradle**
 
-The 'docker-build' task builds the [galasa-maven image](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-maven/artifacts-tab) and pushes it to harbor. The image is tagged with the commit hash from the last commit in the pull request.
+These pipelines build the [Galasa Gradle plug-in](https://github.com/galasa-dev/gradle)
 
+pr-gradle:
+1. git-verify
+1. clone-automation
+1. clone-gradle
+1. get-commit
+1. gradle-build-gradle
+1. docker-build-gradle
+1. git-status
 
-### Main builds (main-*repository*)
+branch-gradle:
+1. clone-automation
+1. clone-gradle
+1. get-commit
+1. branch-gradle-build-gradle
+1. branch-docker-build-gradle
+1. recycle-deployment
+1. wait-deployment
 
-When there is a push to the main branch of a repository, the Main build for that repository is invoked.
+The Docker image for the Gradle Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-gradle/artifacts-tab).
 
-Every Main build follows similar a structure that make use of generic tasks that can be substituted in when needed to keep pipelines more maintainable. However more detail about each pipeline is documented below as there are repository specific components.
+The Gradle Maven repository is [here](https://development.galasa.dev/main/maven-repo/gradle).
 
-Main builds (excluding main-automation) involve the following tasks:
-
-1. The first task is a 'git-clone' to clone the Automation repository, as all resources used in the build pipelines are stored there.
-
-1. The next task is a 'git-clone' to clone the repository where the main branch was pushed to.
-
-1. The 'get-commit' task outputs and stores the latest git commit hash of the repository.
-
-1. **If the repository is built using Maven:** the 'maven-gpg' task is ran first to put in place the GPG key for signing artifacts, followed by the 'maven-build' task. **If the repository is built using Gradle:** the 'gradle-build' task is ran.
-
-1. The 'docker-build' task is used to build the image of the main branch of the repository. The image is tagged main, and is pushed to harbor. This is so we can easily distinguish the main image from other images built from pull requests, branch builds, etc. The main image is also used as the container for the Deployments, which deploy Maven artifacts to the [Maven artifact repository](development.galasa.dev).
-
-1. The 'recycle-deployment' task performs a kubectl rolling restart of the Deployment which hosts the Maven artifact repository for the repository.
-
-1. Finally, a 'git-clean' is then performed on the subdirectories where repositories were cloned.
-
-
-### main-wrapping
-
-This pipeline is triggered when there is a push to the main branch of the Wrapping repository.
-
-This pipeline follows the structure of a Main build as mentioned above.
-
-This repository requires a Maven build. Therefore, 'maven-gpg' is ran prior to running the 'maven-build' task. The command in the maven-build is 'deploy', to add the built artifacts to the remote Maven artifact repository.
-
-This pipeline runs 'docker-build' to build the galasa-wrapping image, which is then pushed to [harbor](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-wrapping/artifacts-tab) and is tagged as main.
-
-Then the 'recycle-deployment' task performs a rolling restart of the maven-wrapping Deployment to make sure the latest 'galasa-wrapping:main' image is deployed to the [remote Maven artifact repository](development.galasa.dev/main/maven/wrapping).
-
-
-### main-gradle
-
-This pipeline is triggered when there is a push to the main branch of the Gradle repository.
-
-This pipeline follows the structure of a Main build as mentioned above.
-
-This repository requires a Gradle build. Therefore, 'gradle-build' is ran, with the command 'publish', to publish built artifacts to the remote Maven artifact repository.
-
-This pipeline runs 'docker-build' to build the galasa-gradle image, which is then pushed to [harbor](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-gradle/artifacts-tab) and is tagged as main.
-
-Then the 'recycle-deployment' task performs a rolling restart of the maven-gradle Deployment to make sure the latest 'galasa-gradle:main' image is deployed to the [remote Maven artifact repository](development.galasa.dev/main/maven/gradle).
-
-
-### main-maven
-
-This pipeline is triggered when there is a push to the main branch of the Maven repository.
-
-This pipeline follows the structure of a Main build as mentioned above.
-
-This repository requires a Maven build.
-
-This pipeline runs 'docker-build' to build the galasa-maven image, which is then pushed to [harbor](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-maven/artifacts-tab) and is tagged as main.
-
-Then the 'recycle-deployment' task performs a rolling restart of the maven-maven Deployment to make sure the latest 'galasa-maven:main' image is deployed to the [remote Maven artifact repository](development.galasa.dev/main/maven/maven).
+
+**Isolated**
+
+_Documentation to be written._
+
+pr-isolated:
+
+branch-isolated:
+
+
+**Managers**
+
+These pipelines build the [Galasa Managers](https://github.com/galasa-dev/managers)
+
+pr-managers:
+1. git-verify
+1. clone-automation
+1. clone-managers
+1. get-commit
+1. gradle-build-managers
+1. docker-build-managers
+1. git-status
+
+branch-managers:
+1. clone-automation
+1. clone-managers
+1. get-commit
+1. branch-gradle-build-managers
+1. branch-docker-build-managers
+1. recycle-deployment
+1. wait-deployment
+
+The Docker image for the Managers Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-managers/artifacts-tab).
+
+The Managers Maven repository is [here](https://development.galasa.dev/main/maven-repo/managers).
+
+
+**Maven**
+
+These pipelines build the [Galasa Maven plug-in](https://github.com/galasa-dev/maven)
+
+pr-maven:
+1. git-verify
+1. clone-automation
+1. clone-maven
+1. get-commit
+1. maven-gpg
+1. maven-build-maven
+1. docker-build-maven
+1. git-status
+
+branch-maven:
+1. clone-automation
+1. clone-maven
+1. get-commit
+1. maven-gpg
+1. branch-maven-build-maven
+1. branch-docker-build-maven
+1. recycle-deployment
+1. wait-deployment
+
+The Docker image for the Maven Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-maven/artifacts-tab).
+
+The Maven Maven repository is [here](https://development.galasa.dev/main/maven-repo/maven).
+
+
+**OBR**
+
+These pipelines build the Galasa OSGi Bundle Repository (OBR) and the Javadoc for Galasa. Both are stored in the [OBR repository](https://github.com/galasa-dev/obr).
+
+The Javadoc is deployed to a Maven repository as a zip file, and also a Javadoc site.
+
+pr-obr:
+1. git-verify
+1. clone-automation
+1. clone-framework
+1. clone-extensions
+1. clone-managers
+1. clone-obr
+1. maven-gpg
+1. get-commit
+1. generate-bom
+1. list-bom
+1. maven-build-bom
+1. generate-obr
+1. list-obr
+1. maven-build-obr
+1. docker-build-obr
+1. generate-javadoc
+1. maven-build-javadoc
+1. docker-build-javadoc-site
+1. docker-build-javadoc-maven-repo
+1. git-status
+
+branch-obr:
+1. clone-automation
+1. clone-framework
+1. clone-extensions
+1. clone-managers
+1. clone-obr
+1. maven-gpg
+1. get-commit
+1. generate-bom
+1. list-bom
+1. branch-maven-build-bom
+1. generate-obr
+1. list-obr
+1. branch-maven-build-obr
+1. branch-docker-build-obr
+1. recycle-obr-deployment
+1. wait-obr-deployment
+1. generate-javadoc
+1. maven-build-javadoc
+1. docker-build-javadoc-site
+1. docker-build-javadoc-maven-repo
+1. recycle-javadoc-maven-repo
+1. wait-javadoc-maven-repo
+1. recycle-javadoc-site
+1. recycle-javadoc-site
+
+The Docker image for the OBR Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr/artifacts-tab).
+
+The OBR Maven repository is [here](https://development.galasa.dev/main/maven-repo/obr).
+
+
+**Simplatform**
+
+These pipelines build the Galasa SimBank Eclipse plug-in, Simbank applications (_to-do_) and and set of sample Simbank tests, all stored in the [Simplatform repository](https://github.com/galasa-dev/simplatform).
+
+pr-simplatform:
+1. git-verify
+1. clone-automation
+1. clone-simplatform
+1. get-commit
+1. maven-build-simplatform-application
+1. maven-build-simbank-tests
+1. docker-build-simplatform-repo
+1. docker-build-simplatform-jar
+1. git-status
+
+branch-simplatform:
+1. clone-automation
+1. clone-simplatform
+1. get-commit
+1. branch-maven-build-simplatform-application
+1. branch-maven-build-simbank-tests
+1. branch-docker-build-simplatform-repo
+1. branch-docker-build-simplatform-jar
+1. recycle-deployment
+1. wait-deployment
+
+The Docker image for the Simplatform Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-simplatform/artifacts-tab) and the image for the Simplatform AMD64 jar is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-simplatform-amd64/artifacts-tab).
+
+The Simplatform Maven repository is [here](https://development.galasa.dev/main/maven-repo/simplatform).
+
+
+**Wrapping**
+
+These pipelines build the [Wrapping repository](https://github.com/galasa-dev/wrapping). This repository wraps external Galasa dependencies that are not in an OSGi bundle into an OSGi bundle so it can be ran in Galasa.
+
+pr-wrapping:
+1. git-verify
+1. clone-automation
+1. clone-wrapping
+1. get-commit
+1. maven-gpg
+1. maven-build-wrapping
+1. docker-build-wrapping
+1. git-status
+
+branch-wrapping:
+1. clone-automation
+1. clone-wrapping
+1. get-commit
+1. maven-gpg
+1. branch-maven-build-wrapping
+1. branch-docker-build-wrapping
+1. recycle-deployment
+1. wait-deployment
+
+The Docker image for the Wrapping Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-wrapping/artifacts-tab).
+
+The Wrapping Maven repository is [here](https://development.galasa.dev/main/maven-repo/wrapping).
 
 
 ## Tasks
 
+### argocd-cli
+
+This task uses the Argo CD CLI to interact with resources that are managed by Argo CD, including resources for our Maven repositories. 
+
+Parameters:
+* server: The argocd server to perform the command on.
+* command: An array of each part of the argocd command to execute.
+
+This task uses the custom [argocd-cli image](https://harbor.galasa.dev/harbor/projects/5/repositories/argocd-cli/artifacts-tab). 
+
+
+### copy
+
+This task performs a simple copy from one location to another.
+
+Parameters:
+* context: The directory to perform the command in
+* source: The from location.
+* destination: The to location.
+
+This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
+
+
+### galasabld
+
+This task uses the galasabld CLI to perform galasabld commands, such as galasabld template.
+
+Parameters:
+* context: The directory to perform the command in.
+* command: An array of all of the parts of the command.
+
+This task uses the custom [galasabld image](https://harbor.galasa.dev/harbor/projects/5/repositories/galasabld/artifacts-tab).
+
+
 ### get-commit
 
-This task outputs the latest git commit hash from the provided repository, and stores it in a location in the workspace.
+This task gets the latest git commit hash from the provided repository, and stores it in a location in the workspace.
 
-This task uses the custom gitcli image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab). This image allows for git commands and is also built on top of the custom gpg image as this task requires both commands. 
+Parameters:
+* pipelineRunName: The name of the currently running PipelineRun, from the PipelineRun context, to find the working directory.
+* repo: The name of the GitHub repository.
+
+This task uses the custom [gitcli image](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab).
+
 
 ### git-clean
 
-This task removes the cleans the provided subdirectory from the workspace.
+This task cleans a provided subdirectory from the workspace.
 
-This task uses the latest busybox image to perform Unix commands.
+Parameters:
+* subdirectory: The subdirectory of the workspace to clean.
+
+This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
+
+_All uses of this task have been commented out as the pipelines use a volumeClaimTemplate which is provisioned for each pipeline, so it is not important to clear up after a pipeline. However, if in future a PersistentVolumeClaim is used in the pipelines, git-clean will need to be used so that the storage is kept clean._
+
 
 ### git-clone
 
-This task clones a repository from the provided URL into the workspace.
+This task clones a GitHub repository from the provided URL into the workspace.
 
-More documentation to be written.
+_More documentation to be written._ 
+
 
 ### git-status
 
-This task provides the status of a pull request build - whether it passed or failed - and updates the pull request on GitHub with this status.
-
-The parameters for this task are extracted from the payload of the webhook. These are then passed as parameters to the Go program build-images/github-status/main.go that will then output the appropriate status on the pull request on GitHub.
+This task calls the github-status Go program with parameters extracted from the GitHub webhook payload, and sends the status of a PR build pipeline from Tekton to the pull request on GitHub. The status is updated and a comment is posted to the pull request.
 
 Parameters:
-- The status of the tasks from the pipeline.
-- prUrl, the URL of the pull request on Github.
-- statusesUrl, the URL to return the status of the build to the pull request via a POST request.
-- issueUrl, the URL to return comments to the pull request via a POST request.
+* status: The status of the Tasks from the Tekton pipeline. It is only a Success if all Tasks passed.
+* prUrl: The URL of the pull request on GitHub.
+* statusesUrl: The URL to return the status of the build to the pull request via a POST request.
+* issueUrl: The URL to return comments to the pull request via a POST request.
 
-This task uses the custom ghstatus image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghstatus/artifacts-tab)
+This task uses the custom [ghstatus image](https://harbor.galasa.dev/harbor/projects/5/repositories/ghstatus/artifacts-tab).
+
 
 ### git-verify
 
-This task is used to verify that a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build.
-
-The parameters for this task are extracted from the payload of the webhook. These are then passed as parameters to the Go program build-images/github-verify/main.go that will then output the appropriate message to the pull request on GitHub.
+This task calls the github-verify Go program with parameters extracted from the GitHub webhook payload, to verify if a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build. If the user is an approved user, the PR build proceeds, if not, a comment is posted to the pull request informing the author that the PR needs to be approved for building.
 
 Parameters:
-- The userId of the Github user who has opened the pull request.
-- The prUrl, the URL of the pull request on Github.
-- The action, describes whether the pull request is opened, closed, synchronized etc.
+* userId: The user ID of the GitHub user who has opened the pull request.
+* prUrl: The URL of the pull request on GitHub.
+* action: Describes whether the pull request is opened, closed, synchronized etc.
 
-This task uses the ghverify Go program to first verify that the action is a supported one. It then checks if the userId is in the approved group. It then returns to the pull request whether the build has been submitted, or if an admin needs to approve.
-
-This task uses the custom ghverify image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/ghverify/artifacts-tab)
+This task uses the custom [ghverify image](https://harbor.galasa.dev/harbor/projects/5/repositories/ghverify/artifacts-tab).
 
 
 ### go-build
@@ -296,76 +549,103 @@ This task uses the custom ghverify image stored in [harbor](https://harbor.galas
 This task is used to build Go code. 
 
 Parameters:
-- The context, describes the path of the go code to build.
-- goArgs include the go command to be executed such as build or install, and any other flags and arguments needed.
-- The other paramters are all environment variables which have default values and can be overwritten if necessary.
+* context: Describes the path to the Go code to build.
+* goArgs: Include the Go command to be executed such as build or install, and any other flags and arguments needed.
+* The other paramters are all environment variables which have default values and can be overwritten if necessary.
 
-This task uses the latest official GoLang image in order to perform Go commands.
+This task uses the latest official [GoLang image](https://hub.docker.com/_/golang).
 
-### make
-
-This task is used to perform the shell command 'make all' and execute a Makefile.
-
-Parameters:
-- The directory to perform the 'make all' command in.
-
-This task uses the official GoLang image from DockerHub.
 
 ### gradle-build
 
-This task performs a Gradle build. It is generic and allows for parameters to dictacte the exact functionality of the build. Therefore, it is a highly reusable task.
+This task executes a Gradle build. It is generic and allows for parameters to dictate the exact type of build.
 
 Parameters:
-- The 'context' which is the directory where you want the Gradle build to take place (where the gradle.build file is).
-- An array, 'build-args', is used to pass any additional arguments to the Gradle build. This parameter is to keep the gradle-build task as generic as possible so it can be used in any build situation that requires Gradle.
-- The command to use in the build such as 'publish' or 'build'.
+* context: The directory where you want the Gradle build to take place (where the gradle.build file is).
+* build-args: An array used to pass any additional arguments to the Gradle build.
+* command: An array of commands to use in the build such as 'publish' and 'check'.
 
-This task uses the offical Gradle image from DockerHub in order to perform the Gradle commands.
+This task uses the offical [Gradle image](https://hub.docker.com/_/gradle) from DockerHub.
+
 
 ### kaniko-builder
 
-This task allows you to build and push docker images within a kubernetes cluster or container.
+This task allows you to build and push Docker images within a Kubernetes cluster or container. This is needed as Docker virtualisation cannot be performed inside a containerised environment.
 
 Parameters:
-- The dockerfilePath is the path to the Dockerfile needed for the build.
-- The imageName is the name of the image that the task is going to build.
-- The noPush parameter allows you to choose whether you want to push the image built to the given destination (imageName).
-- The array, 'buildArgs', is used to pass any arguments needed into the Dockerfile.
+* dockerfilePath: The path to the Dockerfile needed for the build.
+* imageName: The name to give the image after it is built, including the tag.
+* noPush: Allows you to choose whether you want to push the image built to the given destination (dockerRegistry/imageName).
+* buildArgs: An array used to pass any build arguments needed into the Dockerfile.
 
-The task uses kaniko-executor image to perform kaniko commands. This image is from gcr.io (Google Container Registry).
+The task uses [kaniko-executor image](https://console.cloud.google.com/gcr/images/kaniko-project/GLOBAL/executor@sha256:23ae6ccaba2b0f599966dbc5ecf38aa4404f4cd799add224167eaf285696551a/details?tag=latest), from gcr.io (Google Container Registry).
+
+
+### make
+
+This task is used to perform the shell command 'make all' to execute a Makefile.
+
+Parameters:
+* directory: The directory to perform the command in.
+
+This task uses the official [GoLang image](https://hub.docker.com/_/golang).
+
 
 ### maven-build
 
-This task performs a Maven build. It is generic and allows for parameters to dictacte the exact functionality of the build. Therefore, it is a highly reusable task.
+This task performs a Maven build. It is generic and allows for parameters to dictate the exact type of build.
 
 Parameters:
-- The 'context' which is the directory where you want the Maven build to take place (where the pom.xml file is).
-- An array, 'buildArgs', is used for any additional arguments to pass to Maven. This parameter is to keep the maven-build task as generic as possible so it can be used in any build situation that requires Maven.
-- The command to use in the build such as 'deploy' or 'install'.
+* context: The directory where you want the Maven build to take place (where the pom.xml file is).
+* settingsLocation: The location of the settings.xml produced by the maven-gpg task. This will normally be /workspace/git/PIPELINE_RUN_NAME/REPO/gpg/settings.xml. For the OBR builds, as two Maven builds occur in two different contexts, to avoid doing maven-gpg twice, the settingsLocation is set.
+* buildArgs: An array used for any additional arguments to pass to Maven.
+* command: An array of commands to use in the build such as 'deploy' or 'install'.
 
-This task uses the offical Maven image from DockerHub in order to perform the Maven commands.
+This task uses the offical [Maven image](https://hub.docker.com/_/maven) from DockerHub.
+
 
 ### maven-gpg
 
-The Maven build uses the Maven GPG Plugin to sign all of the built artifacts using GnuPG. The maven-gpg task uses the GnuPG CLI to put the correct secrets in place for the Maven GPG Plugin to use during the maven-build task. This task uses the ExternalSecret mavengpg.
+The Maven build uses the Maven GPG Plugin to sign all of the built artifacts using GnuPG. This task uses the GnuPG CLI to put the correct secrets in place for the Maven GPG Plugin to use during the maven-build task. This task uses the ExternalSecret mavengpg.
 
 1. The first step makes a new directory within the provided working directory.
 1. The second step performs a gpg command to import the passphrase and gpg key.
 1. In the last step, the settings.xml from the mavengpg secret that has been populated with the galasa.passphrase is copied and put in the directory made in the first step.
 
 Parameters:
-- The context which is the directory to store the settings.xml for use by a Maven build.
+* context: The location to store the settings.xml for use by a Maven build.
 
-This task uses the custom gpg image stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/gpg/artifacts-tab) to perform gpg commands.
-This task also uses the offical busybox image from DockerHub to perform Unix commands.
+This task uses the custom [gpg image](https://harbor.galasa.dev/harbor/projects/5/repositories/gpg/artifacts-tab). This task also uses the offical [busybox image](https://hub.docker.com/_/busybox) from DockerHub to perform Unix commands.
 
 
 ### recycle-deployment
 
-1. This task performs a kubernetes rolling restart of the given deployment which shuts down and restarts each container in the deployment one by one.
-1. It then outputs the status of the rolling restart. If no status is returned within 3 minutes, it will timeout.
+This task uses the kubectl CLI to recycle deployments on the cluster. 
 
 Parameters:
-- This task takes the deployment name to perform the rollout restart commands on.
+* namespace: The name of the Kubernetes Namespace.
+* deployment: The name of the Kubernetes Deployment.
 
-This task uses the custom kubectl image that is stored in [harbor](https://harbor.galasa.dev/harbor/projects/5/repositories/kubectl/artifacts-tab). 
+This task uses the custom [kubectl image](https://harbor.galasa.dev/harbor/projects/5/repositories/kubectl/artifacts-tab).
+
+
+### tkn-cli
+
+This task is used the Tekton CLI to communicate with Tekton.
+
+Parameters:
+* context: The directory to perform the command in.
+* command: An array with the parts of the command to perform.
+
+This task uses the custom [tkn image](https://harbor.galasa.dev/harbor/projects/5/repositories/tkn/artifacts-tab).
+
+
+### unix-command
+
+This task is used to perform Unix commands. 
+
+Parameters:
+* context: The directory to perform the command in.
+* command: An array with the parts of the command to perform.
+
+This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
