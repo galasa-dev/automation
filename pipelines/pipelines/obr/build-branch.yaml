@@ -282,7 +282,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: recycle-deployment
+  - name: recycle-obr-deployment
     taskRef:
       name: argocd-cli
     runAfter:
@@ -301,11 +301,11 @@ spec:
       - Deployment
       - --resource-name
       - obr-$(params.toBranch)
-  - name: wait-deployment
+  - name: wait-obr-deployment
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-deployment
+    - recycle-obr-deployment
     params:
     - name: server
       value: argocd.galasa.dev
@@ -323,11 +323,7 @@ spec:
     taskRef: 
       name: galasabld
     runAfter:
-    - clone-automation
-    - clone-framework
-    - clone-extensions
-    - clone-managers
-    - clone-obr
+    - wait-obr-deployment
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
