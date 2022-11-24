@@ -10,6 +10,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
     nginx.org/client-max-body-size: "20m"
+    nginx.org/proxy-request-buffering: "off"
     
 spec:
   tls:
