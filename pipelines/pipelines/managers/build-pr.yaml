@@ -104,7 +104,9 @@ spec:
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
     - name: command
-      value: "check publish"
+      value: 
+        - check
+        - publish
     workspaces:
      - name: git-workspace
        workspace: git-workspace
