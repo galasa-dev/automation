@@ -78,7 +78,9 @@ spec:
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/gradle/repo"
     - name: command
-      value: publish
+      value: 
+        - check
+        - publish
     workspaces:
      - name: git-workspace
        workspace: git-workspace
