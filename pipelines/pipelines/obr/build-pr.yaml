@@ -317,11 +317,7 @@ spec:
     taskRef: 
       name: galasabld
     runAfter:
-    - clone-automation
-    - clone-framework
-    - clone-extensions
-    - clone-managers
-    - clone-obr
+    - docker-build-obr
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
