@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.extensions.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: extensions-{{ .Values.extensions.branch }}
+  name: extensions-{{ .Values.extensions.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: extensions-{{ .Values.extensions.branch }}
+{{ end }}

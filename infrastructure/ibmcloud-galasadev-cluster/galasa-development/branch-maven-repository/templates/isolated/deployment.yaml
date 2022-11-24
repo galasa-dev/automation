@@ -1,0 +1,29 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: isolated-{{ .Values.isolated.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: isolated-{{ .Values.isolated.branch }}
+  template:
+    metadata:
+      name: isolated-{{ .Values.isolated.branch }}
+      labels:
+        app: isolated-{{ .Values.isolated.branch }}
+    spec:
+      containers:
+        - image: harbor.galasa.dev/galasadev/galasa-isolated:{{ .Values.isolated.imageTag }}
+          imagePullPolicy: Always
+          name: isolated-{{ .Values.isolated.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.isolated.branch }}/maven-repo/isolated
+          ports:
+            - containerPort: 80
