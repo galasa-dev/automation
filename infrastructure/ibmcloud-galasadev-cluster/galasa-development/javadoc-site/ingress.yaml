@@ -23,5 +23,5 @@ spec:
             name: javadoc-site
             port:
               number: 80
-        path: main/javadoc-site
+        path: /main/javadoc-site
         pathType: Prefix
