@@ -458,7 +458,7 @@ spec:
       - app 
       - actions 
       - run 
-      - main-maven-repos
+      - javadoc-site
       - restart 
       - --kind 
       - Deployment
@@ -476,7 +476,7 @@ spec:
       value: 
       - app 
       - wait
-      - main-maven-repos
+      - javadoc-site
       - --resource
       - apps:Deployment:javadoc-site
       - --health
