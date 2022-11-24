@@ -34,29 +34,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: trigger-gradle
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - clone-automation
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start 
-      - --filename
-      - ./pipelines/pipelines/gradle/build-branch.yaml # Change to Pipeline name in future
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-      # - --kubeconfig
-      # - location
   - name: clone-wrapping
     taskRef: 
       name: git-clone
@@ -178,11 +155,13 @@ spec:
       - --resource
       - apps:Deployment:wrapping-$(params.branch)
       - --health
+
+# COMMENTING THIS OUT FOR NOW AS IT DOESN'T WORK AND I DONT WANT TO FAIL THIS PIPELINE
   # - name: trigger-gradle
   #   taskRef:
   #     name: tkn-cli
   #   runAfter:
-  #   - wait-deployment
+  #   - recycle-deployment
   #   params:
   #   - name: context
   #     value: $(context.pipelineRun.name)/automation
@@ -191,16 +170,19 @@ spec:
   #     - pipeline
   #     - start 
   #     - --filename
-  #     - ./pipelines/pipelines/gradle/build-branch.yaml # Change to Pipeline name in future
+  #     - /pipelines/pipelines/gradle/build-branch.yaml
+  #     # - branch-gradle
+  #     # - -n
+  #     # - galasa-build
   #     - --use-param-defaults
   #     - --workspace
-  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+  #     - name=git-workspace,volumeClaimTemplateFile=/pipelines/templates/git-workspace-template.yaml
   #     - --pod-template
-  #     - ./pipelines/templates/pod-template.yaml
+  #     - /pipelines/templates/pod-template.yaml
   #     - --serviceaccount
   #     - galasa-build-bot
   #     # - --kubeconfig
-  #     # - location
+  #     # - LOCATION_OF_CONFIG
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
