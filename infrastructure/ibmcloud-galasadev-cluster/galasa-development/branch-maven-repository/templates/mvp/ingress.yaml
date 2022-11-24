@@ -9,6 +9,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+    nginx.org/client-max-body-size: "20m"
     
 spec:
   tls:
