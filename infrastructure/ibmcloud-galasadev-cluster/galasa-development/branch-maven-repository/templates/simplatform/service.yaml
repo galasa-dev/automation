@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.simplatform.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: simplatform-{{ .Values.simplatform.branch }}
+  name: simplatform-{{ .Values.simplatform.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: simplatform-{{ .Values.simplatform.branch }}
+{{ end }}

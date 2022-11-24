@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.mvp.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mvp-{{ .Values.mvp.branch }}
+  name: mvp-{{ .Values.mvp.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: mvp-{{ .Values.mvp.branch }}
+{{ end }}
