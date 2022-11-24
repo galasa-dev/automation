@@ -24,7 +24,7 @@ spec:
           name: javadoc-site
           env:
           - name: CONTEXTROOT
-            value: main/javadoc-site
+            value: /main/javadoc-site
           ports:
             - containerPort: 80
               name: javadoc-site
