@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.maven.branch }}/maven-repo/maven
           ports:
             - containerPort: 80
-              name: maven-{{ .Values.maven.branch }}
 {{ end }}

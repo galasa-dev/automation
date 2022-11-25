@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.gradle.branch }}/maven-repo/gradle
           ports:
             - containerPort: 80
-              name: gradle-{{ .Values.gradle.branch }}
 {{ end }}

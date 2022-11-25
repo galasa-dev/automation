@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.javadoc.branch }}/maven-repo/javadoc
           ports:
             - containerPort: 80
-              name: javadoc-{{ .Values.javadoc.branch }}
 {{ end }}
