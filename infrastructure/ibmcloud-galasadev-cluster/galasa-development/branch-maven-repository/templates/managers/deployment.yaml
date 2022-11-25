@@ -20,7 +20,7 @@ spec:
         app: managers-{{ .Values.managers.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-managers:{{ .Values.managers.imageTag }}
+        - image: {{ .Values.managers.imageName }}:{{ .Values.managers.imageTag }}
           imagePullPolicy: Always
           name: managers-{{ .Values.managers.branch }}
           env:
