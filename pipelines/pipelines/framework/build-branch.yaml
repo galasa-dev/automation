@@ -17,6 +17,9 @@ spec:
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
+  - name: appname
+    type: string
+    default: main-maven-repos
   workspaces:
   - name: git-workspace
   tasks:
@@ -106,7 +109,7 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.toBranch)"
+        - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -124,7 +127,7 @@ spec:
       - app 
       - actions 
       - run 
-      - main-maven-repos
+      - $(params.appname)
       - restart 
       - --kind 
       - Deployment
@@ -142,7 +145,7 @@ spec:
       value: 
       - app 
       - wait
-      - main-maven-repos 
+      - $(params.appname) 
       - --resource
       - apps:Deployment:framework-$(params.toBranch)
       - --health

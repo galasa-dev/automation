@@ -20,7 +20,7 @@ spec:
         app: maven-{{ .Values.maven.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-maven:{{ .Values.maven.imageTag }}
+        - image: {{ .Values.maven.imageName }}:{{ .Values.maven.imageTag }}
           imagePullPolicy: Always
           name: maven-{{ .Values.maven.branch }}
           env:

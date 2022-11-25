@@ -20,7 +20,7 @@ spec:
         app: obr-{{ .Values.obr.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-obr:{{ .Values.obr.imageTag }}
+        - image: {{ .Values.obr.imageName }}:{{ .Values.obr.imageTag }}
           imagePullPolicy: Always
           name: obr-{{ .Values.obr.branch }}
           env:
