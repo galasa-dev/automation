@@ -1,6 +1,7 @@
 #
 # Copyright contributors to the Galasa project 
 # 
+{{ if .Values.simplatform.deploy }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,3 +28,4 @@ spec:
             value: {{ .Values.simplatform.branch }}/maven-repo/simplatform
           ports:
             - containerPort: 80
+{{ end }}
