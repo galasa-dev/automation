@@ -20,7 +20,7 @@ spec:
         app: mvp-{{ .Values.mvp.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-mvp:{{ .Values.mvp.imageTag }}
+        - image: {{ .Values.mvp.imageName }}:{{ .Values.mvp.imageTag }}
           imagePullPolicy: Always
           name: mvp-{{ .Values.mvp.branch }}
           env:

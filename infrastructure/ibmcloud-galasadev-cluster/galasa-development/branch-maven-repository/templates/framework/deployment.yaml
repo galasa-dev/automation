@@ -20,7 +20,7 @@ spec:
         app: framework-{{ .Values.framework.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-framework:{{ .Values.framework.imageTag }}
+        - image: {{ .Values.framework.imageName }}:{{ .Values.framework.imageTag }}
           imagePullPolicy: Always
           name: framework-{{ .Values.framework.branch }}
           env:

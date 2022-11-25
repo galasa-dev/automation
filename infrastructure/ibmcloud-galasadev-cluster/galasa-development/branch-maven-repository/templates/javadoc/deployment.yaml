@@ -20,7 +20,7 @@ spec:
         app: javadoc-{{ .Values.javadoc.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:{{ .Values.javadoc.imageTag }}
+        - image: {{ .Values.javadoc.imageName }}:{{ .Values.javadoc.imageTag }}
           imagePullPolicy: Always
           name: javadoc-{{ .Values.javadoc.branch }}
           env:
