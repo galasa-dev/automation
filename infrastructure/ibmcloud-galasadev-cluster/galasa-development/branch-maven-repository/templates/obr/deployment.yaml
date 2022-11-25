@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.obr.branch }}/maven-repo/obr
           ports:
             - containerPort: 80
-              name: obr-{{ .Values.obr.branch }}
 {{ end }}
