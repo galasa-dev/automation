@@ -17,6 +17,9 @@ spec:
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
+  - name: appname
+    type: string
+    default: main-maven-repos
   workspaces:
   - name: git-workspace
   tasks:
@@ -295,7 +298,7 @@ spec:
       - app 
       - actions 
       - run 
-      - main-maven-repos
+      - $(params.appname)
       - restart 
       - --kind 
       - Deployment
@@ -313,7 +316,7 @@ spec:
       value: 
       - app 
       - wait
-      - main-maven-repos
+      - $(params.appname)
       - --resource
       - apps:Deployment:obr-$(params.toBranch)
       - --health
@@ -423,7 +426,7 @@ spec:
       - app 
       - actions 
       - run 
-      - main-maven-repos
+      - $(params.appname)
       - restart 
       - --kind 
       - Deployment
@@ -441,7 +444,7 @@ spec:
       value: 
       - app 
       - wait
-      - main-maven-repos
+      - $(params.appname)
       - --resource
       - apps:Deployment:javadoc-$(params.toBranch)
       - --health
