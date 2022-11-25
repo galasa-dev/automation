@@ -277,7 +277,7 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.toBranch)"
+        - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace

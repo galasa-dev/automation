@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
     type: string
     default: main
   - name: refspec
@@ -41,7 +44,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/maven
     - name: revision
-      value: $(params.branch)
+      value: $(params.toBranch)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -110,12 +113,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/maven/maven-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-maven:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-maven:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.branch)"
+        - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -138,7 +141,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - maven-$(params.branch)
+      - maven-$(params.toBranch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -153,7 +156,7 @@ spec:
       - wait
       - main-maven-repos
       - --resource
-      - apps:Deployment:maven-$(params.branch)
+      - apps:Deployment:maven-$(params.toBranch)
       - --health
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
