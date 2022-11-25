@@ -20,7 +20,7 @@ spec:
         app: eclipse-{{ .Values.eclipse.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-eclipse:{{ .Values.eclipse.imageTag }}
+        - image: {{ .Values.eclipse.imageName }}:{{ .Values.eclipse.imageTag }}
           imagePullPolicy: Always
           name: eclipse-{{ .Values.eclipse.branch }}
           env:
