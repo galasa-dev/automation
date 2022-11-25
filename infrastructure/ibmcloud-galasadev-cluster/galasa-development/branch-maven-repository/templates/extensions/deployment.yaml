@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.extensions.branch }}/maven-repo/extensions
           ports:
             - containerPort: 80
-              name: extensions-{{ .Values.extensions.branch }}
 {{ end }}
