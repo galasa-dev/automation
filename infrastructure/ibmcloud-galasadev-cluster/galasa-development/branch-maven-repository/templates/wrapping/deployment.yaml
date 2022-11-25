@@ -20,7 +20,7 @@ spec:
         app: wrapping-{{ .Values.wrapping.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-wrapping:{{ .Values.wrapping.imageTag }}
+        - image: {{ .Values.wrapping.imageName }}:{{ .Values.wrapping.imageTag }}
           imagePullPolicy: Always
           name: wrapping-{{ .Values.wrapping.branch }}
           env:

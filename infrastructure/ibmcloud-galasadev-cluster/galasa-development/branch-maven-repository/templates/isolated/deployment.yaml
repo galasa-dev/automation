@@ -20,7 +20,7 @@ spec:
         app: isolated-{{ .Values.isolated.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-isolated:{{ .Values.isolated.imageTag }}
+        - image: {{ .Values.isolated.imageName }}:{{ .Values.isolated.imageTag }}
           imagePullPolicy: Always
           name: isolated-{{ .Values.isolated.branch }}
           env:
