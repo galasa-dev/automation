@@ -20,7 +20,7 @@ spec:
         app: gradle-{{ .Values.gradle.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-gradle:{{ .Values.gradle.imageTag }}
+        - image: {{ .Values.gradle.imageName }}:{{ .Values.gradle.imageTag }}
           imagePullPolicy: Always
           name: gradle-{{ .Values.gradle.branch }}
           env:

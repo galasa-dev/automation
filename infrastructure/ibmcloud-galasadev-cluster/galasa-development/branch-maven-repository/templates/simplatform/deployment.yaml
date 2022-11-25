@@ -20,7 +20,7 @@ spec:
         app: simplatform-{{ .Values.simplatform.branch }}
     spec:
       containers:
-        - image: harbor.galasa.dev/galasadev/galasa-simplatform:{{ .Values.simplatform.imageTag }}
+        - image: {{ .Values.simplatform.imageName }}:{{ .Values.simplatform.imageTag }}
           imagePullPolicy: Always
           name: simplatform-{{ .Values.simplatform.branch }}
           env:
