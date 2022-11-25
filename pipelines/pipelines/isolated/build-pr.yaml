@@ -519,9 +519,9 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-isolated:$(params.headSha)
+      value: icr.io/galasadev/galasa-isolated:$(params.headSha)
     - name: noPush
-      value: ""
+      value: "--no-push"
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
@@ -539,7 +539,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-distibution:$(params.headSha)
+      value: icr.io/galasadev/galasa-distibution:$(params.headSha)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -599,9 +599,9 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfileZip
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-isolated-zip:$(params.headSha)
+      value: icr.io/galasadev/galasa-isolated-zip:$(params.headSha)
     - name: noPush
-      value: ""  
+      value: "--no-push"  
     - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"
@@ -962,9 +962,9 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-mvp:$(params.headSha)
+      value: icr.io/galasadev/galasa-mvp:$(params.headSha)
     - name: noPush
-      value: ""
+      value: "--no-push"
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
@@ -982,7 +982,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-distribution:$(params.headSha)
+      value: icr.io/galasadev/galasa-distribution:$(params.headSha)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -1042,9 +1042,9 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfileZip
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-mvp-zip:$(params.headSha)
+      value: icr.io/galasadev/galasa-mvp-zip:$(params.headSha)
     - name: noPush
-      value: ""  
+      value: "--no-push"  
     - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"

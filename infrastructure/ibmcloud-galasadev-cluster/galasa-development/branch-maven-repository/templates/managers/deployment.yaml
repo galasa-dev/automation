@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.managers.branch }}/maven-repo/managers
           ports:
             - containerPort: 80
-              name: managers-{{ .Values.managers.branch }}
 {{ end }}

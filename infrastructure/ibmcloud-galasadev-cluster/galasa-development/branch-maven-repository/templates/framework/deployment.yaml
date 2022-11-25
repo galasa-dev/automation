@@ -28,5 +28,4 @@ spec:
             value: {{ .Values.framework.branch }}/maven-repo/framework
           ports:
             - containerPort: 80
-              name: framework-{{ .Values.framework.branch }}
 {{ end }}
