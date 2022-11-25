@@ -491,7 +491,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-isolated:$(params.toBranch)
+      value: icr.io/galasadev/galasa-isolated:$(params.toBranch)
     - name: noPush
       value: ""
     workspaces:
@@ -511,7 +511,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-distibution:$(params.toBranch)
+      value: icr.io/galasadev/galasa-distibution:$(params.toBranch)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -571,7 +571,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfileZip
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-isolated-zip:$(params.toBranch)
+      value: icr.io/galasadev/galasa-isolated-zip:$(params.toBranch)
     - name: noPush
       value: ""  
     - name: buildArgs
@@ -969,7 +969,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-mvp:$(params.toBranch)
+      value: icr.io/galasadev/galasa-mvp:$(params.toBranch)
     - name: noPush
       value: ""
     workspaces:
@@ -989,7 +989,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-distribution:$(params.toBranch)
+      value: icr.io/galasadev/galasa-distribution:$(params.toBranch)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -1049,7 +1049,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfileZip
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-mvp-zip:$(params.toBranch)
+      value: icr.io/galasadev/galasa-mvp-zip:$(params.toBranch)
     - name: noPush
       value: ""  
     - name: buildArgs
