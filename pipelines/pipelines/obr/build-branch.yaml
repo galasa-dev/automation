@@ -17,6 +17,9 @@ spec:
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
+  - name: imageTag
+    type: string
+    default: main
   - name: appname
     type: string
     default: main-maven-repos
@@ -275,7 +278,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/obr/obr-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -303,7 +306,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - obr-$(params.toBranch)
+      - obr-$(params.imageTag)
   - name: wait-obr-deployment
     taskRef:
       name: argocd-cli
@@ -318,7 +321,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:obr-$(params.toBranch)
+      - apps:Deployment:obr-$(params.imageTag)
       - --health
 
 ### JAVADOC
@@ -380,7 +383,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.imageTag)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: noPush
@@ -399,7 +402,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:$(params.imageTag)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs/docker
     - name: noPush
@@ -431,7 +434,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - javadoc-$(params.toBranch)
+      - javadoc-$(params.imageTag)
   - name: wait-javadoc-maven-repo
     taskRef:
       name: argocd-cli
@@ -446,7 +449,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:javadoc-$(params.toBranch)
+      - apps:Deployment:javadoc-$(params.imageTag)
       - --health
   - name: recycle-javadoc-site
     taskRef:
