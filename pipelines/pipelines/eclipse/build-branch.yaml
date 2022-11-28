@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: fromBranch
+  - name: fromObrBranch
+    type: string
+    default: main
+  - name: fromSimplatformBranch
     type: string
     default: main
   - name: toBranch
@@ -101,8 +104,8 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
-        - "-Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
-        - "-Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/simplatform"
+        - "-Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr"
+        - "-Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform"
     - name: command
       value: deploy
     workspaces:
