@@ -124,7 +124,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
