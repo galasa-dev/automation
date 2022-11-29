@@ -214,7 +214,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/obr-generic
     - name: dockerfilePath
-      value: automation/dockerfiles/runtime/obrGeneric-dockerfile
+      value: automation/dockerfiles/runtime/obrGeneric/obrGeneric-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-obr-generic:$(params.headSha)
     - name: noPush
