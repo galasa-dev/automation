@@ -9,7 +9,8 @@ FROM ${jdkImage}
 RUN touch /var/run/docker.sock && \
     chmod 666 /var/run/docker.sock
 
-RUN adduser --disabled-password --home /galasa galasa       && \
+RUN mkdir /galasa
+RUN useradd --home-dir /galasa galasa       && \
     chown -R galasa:galasa /galasa
     
 COPY kubectl /usr/bin/kubectl
