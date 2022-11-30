@@ -1,3 +1,6 @@
+# Used for kicking off pipelines using tkn CLI
+# A volumeClaimTemplate file must be passed in
+
 spec:
   storageClassName: longhorn-temp
   accessModes:
