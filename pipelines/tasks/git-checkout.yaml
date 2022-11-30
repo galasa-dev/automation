@@ -39,14 +39,10 @@ spec:
     #   fi
     script: |
       #!/bin/sh
-      branch=$(params.branch)
-      exists=$(git branch --list ${branch})
+      set +e
 
-      if [[ -z ${exists} ]]; then
-        echo 0
-      else
-        echo 1
-      fi
+      exists=$(git branch --list $(params.branch))
+      echo ${exists}
   # results:
   #   - name: result
   #     description: Describes if the branch exists on a repo or needs to be created
