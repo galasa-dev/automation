@@ -61,6 +61,8 @@ spec:
      - name: output
        workspace: git-workspace
   - name: check-branch
+    # Have to remove this when clause for now, as get-commit and the build task should runAfter this
+    # but if this doesn't execute, the pipeline will stop. Need to improve in future.
     # when: 
     #   - input: "$(params.toBranch)"
     #     operator: notin
