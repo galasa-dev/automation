@@ -37,34 +37,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
-
-  - name: trigger-gradle
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - clone-automation
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start 
-      - branch-gradle
-      - -n
-      - galasa-build
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
   - name: clone-wrapping
     taskRef: 
       name: git-clone
@@ -186,34 +158,33 @@ spec:
       - --resource
       - apps:Deployment:wrapping-$(params.branch)
       - --health
-
-# COMMENTING THIS OUT FOR NOW AS IT DOESN'T WORK AND I DONT WANT TO FAIL THIS PIPELINE
-  # - name: trigger-gradle
-  #   taskRef:
-  #     name: tkn-cli
-  #   runAfter:
-  #   - recycle-deployment
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/automation
-  #   - name: command
-  #     value: 
-  #     - pipeline
-  #     - start 
-  #     - --filename
-  #     - /pipelines/pipelines/gradle/build-branch.yaml
-  #     # - branch-gradle
-  #     # - -n
-  #     # - galasa-build
-  #     - --use-param-defaults
-  #     - --workspace
-  #     - name=git-workspace,volumeClaimTemplateFile=/pipelines/templates/git-workspace-template.yaml
-  #     - --pod-template
-  #     - /pipelines/templates/pod-template.yaml
-  #     - --serviceaccount
-  #     - galasa-build-bot
-  #     # - --kubeconfig
-  #     # - LOCATION_OF_CONFIG
+  - name: trigger-gradle
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start 
+      - branch-gradle
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-branch-gradle
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
