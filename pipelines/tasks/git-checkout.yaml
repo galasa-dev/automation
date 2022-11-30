@@ -38,6 +38,7 @@ spec:
     #     exit;
     #   fi
     script: |
+      #!/bin/sh
       branch=$(params.branch)
       exists=$(git branch --list ${branch})
 
