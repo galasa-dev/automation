@@ -41,7 +41,13 @@ spec:
       #!/bin/sh
       set +e
       EXISTS="$(git branch --list $(params.branch))"
-      if [ -z "$EXISTS" ]; then echo "Does not exist"; else echo "Exists"; fi
+      if [ -z "$EXISTS" ]; then
+        echo "Does not exist";
+        git checkout -b $(params.branch)
+      else
+        echo "Exists";
+        git switch $(params.branch)
+      fi
   # results:
   #   - name: result
   #     description: Describes if the branch exists on a repo or needs to be created
