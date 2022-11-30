@@ -43,6 +43,25 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+  - name: clone-gradle
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/gradle
+    - name: revision
+      value: main
+      # value: $(params.toBranch)
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+      # value: $(params.refspec)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/gradle
+    workspaces:
+     - name: output
+       workspace: git-workspace
   - name: check-if-branch-exists
     when: 
       - input: "$(params.toBranch)"
@@ -51,48 +70,34 @@ spec:
         values: ["main"]
     taskRef: 
       name: git-check-branch
+    runAfter:
+    - clone-gradle  
     params:
-    - name: repo
-      value: gradle
+    - name: context
+      value: $(context.pipelineRun.name)/gradle
     - name: branch
       value: $(params.toBranch)
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: test
-    when: 
-      - input: "$(tasks.check-if-branch-exists.results.result)"
-        operator: in
-        values: ["Create branch"]
-    taskRef: 
-      name: unix-command
-    params:
-    - name: context
-      value: /workspace/git
-    - name: command
-      value: 
-        - echo
-        - "Hello"
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-  - name: clone-gradle
-    taskRef: 
-      name: git-clone
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/gradle
-    - name: revision
-      value: $(params.toBranch)
-    - name: refspec
-      value: $(params.refspec)
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/gradle
-    workspaces:
-     - name: output
-       workspace: git-workspace  
+  # - name: test
+  #   when: 
+  #     - input: "$(tasks.check-if-branch-exists.results.result)"
+  #       operator: in
+  #       values: ["Create branch"]
+  #   taskRef: 
+  #     name: unix-command
+  #   params:
+  #   - name: context
+  #     value: /workspace/git
+  #   - name: command
+  #     value: 
+  #       - echo
+  #       - "Hello"
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
+
   # - name: get-commit
   #   taskRef:
   #     name: get-commit

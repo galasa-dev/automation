@@ -11,13 +11,13 @@ spec:
   - name: git-workspace
     mountPath: /workspace/git
   params:
-  - name: repo
+  - name: context
     type: string 
   - name: branch
     type: string    
   steps:
   - name: run-script
-    workingDir: /workspace/git
+    workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gitcli:main
     imagePullPolicy: Always
     env:
@@ -27,16 +27,25 @@ spec:
           name: github-token
           key: password
           optional: false
+    # script: |
+    #   #!/bin/sh
+    #   git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
+    #   if [ "$?" == "1" ] ; then  
+    #     echo -n "Create branch" | tee $(results.result.path);
+    #     exit;
+    #   else 
+    #     echo -n "Branch exists" | tee $(results.result.path)
+    #     exit;
+    #   fi
     script: |
-      #!/bin/sh
-      git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
-      if [ "$?" == "1" ] ; then  
-        echo -n "Create branch" | tee $(results.result.path);
-        exit;
-      else 
-        echo -n "Branch exists" | tee $(results.result.path)
-        exit;
+      branch=$(params.branch)
+      exists=$(git branch --list ${branch})
+
+      if [[ -z ${exists} ]]; then
+        echo 0
+      else
+        echo 1
       fi
-  results:
-    - name: result
-      description: Describes if the branch exists on a repo or needs to be created
+  # results:
+  #   - name: result
+  #     description: Describes if the branch exists on a repo or needs to be created
