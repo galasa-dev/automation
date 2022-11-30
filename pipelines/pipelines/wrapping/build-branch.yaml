@@ -50,19 +50,23 @@ spec:
     - name: command
       value: 
       - pipeline
-      - start 
+      - list
+      - -n 
+      - galasa-build
+      
+      # - start 
       # - --filename
       # - /pipelines/pipelines/gradle/build-branch.yaml
-      - branch-gradle
-      - -n
-      - galasa-build
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=/pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - /pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
+      # - branch-gradle
+      # - -n
+      # - galasa-build
+      # - --use-param-defaults
+      # - --workspace
+      # - name=git-workspace,volumeClaimTemplateFile=/pipelines/templates/git-workspace-template.yaml
+      # - --pod-template
+      # - /pipelines/templates/pod-template.yaml
+      # - --serviceaccount
+      # - galasa-build-bot
       # - --kubeconfig
       # - LOCATION_OF_CONFIG
 
