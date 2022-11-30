@@ -178,9 +178,13 @@ spec:
       - trigger-gradle-$(params.branch)
       - --param
       - fromBranch=$(params.branch)
+      - --param
       - toBranch=$(params.branch)
+      - --param
       - refspec=$(params.refspec)
+      - --param
       - imageTag=$(params.branch)
+      - --param
       - appname=$(params.appname)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
