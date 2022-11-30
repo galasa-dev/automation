@@ -59,12 +59,30 @@ spec:
       value: $(context.pipelineRun.name)/managers
     workspaces:
      - name: output
-       workspace: git-workspace  
+       workspace: git-workspace
+  - name: check-branch
+    # when: 
+    #   - input: "$(params.toBranch)"
+    #     operator: notin
+    #     values: ["main"]
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-managers  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/managers
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - clone-managers
+    - clone-automation
+    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -77,7 +95,8 @@ spec:
     taskRef:
       name: gradle-build
     runAfter: 
-      - clone-managers
+      - clone-automation
+      - check-branch
     params:
     - name: context
       value: $(context.pipelineRun.name)/managers/galasa-managers-parent
