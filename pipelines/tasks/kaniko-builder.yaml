@@ -32,7 +32,7 @@ spec:
     imagePullPolicy: Always
     env:
     - name: DOCKER_CONFIG
-      value: /kaniko/.docker
+      value: /root/.docker
     command:
     - /kaniko/executor
     - --dockerfile=./$(params.dockerfilePath)
