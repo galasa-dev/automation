@@ -152,7 +152,7 @@ spec:
       - --resource
       - apps:Deployment:extensions-$(params.imageTag)
       - --health
-  Trigger the next Pipeline (branch-managers)
+  # Trigger the next Pipeline (branch-managers)
   - name: trigger-managers
     taskRef:
       name: tkn-cli
