@@ -16,7 +16,7 @@ spec:
   - name: branch
     type: string    
   steps:
-  - name: git-check-branch
+  - name: run-script
     workingDir: /workspace/git
     image: harbor.galasa.dev/common/gitcli:main
     imagePullPolicy: Always
@@ -24,14 +24,12 @@ spec:
       #!/bin/sh
       git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
       if [ "$?" == "1" ] ; then  
-        echo "Branch doesn't exist, it needs to be created";
-        echo -n "create branch" | tee $(results.result.path);
+        echo -n "Create branch" | tee $(results.result.path);
         exit;
       else 
-        echo "Branch exists";
-        echo -n "branch exists" | tee $(results.result.path)
+        echo -n "Branch exists" | tee $(results.result.path)
         exit;
       fi
   results:
     - name: result
-      description: Describes if the branch exists on a repo or not
+      description: Describes if the branch exists on a repo or needs to be created
