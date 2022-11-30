@@ -152,6 +152,39 @@ spec:
       - --resource
       - apps:Deployment:framework-$(params.imageTag)
       - --health
+  # Trigger the next Pipeline (branch-extensions)
+  # - name: trigger-extensions
+  #   taskRef:
+  #     name: tkn-cli
+  #   runAfter:
+  #   - wait-deployment
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/automation
+  #   - name: command
+  #     value: 
+  #     - pipeline
+  #     - start
+  #     - branch-extensions
+  #     - -n
+  #     - galasa-build
+  #     - --prefix-name 
+  #     - trigger-extensions-$(params.toBranch)
+  #     - --param
+  #     - fromBranch=$(params.fromBranch)
+  #     - toBranch=$(params.toBranch)
+  #     - refspec=$(params.refspec)
+  #     - imageTag=$(params.imageTag)
+  #     - appname=$(params.appname)
+  #     - --workspace
+  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+  #     - --pod-template
+  #     - ./pipelines/templates/pod-template.yaml
+  #     - --serviceaccount
+  #     - galasa-build-bot
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:

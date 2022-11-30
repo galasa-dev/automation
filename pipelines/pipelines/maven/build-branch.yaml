@@ -43,128 +43,128 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  # - name: clone-maven
-  #   taskRef: 
-  #     name: git-clone
-  #   params:
-  #   - name: url
-  #     value: https://github.com/galasa-dev/maven
-  #   - name: revision
-  #     value: $(params.toBranch)
-  #   - name: refspec
-  #     value: $(params.refspec)
-  #   - name: depth
-  #     value: "99999999"
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)/maven
-  #   workspaces:
-  #    - name: output
-  #      workspace: git-workspace  
-  # - name: get-commit
-  #   taskRef:
-  #     name: get-commit
-  #   runAfter:
-  #   - clone-maven
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: repo
-  #     value: maven
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: maven-gpg
-  #   taskRef:
-  #     name: maven-gpg
-  #   runAfter:
-  #   - clone-maven 
-  #   params:
-  #   - name: context 
-  #     value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: branch-maven-build-maven
-  #   taskRef:
-  #     name: maven-build
-  #   runAfter:
-  #   - maven-gpg
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
-  #   - name: settingsLocation
-  #     value: /workspace/git/$(context.pipelineRun.name)/maven/galasa-maven-plugin/gpg/settings.xml
-  #   - name: buildArgs
-  #     value: 
-  #       - "-Dgpg.skip=true"
-  #       - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
-  #       - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-  #       - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
-  #   - name: command
-  #     value: deploy
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: branch-docker-build-maven
-  #   taskRef:
-  #     name: docker-build
-  #   runAfter:
-  #   - get-commit
-  #   - branch-maven-build-maven
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/maven
-  #   - name: dockerfilePath
-  #     value: automation/dockerfiles/maven/maven-dockerfile
-  #   - name: imageName
-  #     value: harbor.galasa.dev/galasadev/galasa-maven:$(params.imageTag)
-  #   - name: noPush
-  #     value: ""
-  #   - name: buildArgs
-  #     value:
-  #       - "--build-arg=tag=$(params.fromBranch)"
-  #       - "--build-arg=dockerRepository=harbor.galasa.dev"
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: recycle-deployment
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - branch-docker-build-maven
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - maven-$(params.imageTag)
-  # - name: wait-deployment
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-deployment
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:maven-$(params.imageTag)
-  #     - --health
-  # # Trigger the next Pipeline (branch-framework)
+  - name: clone-maven
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/maven
+    - name: revision
+      value: $(params.toBranch)
+    - name: refspec
+      value: $(params.refspec)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/maven
+    workspaces:
+     - name: output
+       workspace: git-workspace  
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-maven
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - clone-maven 
+    params:
+    - name: context 
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: branch-maven-build-maven
+    taskRef:
+      name: maven-build
+    runAfter:
+    - maven-gpg
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/maven/galasa-maven-plugin/gpg/settings.xml
+    - name: buildArgs
+      value: 
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
+    - name: command
+      value: deploy
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: branch-docker-build-maven
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - branch-maven-build-maven
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/maven
+    - name: dockerfilePath
+      value: automation/dockerfiles/maven/maven-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-maven:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - branch-docker-build-maven
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - maven-$(params.imageTag)
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:maven-$(params.imageTag)
+      - --health
+  # Trigger the next Pipeline (branch-framework)
   # - name: trigger-framework
   #   taskRef:
   #     name: tkn-cli
