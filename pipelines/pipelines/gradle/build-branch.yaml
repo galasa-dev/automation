@@ -66,7 +66,6 @@ spec:
     when: 
       - input: "$(params.toBranch)"
         operator: notin
-        # operator: in
         values: ["main"]
     taskRef: 
       name: git-check-branch
@@ -80,24 +79,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  # - name: test
-  #   when: 
-  #     - input: "$(tasks.check-if-branch-exists.results.result)"
-  #       operator: in
-  #       values: ["Create branch"]
-  #   taskRef: 
-  #     name: unix-command
-  #   params:
-  #   - name: context
-  #     value: /workspace/git
-  #   - name: command
-  #     value: 
-  #       - echo
-  #       - "Hello"
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-
   # - name: get-commit
   #   taskRef:
   #     name: get-commit

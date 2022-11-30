@@ -27,27 +27,14 @@ spec:
           name: github-token
           key: password
           optional: false
-    # script: |
-    #   #!/bin/sh
-    #   git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
-    #   if [ "$?" == "1" ] ; then  
-    #     echo -n "Create branch" | tee $(results.result.path);
-    #     exit;
-    #   else 
-    #     echo -n "Branch exists" | tee $(results.result.path)
-    #     exit;
-    #   fi
     script: |
       #!/bin/sh
       set +e
       EXISTS="$(git branch --list $(params.branch))"
       if [ -z "$EXISTS" ]; then
-        echo "Does not exist";
+        echo "Branch $(params.branch) does not exist on this repo, need to checkout";
         git checkout -b $(params.branch)
       else
-        echo "Exists";
+        echo "Branch $(params.branch) exists on this repo, switching to it";
         git switch $(params.branch)
       fi
-  # results:
-  #   - name: result
-  #     description: Describes if the branch exists on a repo or needs to be created
