@@ -164,7 +164,7 @@ spec:
       - --resource
       - apps:Deployment:maven-$(params.imageTag)
       - --health
-  Trigger the next Pipeline (branch-framework)
+  # Trigger the next Pipeline (branch-framework)
   - name: trigger-framework
     taskRef:
       name: tkn-cli
