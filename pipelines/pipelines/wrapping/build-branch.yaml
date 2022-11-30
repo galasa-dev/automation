@@ -180,7 +180,7 @@ spec:
       - fromBranch=$(params.branch)
       - toBranch=$(params.branch)
       - refspec=$(params.refspec)
-      - imageTag=$(params.imageTag)
+      - imageTag=$(params.branch)
       - appname=$(params.appname)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
