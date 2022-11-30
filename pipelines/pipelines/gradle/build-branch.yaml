@@ -63,7 +63,7 @@ spec:
     when: 
       - input: "$(tasks.check-if-branch-exists.results.result)"
         operator: in
-        values: ["0"]
+        values: ["branch exists"]
     taskRef: 
       name: unix-command
     params:
