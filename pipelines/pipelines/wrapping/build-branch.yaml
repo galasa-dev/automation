@@ -158,24 +158,30 @@ spec:
       - --resource
       - apps:Deployment:wrapping-$(params.branch)
       - --health
+  # Trigger the next Pipeline (branch-gradle)
   - name: trigger-gradle
     taskRef:
       name: tkn-cli
     runAfter:
-    - recycle-deployment
+    - wait-deployment
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
     - name: command
       value: 
       - pipeline
-      - start 
+      - start
       - branch-gradle
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-branch-gradle
-      - --use-param-defaults
+      - trigger-gradle-$(params.branch)
+      - --param
+      - fromBranch=$(params.branch)
+      - toBranch=$(params.branch)
+      - refspec=$(params.refspec)
+      - imageTag=$(params.imageTag)
+      - appname=$(params.appname)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template

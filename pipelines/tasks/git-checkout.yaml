@@ -1,0 +1,37 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-check-branch
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: repo
+    type: string 
+  - name: branch
+    type: string    
+  steps:
+  - name: git-check-branch
+    workingDir: /workspace/git
+    image: harbor.galasa.dev/common/gitcli:main
+    imagePullPolicy: Always
+    script: |
+      #!/bin/sh
+      git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
+      if [ "$?" == "1" ] ; then  
+        echo "Branch doesn't exist, it needs to be created";
+        1 | tee $(results.result.path);
+        exit;
+      else 
+        echo "Branch exists";
+        0 | tee $(results.result.path)
+        exit;
+      fi
+  results:
+    - name: result
+      description: 1 if the branch needs to be created, 0 if it doesn't
