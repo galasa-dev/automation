@@ -62,7 +62,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: check-if-branch-exists
+  - name: check-branch
     when: 
       - input: "$(params.toBranch)"
         operator: notin
@@ -79,98 +79,98 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  # - name: get-commit
-  #   taskRef:
-  #     name: get-commit
-  #   runAfter:
-  #   - clone-gradle
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: repo
-  #     value: gradle
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: branch-gradle-build-gradle
-  #   taskRef:
-  #     name: gradle-build
-  #   runAfter: 
-  #     - clone-gradle
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/gradle
-  #   - name: buildArgs
-  #     value:
-  #       - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
-  #       - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-  #       - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/gradle/repo"
-  #   - name: command
-  #     value: 
-  #       - check
-  #       - publish
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: branch-docker-build-gradle
-  #   taskRef:
-  #     name: docker-build
-  #   runAfter:
-  #     - get-commit
-  #     - branch-gradle-build-gradle
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/gradle
-  #   - name: dockerfilePath
-  #     value: automation/dockerfiles/gradle/gradle-dockerfile
-  #   - name: imageName
-  #     value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.imageTag)
-  #   - name: noPush
-  #     value: ""
-  #   - name: buildArgs
-  #     value:
-  #       - "--build-arg=tag=$(params.fromBranch)"
-  #       - "--build-arg=dockerRepository=harbor.galasa.dev"
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: recycle-deployment
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - branch-docker-build-gradle
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - gradle-$(params.imageTag)
-  # - name: wait-deployment
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-deployment
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:gradle-$(params.imageTag)
-  #     - --health
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-gradle
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: branch-gradle-build-gradle
+    taskRef:
+      name: gradle-build
+    runAfter: 
+      - clone-gradle
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/gradle
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/gradle/repo"
+    - name: command
+      value: 
+        - check
+        - publish
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: branch-docker-build-gradle
+    taskRef:
+      name: docker-build
+    runAfter:
+      - get-commit
+      - branch-gradle-build-gradle
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/gradle
+    - name: dockerfilePath
+      value: automation/dockerfiles/gradle/gradle-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - branch-docker-build-gradle
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - gradle-$(params.imageTag)
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:gradle-$(params.imageTag)
+      - --health
   # # Trigger the next Pipeline (branch-maven)
   # - name: trigger-maven
   #   taskRef:
