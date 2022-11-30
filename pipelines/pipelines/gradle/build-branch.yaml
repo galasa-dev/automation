@@ -61,10 +61,10 @@ spec:
      - name: output
        workspace: git-workspace
   - name: check-branch
-    when: 
-      - input: "$(params.toBranch)"
-        operator: notin
-        values: ["main"]
+    # when: 
+    #   - input: "$(params.toBranch)"
+    #     operator: notin
+    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -81,7 +81,7 @@ spec:
     taskRef:
       name: get-commit
     runAfter:
-    - clone-gradle
+    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -94,7 +94,7 @@ spec:
     taskRef:
       name: gradle-build
     runAfter: 
-      - clone-gradle
+      - check-branch
     params:
     - name: context
       value: $(context.pipelineRun.name)/gradle
