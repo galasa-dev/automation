@@ -30,25 +30,17 @@ spec:
     script: |
       #!/bin/sh
       set +e
-      echo "Creating branch '$(params.branch)' on local repository"
-      git checkout -b $(params.branch)
-      echo "Attempting to pull in '$(params.branch)' from remote if it exists"
-      if git pull origin $(params.branch) | grep -q "couldn't find remote ref"; then
-        echo "'$(params.branch)' did not exist on remote, new branch is based on main"
+      if ["$(params.branch)" != "main"]; then
+        echo "Creating branch '$(params.branch)' on local repository"
+        git checkout -b $(params.branch)
+        echo "Attempting to pull in '$(params.branch)' from remote if it exists"
+        if git pull origin $(params.branch) | grep -q "couldn't find remote ref"; then
+          echo "'$(params.branch)' did not exist on remote, new branch is based on main"
+        else 
+          echo "'$(params.branch)' pulled in"
+        fi
       else 
-        echo "'$(params.branch)' pulled in"
+        echo "This build pipeline is for the 'main' branch, skipping step"
       fi
 
-    # The way git-clone works in the pipelines means that you can't see any other branches other than the one you've cloned
-    # The method below seems better but I can't get it to work right now
-    # script: |
-    #   #!/bin/sh
-    #   set +e
-    #   EXISTS="$(git branch --list $(params.branch))"
-    #   if [ -z "$EXISTS" ]; then
-    #     echo "Branch $(params.branch) does not exist on this repo, need to checkout";
-    #     git checkout -b $(params.branch)
-    #   else
-    #     echo "Branch $(params.branch) exists on this repo, switching to it";
-    #     git switch $(params.branch)
-    #   fi
+# TO BE IMPROVED
