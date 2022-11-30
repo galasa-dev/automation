@@ -30,19 +30,16 @@ spec:
     script: |
       #!/bin/sh
       set +e
+
       branch="$(params.branch)"
       main="main"
-      if ["$branch" != "$main"]; then
-        echo "Creating branch '$(params.branch)' on local repository"
-        git checkout -b $(params.branch)
-        echo "Attempting to pull in '$(params.branch)' from remote if it exists"
-        if git pull origin $(params.branch) | grep -q "couldn't find remote ref"; then
-          echo "'$(params.branch)' did not exist on remote, new branch is based on main"
-        else 
-          echo "'$(params.branch)' pulled in"
-        fi
+      if [ "$branch" == "$main" ]; then
+          echo "This build pipeline is for the 'main' branch, skipping step";
       else 
-        echo "This build pipeline is for the 'main' branch, skipping step"
+          echo "Creating branch '$(params.branch)' locally";
+          git checkout -b $(params.branch);
+          echo "Attempting to pull in '$(params.branch)' from remote if it exists";
+          git pull origin $(params.branch)
       fi
 
 # TO BE IMPROVED
