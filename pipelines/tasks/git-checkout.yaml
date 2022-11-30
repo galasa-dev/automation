@@ -25,13 +25,13 @@ spec:
       git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
       if [ "$?" == "1" ] ; then  
         echo "Branch doesn't exist, it needs to be created";
-        1 | tee $(results.result.path);
+        echo -n "create branch" | tee $(results.result.path);
         exit;
       else 
         echo "Branch exists";
-        0 | tee $(results.result.path)
+        echo -n "branch exists" | tee $(results.result.path)
         exit;
       fi
   results:
     - name: result
-      description: 1 if the branch needs to be created, 0 if it doesn't
+      description: Describes if the branch exists on a repo or not
