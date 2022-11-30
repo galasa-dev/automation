@@ -20,6 +20,13 @@ spec:
     workingDir: /workspace/git
     image: harbor.galasa.dev/common/gitcli:main
     imagePullPolicy: Always
+    env:
+    - name: GITHUBTOKEN
+      valueFrom:
+        secretKeyRef:
+          name: github-token
+          key: password
+          optional: false
     script: |
       #!/bin/sh
       git ls-remote --heads git@github.com:galasa-dev/$(params.repo).git $(params.branch) | grep $(params.branch) >/dev/null
