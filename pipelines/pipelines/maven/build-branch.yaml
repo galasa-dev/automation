@@ -50,21 +50,38 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/maven
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/maven
     workspaces:
      - name: output
-       workspace: git-workspace  
+       workspace: git-workspace 
+  - name: check-branch
+    # when: 
+    #   - input: "$(params.toBranch)"
+    #     operator: notin
+    #     values: ["main"]
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-maven  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/maven
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - clone-maven
+    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -77,7 +94,7 @@ spec:
     taskRef:
       name: maven-gpg
     runAfter:
-    - clone-maven 
+    - check-branch
     params:
     - name: context 
       value: $(context.pipelineRun.name)/maven/galasa-maven-plugin
@@ -164,6 +181,43 @@ spec:
       - --resource
       - apps:Deployment:maven-$(params.imageTag)
       - --health
+  # Trigger the next Pipeline (branch-framework)
+  - name: trigger-framework
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-framework
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-framework-$(params.toBranch)
+      - --param
+      - fromBranch=$(params.fromBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:

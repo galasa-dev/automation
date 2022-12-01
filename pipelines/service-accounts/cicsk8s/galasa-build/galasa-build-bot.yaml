@@ -22,6 +22,9 @@ rules:
   - apiGroups: ["tekton.dev"]
     resources: ["pipelineruns"]
     verbs: ["create", "get", "watch", "list"]
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelines"]
+    verbs: ["delete", "get", "watch", "list"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
