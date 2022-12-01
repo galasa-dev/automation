@@ -50,9 +50,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/framework
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
