@@ -1,3 +1,6 @@
+# Used for kicking off pipelines using tkn CLI
+# A podTemplate file must be passed in
+
 volumes:
 - name: gradle-properties
   secret:
