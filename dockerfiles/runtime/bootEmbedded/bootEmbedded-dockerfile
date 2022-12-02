@@ -3,8 +3,10 @@ ARG tag
 ARG jdkImage
 
 FROM ${dockerRepository}/galasadev/galasa-obr-generic:${tag}
+FROM gcr.io/kaniko-project/executor:v1.6.0 AS kaniko
 
 FROM ${jdkImage}
+COPY --from=kaniko /kaniko/executor /kaniko/
 
 RUN touch /var/run/docker.sock && \
     chmod 666 /var/run/docker.sock
