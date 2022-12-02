@@ -188,7 +188,7 @@ spec:
       - --prefix-name 
       - trigger-extensions-$(params.toBranch)
       - --param
-      - fromBranch=$(params.fromBranch)
+      - fromBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
       - --param
