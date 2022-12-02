@@ -28,7 +28,7 @@ spec:
   steps:
   - name: docker-build
     workingDir: /workspace/git/$(params.pipelineRunName)
-    image: gcr.io/kaniko-project/executor:debug-v0.16.0
+    image: mgit/base:kaniko-executor-debug-stable
     imagePullPolicy: Always
     env:
     - name: DOCKER_CONFIG
