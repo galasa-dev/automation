@@ -231,7 +231,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: source
-      value: automation/dockerfiles/runtime/bootEmbedded
+      value: /automation/dockerfiles/runtime/bootEmbedded
     - name: destination
       value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/target 
     workspaces:
