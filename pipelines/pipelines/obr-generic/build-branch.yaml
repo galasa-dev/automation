@@ -215,7 +215,7 @@ spec:
     - name: source
       value: /opt/k8s/bin/kubectl
     - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
+      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/target 
     - name: image
       value: harbor.galasa.dev/common/kubectl:main  
     workspaces:
