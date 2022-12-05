@@ -222,7 +222,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace 
 
-  - name: copy-bootEmbedded-files
+  - name: copy-bootembedded-files
     taskRef:
       name: copy
     runAfter:
@@ -261,7 +261,7 @@ spec:
       name: docker-build
     runAfter:
       - copy-kubectl
-      - copy-bootEmbedded-files
+      - copy-bootembedded-files
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
