@@ -19,7 +19,7 @@ WORKDIR /galasa
 
 USER galasa
 
-COPY --from=0 /galasa/* /galasa/
+#COPY --from=0 /galasa/* /galasa/
 
 
 RUN mkdir /galasa/.galasa                          && \
