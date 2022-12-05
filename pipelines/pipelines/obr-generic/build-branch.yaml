@@ -215,7 +215,7 @@ spec:
     - name: source
       value: /opt/k8s/bin/kubectl
     - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/target 
+      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
     - name: image
       value: harbor.galasa.dev/common/kubectl:main  
     workspaces:
