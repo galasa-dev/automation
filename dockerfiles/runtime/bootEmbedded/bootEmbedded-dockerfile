@@ -4,7 +4,7 @@ ARG jdkImage
 
 FROM ${dockerRepository}/galasadev/galasa-obr-generic:${tag}
 
-FROM ${jdkImage}
+#FROM ${jdkImage}
 
 RUN touch /var/run/docker.sock && \
     chmod 666 /var/run/docker.sock

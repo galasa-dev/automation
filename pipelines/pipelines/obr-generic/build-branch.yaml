@@ -237,7 +237,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.imageTag)
     - name: noPush
-      value: "--no-push"
+      value: ""
     - name: buildArgs
       value:
         - "--build-arg=tag=$(params.fromBranch)"
@@ -262,7 +262,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:$(params.imageTag)
     - name: noPush
-      value: "--no-push"
+      value: ""
     - name: buildArgs
       value:
         - "--build-arg=tag=$(params.fromBranch)"
