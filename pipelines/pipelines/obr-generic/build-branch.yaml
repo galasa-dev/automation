@@ -220,18 +220,54 @@ spec:
       value: harbor.galasa.dev/common/kubectl:main  
     workspaces:
      - name: git-workspace
-       workspace: git-workspace       
+       workspace: git-workspace 
+
+  - name: copy-bootEmbedded-files
+    taskRef:
+      name: copy
+    runAfter:
+      - branch-docker-build-obr-generic  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: source
+      value: automation/dockerfiles/runtime/bootEmbedded
+    - name: destination
+      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/target 
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace           
+
+  # - name: scripts
+  #   taskRef:
+  #     name: script
+  #   runAfter:
+  #     - branch-docker-build-obr-generic  
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: source
+  #     value: /opt/k8s/bin/kubectl
+  #   - name: destination
+  #     value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
+  #   - name: image
+  #     value: harbor.galasa.dev/common/kubectl:main  
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace     
 
   - name: branch-docker-build-amd64-embedded
     taskRef:
       name: docker-build
     runAfter:
       - copy-kubectl
+      - copy-bootEmbedded-files
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
+      value: $(context.pipelineRun.name)/obr/obr-generic
+      # value: $(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
     - name: dockerfilePath
       value: automation/dockerfiles/runtime/bootEmbedded/bootEmbedded-dockerfile
     - name: imageName
