@@ -23,8 +23,9 @@ spec:
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
     imagePullPolicy: Always
+    args: ["$(params.script[*])"]
     script: |
       #!/bin/sh
       set +e
-      $(params.script[*])
+      "$@"
      
