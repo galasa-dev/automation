@@ -23,8 +23,6 @@ spec:
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
     imagePullPolicy: Always
-    # command: ["/bin/bash"]
-    # args: ["set +e", "$(params.script[*])"]
     script: |
       #!/bin/sh
       set +e
