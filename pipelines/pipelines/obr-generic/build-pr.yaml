@@ -124,7 +124,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: main
+      value: $(params.baseRef)
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
@@ -195,7 +195,6 @@ spec:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        #- "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
         - dev.galasa:galasa-maven-plugin:0.15.0:obrembedded
     - name: command
       value: process-sources
@@ -218,52 +217,53 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-obr-generic:$(params.headSha)
     - name: noPush
-      value: "--no-push"
+      value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
+       workspace: git-workspace  
 
-  - name: copy-kubectl
+  - name: copy-files
     taskRef:
-      name: copy
+      name: script
     runAfter:
       - branch-docker-build-obr-generic  
     params:
     - name: context
       value: $(context.pipelineRun.name)
-    - name: source
-      value: /opt/k8s/bin/kubectl
-    - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
+    - name: script
+      value: cp -vr /opt/k8s/bin/kubectl 
+             /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh 
+             /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties 
+             /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/
     - name: image
       value: harbor.galasa.dev/common/kubectl:main  
     workspaces:
      - name: git-workspace
-       workspace: git-workspace       
+       workspace: git-workspace   
 
   - name: branch-docker-build-amd64-embedded
     taskRef:
       name: docker-build
     runAfter:
-      - copy-kubectl
+      - copy-files
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
+      value: $(context.pipelineRun.name)/obr/obr-generic/
     - name: dockerfilePath
       value: automation/dockerfiles/runtime/bootEmbedded/bootEmbedded-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.headSha)
     - name: noPush
-      value: "--no-push"
+      value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=jdkImage=docker.io/library/openjdk:11"
     workspaces:
@@ -285,18 +285,36 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:$(params.headSha)
     - name: noPush
-      value: "--no-push"
+      value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=main"
+        - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=platform=amd64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  finally:
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
+    taskRef:
+      name: git-status
+    params:
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
   # - name: git-clean
   #   taskRef: 
   #     name: git-clean
