@@ -1,0 +1,30 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: script
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: script
+    type: array
+  - name: image
+    type: string
+    default: busybox:latest 
+  steps:
+  - name: script
+    workingDir: /workspace/git/$(params.context)
+    image: $(params.image)
+    imagePullPolicy: Always
+    script: |
+      #!/bin/sh
+      set +e
+      $(params.script[*])
+     
