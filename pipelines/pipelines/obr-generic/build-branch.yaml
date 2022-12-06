@@ -172,7 +172,6 @@ spec:
         - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
-        #- "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
         - dev.galasa:galasa-maven-plugin:0.15.0:obrembedded
     - name: command
       value: process-sources
@@ -202,59 +201,9 @@ spec:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
+       workspace: git-workspace   
 
-  # - name: copy-kubectl
-  #   taskRef:
-  #     name: copy
-  #   runAfter:
-  #     - branch-docker-build-obr-generic  
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: source
-  #     value: /opt/k8s/bin/kubectl
-  #   - name: destination
-  #     value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
-  #   - name: image
-  #     value: harbor.galasa.dev/common/kubectl:main  
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace 
-
-  # - name: copy-bootembedded-files
-  #   taskRef:
-  #     name: copy
-  #   runAfter:
-  #     - branch-docker-build-obr-generic  
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: source
-  #     value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh
-  #   - name: destination
-  #     value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace       
-
-  # - name: copy-bootembedded-files2
-  #   taskRef:
-  #     name: copy
-  #   runAfter:
-  #     - branch-docker-build-obr-generic  
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: source
-  #     value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties
-  #   - name: destination
-  #     value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace           
-
-  - name: copy-scripts
+  - name: copy-files
     taskRef:
       name: script
     runAfter:
@@ -277,16 +226,12 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-      # - copy-kubectl
-      # - copy-bootembedded-files
-      # - copy-bootembedded-files2
-      - copy-scripts
+      - copy-files
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)/obr/obr-generic/
-      # value: $(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
     - name: dockerfilePath
       value: automation/dockerfiles/runtime/bootEmbedded/bootEmbedded-dockerfile
     - name: imageName
