@@ -14,7 +14,7 @@ spec:
   - name: context
     type: string
   - name: script
-    type: array
+    type: string
   - name: image
     type: string
     default: busybox:latest 
@@ -23,10 +23,10 @@ spec:
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
     imagePullPolicy: Always
-    command: ["/bin/bash"]
-    args: ["set +e", "$(params.script[*])"]
-    # script: |
-    #   #!/bin/sh
-    #   set +e
-    #   "$@"
+    # command: ["/bin/bash"]
+    # args: ["set +e", "$(params.script[*])"]
+    script: |
+      #!/bin/sh
+      set +e
+      $(params.script)
      
