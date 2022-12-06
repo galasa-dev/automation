@@ -220,7 +220,7 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
     workspaces:
      - name: git-workspace
@@ -263,7 +263,7 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=jdkImage=docker.io/library/openjdk:11"
     workspaces:
@@ -288,7 +288,7 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=platform=amd64"
     workspaces:
