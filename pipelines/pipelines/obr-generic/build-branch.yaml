@@ -233,7 +233,7 @@ spec:
     - name: source
       value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/
     - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/target 
+      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
     workspaces:
      - name: git-workspace
        workspace: git-workspace           
