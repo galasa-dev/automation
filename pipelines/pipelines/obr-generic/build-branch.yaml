@@ -204,59 +204,9 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: copy-kubectl
-    taskRef:
-      name: copy
-    runAfter:
-      - branch-docker-build-obr-generic  
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: source
-      value: /opt/k8s/bin/kubectl
-    - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
-    - name: image
-      value: harbor.galasa.dev/common/kubectl:main  
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace 
-
-  - name: copy-bootembedded-files
-    taskRef:
-      name: copy
-    runAfter:
-      - branch-docker-build-obr-generic  
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: source
-      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh
-    - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace       
-
-  - name: copy-bootembedded-files2
-    taskRef:
-      name: copy
-    runAfter:
-      - branch-docker-build-obr-generic  
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: source
-      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties
-    - name: destination
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace           
-
-  # - name: scripts
+  # - name: copy-kubectl
   #   taskRef:
-  #     name: script
+  #     name: copy
   #   runAfter:
   #     - branch-docker-build-obr-generic  
   #   params:
@@ -265,20 +215,72 @@ spec:
   #   - name: source
   #     value: /opt/k8s/bin/kubectl
   #   - name: destination
-  #     value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
+  #     value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
   #   - name: image
   #     value: harbor.galasa.dev/common/kubectl:main  
   #   workspaces:
   #    - name: git-workspace
-  #      workspace: git-workspace     
+  #      workspace: git-workspace 
+
+  # - name: copy-bootembedded-files
+  #   taskRef:
+  #     name: copy
+  #   runAfter:
+  #     - branch-docker-build-obr-generic  
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: source
+  #     value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh
+  #   - name: destination
+  #     value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace       
+
+  # - name: copy-bootembedded-files2
+  #   taskRef:
+  #     name: copy
+  #   runAfter:
+  #     - branch-docker-build-obr-generic  
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: source
+  #     value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties
+  #   - name: destination
+  #     value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace           
+
+  - name: copy-scripts
+    taskRef:
+      name: script
+    runAfter:
+      - branch-docker-build-obr-generic  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value: 
+        - cp -vr /opt/k8s/bin/kubectl /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
+        - cp -vr /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/
+        - cp -vr /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/
+    - name: image
+      value: harbor.galasa.dev/common/kubectl:main  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
 
   - name: branch-docker-build-amd64-embedded
     taskRef:
       name: docker-build
     runAfter:
-      - copy-kubectl
-      - copy-bootembedded-files
-      - copy-bootembedded-files2
+      # - copy-kubectl
+      # - copy-bootembedded-files
+      # - copy-bootembedded-files2
+      - copy-scripts
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
