@@ -231,7 +231,23 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: source
-      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/
+      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh
+    - name: destination
+      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace       
+
+  - name: copy-bootembedded-files2
+    taskRef:
+      name: copy
+    runAfter:
+      - branch-docker-build-obr-generic  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: source
+      value: /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties
     - name: destination
       value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/ 
     workspaces:
@@ -262,11 +278,12 @@ spec:
     runAfter:
       - copy-kubectl
       - copy-bootembedded-files
+      - copy-bootembedded-files2
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/obr/obr-generic/bootEmbedded
+      value: $(context.pipelineRun.name)/obr/obr-generic/
       # value: $(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded
     - name: dockerfilePath
       value: automation/dockerfiles/runtime/bootEmbedded/bootEmbedded-dockerfile
