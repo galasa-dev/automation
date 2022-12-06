@@ -192,6 +192,42 @@ spec:
       - apps:Deployment:eclipse-$(params.imageTag) 
       - --health
 
+  - name: recycle-deployment-p2
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - eclipse-p2-$(params.imageTag) 
+  - name: wait-deployment-p2
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment-p2
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:eclipse-p2-$(params.imageTag) 
+      - --health    
+
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
   # - name: git-clean
