@@ -150,7 +150,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse-p2:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-p2:$(params.imageTag)
     - name: noPush
       value: ""
     workspaces:
@@ -210,7 +210,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - eclipse-p2-$(params.imageTag) 
+      - p2-$(params.imageTag) 
   - name: wait-deployment-p2
     taskRef:
       name: argocd-cli
@@ -225,7 +225,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:eclipse-p2-$(params.imageTag) 
+      - apps:Deployment:p2-$(params.imageTag) 
       - --health    
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC

@@ -5,7 +5,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: eclipse-p2-{{ .Values.p2.branch }}
+  name: p2-{{ .Values.p2.branch }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
@@ -21,9 +21,9 @@ spec:
       paths:
       - backend:
           service:
-            name: eclipse-p2-{{ .Values.p2.branch }}
+            name: p2-{{ .Values.p2.branch }}
             port:
               number: 80
-        path: /{{ .Values.p2.branch }}/maven-repo/eclipse-p2
+        path: /{{ .Values.p2.branch }}/maven-repo/p2
         pathType: Prefix
 {{ end }}
