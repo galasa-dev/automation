@@ -5,27 +5,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eclipse-p2-{{ .Values.p2.branch }}
+  name: p2-{{ .Values.p2.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
-      app: eclipse-p2-{{ .Values.p2.branch }}
+      app: p2-{{ .Values.p2.branch }}
   template:
     metadata:
-      name: eclipse-p2-{{ .Values.p2.branch }}
+      name: p2-{{ .Values.p2.branch }}
       labels:
-        app: eclipse-p2-{{ .Values.p2.branch }}
+        app: p2-{{ .Values.p2.branch }}
     spec:
       containers:
         - image: {{ .Values.p2.imageName }}:{{ .Values.p2.imageTag }}
           imagePullPolicy: Always
-          name: eclipse-p2-{{ .Values.p2.branch }}
+          name: p2-{{ .Values.p2.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.p2.branch }}/maven-repo/eclipse-p2
+            value: {{ .Values.p2.branch }}/maven-repo/p2
           ports:
             - containerPort: 80
 {{ end }}
