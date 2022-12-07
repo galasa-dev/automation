@@ -5,7 +5,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: -{{ .Values.p2.branch }}
+  name: p2-{{ .Values.p2.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   revisionHistoryLimit: 1
