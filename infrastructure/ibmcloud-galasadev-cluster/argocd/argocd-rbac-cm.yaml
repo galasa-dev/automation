@@ -12,22 +12,14 @@ metadata:
 data:
   policy.default: role:readonly
   policy.csv: |
-    p, role:member, applications, create, default/main-maven-repos, deny
-    p, role:member, applications, create, default/javadoc-site, deny
-    p, role:member, applications, create, default/galasa-development-namespace, deny
-    p, role:member, applications, delete, default/main-maven-repos, deny
-    p, role:member, applications, delete, default/javadoc-site, deny
-    p, role:member, applications, delete, default/galasa-development-namespace, deny
-    p, role:member, applications, update, default/main-maven-repos, deny
-    p, role:member, applications, update, default/javadoc-site, deny
-    p, role:member, applications, update, default/galasa-development-namespace, deny
-    p, role:member, applications, sync, default/main-maven-repos, deny
-    p, role:member, applications, sync, default/javadoc-site, deny
-    p, role:member, applications, sync, default/galasa-development-namespace, deny
+    p, role:member, applications, *, default/main-maven-repos, deny
+    p, role:member, applications, *, default/javadoc-site, deny
+    p, role:member, applications, *, default/galasa-development-namespace, deny
     p, role:member, applications, create, default/*, allow
     p, role:member, applications, delete, default/*, allow
     p, role:member, applications, update, default/*, allow
     p, role:member, applications, sync, default/*, allow
+    p, role:member, applications, override, default/*, allow
     
     g, galasa, role:admin
     g, galasa-dev:code-admin, role:admin
