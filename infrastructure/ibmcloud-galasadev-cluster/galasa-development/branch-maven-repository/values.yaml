@@ -42,7 +42,7 @@ eclipse:
 p2:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-eclipse-p2
+  imageName: harbor.galasa.dev/galasadev/galasa-p2
   imageTag: main  
 isolated:
   deploy: false
