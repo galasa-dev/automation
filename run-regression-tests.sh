@@ -1,9 +1,7 @@
 #! /usr/bin/env bash
 
 #-----------------------------------------------------------------------------------------
-#
 # Objective: Run regression tests from a given branch in a given repo.
-#
 #-----------------------------------------------------------------------------------------
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
 cd "${BASEDIR}/.."
@@ -11,9 +9,7 @@ WORKSPACE_DIR=$(pwd)
 cd "${BASEDIR}"
 
 #-----------------------------------------------------------------------------------------
-#
 # Set Colors
-#
 #-----------------------------------------------------------------------------------------
 bold=$(tput bold)
 underline=$(tput sgr 0 1)
@@ -25,9 +21,7 @@ tan=$(tput setaf 202)
 blue=$(tput setaf 25)
 
 #-----------------------------------------------------------------------------------------
-#
 # Headers and Logging
-#
 #-----------------------------------------------------------------------------------------
 underline() { printf "${underline}${bold}%s${reset}\n" "$@"
 }
@@ -132,6 +126,19 @@ if [[ "${targetBranch}" != "main" ]]; then
       'obr'
   )
 
+  index=-1
+  for i in "${!repositories[@]}"; do
+    if [[ "${targetRepository}" == "${repositories[$i]}" ]]; then
+      index=$i
+      break
+    fi
+  done
+
+  if [[ ${index} -eq -1 ]]; then
+    error "Repository '${targetRepository}' not found."
+    exit 1
+  fi
+
   h2 "Logging into Argo CD."
   argocd login argocd.galasa.dev --sso --grpc-web
 
@@ -146,21 +153,6 @@ if [[ "${targetBranch}" != "main" ]]; then
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --grpc-web
-
-  index=-1
-  for i in "${!repositories[@]}"; do
-    if [[ "${targetRepository}" == "${repositories[$i]}" ]]; then
-      index=$i
-      break
-    fi
-  done
-
-  if [[ ${index} -eq -1 ]]; then
-    error "Repository '${targetRepository}' not found."
-    info "Deleting ${appName} app."
-    argocd app delete "${appName}" -y --grpc-web
-    exit 1
-  fi
 
   h2 "Configuring helm parameters."
   for repo in "${repositories[@]:${index}}"; do
@@ -188,7 +180,6 @@ if [[ "${targetBranch}" != "main" ]]; then
   info "Waiting for builds to complete..."
   argocd app wait "${appName}" \
       --resource "apps:Deployment:obr-${targetBranch}" \
-      --health \
       --grpc-web
   success "Builds complete."
 fi
