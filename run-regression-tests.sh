@@ -139,10 +139,10 @@ if [[ "${targetBranch}" != "main" ]]; then
     exit 1
   fi
 
-  h2 "Logging into Argo CD."
+  h2 "Logging into Argo CD"
   argocd login argocd.galasa.dev --sso --grpc-web
 
-  h2 "Creating app."
+  h2 "Creating app"
   argocd app create "${appName}" \
                     --project default \
                     --sync-policy auto \
@@ -153,8 +153,9 @@ if [[ "${targetBranch}" != "main" ]]; then
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --grpc-web
+  rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to create ${appName}." ; exit 1 ; fi
 
-  h2 "Configuring helm parameters."
+  h2 "Configuring helm parameters"
   for repo in "${repositories[@]:${index}}"; do
       argocd app set "${appName}" \
         --helm-set "${repo}.branch=${targetBranch}" \
@@ -162,7 +163,7 @@ if [[ "${targetBranch}" != "main" ]]; then
         --helm-set "${repo}.deploy=true" \
         --grpc-web
   done
-  success "Argo CD app created."
+  success "${appName} app created."
 
   pipeline="branch-${targetRepository}"
   h1 "Starting ${pipeline} build pipeline"
@@ -176,11 +177,17 @@ if [[ "${targetBranch}" != "main" ]]; then
       --pod-template pipelines/templates/pod-template.yaml \
       --serviceaccount galasa-build-bot \
       -n galasa-build
+  rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to start ${pipeline} pipeline." ; exit 1 ; fi
 
   info "Waiting for builds to complete..."
-  argocd app wait "${appName}" \
-      --resource "apps:Deployment:obr-${targetBranch}" \
-      --grpc-web
+  while [[
+    "$(curl "https://development.galasa.dev/${targetBranch}/maven-repo/obr/" \
+    --silent \
+    --output /dev/null \
+    --write-out "%{response_code}")" != "200"
+  ]]; do
+    sleep 5
+  done
   success "Builds complete."
 fi
 
@@ -193,6 +200,7 @@ go run ${galasactlPath} runs prepare \
     --bootstrap "${bootstrap}" \
     --stream inttests \
     --package local
+rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to create regression test portfolio." ; exit 1 ; fi
 success "Portfolio created."
 
 h1 "Starting regression tests"
@@ -214,5 +222,6 @@ success "Regression tests complete."
 if [[ "${targetBranch}" != "main" ]]; then
   h1 "Deleting ${appName} Argo CD app"
   argocd app delete "${appName}" -y --grpc-web
+  rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to delete ${appName}." ; exit 1 ; fi
+  success "${appName} app deleted successfully."
 fi
-success "Regression testing complete."
