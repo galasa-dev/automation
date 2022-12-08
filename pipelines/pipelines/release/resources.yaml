@@ -50,9 +50,9 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/resources
+      value: $(context.pipelineRun.name)/automation/dockerfiles/release/resources
     - name: dockerfilePath
-      value: automation/dockerfiles/release/resources-dockerfile
+      value: automation/dockerfiles/release/resources/resources-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-resources:$(params.imageTag)
     - name: noPush
@@ -60,7 +60,6 @@ spec:
     - name: buildArgs
       value:
         - "--build-arg=branch=$(params.fromBranch)"
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
         - "--build-arg=version=0.25.0"
     workspaces:
      - name: git-workspace
