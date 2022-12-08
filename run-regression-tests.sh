@@ -5,7 +5,6 @@
 # Objective: Run regression tests from a given branch.
 #
 #-----------------------------------------------------------------------------------------
-
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
 cd "${BASEDIR}/.."
 WORKSPACE_DIR=$(pwd)
@@ -109,7 +108,6 @@ fi
 #-----------------------------------------------------------------------------------------
 # Main logic
 #-----------------------------------------------------------------------------------------
-
 verifyTool "argocd"
 verifyTool "tkn"
 verifyTool "go"
@@ -119,7 +117,6 @@ if [[ ! -e "../cli" ]]; then
     exit 1
 fi
 
-#----------------------------------------------------------------
 # Create a new Argo CD app if a branch other than main is specified, otherwise just run regression tests from main
 appName="${targetBranch}-maven-repos"
 if [[ "${targetBranch}" != "main" ]]; then
