@@ -8,7 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
     type: string
     default: main
   - name: refspec
@@ -44,7 +47,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/wrapping
     - name: revision
-      value: $(params.branch)
+      value: $(params.toBranch)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -113,7 +116,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -141,7 +144,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - wrapping-$(params.branch)
+      - wrapping-$(toBranch)
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -156,7 +159,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:wrapping-$(params.branch)
+      - apps:Deployment:wrapping-$(toBranch)
       - --health
   # Trigger the next Pipeline (branch-gradle)
   - name: trigger-gradle
@@ -175,15 +178,15 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-gradle-$(params.branch)
+      - trigger-gradle-$(toBranch)
       - --param
-      - fromBranch=$(params.branch)
+      - fromBranch=$(toBranch)
       - --param
-      - toBranch=$(params.branch)
+      - toBranch=$(toBranch)
       - --param
       - refspec=$(params.refspec)
       - --param
-      - imageTag=$(params.branch)
+      - imageTag=$(toBranch)
       - --param
       - appname=$(params.appname)
       - --workspace
