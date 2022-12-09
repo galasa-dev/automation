@@ -443,6 +443,41 @@ The Docker image for the OBR Maven repo is [here](https://harbor.galasa.dev/harb
 The OBR Maven repository is [here](https://development.galasa.dev/main/maven-repo/obr).
 
 
+**OBR Generic**
+
+These pipelines build a generic Galasa OSGi Bundle Repository (OBR) and place it inside the bootEmbedded and ibmBootEmbedded images, which are used for running Galasa tests.
+
+pr-obr:
+1. git-verify
+1. clone-automation
+1. clone-framework
+1. clone-extensions
+1. clone-managers
+1. clone-obr
+1. maven-gpg
+1. generate-embedded
+1. maven-build-obr-generic
+1. docker-build-obr-generic
+1. copy-files
+1. docker-build-amd64-embedded
+1. docker-build-ibm-embedded
+1. git-status
+
+branch-obr:
+1. clone-automation
+1. clone-framework
+1. clone-extensions
+1. clone-managers
+1. clone-obr
+1. maven-gpg
+1. generate-embedded
+1. branch-maven-build-obr-generic
+1. branch-docker-build-obr-generic
+1. copy-files
+1. branch-docker-build-amd64-embedded
+1. branch-docker-build-ibm-embedded
+
+
 **Simplatform**
 
 These pipelines build the Galasa SimBank Eclipse plug-in, Simbank applications (_to-do_) and and set of sample Simbank tests, all stored in the [Simplatform repository](https://github.com/galasa-dev/simplatform).
