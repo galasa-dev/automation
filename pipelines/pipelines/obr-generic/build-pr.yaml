@@ -180,7 +180,7 @@ spec:
        workspace: git-workspace      
  
 
-  - name: branch-maven-build-obr-generic
+  - name: maven-build-obr-generic
     taskRef:
       name: maven-build
     runAfter: 
@@ -202,11 +202,11 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: branch-docker-build-obr-generic
+  - name: docker-build-obr-generic
     taskRef:
       name: docker-build
     runAfter:
-      - branch-maven-build-obr-generic
+      - maven-build-obr-generic
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -230,7 +230,7 @@ spec:
     taskRef:
       name: script
     runAfter:
-      - branch-docker-build-obr-generic  
+      - docker-build-obr-generic  
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -245,7 +245,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace   
 
-  - name: branch-docker-build-amd64-embedded
+  - name: docker-build-amd64-embedded
     taskRef:
       name: docker-build
     runAfter:
@@ -270,11 +270,11 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: branch-docker-build-ibm-embedded
+  - name: docker-build-ibm-embedded
     taskRef:
       name: docker-build
     runAfter:
-      - branch-docker-build-amd64-embedded
+      - docker-build-amd64-embedded
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
