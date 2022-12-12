@@ -507,6 +507,10 @@ spec:
 
   #trigger obr-generic
   - name: trigger-obr-generic
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
