@@ -545,6 +545,10 @@ spec:
 
   #trigger eclipse
   - name: trigger-eclipse
+    when:
+      - input: "$(params.toBranch)"
+        operator: notin
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
