@@ -570,7 +570,7 @@ spec:
       - --prefix-name 
       - trigger-eclipse-$(params.toBranch)
       - --param
-      - fromBranch=$(params.toBranch)
+      - fromObrBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
       - --param
