@@ -268,7 +268,7 @@ spec:
       - --prefix-name 
       - trigger-isolated-$(params.toBranch)
       - --param
-      - fromBranch=$(params.toBranch)
+      - toBranch=$(params.toBranch)
       - --param
       - fromObrBranch=$(params.toBranch)
       - --param
