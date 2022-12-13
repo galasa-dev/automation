@@ -232,6 +232,50 @@ spec:
       - apps:Deployment:simplatform-$(params.imageTag)
       - --health
 
+  #trigger eclipse
+  - name: trigger-eclipse
+    when:
+      - input: "$(params.toBranch)"
+        operator: notin
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-eclipse
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-eclipse-$(params.toBranch)
+      - --param
+      - fromObrBranch=$(params.toBranch)
+      - --param
+      - fromSimplatformBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace       
+
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean
   #   taskRef: 
