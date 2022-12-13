@@ -572,7 +572,7 @@ spec:
       - --param
       - fromObrBranch=$(params.toBranch)
       - --param
-      - fromSimplatformBranch=$(params.fromBranch)
+      - fromSimplatformBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
       - --param
