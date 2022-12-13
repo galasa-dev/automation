@@ -53,7 +53,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/eclipse
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -63,11 +63,30 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace  
+
+  - name: check-branch
+    # when: 
+    #   - input: "$(params.toBranch)"
+    #     operator: notin
+    #     values: ["main"]
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-eclipse  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace      
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
     - clone-eclipse
+    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -81,6 +100,7 @@ spec:
       name: maven-gpg
     runAfter:
     - clone-eclipse 
+    - check-branch
     params:
     - name: context
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
