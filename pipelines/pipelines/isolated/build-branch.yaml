@@ -132,7 +132,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/isolated
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -142,6 +142,24 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+  - name: check-branch
+    # when: 
+    #   - input: "$(params.toBranch)"
+    #     operator: notin
+    #     values: ["main"]
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-isolated  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/isolated
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace       
 
   # - name: get-commit
   #   taskRef:
@@ -167,6 +185,7 @@ spec:
     - clone-extensions
     - clone-managers
     - clone-isolated  
+    - check-branch
     params:
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
