@@ -270,7 +270,13 @@ spec:
       - --param
       - fromBranch=$(params.toBranch)
       - --param
-      - toBranch=$(params.toBranch)
+      - fromObrBranch=$(params.toBranch)
+      - --param
+      - fromSimplatformBranch=$(params.toBranch)
+      - --param
+      - fromJavadocBranch=$(params.toBranch)
+      - --param
+      - fromEclipseBranch=$(params.toBranch)
       - --param
       - refspec=$(params.refspec)
       - --param
