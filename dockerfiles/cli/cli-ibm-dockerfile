@@ -1,6 +1,6 @@
 ARG dockerRepository
-ARG branch
-FROM ${dockerRepository}/galasadev/galasa-cli-amd64:${branch}
+ARG tag
+FROM ${dockerRepository}/galasadev/galasa-cli-amd64:${tag}
 
 USER root
 
