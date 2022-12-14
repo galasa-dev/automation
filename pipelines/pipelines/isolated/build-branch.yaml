@@ -547,7 +547,7 @@ spec:
       value: "--no-push"
     - name: buildArgs
       value:
-        - "--tar-path"
+        - "--tarPath"
         - "/workspace/git/$(context.pipelineRun.name)/isolated/full/target/isolated/isolated.tar"
     workspaces:
       - name: git-workspace
