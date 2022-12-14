@@ -224,7 +224,7 @@ spec:
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch="
+        - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -248,7 +248,7 @@ spec:
       value: automation/dockerfiles/cli/cli-binary-dockerfile
     - name: buildArgs
       value:
-        - "--build-arg=branch="
+        - "--build-arg=branch=$(params.toBranch)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace          
