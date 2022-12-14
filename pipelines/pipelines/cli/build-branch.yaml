@@ -102,7 +102,7 @@ spec:
     - check-branch
     params:
     - name: context
-      value:
+      value: $(context.pipelineRun.name)/cli
     - name: image
       value: harbor.galasa.dev/common/openapi:main  
     - name: command
