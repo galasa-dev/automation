@@ -269,7 +269,7 @@ spec:
       value: automation/dockerfiles/cli/cli-binary-dockerfile
     - name: buildArgs
       value:
-        - "--build-arg=branch=$(params.toBranch)"
+        - "--build-arg=branch=$(params.headRef)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
