@@ -14,7 +14,7 @@ extensions:
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-extensions
   imageTag: main
-cli-binary:
+cli:
   deploy: false
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-cli-binary
