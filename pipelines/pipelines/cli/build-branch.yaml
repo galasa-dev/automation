@@ -168,7 +168,8 @@ spec:
       value:  
         version=$(cat VERSION) &&
         cat pkg/cmd/root.go | sed "s/unknowncliversion-unknowngithash/${version}/1" > temp.txt &&
-        mv -f temp.txt pkg/cmd/root.go  
+        mv -f temp.txt pkg/cmd/root.go &&
+        cat pkg/cmd/root.go 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
