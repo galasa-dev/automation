@@ -1,0 +1,31 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.cli-binary.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cli-binary-{{ .Values.cli-binary.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cli-binary-{{ .Values.cli-binary.branch }}
+  template:
+    metadata:
+      name: cli-binary-{{ .Values.cli-binary.branch }}
+      labels:
+        app: cli-binary-{{ .Values.cli-binary.branch }}
+    spec:
+      containers:
+        - image: {{ .Values.cli-binary.imageName }}:{{ .Values.cli-binary.imageTag }}
+          imagePullPolicy: Always
+          name: cli-binary-{{ .Values.cli-binary.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.cli-binary.branch }}/maven-repo/cli-binary
+          ports:
+            - containerPort: 80
+{{ end }}
