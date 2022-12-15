@@ -158,17 +158,17 @@ spec:
 
   - name: update-version
     taskRef: 
-      name: general-command
+      name: script
     runAfter:
     - clear-sum   
     params:    
     - name: context
       value: $(context.pipelineRun.name)/cli
-    - name: command
+    - name: script
       value:  
-        - version=$(cat VERSION)
-        - cat pkg/cmd/root.go | sed "s/unknowncliversion-unknowngithash/${version}/1" > temp.txt
-        - mv -f temp.txt pkg/cmd/root.go  
+        version=$(cat VERSION) &&
+        cat pkg/cmd/root.go | sed "s/unknowncliversion-unknowngithash/${version}/1" > temp.txt &&
+        mv -f temp.txt pkg/cmd/root.go  
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
