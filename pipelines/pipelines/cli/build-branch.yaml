@@ -271,6 +271,114 @@ spec:
      - name: git-workspace
        workspace: git-workspace          
 
+
+  # - name: recycle-cli
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - docker-buld-cli-binary
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - actions 
+  #     - run 
+  #     - $(params.appname)
+  #     - restart 
+  #     - --kind 
+  #     - Deployment
+  #     - --resource-name
+  #     - cli-$(params.imageTag)
+  # - name: wait-cli
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - recycle-cli
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - wait
+  #     - $(params.appname)
+  #     - --resource
+  #     - apps:Deployment:cli-$(params.imageTag)
+  #     - --health
+  # - name: recycle-cli-ibm
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - wait-cli
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - actions 
+  #     - run 
+  #     - $(params.appname)
+  #     - restart 
+  #     - --kind 
+  #     - Deployment
+  #     - --resource-name
+  #     - cli-ibm-$(params.imageTag)
+  # - name: wait-cli-ibm
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - recycle-cli-ibm
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - wait
+  #     - $(params.appname)
+  #     - --resource
+  #     - apps:Deployment:cli-ibm-$(params.imageTag)
+  #     - --health
+  - name: recycle-cli-binary
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build-cli-binary
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - cli-binary-$(params.imageTag)
+  - name: wait-cli-binary
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-cli-binary
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:cli-binary-$(params.imageTag)
+      - --health    
+     
+
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
   # - name: git-clean
