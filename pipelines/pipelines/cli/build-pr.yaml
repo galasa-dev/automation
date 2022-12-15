@@ -216,7 +216,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli/
     - name: noPush
-      value: ""
+      value: "--no-push"
     - name: dockerfilePath
       value: automation/dockerfiles/cli/cli-dockerfile
     - name: buildArgs
@@ -239,7 +239,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli/
     - name: noPush
-      value: ""
+      value: "--no-push"
     - name: dockerfilePath
       value: automation/dockerfiles/cli/cli-ibm-dockerfile
     - name: buildArgs
@@ -264,7 +264,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli/
     - name: noPush
-      value: ""
+      value: "--no-push"
     - name: dockerfilePath
       value: automation/dockerfiles/cli/cli-binary-dockerfile
     - name: buildArgs
