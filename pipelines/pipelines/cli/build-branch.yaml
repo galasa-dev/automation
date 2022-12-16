@@ -86,6 +86,8 @@ spec:
       name: git-check-branch
     runAfter:
     - clone-cli  
+    - clone-automation
+    - clone-framework
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
