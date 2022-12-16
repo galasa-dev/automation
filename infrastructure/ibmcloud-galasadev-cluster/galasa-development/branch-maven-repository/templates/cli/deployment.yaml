@@ -25,7 +25,7 @@ spec:
           name: cli-{{ .Values.cli.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.cli.branch }}/maven-repo/cli
+            value: {{ .Values.cli.branch }}/binary/cli
           ports:
             - containerPort: 80
 {{ end }}
