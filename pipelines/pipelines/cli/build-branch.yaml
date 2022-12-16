@@ -360,7 +360,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - cli-binary-$(params.imageTag)
+      - cli-$(params.imageTag)
   - name: wait-cli-binary
     taskRef:
       name: argocd-cli
@@ -375,7 +375,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:cli-binary-$(params.imageTag)
+      - apps:Deployment:cli-$(params.imageTag)
       - --health    
      
 
