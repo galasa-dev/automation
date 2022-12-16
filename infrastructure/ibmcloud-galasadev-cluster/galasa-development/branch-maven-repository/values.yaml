@@ -17,7 +17,7 @@ extensions:
 cli:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-cli-binary
+  imageName: harbor.galasa.dev/galasadev/galasa-cli-binary-downloadables
   imageTag: main  
 framework:
   deploy: false
