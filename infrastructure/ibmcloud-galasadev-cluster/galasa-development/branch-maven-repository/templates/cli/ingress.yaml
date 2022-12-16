@@ -24,6 +24,6 @@ spec:
             name: cli-{{ .Values.cli.branch }}
             port:
               number: 80
-        path: /{{ .Values.cli.branch }}/maven-repo/cli
+        path: /{{ .Values.cli.branch }}/binary/cli
         pathType: Prefix
 {{ end }}
