@@ -52,7 +52,7 @@ p2:
 isolated:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-isolated
+  imageName: harbor.galasa.dev/galasadev/galasa-isolated-zip
   imageTag: main
 javadoc:
   deploy: false
@@ -62,7 +62,7 @@ javadoc:
 mvp:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-mvp
+  imageName: harbor.galasa.dev/galasadev/galasa-mvp-zip
   imageTag: main
 simplatform:
   deploy: false
