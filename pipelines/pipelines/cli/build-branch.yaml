@@ -259,7 +259,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-cli-binary:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-cli-binary-downloadables:$(params.imageTag)
     - name: context
       value: $(context.pipelineRun.name)/cli/
     - name: noPush
