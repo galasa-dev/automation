@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.inttests.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: inttests-{{ .Values.inttests.branch }}
+  name: inttests-{{ .Values.inttests.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: inttests-{{ .Values.inttests.branch }}
+{{ end }}
