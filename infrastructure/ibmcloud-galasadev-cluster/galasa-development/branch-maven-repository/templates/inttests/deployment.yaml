@@ -1,0 +1,31 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.inttests.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inttests-{{ .Values.inttests.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inttests-{{ .Values.inttests.branch }}
+  template:
+    metadata:
+      name: inttests-{{ .Values.inttests.branch }}
+      labels:
+        app: inttests-{{ .Values.inttests.branch }}
+    spec:
+      containers:
+        - image: {{ .Values.inttests.imageName }}:{{ .Values.inttests.imageTag }}
+          imagePullPolicy: Always
+          name: inttests-{{ .Values.inttests.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.inttests.branch }}/maven-repo/inttests
+          ports:
+            - containerPort: 80
+{{ end }}
