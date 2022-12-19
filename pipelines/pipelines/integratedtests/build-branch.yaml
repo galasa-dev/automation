@@ -43,7 +43,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-integratedtests
+  - name: clone-inttests
     taskRef: 
       name: git-clone
     params:
