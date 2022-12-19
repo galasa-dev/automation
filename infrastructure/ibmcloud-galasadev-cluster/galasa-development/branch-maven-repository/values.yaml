@@ -24,6 +24,11 @@ framework:
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-framework
   imageTag: main
+inttests:
+  deploy: false
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-inttests
+  imageTag: main  
 obr:
   deploy: false
   branch: main
