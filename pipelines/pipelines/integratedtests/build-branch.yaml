@@ -135,9 +135,9 @@ spec:
         - "-Dgalasa.bootstrap="
         - "-Dgalasa.skip.deploytestcatatlog=true" 
         - "-Dgalasa.skip.bundletestcatatlog=false"
-        - dev.galasa:galasa-maven-plugin:deploytestcat
+        
     - name: command
-      value: deploy
+      value: deploy dev.galasa:galasa-maven-plugin:deploytestcat
     workspaces:
      - name: git-workspace
        workspace: git-workspace
