@@ -216,7 +216,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -279,7 +280,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -381,7 +383,8 @@ spec:
     - name: settingsLocation
       value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
     - name: command
-      value: deploy
+      value: 
+        - deploy
     - name: buildArgs
       value: 
         - "-Dgpg.skip=true"

@@ -121,7 +121,8 @@ spec:
         - "-Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
