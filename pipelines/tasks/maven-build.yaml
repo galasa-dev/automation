@@ -18,7 +18,7 @@ spec:
   - name: buildArgs
     type: array    
   - name: command
-    type: string  
+    type: array  
   steps:
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
@@ -33,6 +33,6 @@ spec:
       - --batch-mode
       - --errors
       - --fail-at-end
-      - $(params.command) 
+      - $(params.command[*]) 
 
   
