@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: branch-integratedtests
+  name: branch-inttests
   namespace: galasa-build
 spec:
   params:
