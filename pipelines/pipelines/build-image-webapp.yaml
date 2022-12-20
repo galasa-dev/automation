@@ -69,7 +69,8 @@ spec:
         - "-Dgalasa.source.repo=https://galasadev-cicsk8s.hursley.ibm.com/main/maven/obr/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2" 
     - name: command
-      value: deploy    
+      value: 
+        - deploy    
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
