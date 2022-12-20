@@ -1,0 +1,3 @@
+FROM alpine
+COPY bin/ghreceiver /go/bin/ghreceiver
+ENTRYPOINT ["/go/bin/ghreceiver"]
