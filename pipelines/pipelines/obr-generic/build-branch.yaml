@@ -174,7 +174,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - dev.galasa:galasa-maven-plugin:0.15.0:obrembedded
     - name: command
-      value: process-sources
+      value: 
+        - process-sources
     workspaces:
      - name: git-workspace
        workspace: git-workspace
