@@ -109,7 +109,7 @@ spec:
       - maven-build-simplatform-application 
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
     - name: script
       value: ls
     - name: image
@@ -127,7 +127,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/simplatform
+      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
     - name: dockerfilePath
       value: automation/dockerfiles/webapp/webapp-dockerfile
     - name: imageName
