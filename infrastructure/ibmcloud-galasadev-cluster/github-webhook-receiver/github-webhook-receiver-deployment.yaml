@@ -36,4 +36,4 @@ spec:
           args: ["--port", "80"]
           ports:
             - containerPort: 80
-              name: github-webhook-receiver
+              name: gh-webhook-receiver
