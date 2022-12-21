@@ -1,0 +1,14 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: latest-id
+  namespace: galasa-build
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
