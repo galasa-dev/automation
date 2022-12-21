@@ -21,7 +21,7 @@ You can find hook id's with this command:
 curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <TOKEN>" https://api.github.com/orgs/<ORG_NAME>/hooks
 ```
 
-### Building the receiver
+### Building the receiver docker image
 
 Use docker from this repo to build this image. Example:
 ```
@@ -39,3 +39,6 @@ docker run \
 ```
 This does expect the corresponding `config.yaml` and `latestId` file to be created. In normal operation the latestId file would be created automatically if no existing, but to track locally this file needs to be mounted.
 
+## Deployment
+This program/docker image gets deployed to the external-to-IBM cluster using argocd.
+See the details [here](../../infrastructure/ibmcloud-galasadev-cluster/github-webhook-receiver/README.md)
