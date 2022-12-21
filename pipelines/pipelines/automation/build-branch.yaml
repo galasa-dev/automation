@@ -64,6 +64,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-ghverify-image
     taskRef:
       name: docker-build
@@ -83,6 +84,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: go-build-ghstatus
     taskRef:
       name: go-build
@@ -100,6 +102,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-ghstatus-image
     taskRef:
       name: docker-build
@@ -119,6 +122,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  # Build a tool which monitors github for webhook events which have previously
+  # been delivered, and kick-off an internal pipeline to handle them.
   - name: go-build-ghmonitor
     taskRef:
       name: go-build
@@ -136,6 +142,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  
   - name: build-ghmonitor-image
     taskRef:
       name: docker-build
@@ -154,7 +161,50 @@ spec:
       value: ""
     workspaces:
      - name: git-workspace
-       workspace: git-workspace     
+       workspace: git-workspace  
+
+
+  # A tool which is called by the webhook, responds OK, and 
+  # tells a pull request that a build is 'pending...'
+  - name: go-build-ghreceiver
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-receiver
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghreceiver
+      - cmd/github-webhook-receiver/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: build-ghreceiver-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghreceiver
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-receiver
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/github-receiver-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghreceiver:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+   
+
   - name: build-gpg-image
     taskRef:
       name: docker-build
@@ -174,6 +224,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-kubectl-image
     taskRef:
       name: docker-build
@@ -193,6 +244,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: build-gitcli-image
     taskRef:
       name: docker-build
@@ -213,6 +265,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
+
   - name: build-tkn-image
     taskRef:
       name: docker-build

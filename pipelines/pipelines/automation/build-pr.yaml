@@ -88,6 +88,49 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  # A tool which is called by the webhook, responds OK, and 
+  # tells a pull request that a build is 'pending...'
+  - name: go-build-ghreceiver
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-receiver
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghreceiver
+      - cmd/github-webhook-receiver/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: build-ghreceiver-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghreceiver
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-receiver
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/github-receiver-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghreceiver:$(params.headSha)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+   
+   
+  
   - name: go-build-ghstatus
     taskRef:
       name: go-build
