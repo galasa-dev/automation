@@ -85,7 +85,7 @@ spec:
     - clone-simplatform
     params:
     - name: context
-      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
+      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
     - name: settingsLocation
       value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
     - name: buildArgs
