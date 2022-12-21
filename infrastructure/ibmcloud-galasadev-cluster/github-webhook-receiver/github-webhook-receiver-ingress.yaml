@@ -20,7 +20,7 @@ spec:
       paths:
       - backend:
           service:
-            name: github-webhook-receiver
+            name: gh-webhook-receiver
             port:
               number: 80
         path: /github-webhook-receiver
