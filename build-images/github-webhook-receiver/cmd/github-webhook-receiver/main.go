@@ -87,7 +87,7 @@ func handler(response http.ResponseWriter, request *http.Request) {
 	updateStatus("Pending...", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
 
 	fmt.Fprintf(response, "OK")
-	response.WriteHeader(http.StatusOK)
+	// response.WriteHeader(http.StatusOK)
 }
 
 // Logs a request, so we can see it on the output console.
