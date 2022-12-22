@@ -6,6 +6,8 @@ kind: Pipeline
 metadata:
   name: branch-automation
   namespace: galasa-build
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
   - name: branch
