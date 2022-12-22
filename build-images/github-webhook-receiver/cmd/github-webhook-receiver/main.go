@@ -91,18 +91,28 @@ func handler(response http.ResponseWriter, request *http.Request) {
 			response.WriteHeader(http.StatusBadRequest)
 		} else {
 
-			var requestPayload types.Payload
-			err = json.Unmarshal(bytes, &requestPayload)
+			requestPayload, err := unmarshallPayload(bytes)
 
 			if err != nil {
-				log.Println("Failed to parse the message payload")
-				fmt.Fprintf(response, "Failed to parse the message payload.")
+				log.Printf("Failed to parse the message payload. %s\n", err.Error())
+				fmt.Fprintf(response, "Failed to parse the message payload. Reason is %s", err.Error())
 				response.WriteHeader(http.StatusBadRequest)
 			} else {
-				_ = handlerWithPayload(response, request, requestPayload)
+				_ = handlerWithPayload(response, request, *requestPayload)
 			}
 		}
 	}
+}
+
+func unmarshallPayload(bytes []byte) (*types.Payload, error) {
+	var requestPayload *types.Payload
+	requestPayload = new(types.Payload)
+	err := json.Unmarshal(bytes, requestPayload)
+	if err != nil {
+		// An error, so free up the memory.
+		requestPayload = nil
+	}
+	return requestPayload, err
 }
 
 // List the "action" field value we want to take notice of and process.
