@@ -77,7 +77,7 @@ func main() {
 func handler(response http.ResponseWriter, request *http.Request) {
 
 	// Log the request we've just been sent
-	logRequest(request)
+	logRequestHeaders(request)
 
 	if request.Method != "POST" {
 		// We don't care about things which are not posting.
@@ -86,16 +86,18 @@ func handler(response http.ResponseWriter, request *http.Request) {
 		bytes, err := io.ReadAll(request.Body)
 
 		if err != nil {
-			log.Println("Failed to read the message payload")
-			fmt.Fprintf(response, "Failed to read the message payload.")
+			msg := "Failed to read the message payload"
+			log.Println(msg)
+			fmt.Fprintf(response, msg)
 			response.WriteHeader(http.StatusBadRequest)
 		} else {
 
 			requestPayload, err := unmarshallPayload(bytes)
 
 			if err != nil {
-				log.Printf("Failed to parse the message payload. %s\n", err.Error())
-				fmt.Fprintf(response, "Failed to parse the message payload. Reason is %s", err.Error())
+				msg := fmt.Sprintf("Failed to parse the message payload. %s\n", err.Error())
+				log.Println(msg)
+				fmt.Fprintf(response, msg)
 				response.WriteHeader(http.StatusBadRequest)
 			} else {
 				_ = handlerWithPayload(response, request, *requestPayload)
@@ -152,18 +154,6 @@ func handlerWithPayload(response http.ResponseWriter, request *http.Request, req
 		}
 	}
 	return err
-}
-
-// Logs a request, so we can see it on the output console.
-func logRequest(request *http.Request) {
-	log.Printf("URL : %s\n", request.URL)
-	logRequestHeaders(request)
-	logRequestBody(request)
-}
-
-func logRequestBody(request *http.Request) {
-	body, _ := io.ReadAll(request.Body)
-	log.Printf("Body: %s\n", body)
 }
 
 func logRequestHeaders(request *http.Request) {
