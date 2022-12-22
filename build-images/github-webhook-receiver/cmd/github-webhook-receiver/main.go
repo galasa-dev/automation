@@ -88,8 +88,7 @@ func handler(response http.ResponseWriter, request *http.Request) {
 		if err != nil {
 			msg := "Failed to read the message payload"
 			log.Println(msg)
-			fmt.Fprintf(response, msg)
-			response.WriteHeader(http.StatusBadRequest)
+			http.Error(response, msg, http.StatusBadRequest)
 		} else {
 
 			requestPayload, err := unmarshallPayload(bytes)
@@ -97,8 +96,7 @@ func handler(response http.ResponseWriter, request *http.Request) {
 			if err != nil {
 				msg := fmt.Sprintf("Failed to parse the message payload. %s\n", err.Error())
 				log.Println(msg)
-				fmt.Fprintf(response, msg)
-				response.WriteHeader(http.StatusBadRequest)
+				http.Error(response, msg, http.StatusBadRequest)
 			} else {
 				_ = handlerWithPayload(response, request, *requestPayload)
 			}
@@ -145,8 +143,7 @@ func handlerWithPayload(response http.ResponseWriter, request *http.Request, req
 		if err != nil {
 			msg := "Couldn't update pull request state."
 			log.Println(msg)
-			fmt.Fprintf(response, msg)
-			response.WriteHeader(http.StatusInternalServerError)
+			http.Error(response, msg, http.StatusInternalServerError)
 		} else {
 			msg := "OK"
 			log.Println(msg)
