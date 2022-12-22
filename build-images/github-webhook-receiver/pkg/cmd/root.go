@@ -1,12 +1,13 @@
 /*
- * Copyright contributors to the Galasa Project
+ * Copyright contributors to the Galasa project
  */
 package cmd
 
 import (
+	"os"
+
 	env "github.com/galasa-dev/automation/build-images/github-webhook-receiver/pkg/env"
 	"github.com/spf13/cobra"
-	viper "github.com/spf13/viper"
 )
 
 const DEFAULT_PORT = 80
@@ -25,10 +26,11 @@ var (
 )
 
 func init() {
+	defaultGitHubToken := os.Getenv("GITHUBTOKEN")
 	rootCmd.PersistentFlags().Int32VarP(&port, "port", "p", DEFAULT_PORT, "Port to listen on.")
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.PersistentFlags().StringVarP(&githubToken, "githubtoken", "g",
-		viper.GetString("GITHUBTOKEN"), "The github token. Defaults to value of the GITHUBTOKEN environment variable.")
+		defaultGitHubToken, "The github token. Defaults to value of the GITHUBTOKEN environment variable.")
 }
 
 func GetInputs() (*env.Inputs, error) {
