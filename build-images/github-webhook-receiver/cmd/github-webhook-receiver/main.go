@@ -79,33 +79,45 @@ func handler(response http.ResponseWriter, request *http.Request) {
 	// Log the request we've just been sent
 	logRequest(request)
 
-	bytes, err := io.ReadAll(request.Body)
-
-	if err != nil {
-		log.Println("Failed to read the message payload")
-		fmt.Fprintf(response, "Failed to read the message payload.")
-		response.WriteHeader(http.StatusBadRequest)
+	if request.Method != "POST" {
+		// We don't care about things which are not posting.
+		log.Printf("HTTP request arrived of type %s. We only care about POST requests.\n", request.Method)
 	} else {
-
-		var requestPayload types.Payload
-		err = json.Unmarshal(bytes, &requestPayload)
+		bytes, err := io.ReadAll(request.Body)
 
 		if err != nil {
-			log.Println("Failed to parse the message payload")
-			fmt.Fprintf(response, "Failed to parse the message payload.")
+			log.Println("Failed to read the message payload")
+			fmt.Fprintf(response, "Failed to read the message payload.")
 			response.WriteHeader(http.StatusBadRequest)
 		} else {
-			_ = handlerWithPayload(response, request, requestPayload)
+
+			var requestPayload types.Payload
+			err = json.Unmarshal(bytes, &requestPayload)
+
+			if err != nil {
+				log.Println("Failed to parse the message payload")
+				fmt.Fprintf(response, "Failed to parse the message payload.")
+				response.WriteHeader(http.StatusBadRequest)
+			} else {
+				_ = handlerWithPayload(response, request, requestPayload)
+			}
 		}
 	}
 }
 
+// List the "action" field value we want to take notice of and process.
+// Anything else in the "action" field we ignore and just return success.
+var pullRequestActions = map[string]string{"opened": "opened", "synchronize": "synchronize", "reopened": "reopened"}
+
 func handlerWithPayload(response http.ResponseWriter, request *http.Request, requestPayload types.Payload) error {
 	var err error = nil
 
-	if requestPayload.Action != "opened" && requestPayload.Action != "synchronize" {
-		log.Println("Event is neither a pull request \"opened\" nor a pull request \"synchronize\". Ignoring.")
+	_, isPresent := pullRequestActions[requestPayload.Action]
+	if !isPresent {
+		log.Println("Event is neither a pull request \"opened\" nor a pull request \"synchronize\" or a pull request \"reopened\". Ignoring.")
 	} else {
+
+		// We know we are dealing with a pull request POST now... so it should have a payload.
 
 		// The location of the pull request.
 		pullRequestUrl := requestPayload.PullRequest.Url
