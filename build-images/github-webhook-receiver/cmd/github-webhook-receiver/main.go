@@ -4,16 +4,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"net/http"
-
 	cmd "github.com/galasa-dev/automation/build-images/github-webhook-receiver/pkg/cmd"
 	"github.com/galasa-dev/automation/build-images/github-webhook-receiver/pkg/env"
+	"github.com/galasa-dev/automation/build-images/github-webhook-receiver/pkg/types"
 )
 
 var (
@@ -77,17 +79,57 @@ func handler(response http.ResponseWriter, request *http.Request) {
 	// Log the request we've just been sent
 	logRequest(request)
 
-	// The location of the pull request.
-	// TODO: Should be found from the request message body.
-	pullRequestUrl := ""
+	bytes, err := io.ReadAll(request.Body)
 
-	statusUrl := ""
-	githubIssueUrl := ""
+	if err != nil {
+		log.Println("Failed to read the message payload")
+		fmt.Fprintf(response, "Failed to read the message payload.")
+		response.WriteHeader(http.StatusBadRequest)
+	} else {
 
-	updateStatus("Pending...", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
+		var requestPayload types.Payload
+		err = json.Unmarshal(bytes, &requestPayload)
 
-	fmt.Fprintf(response, "OK")
-	// response.WriteHeader(http.StatusOK)
+		if err != nil {
+			log.Println("Failed to parse the message payload")
+			fmt.Fprintf(response, "Failed to parse the message payload.")
+			response.WriteHeader(http.StatusBadRequest)
+		} else {
+			_ = handlerWithPayload(response, request, requestPayload)
+		}
+	}
+}
+
+func handlerWithPayload(response http.ResponseWriter, request *http.Request, requestPayload types.Payload) error {
+	var err error = nil
+
+	if requestPayload.Action != "opened" && requestPayload.Action != "synchronize" {
+		log.Println("Event is neither a pull request \"opened\" nor a pull request \"synchronize\". Ignoring.")
+	} else {
+
+		// The location of the pull request.
+		pullRequestUrl := requestPayload.PullRequest.Url
+		statusUrl := requestPayload.PullRequest.StatusesUrl
+		githubIssueUrl := requestPayload.PullRequest.IssueUrl
+
+		log.Printf("Pull request URL = %s\n", pullRequestUrl)
+		log.Printf("Status URL = %s\n", statusUrl)
+		log.Printf("gitHubIssue URL = %s\n", githubIssueUrl)
+
+		err = updateStatus("Pending...", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
+
+		if err != nil {
+			msg := "Couldn't update pull request state."
+			log.Println(msg)
+			fmt.Fprintf(response, msg)
+			response.WriteHeader(http.StatusInternalServerError)
+		} else {
+			msg := "OK"
+			log.Println(msg)
+			fmt.Fprintf(response, msg)
+		}
+	}
+	return err
 }
 
 // Logs a request, so we can see it on the output console.
@@ -98,16 +140,8 @@ func logRequest(request *http.Request) {
 }
 
 func logRequestBody(request *http.Request) {
-	body := request.Body
-
-	buffer := make([]byte, 1024)
-	var bytesRead int = 100
-	var err error = nil
-
-	for (bytesRead > 0) && (err == nil) {
-		bytesRead, err = body.Read(buffer)
-		log.Printf("%s", string(buffer))
-	}
+	body, _ := io.ReadAll(request.Body)
+	log.Printf("Body: %s\n", body)
 }
 
 func logRequestHeaders(request *http.Request) {
@@ -134,9 +168,20 @@ func updateStatus(status string, message string, githubToken string,
 	pullRequestUrl string, statusUrl string, githubIssueUrl string) error {
 
 	body := fmt.Sprintf("{\"state\":\"%s\", \"description\":\"%s\", \"context\":\"Tekton\"}", status, message)
+	log.Printf("Updating status . Body: %s\n", body)
+
 	req, _ := http.NewRequest("POST", statusUrl, strings.NewReader(body))
 	req.Header.Add("Accept", "application/vnd.github+json")
-	_, err := sendRequest(req, githubToken)
+	response, err := sendRequest(req, githubToken)
+	if err != nil {
+		if response.StatusCode == http.StatusOK {
+			log.Println("Github response code is OK")
+		} else {
+			log.Printf("Github response status code is %d", response.StatusCode)
+			responseBody, _ := io.ReadAll(response.Body)
+			log.Printf("Github response body : %s\n", &responseBody)
+		}
+	}
 	return err
 }
 
@@ -147,13 +192,9 @@ func sendRequest(req *http.Request, githubToken string) (*http.Response, error) 
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode == http.StatusAccepted {
-		return resp, err
-	}
-	if resp.StatusCode == http.StatusCreated {
-		return resp, err
-	}
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusAccepted ||
+		resp.StatusCode == http.StatusCreated ||
+		resp.StatusCode == http.StatusOK {
 		return resp, err
 	}
 	return resp, fmt.Errorf("bad response: %s", resp.Status)
