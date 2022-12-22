@@ -26,6 +26,10 @@ tests: source
 	go tool cover -html=build/coverage.out -o build/coverage.html
 	go tool cover -func=build/coverage.out > build/coverage.txt
 	cat build/coverage.txt
+	go test -v ./cmd/* -cover -coverprofile=build/coverage.out
+	go tool cover -html=build/coverage.out -o build/coverage.html
+	go tool cover -func=build/coverage.out > build/coverage.txt
+	cat build/coverage.txt
 
 source: ./cmd/github-webhook-receiver/*.go ./pkg/env/*.go ./pkg/cmd/*.go
 
