@@ -39,9 +39,10 @@ This directory is the single location for all Dockerfiles needed to build the im
 | Galasa runtime images | obrGeneric, bootEmbedded, ibmBootEmbedded | 
 | Galasa Eclipse plug-in | eclipse, eclipse-p2 |
 | Galasa Isolated build | isolated, isolatedZip |
-| Galasa CLI tools | galasabld | 
+| Galasa Integrated tests | inttests |
+| Galasa CLI tools | galasabld, galasactl | 
 | Galasa Javadoc | javadoc-maven-repo, javadoc-site |
-| Galasa Simplatform | simplatform, simplatform-amd64 |
+| Galasa Simplatform | simplatform, simplatform-amd64, simbank webapp |
 
 
 # Infrastructure
