@@ -202,6 +202,49 @@ branch-buildutils:
 The Docker image for the galasabld CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasabld/artifacts-tab).
 
 
+**CLI**
+
+These pipelines build the binaries for the galasactl CLI tool, the code for which is in the [CLI repository](https://github.com/galasa-dev/cli).
+
+pr-cli:
+1. git-verify
+1. clone-automation
+1. clone-framework
+1. clone-cli
+1. generate-api
+1. clear-mod
+1. clear-sum
+1. update-version
+1. get-commit
+1. galasactl-make
+1. docker-build-cli
+1. docker-build-cli-ibm
+1. docker-build-cli-binary
+1. git-status
+
+branch-cli:
+1. clone-automation
+1. clone-framework
+1. clone-cli
+1. check-branch
+1. generate-api
+1. clear-mod
+1. clear-sum
+1. update-version
+1. get-commit
+1. galasactl-make
+1. docker-build-cli
+1. docker-build-cli-ibm
+1. docker-build-cli-binary
+1. recycle-cli-binary
+1. wait-cli-binary
+
+The Docker image for the galasactl CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-amd64/artifacts-tab).
+
+The Docker image conatining the galasactl CLI binaries is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-binary-downloadables/artifacts-tab).
+
+The CLI binaries are downloadable from [here](https://development.galasa.dev/main/binary/cli).
+
 **Eclipse**
 
 These pipelines build the [Galasa Eclipse plug-in](https://github.com/galasa-dev/eclipse).
@@ -317,13 +360,119 @@ The Docker image for the Gradle Maven repo is [here](https://harbor.galasa.dev/h
 The Gradle Maven repository is [here](https://development.galasa.dev/main/maven-repo/gradle).
 
 
+**Integrated tests**
+
+These pipelines build the [Galasa Integrated tests](https://github.com/galasa-dev/integratedtests)
+
+pr-integratedtests:
+1. git-verify
+1. clone-automation
+1. clone-inttests
+1. get-commit
+1. branch-gradle-build-inttests
+1. branch-maven-build-inttests
+1. branch-docker-build-inttests
+1. git-status
+
+branch-integratedtests:
+1. clone-automation
+1. clone-inttests
+1. check-branch
+1. get-commit
+1. branch-gradle-build-inttests
+1. branch-maven-build-inttests
+1. branch-docker-build-inttests
+1. recycle-deployment
+1. wait-deployment
+
+The Docker image for the Integrated tests Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-inttests/artifacts-tab).
+
+The Integrated tests Maven repository is [here](https://development.galasa.dev/main/maven-repo/inttests).
+
 **Isolated**
 
 _Documentation to be written._
 
 pr-isolated:
+1. git-verify
+1. clone-automation
+1. clone-obr
+1. clone-framework
+1. clone-extensions
+1. clone-isolated
+1. generate-pom
+1. maven-build-isolated1
+1. maven-build-isolated2
+1. maven-build-isolated3
+1. maven-build-isolated4
+1. maven-build-isolated5
+1. maven-build-isolated6
+1. maven-build-javadoc
+1. maven-build-docs
+1. copy-text-files
+1. docker-build-isolated
+1. docker-build-tar-isolated
+1. maven-build-isolated-zip
+1. docker-build-isolated-zip
+1. generate-pom-mvp
+1. maven-build-mvp1
+1. maven-build-mvp2
+1. maven-build-mvp3
+1. maven-build-mvp4
+1. maven-build-mvp5
+1. maven-build-mvp6
+1. maven-build-javadoc-mvp
+1. maven-build-docs-mvp
+1. copy-text-files-mvp
+1. docker-build-mvp
+1. docker-build-tar-mvp
+1. maven-build-mvp-zip
+1. docker-build-mvp-zip
+1. git-status
 
 branch-isolated:
+1. clone-automation
+1. clone-obr
+1. clone-framework
+1. clone-extensions
+1. clone-isolated
+1. check-branch
+1. generate-pom
+1. maven-build-isolated1
+1. maven-build-isolated2
+1. maven-build-isolated3
+1. maven-build-isolated4
+1. maven-build-isolated5
+1. maven-build-isolated6
+1. maven-build-javadoc
+1. maven-build-docs
+1. copy-text-files
+1. docker-build-isolated
+1. docker-build-tar-isolated
+1. maven-build-isolated-zip
+1. docker-build-isolated-zip
+1. recylce-deployment
+1. wait-deployment
+1. generate-pom-mvp
+1. maven-build-mvp1
+1. maven-build-mvp2
+1. maven-build-mvp3
+1. maven-build-mvp4
+1. maven-build-mvp5
+1. maven-build-mvp6
+1. maven-build-javadoc-mvp
+1. maven-build-docs-mvp
+1. copy-text-files-mvp
+1. docker-build-mvp
+1. docker-build-tar-mvp
+1. maven-build-mvp-zip
+1. docker-build-mvp-zip
+1. recylce-deployment-mvp
+1. wait-deployment-mvp
+
+The Docker image for the isolated build is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-isolated/artifacts-tab).
+
+The isolated Maven repository is [here](https://development.galasa.dev/main/maven-repo/isolated).
 
 
 **Managers**
@@ -714,6 +863,17 @@ Parameters:
 
 This task uses the custom [kubectl image](https://harbor.galasa.dev/harbor/projects/5/repositories/kubectl/artifacts-tab).
 
+
+### script
+
+This task is used to perform a script.
+
+Parameters:
+* context: The directory to perform the command in.
+* script: A string containing the script to be performed
+* image: By default this uses busybox to contain most commands likely needed. However if other commands are needed then a custom image can be passed here.
+
+This task, by default, uses the latest [busybox image](https://hub.docker.com/_/busybox). Unless, an image is passed as a paramter.
 
 ### tkn-cli
 
