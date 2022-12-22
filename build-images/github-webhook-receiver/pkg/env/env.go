@@ -1,5 +1,5 @@
 /*
- * Copyright contributors to the Galasa Project
+ * Copyright contributors to the Galasa project
  */
 package env
 
@@ -25,3 +25,5 @@ func ValidateGitHubToken(token string) error {
 	}
 	return err
 }
+
+
