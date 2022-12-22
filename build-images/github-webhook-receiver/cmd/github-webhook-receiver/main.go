@@ -140,7 +140,7 @@ func handlerWithPayload(response http.ResponseWriter, request *http.Request, req
 		log.Printf("Status URL = %s\n", statusUrl)
 		log.Printf("gitHubIssue URL = %s\n", githubIssueUrl)
 
-		err = updateStatus("Pending...", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
+		err = updateStatus("pending", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
 
 		if err != nil {
 			msg := "Couldn't update pull request state."
@@ -171,7 +171,7 @@ func fail(err error) {
 
 // updateStatus() - Tells the pull request to update it's status for the tekton build.
 // Parameters:
-// status : The status id to update
+// status : The status to set. "error" "failure" "pending" or "success"
 // message : The text message to display against this status id
 // pullRequestUrl : The URL where the pull request is located.
 // statusUrl : The URL of where status should be posted into github.
@@ -186,12 +186,17 @@ func updateStatus(status string, message string, githubToken string,
 	req.Header.Add("Accept", "application/vnd.github+json")
 	response, err := sendRequest(req, githubToken)
 	if err != nil {
+		log.Printf("Failed to send POST request to github. Reason %s\n", err.Error())
+	} else {
+		log.Println("Github responded to the POST request.")
+
 		if response.StatusCode == http.StatusOK {
 			log.Println("Github response code is OK")
 		} else {
 			log.Printf("Github response status code is %d", response.StatusCode)
-			responseBody, _ := io.ReadAll(response.Body)
-			log.Printf("Github response body : %s\n", &responseBody)
+			responseBodyBytes, _ := io.ReadAll(response.Body)
+			responseBody := string(responseBodyBytes[:])
+			log.Printf("Github response body : %s\n", responseBody)
 		}
 	}
 	return err
