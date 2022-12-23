@@ -77,35 +77,57 @@ func main() {
 func handler(response http.ResponseWriter, request *http.Request) {
 
 	// Log the request we've just been sent
-	logRequest(request)
+	logRequestHeaders(request)
 
-	bytes, err := io.ReadAll(request.Body)
-
-	if err != nil {
-		log.Println("Failed to read the message payload")
-		fmt.Fprintf(response, "Failed to read the message payload.")
-		response.WriteHeader(http.StatusBadRequest)
+	if request.Method != "POST" {
+		// We don't care about things which are not posting.
+		log.Printf("HTTP request arrived of type %s. We only care about POST requests.\n", request.Method)
 	} else {
-
-		var requestPayload types.Payload
-		err = json.Unmarshal(bytes, &requestPayload)
+		bytes, err := io.ReadAll(request.Body)
 
 		if err != nil {
-			log.Println("Failed to parse the message payload")
-			fmt.Fprintf(response, "Failed to parse the message payload.")
-			response.WriteHeader(http.StatusBadRequest)
+			msg := "Failed to read the message payload"
+			log.Println(msg)
+			http.Error(response, msg, http.StatusBadRequest)
 		} else {
-			_ = handlerWithPayload(response, request, requestPayload)
+
+			requestPayload, err := unmarshallPayload(bytes)
+
+			if err != nil {
+				msg := fmt.Sprintf("Failed to parse the message payload. %s\n", err.Error())
+				log.Println(msg)
+				http.Error(response, msg, http.StatusBadRequest)
+			} else {
+				_ = handlerWithPayload(response, request, *requestPayload)
+			}
 		}
 	}
 }
 
+func unmarshallPayload(bytes []byte) (*types.Payload, error) {
+	var requestPayload *types.Payload
+	requestPayload = new(types.Payload)
+	err := json.Unmarshal(bytes, requestPayload)
+	if err != nil {
+		// An error, so free up the memory.
+		requestPayload = nil
+	}
+	return requestPayload, err
+}
+
+// List the "action" field value we want to take notice of and process.
+// Anything else in the "action" field we ignore and just return success.
+var pullRequestActions = map[string]string{"opened": "opened", "synchronize": "synchronize", "reopened": "reopened"}
+
 func handlerWithPayload(response http.ResponseWriter, request *http.Request, requestPayload types.Payload) error {
 	var err error = nil
 
-	if requestPayload.Action != "opened" && requestPayload.Action != "synchronize" {
-		log.Println("Event is neither a pull request \"opened\" nor a pull request \"synchronize\". Ignoring.")
+	_, isPresent := pullRequestActions[requestPayload.Action]
+	if !isPresent {
+		log.Println("Event is neither a pull request \"opened\" nor a pull request \"synchronize\" or a pull request \"reopened\". Ignoring.")
 	} else {
+
+		// We know we are dealing with a pull request POST now... so it should have a payload.
 
 		// The location of the pull request.
 		pullRequestUrl := requestPayload.PullRequest.Url
@@ -116,13 +138,12 @@ func handlerWithPayload(response http.ResponseWriter, request *http.Request, req
 		log.Printf("Status URL = %s\n", statusUrl)
 		log.Printf("gitHubIssue URL = %s\n", githubIssueUrl)
 
-		err = updateStatus("Pending...", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
+		err = updateStatus("pending", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
 
 		if err != nil {
 			msg := "Couldn't update pull request state."
 			log.Println(msg)
-			fmt.Fprintf(response, msg)
-			response.WriteHeader(http.StatusInternalServerError)
+			http.Error(response, msg, http.StatusInternalServerError)
 		} else {
 			msg := "OK"
 			log.Println(msg)
@@ -130,18 +151,6 @@ func handlerWithPayload(response http.ResponseWriter, request *http.Request, req
 		}
 	}
 	return err
-}
-
-// Logs a request, so we can see it on the output console.
-func logRequest(request *http.Request) {
-	log.Printf("URL : %s\n", request.URL)
-	logRequestHeaders(request)
-	logRequestBody(request)
-}
-
-func logRequestBody(request *http.Request) {
-	body, _ := io.ReadAll(request.Body)
-	log.Printf("Body: %s\n", body)
 }
 
 func logRequestHeaders(request *http.Request) {
@@ -159,7 +168,7 @@ func fail(err error) {
 
 // updateStatus() - Tells the pull request to update it's status for the tekton build.
 // Parameters:
-// status : The status id to update
+// status : The status to set. "error" "failure" "pending" or "success"
 // message : The text message to display against this status id
 // pullRequestUrl : The URL where the pull request is located.
 // statusUrl : The URL of where status should be posted into github.
@@ -174,12 +183,17 @@ func updateStatus(status string, message string, githubToken string,
 	req.Header.Add("Accept", "application/vnd.github+json")
 	response, err := sendRequest(req, githubToken)
 	if err != nil {
+		log.Printf("Failed to send POST request to github. Reason %s\n", err.Error())
+	} else {
+		log.Println("Github responded to the POST request.")
+
 		if response.StatusCode == http.StatusOK {
 			log.Println("Github response code is OK")
 		} else {
 			log.Printf("Github response status code is %d", response.StatusCode)
-			responseBody, _ := io.ReadAll(response.Body)
-			log.Printf("Github response body : %s\n", &responseBody)
+			responseBodyBytes, _ := io.ReadAll(response.Body)
+			responseBody := string(responseBodyBytes[:])
+			log.Printf("Github response body : %s\n", responseBody)
 		}
 	}
 	return err
