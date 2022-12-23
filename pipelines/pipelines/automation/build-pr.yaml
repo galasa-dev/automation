@@ -6,6 +6,8 @@ kind: Pipeline
 metadata:
   name: pr-automation
   namespace: galasa-build
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   workspaces:
   - name: git-workspace
