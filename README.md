@@ -392,7 +392,7 @@ The Integrated tests Maven repository is [here](https://development.galasa.dev/m
 
 **Isolated**
 
-_Documentation to be written._
+These pipelines build the isolated and mvp images which are used to install Galasa offline. [Galasa Isolated](https://github.com/galasa-dev/isolated) 
 
 pr-isolated:
 1. git-verify
@@ -473,8 +473,13 @@ branch-isolated:
 
 The Docker image for the isolated build is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-isolated/artifacts-tab).
 
-The isolated Maven repository is [here](https://development.galasa.dev/main/maven-repo/isolated).
+The Docker image for isolated.tar is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-distribution/artifacts-tab). This image may be used if you want to host Galasa on an internal server to be accessed by other users. 
 
+The isolated zip file can be downloaded from [here](https://development.galasa.dev/main/maven-repo/isolated). It can then be extracted. The Docker image for this is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-isolated-zip/artifacts-tab).
+
+The Docker image for the mvp build is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-mvp/artifacts-tab). The mvp is similar to isolated but contains only the most used and most stable managers and tests.
+
+The mvp zip file can be downloaded from [here](https://development.galasa.dev/main/maven-repo/mvp). It can then be extracted. The Docker image for this is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-mvp-zip/artifacts-tab).
 
 **Managers**
 
