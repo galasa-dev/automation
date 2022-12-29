@@ -256,7 +256,7 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)
-    - name:
+    - name: command
       value:    
         - jacocofetch
         - --results 
