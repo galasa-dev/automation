@@ -169,7 +169,7 @@ spec:
     - name: context       
       value: $(context.pipelineRun.name)
     - name: settingsLocation
-      value: $(context.pipelineRun.name)/obr/settings.xml
+      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
     - name: buildArgs
       value: 
         - -Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr
