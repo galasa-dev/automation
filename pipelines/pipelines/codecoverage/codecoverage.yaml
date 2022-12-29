@@ -220,7 +220,7 @@ spec:
         - --override
         - java.jacoco.code.coverage=true
         - --override
-        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/$(params.distBranch)/execs
+        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/main/execs
         - --override
         - java.jacoco.save.credentials=JACOCO
         - --override
