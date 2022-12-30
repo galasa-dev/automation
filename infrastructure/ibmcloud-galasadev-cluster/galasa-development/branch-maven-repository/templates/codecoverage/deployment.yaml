@@ -1,0 +1,31 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.codecov.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codecov-{{ .Values.codecov.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codecov-{{ .Values.codecov.branch }}
+  template:
+    metadata:
+      name: codcodecovecoverage-{{ .Values.codecov.branch }}
+      labels:
+        app: codecov-{{ .Values.codecov.branch }}
+    spec:
+      containers:
+        - image: {{ .Values.codecov.imageName }}:{{ .Values.codecov.imageTag }}
+          imagePullPolicy: Always
+          name: codecov-{{ .Values.codecov.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.codecov.branch }}/codecov
+          ports:
+            - containerPort: 80
+{{ end }}
