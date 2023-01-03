@@ -176,7 +176,7 @@ spec:
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
     - name: command
       value: 
-        - process-resources      
+        - process-sources      
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
