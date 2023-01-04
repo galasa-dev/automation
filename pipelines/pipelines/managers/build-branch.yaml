@@ -105,6 +105,7 @@ spec:
         - "-PsourceMaven=https://development.galasa.dev/$(params.fromBranch)/maven-repo/extensions"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
+        - "-PjacocoEnabled=true"
     - name: command
       value: 
         - check
