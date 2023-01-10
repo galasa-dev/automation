@@ -203,7 +203,7 @@ spec:
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
         - --throttle
-        - '1'
+        - '5'
         # - --throttlefile
         # - throttle
         - --poll
