@@ -271,7 +271,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-javadocs  
+    - wait-javadoc  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
