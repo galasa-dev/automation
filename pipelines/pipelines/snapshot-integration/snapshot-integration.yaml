@@ -389,37 +389,73 @@ spec:
       - apps:Deployment:p2-$(params.imageTag)
       - --health         
 
-  # - name: snapshot-apidocs
-  #   taskRef:
-  #     name: docker-build
-  #   runAfter:
-  #   - snapshot-p2  
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name) 
-  #   - name: context
-  #     value: $(context.pipelineRun.name) 
-  #   - name: dockerfilePath
-  #     value: automation/dockerfiles/snapshots/repo-dockerfile
-  #   - name: imageName
-  #     value: harbor.galasa.dev/galasadev/galasa-apidocs:$(params.toBranch)
-  #   - name: noPush
-  #     value: ""
-  #   - name: buildArgs
-  #     value:
-  #       - "--build-arg=dockerRepository=harbor.galasa.dev"         
-  #       - "--build-arg=image=galasa-apidocs"   
-  #       - "--build-arg=oldBranch=$(params.fromBranch)"   
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace      
+  - name: snapshot-javadoc-site
+    taskRef:
+      name: docker-build
+    runAfter:
+    - wait-p2  
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/repo-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.toBranch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasa-javadoc-site"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
+
+  - name: recycle-javadoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-javadoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - javadoc-site-$(params.imageTag)
+  - name: wait-javadoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-p2
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:javadoc-site-$(params.imageTag)
+      - --health         
 
 
   - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-apidocs  
+    - wait-javadoc-site  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
