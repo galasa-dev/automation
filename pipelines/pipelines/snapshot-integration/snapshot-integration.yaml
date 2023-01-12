@@ -106,7 +106,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-obr   
+    - snapshot-obr   
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -168,7 +168,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-mvp  
+    - snapshot-mvp  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -229,7 +229,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-isolated  
+    - snapshot-isolated  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -290,7 +290,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-javadoc  
+    - snapshot-javadoc  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -351,7 +351,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-eclipse  
+    - snapshot-eclipse  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -412,7 +412,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-p2  
+    - snapshot-p2  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -474,7 +474,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-javadoc-site  
+    - snapshot-javadoc-site  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
