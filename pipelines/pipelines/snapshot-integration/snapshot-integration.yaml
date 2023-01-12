@@ -65,48 +65,48 @@ spec:
      - name: git-workspace
        workspace: git-workspace     
 
-  # - name: recycle-obr
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-obr
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - obr-$(params.imageTag)
-  # - name: wait-obr
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-obr
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:obr-$(params.imageTag)
-  #     - --health     
+  - name: recycle-obr
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-obr
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - obr-$(params.imageTag)
+  - name: wait-obr
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-obr
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:obr-$(params.imageTag)
+      - --health     
 
 
   - name: snapshot-mvp
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-obr   
+    - wait-obr   
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -127,48 +127,48 @@ spec:
      - name: git-workspace
        workspace: git-workspace  
 
-  # - name: recycle-mvp
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-mvp
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - mvp-$(params.imageTag)
-  # - name: wait-mvp
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-mvp
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:mvp-$(params.imageTag)
-  #     - --health      
+  - name: recycle-mvp
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-mvp
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - mvp-$(params.imageTag)
+  - name: wait-mvp
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-mvp
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:mvp-$(params.imageTag)
+      - --health      
 
 
   - name: snapshot-isolated
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-mvp  
+    - wait-mvp  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -189,47 +189,47 @@ spec:
      - name: git-workspace
        workspace: git-workspace  
 
-  # - name: recycle-isolated
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-isolated
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - isolated-$(params.imageTag)
-  # - name: wait-isolated
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-isolated
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:isolated-$(params.imageTag)
-  #     - --health        
+  - name: recycle-isolated
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-isolated
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - isolated-$(params.imageTag)
+  - name: wait-isolated
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-isolated
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:isolated-$(params.imageTag)
+      - --health        
 
   - name: snapshot-javadoc
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-isolated  
+    - wait-isolated  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -250,47 +250,47 @@ spec:
      - name: git-workspace
        workspace: git-workspace   
 
-  # - name: recycle-javadoc
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-javadoc
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - javadoc-$(params.imageTag)
-  # - name: wait-javadoc
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-javadoc
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:javadoc-$(params.imageTag)
-  #     - --health         
+  - name: recycle-javadoc
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-javadoc
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - javadoc-$(params.imageTag)
+  - name: wait-javadoc
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-javadoc
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:javadoc-$(params.imageTag)
+      - --health         
 
   - name: snapshot-eclipse
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-javadoc  
+    - wait-javadoc  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -311,47 +311,47 @@ spec:
      - name: git-workspace
        workspace: git-workspace      
 
-  # - name: recycle-eclipse
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-eclipse
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - eclipse-$(params.imageTag)
-  # - name: wait-eclipse
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-eclipse
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:eclipse-$(params.imageTag)
-  #     - --health      
+  - name: recycle-eclipse
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-eclipse
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - eclipse-$(params.imageTag)
+  - name: wait-eclipse
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-eclipse
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:eclipse-$(params.imageTag)
+      - --health      
 
   - name: snapshot-p2
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-eclipse  
+    - wait-eclipse  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -372,47 +372,47 @@ spec:
      - name: git-workspace
        workspace: git-workspace    
 
-  # - name: recycle-p2
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-p2
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - p2-$(params.imageTag)
-  # - name: wait-p2
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-p2
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:p2-$(params.imageTag)
-  #     - --health         
+  - name: recycle-p2
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-p2
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - p2-$(params.imageTag)
+  - name: wait-p2
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-p2
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:p2-$(params.imageTag)
+      - --health         
 
   - name: snapshot-javadoc-site
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-p2  
+    - wait-p2  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -433,48 +433,48 @@ spec:
      - name: git-workspace
        workspace: git-workspace     
 
-  # - name: recycle-javadoc-site
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - snapshot-javadoc-site
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - javadocsite-$(params.imageTag)
-  # - name: wait-javadoc-site
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-p2
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:javadocsite-$(params.imageTag)
-  #     - --health         
+  - name: recycle-javadoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-javadoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - javadoc-site-$(params.imageTag)
+  - name: wait-javadoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-p2
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:javadoc-site-$(params.imageTag)
+      - --health         
 
 
   - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
     runAfter:
-    - snapshot-javadoc-site  
+    - wait-javadoc-site  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
