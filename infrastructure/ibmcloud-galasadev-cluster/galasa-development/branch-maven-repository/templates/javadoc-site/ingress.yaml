@@ -54,6 +54,6 @@ spec:
             name: javadocsite-{{ .Values.javadocsite.branch }}
             port:
               number: 80
-        path: /{{ .Values.javadocsite.branch }}/javadocsite
+        path: /{{ .Values.javadocsite.branch }}/javadoc-site
         pathType: Prefix
 {{ end }}
