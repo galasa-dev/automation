@@ -115,13 +115,13 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/repo-dockerfile
     - name: imageName
-      value: icr.io/galasadev/galasa-mvp:$(params.toBranch)
+      value: icr.io/galasadev/galasa-mvp-zip:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=icr.io"         
-        - "--build-arg=image=galasa-mvp"   
+        - "--build-arg=image=galasa-mvp-zip"   
         - "--build-arg=oldBranch=$(params.fromBranch)"   
     workspaces:
      - name: git-workspace
@@ -177,13 +177,13 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/repo-dockerfile
     - name: imageName
-      value: icr.io/galasadev/galasa-isolated:$(params.toBranch)
+      value: icr.io/galasadev/galasa-isolated-zip:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=icr.io"         
-        - "--build-arg=image=galasa-isolated"   
+        - "--build-arg=image=galasa-isolated-zip"   
         - "--build-arg=oldBranch=$(params.fromBranch)"   
     workspaces:
      - name: git-workspace
