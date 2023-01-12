@@ -1,0 +1,63 @@
+# #
+# # Copyright contributors to the Galasa project 
+# # 
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: javadoc-site
+#   namespace: galasa-development
+# spec:
+#   revisionHistoryLimit: 1
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: javadoc-site
+#   template:
+#     metadata:
+#       name: javadoc-site
+#       labels:
+#         app: javadoc-site
+#     spec:
+#       containers:
+#         - image: harbor.galasa.dev/galasadev/galasa-javadoc-site:main
+#           imagePullPolicy: Always
+#           name: javadoc-site
+#           env:
+#           - name: CONTEXTROOT
+#             value: /main/javadoc-site
+#           ports:
+#             - containerPort: 80
+#               name: javadoc-site
+
+
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.javadocsite.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javadocsite-{{ .Values.javadocsite.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: javadocsite-{{ .Values.javadocsite.branch }}
+  template:
+    metadata:
+      name: javadocsite-{{ .Values.javadocsite.branch }}
+      labels:
+        app: javadocsite-{{ .Values.javadocsite.branch }}
+    spec:
+      containers:
+        - image: {{ .Values.javadocsite.imageName }}:{{ .Values.javadocsite.imageTag }}
+          imagePullPolicy: Always
+          name: javadocsite-{{ .Values.javadocsite.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.javadocsite.branch }}/javadoc-site
+          ports:
+            - containerPort: 80
+{{ end }}              
