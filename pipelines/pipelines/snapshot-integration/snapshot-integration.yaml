@@ -451,7 +451,7 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - javadoc-site-$(params.imageTag)
+      - javadocsite-$(params.imageTag)
   - name: wait-javadoc-site
     taskRef:
       name: argocd-cli
@@ -466,7 +466,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:javadoc-site-$(params.imageTag)
+      - apps:Deployment:javadocsite-$(params.imageTag)
       - --health         
 
 
