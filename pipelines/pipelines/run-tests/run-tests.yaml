@@ -17,9 +17,23 @@ spec:
   #   type: string
   #   default: main-maven-repos
   tasks:
+  - name: ls
+    taskRef:
+      name: script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value: 'ls -la' 
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
+
   - name: run-prepare
     taskRef: 
       name: galasactl
+    runAfter:
+    - ls  
     params:
     - name: context
       value: $(context.pipelineRun.name)
