@@ -1,0 +1,47 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: tag-branch
+spec:
+  params:
+  - name: repo
+    type: string
+  - name: distBranch
+    type: string
+  - name: tag
+    type: string
+  - name: dockerRepo
+    type: string
+    default: harbor.galasa.dev
+#
+#
+#
+  steps: 
+#
+#
+#
+  - name: tag-branch
+    image: $(params.dockerRepo)/galasadev/galasabld
+    command:
+    - galasabld
+    - github
+    - branch
+    - tag
+    - --repository
+    - $(params.repo)
+    - --branch
+    - $(params.distBranch)
+    - --tag
+    - $(params.tag)
+    - --credentials
+    - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+    volumeMounts:
+    - name: githubcreds
+      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
+  volumes:
+    - name: githubcreds
+      secret:
+        secretName: github-creds // JADE TO DO - FIND EQUIVALENT 
