@@ -1,0 +1,173 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-clone-galasa
+spec:
+  params:
+  - name: distBranch
+    type: string
+  - name: fromBranch
+    type: string
+  - name: overwrite
+    type: string
+    default: ""
+  - name: force
+    type: string
+    default: ""
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: clone-branch-automation
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: automation
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-wrapping
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: wrapping
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-gradle
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: gradle
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-maven
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: maven
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-framework
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: framework
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-extensions
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: extensions
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-managers
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: managers
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-obr
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: obr
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-eclipse
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: eclipse
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
+#
+#
+#
+  - name: clone-branch-isolated
+    taskRef: 
+      name: clone-branch
+    params:
+    - name: repo
+      value: isolated
+    - name: distBranch
+      value: $(params.distBranch)
+    - name: fromBranch
+      value: $(params.fromBranch)
+    - name: force
+      value: $(params.force)
