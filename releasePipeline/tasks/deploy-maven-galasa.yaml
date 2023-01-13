@@ -1,0 +1,49 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-maven-galasa
+spec:
+  params:
+  - name: version
+    type: string
+  - name: repository
+    type: string
+  - name: dockerRepo
+    type: string
+  steps: 
+  - name: cat
+    image: $(params.dockerRepo)/galasadev/galasa-obr:{{ .Values.branch }} // JADE TO DO - WHAT SHOULD THIS BE?
+    imagePullPolicy: Always
+    command:
+    - cat
+    - /workspace/git/$(context.pipelineRun.name)/creds/mavencreds.yaml
+    volumeMounts:
+    - name: mavencreds
+      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
+  - name: deploy-maven
+    image: $(params.dockerRepo)/galasadev/galasa-obr:{{ .Values.branch }}
+    imagePullPolicy: Always
+    command:
+    - /usr/local/apache2/htdocs/galasabld
+    - maven
+    - deploy
+    - --repository
+    - $(params.repository)
+    - --local
+    - /usr/local/apache2/htdocs
+    - --group
+    - dev.galasa
+    - --version
+    - $(params.version)
+    - --credentials
+    - /workspace/git/$(context.pipelineRun.name)/creds/mavencreds.yaml
+    volumeMounts:
+    - name: mavencreds
+      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
+  volumes:
+    - name: mavencreds
+      secret:
+        secretName: maven-creds // JADE TO DO - FIND EQUIVALENT
