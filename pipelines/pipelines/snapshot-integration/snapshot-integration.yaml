@@ -522,10 +522,10 @@ spec:
 
 
   - name: trigger-run-tests
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
+    # when:
+    #   - input: "$(params.toBranch)"
+    #     operator: in
+    #     values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
