@@ -1,0 +1,76 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: run-tests
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  # params:
+  # - name: imageTag
+  #   type: string
+  #   default: main
+  # - name: appname
+  #   type: string
+  #   default: main-maven-repos
+  tasks:
+  - name: run-prepare
+    taskRef: 
+      name: galasactl
+  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - runs 
+        - prepare 
+        - --bootstrap 
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
+        - --stream 
+        - inttests 
+        - --portfolio 
+        - test.yaml 
+        - --test 
+        - local.CoreLocalJava11Ubuntu
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
+  - name: run-submit
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - run-prepare
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - runs 
+        - submit 
+        - --bootstrap 
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
+        - --portfolio 
+        - test.yaml 
+        - --throttle 
+        - '10' 
+        - --poll 
+        - '10' 
+        - --progress 
+        - '1' 
+        - --override 
+        - galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr 
+        - --override 
+        - galasaecosystem.docker.version=integration 
+        - --reportyaml 
+        - tests.yaml 
+        - --reportjson 
+        - tests.json 
+        - --reportjunit 
+        - junit.xml
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace       

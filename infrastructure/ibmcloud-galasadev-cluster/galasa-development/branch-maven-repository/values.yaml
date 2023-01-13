@@ -69,6 +69,11 @@ javadoc:
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
   imageTag: main
+javadocsite:
+  deploy: false
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
+  imageTag: main  
 mvp:
   deploy: false
   branch: main
