@@ -21,6 +21,5 @@ spec:
     image: harbor.galasa.dev/galasadev/galasa-cli-amd64:main
     imagePullPolicy: Always
     command:
-    - ls -la
     - galasactl
     - $(params.command[*])
