@@ -1,0 +1,59 @@
+# #
+# # Copyright contributors to the Galasa project 
+# # 
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: javadoc-site
+#   namespace: galasa-development
+#   annotations:
+#     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+    
+# spec:
+#   tls:
+#   - hosts:
+#     - development.galasa.dev
+#     secretName: galasa-wildcard-cert
+#   rules:
+#   - host: development.galasa.dev
+#     http:
+#       paths:
+#       - backend:
+#           service:
+#             name: javadoc-site
+#             port:
+#               number: 80
+#         path: /main/javadoc-site
+#         pathType: Prefix
+
+
+
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.javadocsite.deploy }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: javadocsite-{{ .Values.javadocsite.branch }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+    
+spec:
+  tls:
+  - hosts:
+    - development.galasa.dev
+    secretName: galasa-wildcard-cert
+  rules:
+  - host: development.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: javadocsite-{{ .Values.javadocsite.branch }}
+            port:
+              number: 80
+        path: /{{ .Values.javadocsite.branch }}/javadoc-site
+        pathType: Prefix
+{{ end }}
