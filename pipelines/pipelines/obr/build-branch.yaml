@@ -372,11 +372,26 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  - name: cat-javadoc-pom
+    taskRef:
+      name: unix-command   
+    runAfter:
+    - generate-javadoc
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/obr/javadocs
+    - name: command
+      value:
+      - cat
+      - pom.xml       
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   - name: maven-build-javadoc
     taskRef: 
       name: maven-build
     runAfter: 
-    - generate-javadoc
+    - cat-javadoc-pom
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
