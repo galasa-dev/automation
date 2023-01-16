@@ -28,7 +28,7 @@ spec:
       galasactl runs prepare --bootstrap http://galasa-cicsk8s.hursley.ibm.com/bootstrap --stream inttests --portfolio test.yaml --test local.CoreLocalJava11Ubuntu 
       && galasactl runs submit --bootstrap http://galasa-cicsk8s.hursley.ibm.com/bootstrap --portfolio test.yaml --throttle 10 --poll 10 --progress 1 --override galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr --override galasaecosystem.docker.version=integration --reportyaml tests.yaml --reportjson tests.json --reportjunit junit.xml' 
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-amd64:main
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
