@@ -19,155 +19,241 @@ spec:
 #
 #
   - name: tag-branch-automation
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: automation
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - automation
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-wrapping
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: wrapping
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - wrapping
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-gradle
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: gradle
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - gradle
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-maven
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: maven
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - maven
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-framework
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: framework
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - framework
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-extensions
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: extensions
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - extensions
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-managers
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: managers
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - managers
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-obr
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: obr
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - obr
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-eclipse
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: eclipse
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - eclipse
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-isolated
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: isolated
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
-#
-#
-#
-  - name: tag-branch-docker
-    taskRef: 
-      name: tag-branch
-    params:
-    - name: repo
-      value: docker
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - isolated
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: tag-branch-cli
-    taskRef: 
-      name: tag-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: cli
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: tag
-      value: $(params.tag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - cli
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml

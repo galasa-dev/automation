@@ -2,6 +2,6 @@
 
 set -e
 
-kubectl delete namespace galasa-release
+# kubectl delete namespace galasa-release
 
 echo "Complete"

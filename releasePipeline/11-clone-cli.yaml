@@ -20,5 +20,3 @@ spec:
 #    value: "--overwrite"
 #  - name: force
 #    value: ""
-
-// CREATE PIPELINE
