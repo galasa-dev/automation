@@ -26,13 +26,22 @@ spec:
 #
   - name: clone-branch-cli
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: cli
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - cli
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
