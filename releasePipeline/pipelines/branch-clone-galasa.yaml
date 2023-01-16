@@ -26,148 +26,238 @@ spec:
 #
   - name: clone-branch-automation
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: automation
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - automation
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-wrapping
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: wrapping
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - wrapping
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-gradle
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: gradle
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - gradle
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-maven
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: maven
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - maven
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-framework
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: framework
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - framework
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-extensions
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: extensions
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - extensions
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-managers
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: managers
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - managers
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-obr
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: obr
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - obr
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-eclipse
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: eclipse
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - eclipse
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
   - name: clone-branch-isolated
     taskRef: 
-      name: clone-branch
+      name: galasabld
     params:
-    - name: repo
-      value: isolated
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: fromBranch
-      value: $(params.fromBranch)
-    - name: force
-      value: $(params.force)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - isolated
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
