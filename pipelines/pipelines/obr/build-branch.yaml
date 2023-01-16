@@ -341,7 +341,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:obr-$(paarams.imageTag)
+      - apps:Deployment:obr-$(params.imageTag)
       - --health
 
 ### JAVADOC
