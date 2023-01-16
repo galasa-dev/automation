@@ -17,7 +17,7 @@ spec:
   #   type: string
   #   default: main-maven-repos
   tasks:
-  - name: ls
+  - name: script
     taskRef:
       name: script
     params:
