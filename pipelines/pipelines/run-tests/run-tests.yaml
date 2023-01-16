@@ -17,77 +17,77 @@ spec:
   #   type: string
   #   default: main-maven-repos
   tasks:
-  - name: script
-    taskRef:
-      name: script
+  # - name: script
+  #   taskRef:
+  #     name: script
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: script
+  #     value: '
+  #     galasactl runs prepare --bootstrap http://galasa-cicsk8s.hursley.ibm.com/bootstrap --stream inttests --portfolio test.yaml --test local.CoreLocalJava11Ubuntu 
+  #     && galasactl runs submit --bootstrap http://galasa-cicsk8s.hursley.ibm.com/bootstrap --portfolio test.yaml --throttle 10 --poll 10 --progress 1 --override galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr --override galasaecosystem.docker.version=integration --reportyaml tests.yaml --reportjson tests.json --reportjunit junit.xml' 
+  #   - name: image
+  #     value: harbor.galasa.dev/galasadev/galasa-cli-amd64:busybox 
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace     
+
+  - name: run-prepare
+    taskRef: 
+      name: galasactl
+    # runAfter:
+    # - ls  
     params:
     - name: context
       value: $(context.pipelineRun.name)
-    - name: script
-      value: '
-      galasactl runs prepare --bootstrap http://galasa-cicsk8s.hursley.ibm.com/bootstrap --stream inttests --portfolio test.yaml --test local.CoreLocalJava11Ubuntu 
-      && galasactl runs submit --bootstrap http://galasa-cicsk8s.hursley.ibm.com/bootstrap --portfolio test.yaml --throttle 10 --poll 10 --progress 1 --override galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr --override galasaecosystem.docker.version=integration --reportyaml tests.yaml --reportjson tests.json --reportjunit junit.xml' 
-    - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-amd64:busybox 
+    - name: command
+      value:
+        - runs 
+        - prepare 
+        - --bootstrap 
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
+        - --stream 
+        - inttests 
+        - --portfolio 
+        - test.yaml 
+        - --test 
+        - local.CoreLocalJava11Ubuntu
     workspaces:
      - name: git-workspace
-       workspace: git-workspace     
-
-  # - name: run-prepare
-  #   taskRef: 
-  #     name: galasactl
-  #   runAfter:
-  #   - ls  
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: command
-  #     value:
-  #       - runs 
-  #       - prepare 
-  #       - --bootstrap 
-  #       - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
-  #       - --stream 
-  #       - inttests 
-  #       - --portfolio 
-  #       - test.yaml 
-  #       - --test 
-  #       - local.CoreLocalJava11Ubuntu
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace   
-  # - name: run-submit
-  #   taskRef: 
-  #     name: galasactl
-  #   runAfter:
-  #   - run-prepare
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: command
-  #     value:
-  #       - runs 
-  #       - submit 
-  #       - --bootstrap 
-  #       - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
-  #       - --portfolio 
-  #       - test.yaml 
-  #       - --throttle 
-  #       - '10' 
-  #       - --poll 
-  #       - '10' 
-  #       - --progress 
-  #       - '1' 
-  #       - --override 
-  #       - galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr 
-  #       - --override 
-  #       - galasaecosystem.docker.version=integration 
-  #       - --reportyaml 
-  #       - tests.yaml 
-  #       - --reportjson 
-  #       - tests.json 
-  #       - --reportjunit 
-  #       - junit.xml
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace       
+       workspace: git-workspace   
+  - name: run-submit
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - run-prepare
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - runs 
+        - submit 
+        - --bootstrap 
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
+        - --portfolio 
+        - test.yaml 
+        - --throttle 
+        - '10' 
+        - --poll 
+        - '10' 
+        - --progress 
+        - '1' 
+        - --override 
+        - galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr 
+        - --override 
+        - galasaecosystem.docker.version=integration 
+        - --reportyaml 
+        - tests.yaml 
+        - --reportjson 
+        - tests.json 
+        - --reportjunit 
+        - junit.xml
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace       
