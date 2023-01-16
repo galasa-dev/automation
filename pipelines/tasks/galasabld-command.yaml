@@ -29,7 +29,12 @@ spec:
   #   volumeMounts:
   #   - name: githubcreds
   #     mountPath: /workspace/git/$(context.pipelineRun.name)/creds
+  #   - name: harborcreds
+  #     mountPath: /workspace/git/$(context.pipelineRun.name)/creds
   # volumes:
   #   - name: githubcreds
   #     secret:
   #       secretName: github-creds
+  #   - name: harborcreds
+  #     secret:
+  #       secretName: harbor-creds
