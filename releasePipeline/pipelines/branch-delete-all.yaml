@@ -17,35 +17,62 @@ spec:
 #######  Automation
 #
   - name: delete-branch-automation
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: automation
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - automation
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #######  Wrapping
 #
   - name: delete-branch-wrapping
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: wrapping
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - wrapping
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #######  Gradle
 #
   - name: delete-branch-gradle
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: gradle
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - gradle
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -61,13 +88,22 @@ spec:
 #######  Maven
 #
   - name: delete-branch-maven
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: maven
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - maven
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -83,13 +119,22 @@ spec:
 #######  Framework
 #
   - name: delete-branch-framework
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: framework
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - framework
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -105,13 +150,22 @@ spec:
 #######  Extensions
 #
   - name: delete-branch-extensions
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: extensions
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - extensions
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -127,13 +181,22 @@ spec:
 #######  Managers
 #
   - name: delete-branch-managers
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: managers
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - managers
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -149,13 +212,22 @@ spec:
 #######  Obr
 #
   - name: delete-branch-obr
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: obr
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - obr
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -226,13 +298,22 @@ spec:
 #######  Eclipse
 #
   - name: delete-branch-eclipse
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: eclipse
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - eclipse
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -259,13 +340,22 @@ spec:
 #######  Isolated
 #
   - name: delete-branch-isolated
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: isolated
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - isolated
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
@@ -311,27 +401,25 @@ spec:
     - name: image
       value: galasa-maven-mvp
 #
-#######  Docker
-#
-  - name: delete-branch-docker
-    taskRef: 
-      name: delete-branch
-    params:
-    - name: repo
-      value: docker
-    - name: distBranch
-      value: $(params.distBranch)
-#
 #######  CLI
 #
   - name: delete-branch-cli
-    taskRef: 
-      name: delete-branch
+    taskRef:
+      name: galasabld
     params:
-    - name: repo
-      value: cli
-    - name: distBranch
-      value: $(params.distBranch)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - cli
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
 #
 #
 #
