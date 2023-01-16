@@ -341,7 +341,7 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:obr-$(params.imageTag)
+      - apps:Deployment:obr-$(paarams.imageTag)
       - --health
 
 ### JAVADOC
@@ -374,7 +374,7 @@ spec:
        workspace: git-workspace
   - name: maven-build-javadoc
     taskRef: 
-      name: maven-build
+      name: maven-build-java18
     runAfter: 
     - generate-javadoc
     params:
