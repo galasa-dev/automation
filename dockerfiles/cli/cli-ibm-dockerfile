@@ -6,9 +6,8 @@ USER root
 
 COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
 COPY ibminter.pem /etc/ssl/certs/ibminter.pem
-COPY ibmca.pem /etc/ssl/certs/ibmca.pem
 RUN  cat /etc/ssl/certs/ibmroot.pem >> /etc/ssl/certs/ca-certificates.crt
 RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
-RUN  cat /etc/ssl/certs/ibmca.pem >> /etc/ssl/certs/ca-certificates.crt
+
 
 USER galasa
