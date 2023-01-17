@@ -4,7 +4,7 @@
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: galasactl-
+  generateName: cli-build-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
@@ -12,11 +12,18 @@ metadata:
 #
 #
 spec:
+  params:
+  - name: toBranch
+    value: release
+  - name: imageTag
+    value: release
+  - name: appname
+    value: cli-release-repo
 #
 #
 #
   pipelineRef:
-    name: galasactl-build
+    name: branch-cli
 #
 #
 #
