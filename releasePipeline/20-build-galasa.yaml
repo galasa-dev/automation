@@ -4,22 +4,22 @@
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: complete-
+  generateName: complete-build-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
-  - name: distBranch
+  - name: fromBranch
     value: release
-  - name: simplatformBranch
-    value: prod
+  - name: toBranch
+    value: release
   - name: refspec
-    value: +refs/heads/release:refs/heads/release
-  - name: jacocoEnabled
-    value: "false"
-  - name: isRelease
-    value: "true"
+    value: refs/heads/release:refs/heads/release
+  - name: imageTag
+    value: release
+  - name: appname
+    value: galasa-release-repo
   pipelineRef:
     name: complete-build
   podTemplate:
