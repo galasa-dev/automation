@@ -1,17 +1,15 @@
 #
 # Copyright contributors to the Galasa project 
 # 
-{{ if .Values.cli.deploy }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: cli-{{ .Values.cli.branch }}
-  name: cli-{{ .Values.cli.branch }}
+    app: cli-{{ .Values.branch }}
+  name: cli-{{ .Values.branch }}
   namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 80
   selector:
-    app: cli-{{ .Values.cli.branch }}
-{{ end }}
+    app: cli-{{ .Values.branch }}
