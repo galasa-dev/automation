@@ -7,4 +7,4 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 RUN sed -i "s/--branchname--/${branch}/"    /usr/local/apache2/conf/httpd.conf
 
-COPY bin/ /usr/local/apache2/htdocs/
+COPY bin/galasactl* /usr/local/apache2/htdocs/
