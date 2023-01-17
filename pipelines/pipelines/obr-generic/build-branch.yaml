@@ -330,7 +330,7 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
-    - trigger-isolated
+    - branch-docker-build-ibm-embedded
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
