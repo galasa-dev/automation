@@ -20,9 +20,6 @@ spec:
   - name: imageTag
     type: string
     default: main
-  - name: appname
-    type: string
-    default: main-maven-repos
   workspaces:
   - name: git-workspace
   tasks:
