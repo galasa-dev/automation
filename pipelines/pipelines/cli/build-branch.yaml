@@ -22,7 +22,7 @@ spec:
     default: main
   - name: appname
     type: string
-    default: main-maven-repos
+    default: main-cli
   workspaces:
   - name: git-workspace
   tasks:
