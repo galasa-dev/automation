@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 namespace: galasa-development
 branch: main
 imageName: harbor.galasa.dev/galasadev/galasa-inttests
