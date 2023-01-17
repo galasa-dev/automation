@@ -206,7 +206,7 @@ spec:
        workspace: git-workspace 
   - name: maven-build-bom
     taskRef:
-      name: maven-build-java18
+      name: maven-build
     runAfter: 
       - list-bom
     params:
@@ -344,7 +344,7 @@ spec:
        workspace: git-workspace
   - name: maven-build-javadoc
     taskRef: 
-      name: maven-build
+      name: maven-build-java18
     runAfter: 
     - generate-javadoc
     params:
