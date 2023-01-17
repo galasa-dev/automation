@@ -523,7 +523,7 @@ spec:
       - apps:Deployment:javadoc-site
       - --health
 
-  # Trigger obr-generic when doing a Main Build 
+  # Trigger obr-generic
   - name: trigger-obr-generic
     taskRef:
       name: tkn-cli
