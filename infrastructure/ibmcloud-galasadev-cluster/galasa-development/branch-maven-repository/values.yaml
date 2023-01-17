@@ -79,11 +79,6 @@ mvp:
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-mvp-zip
   imageTag: main
-simplatform:
-  deploy: false
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-simplatform
-  imageTag: main
 wrapping:
   deploy: false
   branch: main
