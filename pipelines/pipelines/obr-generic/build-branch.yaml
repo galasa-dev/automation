@@ -273,6 +273,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
+  # Trigger Isolated when doing a Main Build
   - name: trigger-isolated
     when:
       - input: "$(params.toBranch)"
@@ -318,7 +319,51 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace       
+       workspace: git-workspace  
+
+  # Trigger Eclipse when doing a Complete Build/Branch Build 
+  - name: trigger-eclipse
+    when:
+      - input: "$(params.toBranch)"
+        operator: notin
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - trigger-isolated
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-eclipse
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-eclipse-$(params.toBranch)
+      - --param
+      - fromObrBranch=$(params.toBranch)
+      - --param
+      - fromSimplatformBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace      
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
