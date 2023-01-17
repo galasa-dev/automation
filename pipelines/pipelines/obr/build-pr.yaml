@@ -344,7 +344,7 @@ spec:
        workspace: git-workspace
   - name: maven-build-javadoc
     taskRef: 
-      name: maven-build
+      name: maven-build-java18
     runAfter: 
     - generate-javadoc
     params:

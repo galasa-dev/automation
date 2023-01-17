@@ -9,4 +9,5 @@ COPY ibminter.pem /etc/ssl/certs/ibminter.pem
 RUN  cat /etc/ssl/certs/ibmroot.pem >> /etc/ssl/certs/ca-certificates.crt
 RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
 
+
 USER galasa
