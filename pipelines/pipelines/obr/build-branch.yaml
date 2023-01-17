@@ -523,12 +523,8 @@ spec:
       - apps:Deployment:javadoc-site
       - --health
 
-  #trigger obr-generic
+  # Trigger obr-generic when doing a Main Build 
   - name: trigger-obr-generic
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -564,94 +560,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
-
-       
-
-  #trigger simplatform
-  - name: trigger-simplatform
-    when:
-      - input: "$(params.toBranch)"
-        operator: notin
-        values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - wait-javadoc-site
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - branch-simplatform
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-simplatform-$(params.toBranch)
-      - --param
-      - fromBranch=$(params.toBranch)
-      - --param
-      - toBranch=$(params.toBranch)
-      - --param
-      - refspec=$(params.refspec)
-      - --param
-      - imageTag=$(params.imageTag)
-      - --param
-      - appname=$(params.appname)
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace 
-
-  # #trigger eclipse
-  # - name: trigger-eclipse
-  #   when:
-  #     - input: "$(params.toBranch)"
-  #       operator: notin
-  #       values: ["main"]
-  #   taskRef:
-  #     name: tkn-cli
-  #   runAfter:
-  #   - trigger-simplatform
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/automation
-  #   - name: command
-  #     value: 
-  #     - pipeline
-  #     - start
-  #     - branch-eclipse
-  #     - -n
-  #     - galasa-build
-  #     - --prefix-name 
-  #     - trigger-eclipse-$(params.toBranch)
-  #     - --param
-  #     - fromObrBranch=$(params.toBranch)
-  #     - --param
-  #     - fromSimplatformBranch=$(params.toBranch)
-  #     - --param
-  #     - toBranch=$(params.toBranch)
-  #     - --param
-  #     - refspec=$(params.refspec)
-  #     - --param
-  #     - imageTag=$(params.imageTag)
-  #     - --param
-  #     - appname=$(params.appname)
-  #     - --workspace
-  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-  #     - --pod-template
-  #     - ./pipelines/templates/pod-template.yaml
-  #     - --serviceaccount
-  #     - galasa-build-bot
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace           
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
