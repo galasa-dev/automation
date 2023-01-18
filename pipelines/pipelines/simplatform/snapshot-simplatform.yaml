@@ -5,6 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: snapshot-simplatform
+  namespace: galasa-build
 spec:
   workspaces:
   - name: git-workspace
@@ -13,6 +14,9 @@ spec:
     type: string
     default: main
   - name: toBranch
+    type: string
+    default: prod
+  - name: imageTag
     type: string
     default: prod
   - name: appname
@@ -57,7 +61,7 @@ spec:
       value: $(context.pipelineRun.name) 
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/repo-dockerfile
-    - name: imageTag
+    - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-simplatform:$(params.toBranch)
     - name: noPush
       value: ""
@@ -131,7 +135,7 @@ spec:
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"         
         - "--build-arg=image=galasa-simplatform-amd64"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"  
     workspaces:
      - name: git-workspace
        workspace: git-workspace

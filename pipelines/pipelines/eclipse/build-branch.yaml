@@ -250,12 +250,8 @@ spec:
       - --health    
 
 
-  # Trigger Isolated when doing a Complete Build/Branch Build
+  # Trigger Isolated
   - name: trigger-isolated
-    when:
-      - input: "$(params.toBranch)"
-        operator: notin
-        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:

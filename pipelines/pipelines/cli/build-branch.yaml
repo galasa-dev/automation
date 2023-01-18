@@ -8,9 +8,6 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: fromBranch
-    type: string
-    default: main
   - name: toBranch
     type: string
     default: main

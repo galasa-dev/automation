@@ -1,0 +1,47 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-clone-cli
+spec:
+  params:
+  - name: distBranch
+    type: string
+  - name: fromBranch
+    type: string
+  - name: overwrite
+    type: string
+    default: ""
+  - name: force
+    type: string
+    default: ""
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: clone-branch-cli
+    taskRef: 
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - cli
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
