@@ -10,8 +10,6 @@ metadata:
     argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
-  - name: fromBranch
-    value: release
   - name: toBranch
     value: release
   - name: refspec
@@ -19,20 +17,32 @@ spec:
   - name: imageTag
     value: release
   - name: appname
-    value: galasa-release-repo
+    value: release-maven-repos
+  - name: jacocoEnabled
+    value: "false"
+  - name: isRelease
+    value: "true"
+# 
+# 
+# Start the Complete Build at the Wrapping pipeline
+# 
+# 
   pipelineRef:
-    name: complete-build
+    name: branch-wrapping
+# 
+# 
+# 
   podTemplate:
     volumes:
+    - name: gradle-properties
+      secret:
+        secretName: gradle-properties
+    - name: gpg-key
+      secret:
+        secretName: gpg-key
     - name: mavengpg
       secret:
         secretName: mavengpg
-    - name: gpggradle
-      secret:
-        secretName: gpggradle
-    - name: gpgkey
-      secret:
-        secretName: gpgkey
   workspaces:
   - name: git-workspace
     volumeClaimTemplate:

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-argocd app delete galasa-release-repo
-argocd app delete cli-release-repo
+argocd app delete release-maven-repos
+argocd app delete release-cli
 
 echo "Complete"

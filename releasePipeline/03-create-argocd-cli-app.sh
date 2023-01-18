@@ -2,7 +2,7 @@
 
 set -e
 
-argocd app create cli-release-repo \
+argocd app create release-cli \
                   --project default \
                   --sync-policy auto \
                   --sync-option Prune=true \
@@ -12,4 +12,5 @@ argocd app create cli-release-repo \
                   --path infrastructure/ibmcloud-galasadev-cluster/galasa-development/cli \
                   --dest-server https://kubernetes.default.svc \
                   --dest-namespace galasa-development \
-                  --helm-set branch=release 
+                  --helm-set branch=release \
+                  --helm-set imageTag=release 
