@@ -23,6 +23,12 @@ spec:
   - name: appname
     type: string
     default: main-maven-repos
+  - name: jacocoEnabled
+    type: string
+    default: "false"
+  - name: isRelease
+    type: string
+    default: "false"
   workspaces:
   - name: git-workspace
   tasks:
@@ -105,7 +111,8 @@ spec:
         - "-PsourceMaven=https://development.galasa.dev/$(params.fromBranch)/maven-repo/extensions"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
-        - "-PjacocoEnabled=true"
+        - "-PjacocoEnabled=$(params.jacocoEnabled)"
+        - "-PisRelease=$(params.isRelease)"
     - name: command
       value: 
         - check
@@ -200,6 +207,7 @@ spec:
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template

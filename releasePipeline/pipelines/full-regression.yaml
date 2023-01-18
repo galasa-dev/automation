@@ -12,7 +12,6 @@ spec:
   params:
   - name: distBranch
     type: string
-    # default: {{ .Values.branch }}
   - name: version
     type: string
   - name: bootVersion
