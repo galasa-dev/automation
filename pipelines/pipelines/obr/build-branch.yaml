@@ -523,7 +523,7 @@ spec:
       - apps:Deployment:javadoc-site
       - --health
 
-  # Trigger obr-generic when doing a Main Build 
+  # Trigger obr-generic
   - name: trigger-obr-generic
     taskRef:
       name: tkn-cli
@@ -551,6 +551,7 @@ spec:
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
