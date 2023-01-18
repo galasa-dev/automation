@@ -81,7 +81,8 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=platform=linux-amd64"
+        # - "--build-arg=platform=linux-amd64"
+        - "--build-arg=branch=$(params.branch)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
