@@ -6,7 +6,7 @@ FROM ${dockerRepository}/galasadev/galasabld:main AS buildutils
 
 FROM ${dockerRepository}/galasadev/galasa-managers:${tag}
 
-# RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 COPY repo/ /usr/local/apache2/htdocs/
 COPY obr.githash /usr/local/apache2/htdocs/obr.githash
