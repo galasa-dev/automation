@@ -12,9 +12,6 @@ spec:
   - name: repository
     type: string
     default: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
-  - name: dockerRepo
-    type: string
-    default: harbor.galasa.dev
 #
 #
 #

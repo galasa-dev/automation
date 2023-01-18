@@ -1,7 +1,13 @@
 ARG dockerRepository
 ARG tag
+FROM ${dockerRepository}/galasadev/galasabld:main AS buildutils
+
 FROM ${dockerRepository}/galasadev/galasa-managers:${tag}
 
-COPY repo/ /usr/local/apache2/htdocs/
+# RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
+COPY repo/ /usr/local/apache2/htdocs/
 COPY obr.githash /usr/local/apache2/htdocs/obr.githash
+
+COPY --from=buildutils /usr/local/apache2/htdocs/galasabld-linux-amd64 /usr/local/apache2/htdocs/galasabld
+RUN chmod +x /usr/local/apache2/htdocs/galasabld
