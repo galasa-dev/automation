@@ -18,7 +18,7 @@ spec:
   - name: imageTag
     value: release
   - name: appname
-    value: cli-release-repo
+    value: release-cli
 #
 #
 #

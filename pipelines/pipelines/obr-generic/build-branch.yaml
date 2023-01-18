@@ -11,6 +11,9 @@ spec:
   - name: fromBranch
     type: string
     default: main
+  - name: fromSimplatformBranch
+    type: string
+    default: prod
   - name: toBranch
     type: string
     default: main
@@ -296,15 +299,15 @@ spec:
       - --prefix-name 
       - trigger-isolated-$(params.toBranch)
       - --param
-      - toBranch=$(params.toBranch)
-      - --param
       - fromObrBranch=$(params.toBranch)
       - --param
-      - fromSimplatformBranch=$(params.toBranch)
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
       - fromJavadocBranch=$(params.toBranch)
       - --param
       - fromEclipseBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
       - --param
       - refspec=$(params.refspec)
       - --param
@@ -346,7 +349,7 @@ spec:
       - --param
       - fromObrBranch=$(params.toBranch)
       - --param
-      - fromSimplatformBranch=$(params.toBranch)
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
       - toBranch=$(params.toBranch)
       - --param

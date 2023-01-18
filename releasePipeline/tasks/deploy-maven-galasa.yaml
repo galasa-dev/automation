@@ -14,8 +14,10 @@ spec:
   steps: 
 #
 #
-#  
-# Can't use generic galasabld task for this as requires galasabld to be run inside galasa-obr image
+# Can't use the generic galasabld task for this as this requires galasabld to be run inside galasa-obr image
+# Not worth creating a generic task as this is the only time this is done
+#
+# 
   - name: deploy-maven
     image: harbor.galasa.dev/galasadev/galasa-obr:release
     imagePullPolicy: Always
