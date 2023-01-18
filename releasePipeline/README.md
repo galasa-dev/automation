@@ -105,13 +105,3 @@ All the tests must past, reruns need to be managed manually at the moment.
 1. 99-move-to-new-version.md - Change the repos and files as listed in this file.
 1. Run a complete build to verify everything looks ok.
 1. Raise PRs to push the version changes. Due to the nature of Galasa build, later PRs will fail until the previous PRs are pushed and built.
-
-
-
-
-TO DO:
-20 - Update complete- PRun to make sure correct
-21 - Update cli build PRun to make sure correct
-30 - Make any updates
-31 - Get sonatype login and check if still relevant
-41 - Get Eclipse marketplace login
