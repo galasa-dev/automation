@@ -11,20 +11,13 @@ spec:
     type: string
   - name: repository
     type: string
-  - name: dockerRepo
-    type: string
   steps: 
-  - name: cat
-    image: $(params.dockerRepo)/galasadev/galasa-obr:{{ .Values.branch }} // JADE TO DO - WHAT SHOULD THIS BE?
-    imagePullPolicy: Always
-    command:
-    - cat
-    - /workspace/git/$(context.pipelineRun.name)/creds/mavencreds.yaml
-    volumeMounts:
-    - name: mavencreds
-      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
+#
+#
+#  
+# Can't use generic galasabld task for this as requires galasabld to be run inside galasa-obr image
   - name: deploy-maven
-    image: $(params.dockerRepo)/galasadev/galasa-obr:{{ .Values.branch }}
+    image: harbor.galasa.dev/galasadev/galasa-obr:release
     imagePullPolicy: Always
     command:
     - /usr/local/apache2/htdocs/galasabld
@@ -46,4 +39,4 @@ spec:
   volumes:
     - name: mavencreds
       secret:
-        secretName: maven-creds // JADE TO DO - FIND EQUIVALENT
+        secretName: maven-creds
