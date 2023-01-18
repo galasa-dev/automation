@@ -8,15 +8,6 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: fromBranch
-    type: string
-    default: main
-  - name: toBranch
-    type: string
-    default: main
-  - name: refspec
-    type: string
-    default: refs/heads/main:refs/heads/main
   - name: imageTag
     type: string
     default: main
