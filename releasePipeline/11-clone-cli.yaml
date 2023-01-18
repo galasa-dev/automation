@@ -1,0 +1,22 @@
+#
+# Copyright contributors to the Galasa project 
+#
+kind: PipelineRun
+apiVersion: tekton.dev/v1beta1
+metadata:
+  generateName: clone-cli-
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  pipelineRef:
+    name: branch-clone-cli
+  params:
+  - name: distBranch
+    value: "release"
+  - name: fromBranch
+    value: "main"
+#  - name: overwrite
+#    value: "--overwrite"
+#  - name: force
+#    value: ""
