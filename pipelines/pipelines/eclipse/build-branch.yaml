@@ -250,7 +250,7 @@ spec:
       - --health    
 
 
-  # Trigger Isolated
+  # Trigger Isolated (when doing any kind of build)
   - name: trigger-isolated
     taskRef:
       name: tkn-cli
