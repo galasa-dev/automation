@@ -3,4 +3,7 @@ FROM alpine:3.17.1
 ARG platform
 
 COPY bin/galasabld-${platform} /bin/galasabld
+
+COPY bin/ /usr/local/apache2/htdocs/
+
 ENTRYPOINT ["/bin/galasabld"]

@@ -22,7 +22,7 @@ spec:
     default: main
   - name: appname
     type: string
-    default: main-maven-repos
+    default: main-simplatform
   workspaces:
   - name: git-workspace
   tasks:
@@ -234,11 +234,11 @@ spec:
       - apps:Deployment:simplatform-$(params.imageTag)
       - --health
 
-  #trigger eclipse
+  # Trigger Eclipse when doing a Main Build
   - name: trigger-eclipse
     when:
       - input: "$(params.toBranch)"
-        operator: notin
+        operator: in
         values: ["main"]
     taskRef:
       name: tkn-cli
@@ -276,7 +276,41 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace       
+       workspace: git-workspace
+
+
+  # Trigger snapshot-simplatform (main to prod) when doing a Main Build
+  # - name: snapshot-simplatform
+  #   when:
+  #     - input: "$(params.toBranch)"
+  #       operator: in
+  #       values: ["main"]
+  #   taskRef:
+  #     name: tkn-cli
+  #   runAfter:
+  #   - wait-deployment
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/automation
+  #   - name: command
+  #     value: 
+  #     - pipeline
+  #     - start
+  #     - snapshot-simplatform
+  #     - -n
+  #     - galasa-build
+  #     - --prefix-name 
+  #     - trigger-snapshot-simplatform-
+  #     - --use-param-defaults
+  #     - --workspace
+  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+  #     - --pod-template
+  #     - ./pipelines/templates/pod-template.yaml
+  #     - --serviceaccount
+  #     - galasa-build-bot
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace       
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean
