@@ -28,7 +28,7 @@ spec:
       - --no-daemon 
       - --console
       - plain
-      - --stacktrace
+      - --debug
       - $(params.buildArgs[*])
       - $(params.command[*])
     volumeMounts:
