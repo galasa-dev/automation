@@ -19,6 +19,9 @@ spec:
   workspaces:
   - name: git-workspace
   tasks:
+# 
+# 
+# 
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -36,6 +39,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -49,6 +55,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -66,7 +75,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: build-ghverify-image
     taskRef:
       name: docker-build
@@ -109,7 +120,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: build-ghstatus-image
     taskRef:
       name: docker-build
@@ -153,7 +166,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
+# 
+# 
+# 
   - name: build-ghmonitor-image
     taskRef:
       name: docker-build
@@ -199,8 +214,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  # Build the docker image (and push it to harbor)
+# 
+# 
+# Build the docker image (and push it to harbor)
+# 
+# 
   - name: build-ghreceiver-image
     taskRef:
       name: docker-build
@@ -220,8 +238,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-   
-  # Kick the argocd application to refresh, causing a re-deployment
+# 
+# 
+#  Kick the argocd application to refresh, causing a re-deployment
+# 
+# 
   - name: recycle-webhook-receiver-deployment
     taskRef:
       name: argocd-cli
@@ -241,8 +262,11 @@ spec:
       - Deployment
       - --resource-name
       - github-webhook-receiver
-
-  # Wait for the redeployment to complete.
+# 
+# 
+# Wait for the redeployment to complete.
+# 
+# 
   - name: wait-webhook-receiver-deployment
     taskRef:
       name: argocd-cli
