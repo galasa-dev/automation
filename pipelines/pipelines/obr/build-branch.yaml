@@ -649,12 +649,12 @@ spec:
       - app 
       - actions 
       - run 
-      - javadoc-site
+      - $(params.appname)
       - restart 
       - --kind 
       - Deployment
       - --resource-name
-      - javadoc-site
+      - javadocsite-$(params.imageTag)
 # 
 # 
 #
@@ -670,9 +670,9 @@ spec:
       value: 
       - app 
       - wait
-      - javadoc-site
+      - $(params.appname)
       - --resource
-      - apps:Deployment:javadoc-site
+      - apps:Deployment:javadocsite-$(params.imageTag)
       - --health
 # 
 # 
