@@ -34,6 +34,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+#
   - name: clone-buildutils
     taskRef: 
       name: git-clone
@@ -51,6 +54,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
+# 
+# 
+#
   - name: make
     taskRef:
       name: make
@@ -62,12 +68,40 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-  - name: build-galasabld-image
+# 
+# 
+# 
+  - name: build-galasabld-binary-downloadables
     taskRef:
       name: docker-build
     runAfter:
     - clone-automation
     - make
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/buildutils
+    - name: dockerfilePath
+      value: automation/dockerfiles/galasabld/galasabld-binary-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.branch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=branch=$(params.branch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: build-galasabld-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - build-galasabld-binary-downloadables
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -84,7 +118,7 @@ spec:
         - "--build-arg=platform=linux-amd64"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
+       workspace: git-workspace
        
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
