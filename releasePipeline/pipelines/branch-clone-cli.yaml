@@ -5,6 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: branch-clone-cli
+  namespace: galasa-build
 spec:
   params:
   - name: distBranch
@@ -44,4 +45,4 @@ spec:
         - $(params.overwrite)
         - $(params.force)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
