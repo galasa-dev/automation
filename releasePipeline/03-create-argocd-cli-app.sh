@@ -7,7 +7,7 @@ argocd app create release-cli \
                   --sync-policy auto \
                   --sync-option Prune=true \
                   --self-heal \
-                  --repo https://github.com/galasa-dev/cli \
+                  --repo https://github.com/galasa-dev/automation \
                   --revision HEAD  \
                   --path infrastructure/ibmcloud-galasadev-cluster/galasa-development/cli \
                   --dest-server https://kubernetes.default.svc \

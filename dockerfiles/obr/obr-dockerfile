@@ -1,16 +1,7 @@
 ARG dockerRepository
 ARG tag
 
-# During a release, we need to be able to run galasabld commands from inside this image
-FROM ${dockerRepository}/galasadev/galasabld:main AS buildutils
-
 FROM ${dockerRepository}/galasadev/galasa-managers:${tag}
-
-# RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 COPY repo/ /usr/local/apache2/htdocs/
 COPY obr.githash /usr/local/apache2/htdocs/obr.githash
-
-# So we can run galasabld commands
-COPY --from=buildutils /usr/local/apache2/htdocs/galasabld-linux-amd64 /usr/local/apache2/htdocs/galasabld
-RUN chmod +x /usr/local/apache2/htdocs/galasabld
