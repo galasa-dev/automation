@@ -31,6 +31,9 @@ spec:
     default: main-maven-repos
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -49,6 +52,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-eclipse
     taskRef: 
       name: git-clone
@@ -66,12 +72,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace  
-
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -83,7 +87,10 @@ spec:
       value: $(params.toBranch)
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace  
+# 
+# 
+#     
   - name: get-commit
     taskRef:
       name: get-commit
@@ -98,6 +105,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -110,6 +120,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-maven-build-eclipse
     taskRef:
       name: maven-build
@@ -135,6 +148,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-eclipse
     taskRef:
       name: docker-build
@@ -159,7 +175,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-eclipse-p2
     taskRef:
       name: docker-build
@@ -180,6 +198,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -199,6 +220,9 @@ spec:
       - Deployment
       - --resource-name
       - eclipse-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -215,7 +239,9 @@ spec:
       - --resource
       - apps:Deployment:eclipse-$(params.imageTag) 
       - --health
-
+# 
+# 
+# 
   - name: recycle-deployment-p2
     taskRef:
       name: argocd-cli
@@ -235,6 +261,9 @@ spec:
       - Deployment
       - --resource-name
       - p2-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment-p2
     taskRef:
       name: argocd-cli
@@ -251,8 +280,9 @@ spec:
       - --resource
       - apps:Deployment:p2-$(params.imageTag) 
       - --health    
-
-
+# 
+# 
+# 
   # Trigger Isolated (when doing any kind of build)
   - name: trigger-isolated
     taskRef:

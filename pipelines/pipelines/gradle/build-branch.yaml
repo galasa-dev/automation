@@ -34,6 +34,9 @@ spec:
     default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -52,6 +55,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-gradle
     taskRef: 
       name: git-clone
@@ -69,6 +75,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: check-branch
     # Have to remove this when clause for now, as get-commit and the build task should runAfter this
     # but if this doesn't execute, the pipeline will stop. Need to improve in future.
@@ -88,6 +97,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -101,6 +113,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-gradle-build-gradle
     taskRef:
       name: gradle-build
@@ -123,6 +138,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-gradle
     taskRef:
       name: docker-build
@@ -147,6 +165,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -166,6 +187,9 @@ spec:
       - Deployment
       - --resource-name
       - gradle-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -182,6 +206,9 @@ spec:
       - --resource
       - apps:Deployment:gradle-$(params.imageTag)
       - --health
+# 
+# 
+# 
   # Trigger the next Pipeline (branch-maven)
   - name: trigger-maven
     taskRef:

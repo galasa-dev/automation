@@ -24,6 +24,7 @@ spec:
 #
   pipelineRef:
     name: branch-cli
+  serviceAccountName: galasa-build-bot
 #
 #
 #
