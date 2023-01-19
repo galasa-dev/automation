@@ -15,6 +15,10 @@ spec:
   params:
   - name: toBranch
     value: release
+  - name: revision
+    value: release
+  - name: refspec
+    value: refs/heads/release:refs/heads/release
   - name: imageTag
     value: release
   - name: appname
