@@ -26,9 +26,9 @@ spec:
     - gradle
     args:
       - --no-daemon 
-      - --console 
-      - --stacktrace
+      - --console
       - plain
+      - --stacktrace
       - $(params.buildArgs[*])
       - $(params.command[*])
     volumeMounts:
