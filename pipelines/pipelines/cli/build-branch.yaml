@@ -11,6 +11,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -32,7 +35,7 @@ spec:
     - name: revision
       value: main
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -47,9 +50,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/framework
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -64,9 +67,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/cli
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory

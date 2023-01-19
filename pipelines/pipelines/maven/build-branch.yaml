@@ -14,6 +14,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -56,7 +59,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/maven
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
@@ -212,6 +215,8 @@ spec:
       - fromBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param
