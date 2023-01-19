@@ -17,6 +17,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -53,7 +56,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/eclipse
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -278,6 +281,8 @@ spec:
       - fromJavadocBranch=$(params.toBranch)
       - --param
       - fromEclipseBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param
