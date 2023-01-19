@@ -31,6 +31,9 @@ spec:
     default: main-maven-repos
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -49,6 +52,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -65,7 +71,10 @@ spec:
       value: $(context.pipelineRun.name)/framework
     workspaces:
      - name: output
-       workspace: git-workspace     
+       workspace: git-workspace   
+# 
+# 
+#   
   - name: clone-extensions
     taskRef: 
       name: git-clone
@@ -83,6 +92,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -100,6 +112,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace     
+# 
+# 
+# 
   - name: clone-obr
     taskRef: 
       name: git-clone
@@ -117,6 +132,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -132,8 +150,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
-
+# 
+# 
+# 
   - name: generate-embedded
     taskRef:
       name: galasabld
@@ -161,8 +180,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
- 
-
+# 
+# 
+# 
   - name: branch-maven-build-obr-generic
     taskRef:
       name: maven-build
@@ -185,7 +205,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-obr-generic
     taskRef:
       name: docker-build
@@ -209,7 +231,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
+# 
+# 
+# 
   - name: copy-files
     taskRef:
       name: script
@@ -228,7 +252,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
+# 
+# 
+# 
   - name: branch-docker-build-amd64-embedded
     taskRef:
       name: docker-build
@@ -253,7 +279,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-ibm-embedded
     taskRef:
       name: docker-build
@@ -278,7 +306,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   # Trigger Isolated when doing a Main Build
   - name: trigger-isolated
     when:
@@ -326,7 +356,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-
+# 
+# 
+# 
   # Trigger Eclipse when doing a Complete Build/Branch Build 
   - name: trigger-eclipse
     when:

@@ -37,6 +37,9 @@ spec:
   - name: appname
     type: string
     default: main-maven-repos
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -55,7 +58,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: clone-obr
     taskRef: 
       name: git-clone
@@ -73,7 +78,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -91,7 +98,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace     
-
+# 
+# 
+# 
   - name: clone-extensions
     taskRef: 
       name: git-clone
@@ -109,7 +118,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace   
-
+# 
+# 
+# 
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -127,7 +138,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace       
-
+# 
+# 
+# 
   - name: clone-isolated
     taskRef: 
       name: git-clone
@@ -145,12 +158,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -163,21 +174,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
-
-  # - name: get-commit
-  #   taskRef:
-  #     name: get-commit
-  #   runAfter:
-  #   - clone-isolated
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: repo
-  #     value: isolated
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  
+# 
+# 
+# 
   - name: generate-pom-full
     taskRef:
       name: galasabld
@@ -211,7 +210,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-         
+# 
+# 
+#       
   - name: maven-build-isolated1
     taskRef: 
       name: maven-build
@@ -245,8 +246,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-isolated2
     taskRef: 
       name: maven-build
@@ -280,8 +282,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
+# 
+# 
+# 
   - name: maven-build-isolated3
     taskRef: 
       name: maven-build
@@ -315,7 +318,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-isolated4
     taskRef: 
       name: maven-build
@@ -349,8 +354,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-isolated5
     taskRef: 
       name: maven-build
@@ -384,7 +390,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
-     
+# 
+# 
+#    
   - name: maven-build-isolated6
     taskRef: 
       name: maven-build
@@ -418,7 +426,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-javadoc
     taskRef: 
       name: maven-build
@@ -452,7 +462,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
+# 
+# 
+# 
   - name: maven-build-docs
     taskRef: 
       name: maven-build
@@ -486,24 +498,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
-       
-  # - name: copy-text-files
-  #   taskRef:
-  #     name: unix-command
-  #   runAfter:
-  #   - maven-build-docs
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/isolated/full
-  #   - name: command
-  #     value:
-  #       -  cp -vr resources/* target/isolated/     
-  #   workspaces:
-  #     - name: git-workspace
-  #       workspace: git-workspace    
-
+# 
+# 
+# 
   - name: copy-text-files
     taskRef:
       name: copy
@@ -519,7 +516,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace             
-
+# 
+# 
+# 
   - name: docker-build-isolated
     taskRef:
       name: docker-build
@@ -539,7 +538,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
+# 
+# 
+# 
   - name: docker-build-tar-isolated
     taskRef:
       name: docker-build
@@ -563,8 +564,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
-
-
+# 
+# 
+# 
   - name: maven-build-isolated-zip
     taskRef: 
       name: maven-build
@@ -599,8 +601,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
-
+# 
+# 
+# 
   - name: docker-build-isolated-zip
     taskRef:
       name: docker-build
@@ -624,7 +627,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace        
-
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -644,6 +649,9 @@ spec:
       - Deployment
       - --resource-name
       - isolated-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -698,7 +706,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-         
+# 
+# 
+#        
   - name: maven-build-mvp1
     taskRef: 
       name: maven-build
@@ -732,8 +742,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-mvp2
     taskRef: 
       name: maven-build
@@ -767,8 +778,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
+# 
+# 
+# 
   - name: maven-build-mvp3
     taskRef: 
       name: maven-build
@@ -802,7 +814,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-mvp4
     taskRef: 
       name: maven-build
@@ -836,8 +850,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-mvp5
     taskRef: 
       name: maven-build
@@ -871,7 +886,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
-     
+# 
+# 
+#    
   - name: maven-build-mvp6
     taskRef: 
       name: maven-build
@@ -905,7 +922,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-javadoc-mvp
     taskRef: 
       name: maven-build
@@ -939,7 +958,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
+# 
+# 
+# 
   - name: maven-build-docs-mvp
     taskRef: 
       name: maven-build
@@ -973,24 +994,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
-       
-  # - name: copy-text-files-mvp
-  #   taskRef:
-  #     name: unix-command
-  #   runAfter:
-  #   - maven-build-docs-mvp
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/isolated/mvp
-  #   - name: command
-  #     value:
-  #       -  cp -vr resources/* target/isolated/     
-  #   workspaces:
-  #     - name: git-workspace
-  #       workspace: git-workspace    
-
+# 
+# 
+# 
   - name: copy-text-files-mvp
     taskRef:
       name: copy
@@ -1006,7 +1012,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace             
-
+# 
+# 
+# 
   - name: docker-build-mvp
     taskRef:
       name: docker-build
@@ -1026,7 +1034,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
+# 
+# 
+# 
   - name: docker-build-tar-mvp
     taskRef:
       name: docker-build
@@ -1050,8 +1060,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
-
-
+# 
+# 
+# 
   - name: maven-build-mvp-zip
     taskRef: 
       name: maven-build
@@ -1086,8 +1097,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
-
+# 
+# 
+# 
   - name: docker-build-mvp-zip
     taskRef:
       name: docker-build
@@ -1111,7 +1123,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
+# 
+# 
+# 
   - name: recycle-deployment-mvp
     taskRef:
       name: argocd-cli
@@ -1131,6 +1145,9 @@ spec:
       - Deployment
       - --resource-name
       - mvp-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment-mvp
     taskRef:
       name: argocd-cli
@@ -1146,11 +1163,7 @@ spec:
       - $(params.appname)
       - --resource
       - apps:Deployment:mvp-$(params.imageTag) 
-      - --health
-                
-
-
-      
+      - --health   
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean

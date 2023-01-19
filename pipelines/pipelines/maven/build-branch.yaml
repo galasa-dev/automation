@@ -34,6 +34,9 @@ spec:
     default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -52,6 +55,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-maven
     taskRef: 
       name: git-clone
@@ -69,11 +75,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -86,6 +91,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -99,6 +107,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -110,6 +121,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-maven-build-maven
     taskRef:
       name: maven-build
@@ -134,6 +148,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-maven
     taskRef:
       name: docker-build
@@ -158,6 +175,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -177,6 +197,9 @@ spec:
       - Deployment
       - --resource-name
       - maven-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -193,6 +216,9 @@ spec:
       - --resource
       - apps:Deployment:maven-$(params.imageTag)
       - --health
+# 
+# 
+# 
   # Trigger the next Pipeline (branch-framework)
   - name: trigger-framework
     taskRef:

@@ -25,6 +25,9 @@ spec:
     default: main-cli
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -43,6 +46,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -60,6 +66,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
+# 
+# 
+# 
   - name: clone-cli
     taskRef: 
       name: git-clone
@@ -78,10 +87,6 @@ spec:
      - name: output
        workspace: git-workspace      
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -96,7 +101,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: generate-api
     taskRef: 
       name: general-command
@@ -123,7 +130,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
-
+# 
+# 
+# 
   - name: clear-mod
     taskRef:
       name: unix-command
@@ -140,7 +149,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: clear-sum
     taskRef:
       name: unix-command
@@ -157,7 +168,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
+# 
+# 
+# 
   - name: update-version
     taskRef: 
       name: script
@@ -175,7 +188,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -189,7 +204,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: galasactl-make
     taskRef:
       name: make
@@ -201,7 +218,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
-
+# 
+# 
+# 
   - name: docker-build-cli
     taskRef: 
       name: docker-build
@@ -224,7 +243,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: docker-build-cli-ibm
     taskRef: 
       name: docker-build
@@ -248,8 +269,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-
+# 
+# 
+# 
   - name: docker-build-cli-binary
     taskRef: 
       name: docker-build
@@ -272,78 +294,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace          
-
-
-  # - name: recycle-cli
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - docker-buld-cli-binary
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - cli-$(params.imageTag)
-  # - name: wait-cli
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-cli
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:cli-$(params.imageTag)
-  #     - --health
-  # - name: recycle-cli-ibm
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - wait-cli
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - actions 
-  #     - run 
-  #     - $(params.appname)
-  #     - restart 
-  #     - --kind 
-  #     - Deployment
-  #     - --resource-name
-  #     - cli-ibm-$(params.imageTag)
-  # - name: wait-cli-ibm
-  #   taskRef:
-  #     name: argocd-cli
-  #   runAfter:
-  #   - recycle-cli-ibm
-  #   params:
-  #   - name: server
-  #     value: argocd.galasa.dev
-  #   - name: command
-  #     value: 
-  #     - app 
-  #     - wait
-  #     - $(params.appname)
-  #     - --resource
-  #     - apps:Deployment:cli-ibm-$(params.imageTag)
-  #     - --health
+# 
+# 
+# 
   - name: recycle-cli-binary
     taskRef:
       name: argocd-cli
