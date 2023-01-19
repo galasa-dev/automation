@@ -20,7 +20,6 @@ spec:
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
-    # image: docker.io/library/gradle:7.5-jdk11
     image: docker.io/library/gradle:6.8.2-jdk11 
     imagePullPolicy: Always
     command:
@@ -33,11 +32,9 @@ spec:
       - $(params.command[*])
     volumeMounts:
     - name: gpg-key
-      # mountPath: /opt/gradle/gradle-7.5/galasa.gpg
       mountPath: /opt/gradle/gradle-6.8.2/galasa.gpg
       subPath: galasa.gpg
     - name: gradle-properties
-      # mountPath: /opt/gradle/gradle-7.5/galasa.gpg
       mountPath: /opt/gradle/gradle-6.8.2/gradle.properties
       subPath: gradle.properties
 
