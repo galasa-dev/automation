@@ -25,6 +25,9 @@ spec:
     default: main-simplatform
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -43,6 +46,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-simplatform
     taskRef: 
       name: git-clone
@@ -60,11 +66,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -76,7 +81,10 @@ spec:
       value: $(params.toBranch)
     workspaces:
      - name: git-workspace
-       workspace: git-workspace       
+       workspace: git-workspace  
+# 
+# 
+#      
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,25 +98,13 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
-  # Current Simplatform pipeline does not have maven-gpg equivalent
-  # - name: maven-gpg
-  #   taskRef:
-  #     name: maven-gpg
-  #   runAfter:
-  #   - clone-simplatform 
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/simplatform
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-maven-build-simplatform-application
     taskRef:
       name: maven-build
     runAfter:
-    # - maven-gpg
     - clone-simplatform
     params:
     - name: context
@@ -127,6 +123,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-maven-build-simbank-tests
     taskRef:
       name: maven-build
@@ -149,6 +148,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-simplatform-repo
     taskRef:
       name: docker-build
@@ -174,6 +176,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-simplatform-jar
     taskRef:
       name: docker-build
@@ -191,13 +196,12 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:$(params.imageTag)
     - name: noPush
       value: ""
-    # - name: buildArgs
-    #   value:
-    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
-    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -217,6 +221,9 @@ spec:
       - Deployment
       - --resource-name
       - simplatform-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -233,7 +240,9 @@ spec:
       - --resource
       - apps:Deployment:simplatform-$(params.imageTag)
       - --health
-
+# 
+# 
+# 
   # Trigger snapshot-simplatform (main to prod) when doing a Main Build
   - name: snapshot-simplatform
     when:

@@ -306,7 +306,7 @@ spec:
       - --param
       - fromObrBranch=$(params.toBranch)
       - --param
-      - fromSimplatformBranch=$(params.toBranch)
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
       - fromJavadocBranch=$(params.toBranch)
       - --param

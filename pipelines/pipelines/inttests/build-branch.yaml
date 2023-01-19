@@ -25,6 +25,9 @@ spec:
     default: main-inttests
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -43,6 +46,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-inttests
     taskRef: 
       name: git-clone
@@ -60,13 +66,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: check-branch
-    # Have to remove this when clause for now, as get-commit and the build task should runAfter this
-    # but if this doesn't execute, the pipeline will stop. Need to improve in future.
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -79,7 +82,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -94,7 +99,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-  
+# 
+# 
+# 
   - name: branch-gradle-build-inttests
     taskRef:
       name: gradle-build
@@ -115,7 +122,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-maven-build-inttests
     taskRef:
       name: maven-build
@@ -134,8 +143,7 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/inttests/repo"
         - "-Dgalasa.bootstrap=http://galasa-cicsk8s.hursley.ibm.com/bootstrap"
         - "-Dgalasa.skip.deploytestcatatlog=true" 
-        - "-Dgalasa.skip.bundletestcatatlog=false"
-        
+        - "-Dgalasa.skip.bundletestcatatlog=false"     
     - name: command
       value: 
         - deploy 
@@ -143,7 +151,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-inttests
     taskRef:
       name: docker-build
@@ -168,6 +178,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -187,6 +200,9 @@ spec:
       - Deployment
       - --resource-name
       - inttests-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
