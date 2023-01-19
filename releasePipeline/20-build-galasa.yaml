@@ -12,6 +12,8 @@ spec:
   params:
   - name: toBranch
     value: release
+  - name: revision
+    value: release
   - name: refspec
     value: refs/heads/release:refs/heads/release
   - name: imageTag
@@ -29,6 +31,7 @@ spec:
 # 
   pipelineRef:
     name: branch-wrapping
+  serviceAccountName: galasa-build-bot
 # 
 # 
 # 

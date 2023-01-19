@@ -65,7 +65,7 @@ spec:
     - name: revision
       value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -83,7 +83,7 @@ spec:
     - name: revision
       value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -101,7 +101,7 @@ spec:
     - name: revision
       value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -119,7 +119,7 @@ spec:
     - name: revision
       value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
