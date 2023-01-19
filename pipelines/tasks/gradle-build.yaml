@@ -33,10 +33,10 @@ spec:
       - $(params.command[*])
     volumeMounts:
     - name: gpg-key
-      mountPath: /opt/gradle/gradle-6.8.2/galasa.gpg
+      mountPath: /root/gradle/.gradle/galasa.gpg
       subPath: galasa.gpg
     - name: gradle-properties
-      mountPath: /opt/gradle/gradle-6.8.2/gradle.properties
+      mountPath: /root/gradle/.gradle/gradle.properties
       subPath: gradle.properties
 
     
