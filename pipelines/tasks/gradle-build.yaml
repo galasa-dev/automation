@@ -28,7 +28,6 @@ spec:
       - --no-daemon 
       - --console
       - plain
-      - --debug
       - $(params.buildArgs[*])
       - $(params.command[*])
     volumeMounts:
