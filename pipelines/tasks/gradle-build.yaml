@@ -27,6 +27,7 @@ spec:
     args:
       - --no-daemon 
       - --console 
+      - --stacktrace
       - plain
       - $(params.buildArgs[*])
       - $(params.command[*])
