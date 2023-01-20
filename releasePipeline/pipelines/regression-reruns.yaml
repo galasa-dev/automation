@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: full-regression
+  name: regression-reruns
   namespace: galasa-build
 spec:
 #
@@ -24,7 +24,36 @@ spec:
 #
 #
 #
-  - name: regression-run
+  - name: runs-prepare
+    taskRef: 
+      name: galasactl
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - runs
+        - prepare
+        - --stream
+        - inttests
+        - --portfolio
+        - test.yaml
+        # - --test
+        # - <INSERT_HERE>
+        # - --test EXAMPLE
+        # - local.CoreLocalJava08Ubuntu
+        - --test
+        - local.ZosTsoLocalJava16Ubuntu
+        - --test
+        - local.ZosFileDatasetLocalJava11UbuntuZosmf
+        - --test
+        - local.online.CompilationLocalJava11Ubuntu
+        - --test
+        - local.DockerLocalJava16Ubuntu
+        - --bootstrap
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+
+  - name: runs-submit
     taskRef: 
       name: galasactl
     params:
@@ -34,14 +63,24 @@ spec:
       value: 
         - runs
         - submit
-        - --stream
-        - inttests
-        - --package
-        - local
-        - --package
-        - kubernetes
-        - --package
-        - compilation
+        - --portfolio
+        - test.yaml
+        # - --stream
+        # - inttests
+        # - --package
+        # - local
+        # - --package
+        # - kubernetes
+        # - --package
+        # - compilation
+        # - --test
+        # - local.ZosTsoLocalJava16Ubuntu
+        # - --test
+        # - local.ZosFileDatasetLocalJava11UbuntuZosmf
+        # - --test
+        # - local.online.CompilationLocalJava11Ubuntu
+        # - --test
+        # - local.DockerLocalJava16Ubuntu
         - --trace
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
