@@ -5,6 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: deploy-maven-galasa
+  namespace: galasa-build
 spec:
   params:
   - name: version
@@ -27,5 +28,3 @@ spec:
       value: $(params.version)
     - name: repository
       value: $(params.repository)
-    - name: dockerRepo
-      value: $(params.dockerRepo)
