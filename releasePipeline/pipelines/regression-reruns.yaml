@@ -38,20 +38,14 @@ spec:
         - inttests
         - --portfolio
         - test.yaml
-        # - --test
-        # - <INSERT_HERE>
         # - --test EXAMPLE
         # - local.CoreLocalJava08Ubuntu
-        - --test
-        - local.ZosTsoLocalJava16Ubuntu
-        - --test
-        - local.ZosFileDatasetLocalJava11UbuntuZosmf
-        - --test
-        - local.online.CompilationLocalJava11Ubuntu
-        - --test
-        - local.DockerLocalJava16Ubuntu
+        # - --test
+        # - <INSERT_HERE>
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - --log # Otherwise there is no output
+        - "-"
 
   - name: runs-submit
     taskRef: 
@@ -65,22 +59,6 @@ spec:
         - submit
         - --portfolio
         - test.yaml
-        # - --stream
-        # - inttests
-        # - --package
-        # - local
-        # - --package
-        # - kubernetes
-        # - --package
-        # - compilation
-        # - --test
-        # - local.ZosTsoLocalJava16Ubuntu
-        # - --test
-        # - local.ZosFileDatasetLocalJava11UbuntuZosmf
-        # - --test
-        # - local.online.CompilationLocalJava11Ubuntu
-        # - --test
-        # - local.DockerLocalJava16Ubuntu
         - --trace
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap

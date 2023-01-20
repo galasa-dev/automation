@@ -21,8 +21,7 @@ spec:
   steps:
   - name: galasactl
     workingDir: /workspace/git/$(params.context)
-    # image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.tag)
-    image: harbor.galasa.dev/galasadev/galasa-cli-amd64:$(params.tag)
+    image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.tag)
     imagePullPolicy: Always
     command:
     - galasactl
