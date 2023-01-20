@@ -5,6 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: deploy-maven-galasa
+  namespace: galasa-build
 spec:
   params:
   - name: version
@@ -19,10 +20,10 @@ spec:
 #
 # 
   - name: deploy-maven
-    image: harbor.galasa.dev/galasadev/galasa-obr:release
+    image: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
     imagePullPolicy: Always
     command:
-    - /usr/local/apache2/htdocs/galasabld
+    - galasabld
     - maven
     - deploy
     - --repository

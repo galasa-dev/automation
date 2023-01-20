@@ -284,50 +284,50 @@ spec:
 # 
 # 
   # Trigger Isolated (when doing any kind of build)
-  - name: trigger-isolated
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - wait-deployment-p2
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - branch-isolated
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-isolated-$(params.toBranch)
-      - --param
-      - toBranch=$(params.toBranch)
-      - --param
-      - fromObrBranch=$(params.toBranch)
-      - --param
-      - fromSimplatformBranch=$(params.fromSimplatformBranch)
-      - --param
-      - fromJavadocBranch=$(params.toBranch)
-      - --param
-      - fromEclipseBranch=$(params.toBranch)
-      - --param
-      - revision=$(params.revision)
-      - --param
-      - refspec=$(params.refspec)
-      - --param
-      - imageTag=$(params.imageTag)
-      - --param
-      - appname=$(params.appname)
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+  # - name: trigger-isolated
+  #   taskRef:
+  #     name: tkn-cli
+  #   runAfter:
+  #   - wait-deployment-p2
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/automation
+  #   - name: command
+  #     value: 
+  #     - pipeline
+  #     - start
+  #     - branch-isolated
+  #     - -n
+  #     - galasa-build
+  #     - --prefix-name 
+  #     - trigger-isolated-$(params.toBranch)
+  #     - --param
+  #     - toBranch=$(params.toBranch)
+  #     - --param
+  #     - fromObrBranch=$(params.toBranch)
+  #     - --param
+  #     - fromSimplatformBranch=$(params.fromSimplatformBranch)
+  #     - --param
+  #     - fromJavadocBranch=$(params.toBranch)
+  #     - --param
+  #     - fromEclipseBranch=$(params.toBranch)
+  #     - --param
+  #     - revision=$(params.revision)
+  #     - --param
+  #     - refspec=$(params.refspec)
+  #     - --param
+  #     - imageTag=$(params.imageTag)
+  #     - --param
+  #     - appname=$(params.appname)
+  #     - --workspace
+  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+  #     - --pod-template
+  #     - ./pipelines/templates/pod-template.yaml
+  #     - --serviceaccount
+  #     - galasa-build-bot
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
