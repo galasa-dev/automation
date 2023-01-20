@@ -3,72 +3,92 @@
 set -e
 
 #
-# Check the hostname is present
+# Functions
 #
+function usage {
+    echo "usage: helm-post-install.sh [OPTIONS]"
+    cat << EOF
+Options are:
+--hostname <host_name> : The name/IP of the host running the ecosystem (mandatory).
+--prefix <service_prefix> : The prefix of the external services.
+-h | --help : Display usage information.
+EOF
+}
 
-if [ -z "$1" ]
+function get_external_port() {
+  serviceName=$1
+  portName=$2
+  port=""
+  externalService="${PREFIX}${serviceName}-external"
+
+  # Wait for the external service to be assigned a port
+  maxRetries=10
+  retriesLeft=${maxRetries}
+  while [[ -z "${port}" && ${retriesLeft} -ne 0 ]]; do
+    port=$(kubectl get svc ${externalService} -o=jsonpath="{.spec.ports[?(@.name==\"${portName}\")].nodePort}")
+    [ -z "${port}" ] && sleep 1 && retriesLeft=$((retriesLeft-1))
+  done
+
+  if [[ -z "${port}" ]]; then
+      echo 1>&2 "Error: Failed to retrieve port for ${externalService} after ${maxRetries} tries."
+      usage
+      exit 1
+  fi
+  echo "${port}"
+}
+
+#
+# Process arguments
+#
+HOSTNAME=""
+PREFIX=""
+
+while [ "$1" != "" ]; do
+  case $1 in
+    --hostname )      shift
+                      HOSTNAME="$1"
+                      ;;
+    --prefix )        shift
+                      PREFIX="$1"
+                      ;;
+    -h | --help )     usage
+                      exit
+                      ;;                    
+    * )               echo "Unexpected argument $1"
+                      usage
+                      exit 1
+  esac
+  shift
+done
+
+if [ -z "${HOSTNAME}" ]
   then
-    echo "Hostname is missing"
+    echo "Error: Please specify --hostname <host_name>."
+    usage
     exit 1
 fi
 
-HOSTNAME=$1
-
-
-#
-# Empty string for prefix if it is not present 
-#
-
-if [ -z "$2" ]
-  then
-    PREFIX=""
-  else 
-    PREFIX=$2
-fi
-
-echo HOSTNAME     is $HOSTNAME
-echo PREFIX       is $PREFIX
+echo "HOSTNAME is ${HOSTNAME}"
+echo "PREFIX is ${PREFIX}"
 
 #
 # Retrieve the port numbers of the Services for external access
 #
+echo "Retrieving external service ports..."
+ETCDPORT=$(get_external_port "etcd" "client")
+COUCHDBPORT=$(get_external_port "couchdb" "http")
 
-APIPORT=$(kubectl get svc ${PREFIX}api-external -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
-ETCDPORT=$(kubectl get svc ${PREFIX}etcd-external -o=jsonpath='{.spec.ports[?(@.name=="client")].nodePort}')
-COUCHDBPORT=$(kubectl get svc ${PREFIX}couchdb-external -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
-
-echo API     port is $APIPORT
-echo ETCD    port is $ETCDPORT
-echo COUCHDB port is $COUCHDBPORT
+echo "ETCD port is ${ETCDPORT}"
+echo "COUCHDB port is ${COUCHDBPORT}"
 
 #
-# Retrieve the bootstrap configmap and overwrite with the correct hostname and port number
+# Set environment variables for external services
 #
+echo "Setting environment variables..."
+export GALASA_EXTERNAL_DYNAMICSTATUS_STORE="etcd:http://${HOSTNAME}:${ETCDPORT}"
+export GALASA_EXTERNAL_RESULTARCHIVE_STORE="couchdb:http://${HOSTNAME}:${COUCHDBPORT}"
+export GALASA_EXTERNAL_CREDENTIALS_STORE="etcd:http://${HOSTNAME}:${ETCDPORT}"
 
-kubectl get configmap ${PREFIX}bootstrap-file -o yaml > bootstrap.yaml
-sed "s/etcd:http:\/\/etcd:2379/etcd:http:\/\/$HOSTNAME:$ETCDPORT/g" bootstrap.yaml > bootstrap-new.yaml
-kubectl replace -f bootstrap-new.yaml
-
-#
-# Recycle the API server so that it presents the correct bootstrap
-#
-
-kubectl rollout restart deployment/${PREFIX}api
-kubectl rollout status deployment/${PREFIX}api -w --timeout=3m
-
-#
-# Run the setup ecosystem command so that the CPS is populated with the correct settings
-#
-
-export GALASA_EXTERNAL_DYNAMICSTATUS_STORE=etcd:http://$HOSTNAME:$ETCDPORT
-export GALASA_EXTERNAL_RESULTARCHIVE_STORE=couchdb:http://$HOSTNAME:$COUCHDBPORT
-export GALASA_EXTERNAL_CREDENTIALS_STORE=etcd:http://$HOSTNAME:$ETCDPORT
-
-echo DSS   is $GALASA_EXTERNAL_DYNAMICSTATUS_STORE
-echo RAS   is $GALASA_EXTERNAL_RESULTARCHIVE_STORE
-echo CREDS is $GALASA_EXTERNAL_CREDENTIALS_STORE
-
-# Just make sure the API server is stable
-sleep 10
-
-java -jar boot.jar --obr file:galasa.obr --bootstrap http://${PREFIX}api:8080/bootstrap --setupeco
+echo "DSS is ${GALASA_EXTERNAL_DYNAMICSTATUS_STORE}"
+echo "RAS is ${GALASA_EXTERNAL_RESULTARCHIVE_STORE}"
+echo "CREDS is ${GALASA_EXTERNAL_CREDENTIALS_STORE}"
