@@ -124,7 +124,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/inttests/settings.xml
     - name: buildArgs
       value: 
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/inttests/repo"

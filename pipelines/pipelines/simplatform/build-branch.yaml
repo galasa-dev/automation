@@ -110,10 +110,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
@@ -138,7 +137,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"

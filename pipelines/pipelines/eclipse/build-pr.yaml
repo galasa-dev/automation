@@ -110,10 +110,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/gpg/settings.xml  
+      value: /workspace/git/gpg/settings.xml  
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
