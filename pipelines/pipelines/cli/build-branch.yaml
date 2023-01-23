@@ -85,7 +85,10 @@ spec:
       value: $(context.pipelineRun.name)/cli
     workspaces:
      - name: output
-       workspace: git-workspace      
+       workspace: git-workspace   
+# 
+# 
+#    
   - name: check-branch
     taskRef: 
       name: git-check-branch
@@ -316,6 +319,9 @@ spec:
       - Deployment
       - --resource-name
       - cli-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-cli-binary
     taskRef:
       name: argocd-cli

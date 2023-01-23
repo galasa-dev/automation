@@ -1,4 +1,8 @@
 # Update the IBM Cloud Galasa external sites
 
-1. Push a commit to argocd-ibmcloud repository with default/javadoc-stable.yaml default/p2stable.yaml default/resources.yaml pointing to the new version.
-1. Let ArgoCD sync, application = galasa-ibmcloud
+1. Go to the argocd-ibmcloud repository 
+1. Update the images with the correct version in:
+   - default/javadoc-stable.yaml
+   - default/p2stable.yaml
+   - default/resources.yaml
+1. Let ArgoCD sync (Application = galasa-ibmcloud)
