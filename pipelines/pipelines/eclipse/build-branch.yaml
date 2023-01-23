@@ -13,7 +13,7 @@ spec:
     default: main
   - name: fromSimplatformBranch
     type: string
-    default: main
+    default: prod
   - name: toBranch
     type: string
     default: main
