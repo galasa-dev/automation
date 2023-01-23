@@ -216,45 +216,49 @@ spec:
 # 
 #
   # Trigger the next Pipeline (branch-gradle)
-  # - name: trigger-gradle
-  #   taskRef:
-  #     name: tkn-cli
-  #   runAfter:
-  #   - wait-deployment
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/automation
-  #   - name: command
-  #     value: 
-  #     - pipeline
-  #     - start
-  #     - branch-gradle
-  #     - -n
-  #     - galasa-build
-  #     - --prefix-name 
-  #     - trigger-gradle-$(params.toBranch)
-  #     - --param
-  #     - fromBranch=$(params.toBranch)
-  #     - --param
-  #     - toBranch=$(params.toBranch)
-  #     - --param
-  #     - revision=$(params.revision)
-  #     - --param
-  #     - refspec=$(params.refspec)
-  #     - --param
-  #     - imageTag=$(params.imageTag)
-  #     - --param
-  #     - appname=$(params.appname)
-  #     - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
-  #     - --workspace
-  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-  #     - --pod-template
-  #     - ./pipelines/templates/pod-template.yaml
-  #     - --serviceaccount
-  #     - galasa-build-bot
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
+  - name: trigger-gradle
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-gradle
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-gradle-$(params.toBranch)
+      - --param
+      - fromBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isRelease=$(params.isRelease)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
