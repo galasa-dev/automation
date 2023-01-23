@@ -30,4 +30,4 @@ spec:
     - name: githubcreds
       mountPath: /creds
     - name: harborcreds
-      mountPath: /creds
+      mountPath: /harborcreds
