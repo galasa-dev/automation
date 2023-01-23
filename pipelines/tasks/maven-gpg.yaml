@@ -20,8 +20,7 @@ spec:
     imagePullPolicy: Always
     command:
     - mkdir
-    # - /workspace/git/$(params.context)/gpg
-    - /workspace/gpg
+    - /workspace/git/gpg
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gpg:main
@@ -29,8 +28,7 @@ spec:
     command:
     - gpg
     - --homedir
-    # - /workspace/git/$(params.context)/gpg
-    - /workspace/gpg
+    - /workspace/git/gpg
     - --pinentry-mode
     - loopback
     - --passphrase-file
@@ -47,8 +45,7 @@ spec:
     command:
     - cp
     - /root/mavengpg/settings.xml
-    # - /workspace/git/$(params.context)/gpg/settings.xml
-    - /workspace/gpg/settings.xml
+    - /workspace/git/gpg/settings.xml
     volumeMounts:
     - name: mavengpg
       mountPath: /root/mavengpg 
