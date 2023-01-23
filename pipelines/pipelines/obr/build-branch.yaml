@@ -264,7 +264,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
@@ -336,7 +336,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
