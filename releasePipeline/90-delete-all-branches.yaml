@@ -11,6 +11,14 @@ metadata:
 spec:
   pipelineRef:
     name: branch-delete-all
+  podTemplate:
+    volumes:
+    - name: githubcreds
+      secret:
+        secretName: github-token
+    - name: harborcreds
+      secret:
+        secretName: harbor-creds-yaml
   params:
   - name: distBranch
     value: "release"

@@ -17,6 +17,15 @@ spec:
 #
   pipelineRef:
     name: branch-tag-galasa
+  
+  serviceAccountName: galasa-build-bot
+
+  podTemplate:
+    volumes:
+    - name: githubcreds
+      secret:
+        secretName: github-token
+
   params:
   - name: distBranch
     value: "release"

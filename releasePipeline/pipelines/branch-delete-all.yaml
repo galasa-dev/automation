@@ -32,7 +32,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #######  Wrapping
 #
@@ -52,7 +52,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #######  Gradle
 #
@@ -72,7 +72,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -95,7 +95,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Maven
 #
@@ -115,7 +115,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -138,7 +138,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Framework
 #
@@ -158,7 +158,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -181,7 +181,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Extensions
 #
@@ -201,7 +201,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -224,7 +224,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Managers
 #
@@ -244,7 +244,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -267,7 +267,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Obr
 #
@@ -287,7 +287,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -310,7 +310,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -333,7 +333,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -356,7 +356,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -379,7 +379,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -402,7 +402,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -425,7 +425,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Eclipse
 #
@@ -445,7 +445,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -468,7 +468,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #   
@@ -491,30 +491,30 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Isolated
 #
-#   - name: delete-branch-isolated
-#     taskRef:
-#       name: galasabld
-#     params:
-#     - name: context
-#       value: $(context.pipelineRun.name)
-#     - name: command
-#       value: 
-#         - github
-#         - branch
-#         - delete
-#         - --repository
-#         - isolated
-#         - --branch
-#         - $(params.distBranch)
-#         - --credentials
-#         - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
-# #
-# #
-# #
+  - name: delete-branch-isolated
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - isolated
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
 #   - name: delete-image-isolated
 #     taskRef:
 #       name: galasabld
@@ -534,10 +534,9 @@ spec:
 #         - --tag
 #         - $(params.distBranch)
 #         - --credentials
-#         - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
-# #
-# #
-# #
+#         - /creds/harborcreds.yaml
+#
+#
 #   - name: delete-image-mvp
 #     taskRef:
 #       name: galasabld
@@ -557,10 +556,9 @@ spec:
 #         - --tag
 #         - $(params.distBranch)
 #         - --credentials
-#         - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
-# #
-# #
-# #
+#         - /creds/harborcreds.yaml
+#
+#
 #   - name: delete-image-isolated-maven
 #     taskRef: 
 #       name: delete-branch-image
@@ -569,30 +567,9 @@ spec:
 #       value: $(params.distBranch)
 #     - name: image
 #       value: galasa-maven-isolated
-
-#   - name: delete-image-gradle
-#     taskRef:
-#       name: galasabld
-#     params:
-#     - name: context
-#       value: $(context.pipelineRun.name)
-#     - name: command
-#       value:
-#         - harbor
-#         - deleteimage
-#         - --harbor
-#         - harbor.galasa.dev
-#         - --project
-#         - galasadev
-#         - --repository
-#         - galasa-gradle
-#         - --tag
-#         - $(params.distBranch)
-#         - --credentials
-#         - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
-# #
-# #
-# #
+#
+#
+#
 #   - name: delete-image-mvp-maven
 #     taskRef: 
 #       name: delete-branch-image
@@ -601,27 +578,6 @@ spec:
 #       value: $(params.distBranch)
 #     - name: image
 #       value: galasa-maven-mvp
-
-#   - name: delete-image-gradle
-#     taskRef:
-#       name: galasabld
-#     params:
-#     - name: context
-#       value: $(context.pipelineRun.name)
-#     - name: command
-#       value:
-#         - harbor
-#         - deleteimage
-#         - --harbor
-#         - harbor.galasa.dev
-#         - --project
-#         - galasadev
-#         - --repository
-#         - galasa-gradle
-#         - --tag
-#         - $(params.distBranch)
-#         - --credentials
-#         - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
 #
 #######  CLI
 #
@@ -641,7 +597,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -664,7 +620,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -687,7 +643,7 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #
 #
@@ -710,36 +666,27 @@ spec:
         - --tag
         - $(params.distBranch)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+        - /creds/harborcreds.yaml
 #
 #######  Resources
 #
-  - name: delete-image-resources
-    taskRef: 
-      name: delete-branch-image
-    params:
-    - name: distBranch
-      value: $(params.distBranch)
-    - name: image
-      value: galasa-resources
-
-  - name: delete-image-gradle
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - harbor
-        - deleteimage
-        - --harbor
-        - harbor.galasa.dev
-        - --project
-        - galasadev
-        - --repository
-        - galasa-gradle
-        - --tag
-        - $(params.distBranch)
-        - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/harborcreds.yaml
+  # - name: delete-image-resources
+  #   taskRef:
+  #     name: galasabld
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: command
+  #     value:
+  #       - harbor
+  #       - deleteimage
+  #       - --harbor
+  #       - harbor.galasa.dev
+  #       - --project
+  #       - galasadev
+  #       - --repository
+  #       - galasa-resources
+  #       - --tag
+  #       - $(params.distBranch)
+  #       - --credentials
+  #       - /creds/harborcreds.yaml
