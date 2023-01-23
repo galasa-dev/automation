@@ -55,6 +55,9 @@ spec:
 # 
 # 
 #
+# Clone the main branch, even if this isn't for a main build
+# In the next task, the pipeline will switch to the correct branch
+# 
   - name: clone-wrapping
     taskRef: 
       name: git-clone
@@ -62,9 +65,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/wrapping
     - name: revision
-      value: $(params.revision)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
