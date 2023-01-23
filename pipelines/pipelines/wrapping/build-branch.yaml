@@ -139,6 +139,7 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
         - "-Dgalasa.jacocoEnabled=$(params.jacocoEnabled)"
         - "-Dgalasa.isRelease=$(params.isRelease)"
+        - "-X"
     - name: command
       value: 
         - deploy
