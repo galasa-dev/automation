@@ -267,7 +267,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
@@ -340,7 +339,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
@@ -533,13 +531,12 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: command
       value: 
         - deploy
     - name: buildArgs
       value: 
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
