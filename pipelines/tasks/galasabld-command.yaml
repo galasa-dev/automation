@@ -28,9 +28,6 @@ spec:
     - $(params.command[*])
     volumeMounts:
     - name: githubcreds
-      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
-      subPath: githubcreds.yaml
-  volumes:
-    - name: githubcreds
-      secret:
-        secretName: github-token
+      mountPath: /creds
+    - name: harborcreds
+      mountPath: /harborcreds

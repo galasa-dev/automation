@@ -5,6 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: branch-tag-galasa
+  namespace: galasa-build
 spec:
   params:
   - name: distBranch
@@ -36,7 +37,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -58,7 +59,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -80,7 +81,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -102,7 +103,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -124,7 +125,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -146,7 +147,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -168,7 +169,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -190,7 +191,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -212,7 +213,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -234,7 +235,7 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml
 #
 #
 #
@@ -256,4 +257,4 @@ spec:
         - --tag
         - $(params.tag)
         - --credentials
-        - /workspace/git/$(context.pipelineRun.name)/creds/githubcreds.yaml
+        - /creds/githubcreds.yaml

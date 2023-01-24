@@ -15,7 +15,7 @@ spec:
     default: main
   - name: fromSimplatformBranch
     type: string
-    default: main
+    default: prod
   - name: fromJavadocBranch
     type: string
     default: main
@@ -23,6 +23,9 @@ spec:
     type: string
     default: main
   - name: toBranch
+    type: string
+    default: main
+  - name: revision
     type: string
     default: main
   - name: refspec
@@ -34,6 +37,9 @@ spec:
   - name: appname
     type: string
     default: main-maven-repos
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -52,7 +58,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: clone-obr
     taskRef: 
       name: git-clone
@@ -60,9 +68,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -70,7 +78,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -78,9 +88,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/framework
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -88,7 +98,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace     
-
+# 
+# 
+# 
   - name: clone-extensions
     taskRef: 
       name: git-clone
@@ -96,9 +108,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -106,7 +118,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace   
-
+# 
+# 
+# 
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -114,9 +128,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/managers
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -124,7 +138,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace       
-
+# 
+# 
+# 
   - name: clone-isolated
     taskRef: 
       name: git-clone
@@ -134,7 +150,7 @@ spec:
     - name: revision
       value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -142,12 +158,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -160,21 +174,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
-
-  # - name: get-commit
-  #   taskRef:
-  #     name: get-commit
-  #   runAfter:
-  #   - clone-isolated
-  #   params:
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: repo
-  #     value: isolated
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  
+# 
+# 
+# 
   - name: generate-pom-full
     taskRef:
       name: galasabld
@@ -208,7 +210,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-         
+# 
+# 
+#       
   - name: maven-build-isolated1
     taskRef: 
       name: maven-build
@@ -221,7 +225,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -242,8 +245,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-isolated2
     taskRef: 
       name: maven-build
@@ -256,7 +260,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -277,8 +280,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
+# 
+# 
+# 
   - name: maven-build-isolated3
     taskRef: 
       name: maven-build
@@ -291,7 +295,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -312,7 +315,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-isolated4
     taskRef: 
       name: maven-build
@@ -325,7 +330,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -346,8 +350,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-isolated5
     taskRef: 
       name: maven-build
@@ -360,7 +365,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -381,7 +385,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
-     
+# 
+# 
+#    
   - name: maven-build-isolated6
     taskRef: 
       name: maven-build
@@ -394,7 +400,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -415,7 +420,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-javadoc
     taskRef: 
       name: maven-build
@@ -428,7 +435,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -449,7 +455,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
+# 
+# 
+# 
   - name: maven-build-docs
     taskRef: 
       name: maven-build
@@ -462,7 +470,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -483,24 +490,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
-       
-  # - name: copy-text-files
-  #   taskRef:
-  #     name: unix-command
-  #   runAfter:
-  #   - maven-build-docs
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/isolated/full
-  #   - name: command
-  #     value:
-  #       -  cp -vr resources/* target/isolated/     
-  #   workspaces:
-  #     - name: git-workspace
-  #       workspace: git-workspace    
-
+# 
+# 
+# 
   - name: copy-text-files
     taskRef:
       name: copy
@@ -516,7 +508,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace             
-
+# 
+# 
+# 
   - name: docker-build-isolated
     taskRef:
       name: docker-build
@@ -536,7 +530,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
+# 
+# 
+# 
   - name: docker-build-tar-isolated
     taskRef:
       name: docker-build
@@ -560,8 +556,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
-
-
+# 
+# 
+# 
   - name: maven-build-isolated-zip
     taskRef: 
       name: maven-build
@@ -574,7 +571,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/full/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
@@ -596,8 +593,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
-
+# 
+# 
+# 
   - name: docker-build-isolated-zip
     taskRef:
       name: docker-build
@@ -621,7 +619,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace        
-
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -641,6 +641,9 @@ spec:
       - Deployment
       - --resource-name
       - isolated-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -695,7 +698,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-         
+# 
+# 
+#        
   - name: maven-build-mvp1
     taskRef: 
       name: maven-build
@@ -708,7 +713,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -729,8 +734,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-mvp2
     taskRef: 
       name: maven-build
@@ -743,7 +749,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -764,8 +770,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
+# 
+# 
+# 
   - name: maven-build-mvp3
     taskRef: 
       name: maven-build
@@ -778,7 +785,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -799,7 +806,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-mvp4
     taskRef: 
       name: maven-build
@@ -812,7 +821,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -833,8 +842,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
-
+# 
+# 
+# 
   - name: maven-build-mvp5
     taskRef: 
       name: maven-build
@@ -847,7 +857,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -868,7 +878,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
-     
+# 
+# 
+#    
   - name: maven-build-mvp6
     taskRef: 
       name: maven-build
@@ -881,7 +893,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -902,7 +914,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
+# 
+# 
+# 
   - name: maven-build-javadoc-mvp
     taskRef: 
       name: maven-build
@@ -915,7 +929,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -936,7 +950,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
+# 
+# 
+# 
   - name: maven-build-docs-mvp
     taskRef: 
       name: maven-build
@@ -949,7 +965,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -970,24 +986,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
-       
-  # - name: copy-text-files-mvp
-  #   taskRef:
-  #     name: unix-command
-  #   runAfter:
-  #   - maven-build-docs-mvp
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/isolated/mvp
-  #   - name: command
-  #     value:
-  #       -  cp -vr resources/* target/isolated/     
-  #   workspaces:
-  #     - name: git-workspace
-  #       workspace: git-workspace    
-
+# 
+# 
+# 
   - name: copy-text-files-mvp
     taskRef:
       name: copy
@@ -1003,7 +1004,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace             
-
+# 
+# 
+# 
   - name: docker-build-mvp
     taskRef:
       name: docker-build
@@ -1023,7 +1026,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
+# 
+# 
+# 
   - name: docker-build-tar-mvp
     taskRef:
       name: docker-build
@@ -1047,8 +1052,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
-
-
+# 
+# 
+# 
   - name: maven-build-mvp-zip
     taskRef: 
       name: maven-build
@@ -1061,7 +1067,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/mvp/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
@@ -1083,8 +1089,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
-
+# 
+# 
+# 
   - name: docker-build-mvp-zip
     taskRef:
       name: docker-build
@@ -1108,7 +1115,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
-
+# 
+# 
+# 
   - name: recycle-deployment-mvp
     taskRef:
       name: argocd-cli
@@ -1128,6 +1137,9 @@ spec:
       - Deployment
       - --resource-name
       - mvp-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment-mvp
     taskRef:
       name: argocd-cli
@@ -1143,11 +1155,7 @@ spec:
       - $(params.appname)
       - --resource
       - apps:Deployment:mvp-$(params.imageTag) 
-      - --health
-                
-
-
-      
+      - --health   
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean

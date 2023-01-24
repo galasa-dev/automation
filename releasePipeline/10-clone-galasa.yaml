@@ -11,6 +11,11 @@ metadata:
 spec:
   pipelineRef:
     name: branch-clone-galasa
+  podTemplate:
+    volumes:
+    - name: githubcreds
+      secret:
+        secretName: github-token
   params:
   - name: distBranch
     value: "release"

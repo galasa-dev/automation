@@ -8,10 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  # - name: fromBranch
-  #   type: string
-  #   default: main
   - name: toBranch
+    type: string
+    default: main
+  - name: revision
     type: string
     default: main
   - name: refspec
@@ -31,6 +31,9 @@ spec:
     default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+#
   tasks:
   - name: clone-automation
     taskRef: 
@@ -49,6 +52,12 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+#
+# Clone the main branch, even if this isn't for a main build
+# In the next task, the pipeline will switch to the correct branch
+# 
   - name: clone-wrapping
     taskRef: 
       name: git-clone
@@ -58,19 +67,18 @@ spec:
     - name: revision
       value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: output
-       workspace: git-workspace  
+       workspace: git-workspace 
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -82,7 +90,10 @@ spec:
       value: $(params.toBranch)
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace 
+# 
+# 
+#     
   - name: get-commit
     taskRef:
       name: get-commit
@@ -96,6 +107,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -107,6 +121,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: branch-maven-build-wrapping
     taskRef:
       name: maven-build
@@ -116,10 +133,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/wrapping/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
@@ -131,6 +147,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: branch-docker-build-wrapping
     taskRef:
       name: docker-build
@@ -155,6 +174,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -174,6 +196,9 @@ spec:
       - Deployment
       - --resource-name
       - wrapping-$(params.toBranch)
+# 
+# 
+#
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -190,6 +215,9 @@ spec:
       - --resource
       - apps:Deployment:wrapping-$(params.toBranch)
       - --health
+# 
+# 
+#
   # Trigger the next Pipeline (branch-gradle)
   - name: trigger-gradle
     taskRef:
@@ -213,11 +241,17 @@ spec:
       - --param
       - toBranch=$(params.toBranch)
       - --param
+      - revision=$(params.revision)
+      - --param
       - refspec=$(params.refspec)
       - --param
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isRelease=$(params.isRelease)
       - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
