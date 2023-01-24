@@ -17,6 +17,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -28,6 +31,9 @@ spec:
     default: main-maven-repos
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -46,6 +52,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -53,16 +62,19 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/framework
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/framework
     workspaces:
      - name: output
-       workspace: git-workspace     
+       workspace: git-workspace   
+# 
+# 
+#   
   - name: clone-extensions
     taskRef: 
       name: git-clone
@@ -70,9 +82,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -80,6 +92,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -87,9 +102,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/managers
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -97,6 +112,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace     
+# 
+# 
+# 
   - name: clone-obr
     taskRef: 
       name: git-clone
@@ -104,7 +122,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
@@ -114,6 +132,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -129,8 +150,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
-
+# 
+# 
+# 
   - name: generate-embedded
     taskRef:
       name: galasabld
@@ -158,8 +180,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
- 
-
+# 
+# 
+# 
   - name: branch-maven-build-obr-generic
     taskRef:
       name: maven-build
@@ -169,10 +192,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/obr-generic
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - dev.galasa:galasa-maven-plugin:0.15.0:obrembedded
@@ -182,7 +204,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-obr-generic
     taskRef:
       name: docker-build
@@ -206,7 +230,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
+# 
+# 
+# 
   - name: copy-files
     taskRef:
       name: script
@@ -225,7 +251,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
+# 
+# 
+# 
   - name: branch-docker-build-amd64-embedded
     taskRef:
       name: docker-build
@@ -250,7 +278,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-ibm-embedded
     taskRef:
       name: docker-build
@@ -275,7 +305,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   # Trigger Isolated when doing a Main Build
   - name: trigger-isolated
     when:
@@ -323,7 +355,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-
+# 
+# 
+# 
   # Trigger Eclipse when doing a Complete Build/Branch Build 
   - name: trigger-eclipse
     when:
@@ -352,6 +386,8 @@ spec:
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
       - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param

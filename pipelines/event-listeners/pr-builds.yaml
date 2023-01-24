@@ -78,6 +78,12 @@ spec:
                   - name: mavengpg
                     secret:
                       secretName: mavengpg
+                  - name: githubcreds
+                    secret:
+                      secretName: github-token
+                  - name: harborcreds
+                    secret:
+                      secretName: harbor-creds-yaml
                 workspaces:
                 - name: git-workspace
                   volumeClaimTemplate:
