@@ -122,9 +122,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: $(params.revision)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -192,10 +192,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/obr-generic
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - dev.galasa:galasa-maven-plugin:0.15.0:obrembedded

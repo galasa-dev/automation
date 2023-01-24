@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: full-regression
+  name: regression-reruns
   namespace: galasa-build
 spec:
 #
@@ -24,7 +24,30 @@ spec:
 #
 #
 #
-  - name: regression-run
+  - name: runs-prepare
+    taskRef: 
+      name: galasactl
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - runs
+        - prepare
+        - --stream
+        - inttests
+        - --portfolio
+        - test.yaml
+        # - --test EXAMPLE
+        # - local.CoreLocalJava08Ubuntu
+        # - --test
+        # - <INSERT_HERE>
+        - --bootstrap
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - --log # Otherwise there is no output
+        - "-"
+
+  - name: runs-submit
     taskRef: 
       name: galasactl
     params:
@@ -34,14 +57,8 @@ spec:
       value: 
         - runs
         - submit
-        - --stream
-        - inttests
-        - --package
-        - local
-        - --package
-        - kubernetes
-        - --package
-        - compilation
+        - --portfolio
+        - test.yaml
         - --trace
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap

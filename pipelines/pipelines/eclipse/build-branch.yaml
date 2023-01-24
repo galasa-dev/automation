@@ -13,7 +13,7 @@ spec:
     default: main
   - name: fromSimplatformBranch
     type: string
-    default: main
+    default: prod
   - name: toBranch
     type: string
     default: main
@@ -62,9 +62,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/eclipse
     - name: revision
-      value: $(params.revision)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -132,10 +132,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/gpg/settings.xml  
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"

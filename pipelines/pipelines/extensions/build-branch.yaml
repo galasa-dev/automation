@@ -65,9 +65,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: $(params.revision)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -233,6 +233,10 @@ spec:
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isRelease=$(params.isRelease)
       - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
