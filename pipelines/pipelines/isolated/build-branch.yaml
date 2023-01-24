@@ -15,7 +15,7 @@ spec:
     default: main
   - name: fromSimplatformBranch
     type: string
-    default: main
+    default: prod
   - name: fromJavadocBranch
     type: string
     default: main
@@ -148,9 +148,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/isolated
     - name: revision
-      value: $(params.revision)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -225,7 +225,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -261,7 +260,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -297,7 +295,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -333,7 +330,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -369,7 +365,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -405,7 +400,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -441,7 +435,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -477,7 +470,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -579,7 +571,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/full/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
@@ -721,7 +713,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -757,7 +749,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -793,7 +785,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -829,7 +821,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -865,7 +857,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -901,7 +893,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -937,7 +929,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -973,7 +965,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -1075,7 +1067,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        - -Dgpg.skip=true
+        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/mvp/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr

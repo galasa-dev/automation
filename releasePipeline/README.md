@@ -8,10 +8,11 @@ With many repos making up the Galasa project and many different types of artifac
 
 Galasa has been broken up into multiple components, and these components are only released if the component has changed. These components (and related repos) are:-
 
-Galasa (gradle, maven, framework, extensions, managers, obr, eclipse, isolated, docker)
-CLI (cli)
-Docker Operator (docker-operator)
-Kubernetes Operator (kubernetes-operator)
+1. Galasa (wrapping, gradle, maven, framework, extensions, managers, obr, eclipse, isolated)
+1. CLI (cli)
+<!-- 1. Docker Operator (docker-operator) -->
+<!-- 1. Kubernetes Operator (kubernetes-operator) -->
+
 The Galasa component is always released, but the others are only cloned, built, tested and released if there are changes.
 
 
@@ -46,19 +47,21 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
 ### Build the components
 
-1. Run `kubectl -n galasa-build create -f 20-build-galasa.yaml` - Build the Galasa main component.
+1. Run `kubectl -n galasa-build create -f 20-build-galasa.yaml` - Build the Galasa main component. **After each repo's build, go to its maven repository and check that the artifacts have been signed, there should be .asc files present**
 1. Run `kubectl -n galasa-build create -f 21-build-cli.yaml` - **Only if CLI being released** - Build the CLI.
 <!-- 1. Run `kubectl -n galasa-build create -f 22-build-docker-operator.yaml` - **Only if Docker Operator being released** - Build the Docker Operator.
 1. Run `kubectl -n galasa-build create -f 23-build-kubernetes-operator.yaml` - **Only if Kubernetes Operator being released** - Build the Kubernetes Operator. -->
 
 ### Regression test
 
-1. Amend 29-regression-test-galasa.yaml - Set the correct version, the bootVersion is unlikely to change.
-1. Run `kubectl -n galasa-build create -f 29-regression-test-galasa.yaml` - Test Galasa.
-CHANGE TO GALASACTL COMMAND?
+1. Amend 28-regression-test-galasa.yaml - Set the correct version, the bootVersion is unlikely to change.
+1. Run `kubectl -n galasa-build create -f 28-regression-test-galasa.yaml` - Test Galasa.
+1. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
+1. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
+1. Repeat as required.
 1. Manually install and test the SimBank example in Eclipse.
 
-All the tests must past, reruns need to be managed manually at the moment.
+All the tests must pass before moving on.
 
 ### Obtain release approval
 
