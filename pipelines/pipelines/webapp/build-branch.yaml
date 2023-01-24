@@ -22,6 +22,9 @@ spec:
     default: main
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -40,6 +43,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-simplatform
     taskRef: 
       name: git-clone
@@ -56,12 +62,11 @@ spec:
       value: $(context.pipelineRun.name)/simplatform
     workspaces:
      - name: output
-       workspace: git-workspace     
+       workspace: git-workspace    
+# 
+# 
+#  
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -74,7 +79,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-  
+# 
+# 
+# 
   - name: maven-build-simplatform-application
     taskRef:
       name: maven-build
@@ -84,10 +91,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
@@ -97,9 +103,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  
-
+# 
+# 
+# 
   - name: docker-build-webapp
     taskRef:
       name: docker-build

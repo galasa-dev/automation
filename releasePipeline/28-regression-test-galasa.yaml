@@ -16,7 +16,7 @@ spec:
   - name: version
     value: "x.xx.x"
   - name: bootVersion
-    value: "0.23.0"
+    value: "0.24.0"
 #
 #
 #

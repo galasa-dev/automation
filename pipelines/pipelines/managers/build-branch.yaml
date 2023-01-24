@@ -14,6 +14,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -31,6 +34,9 @@ spec:
     default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -49,6 +55,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -66,11 +75,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -83,6 +91,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -97,6 +108,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-gradle-build-managers
     taskRef:
       name: gradle-build
@@ -120,6 +134,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
+# 
+# 
+# 
   - name: branch-docker-build-managers
     taskRef:
       name: docker-build
@@ -144,6 +161,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -163,6 +183,9 @@ spec:
       - Deployment
       - --resource-name
       - managers-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -179,6 +202,9 @@ spec:
       - --resource
       - apps:Deployment:managers-$(params.imageTag)
       - --health
+# 
+# 
+# 
   # Trigger the next Pipeline (branch-obr)
   - name: trigger-obr
     taskRef:
@@ -201,6 +227,8 @@ spec:
       - fromBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param

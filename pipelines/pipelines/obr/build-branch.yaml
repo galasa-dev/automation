@@ -14,6 +14,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -56,9 +59,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/framework
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -76,9 +79,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -96,9 +99,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/managers
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -261,10 +264,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
@@ -334,10 +336,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
@@ -530,13 +531,12 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: command
       value: 
         - deploy
     - name: buildArgs
       value: 
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
@@ -649,12 +649,12 @@ spec:
       - app 
       - actions 
       - run 
-      - javadoc-site
+      - $(params.appname)
       - restart 
       - --kind 
       - Deployment
       - --resource-name
-      - javadoc-site
+      - javadocsite-$(params.imageTag)
 # 
 # 
 #
@@ -670,9 +670,9 @@ spec:
       value: 
       - app 
       - wait
-      - javadoc-site
+      - $(params.appname)
       - --resource
-      - apps:Deployment:javadoc-site
+      - apps:Deployment:javadocsite-$(params.imageTag)
       - --health
 # 
 # 
@@ -699,6 +699,8 @@ spec:
       - fromBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param

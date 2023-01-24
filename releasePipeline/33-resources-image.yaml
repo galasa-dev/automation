@@ -17,14 +17,14 @@ spec:
 #
   pipelineRef:
     name: resources-build
+
+  serviceAccountName: galasa-build-bot
+
   params:
   - name: distBranch
     value: "release"
-#
-#
-#
   - name: version
-    value: "0.0.0"
+    value: "x.xx.x"
 #
 #
 #

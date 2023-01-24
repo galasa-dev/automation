@@ -16,6 +16,9 @@ spec:
     default: refs/heads/main:refs/heads/main
   workspaces:
   - name: git-workspace
+# 
+# 
+#
   tasks:
   - name: clone-automation
     taskRef: 
@@ -119,7 +122,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-       
+
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
   # - name: git-clean

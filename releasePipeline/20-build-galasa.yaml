@@ -12,6 +12,8 @@ spec:
   params:
   - name: toBranch
     value: release
+  - name: revision
+    value: release
   - name: refspec
     value: refs/heads/release:refs/heads/release
   - name: imageTag
@@ -29,6 +31,7 @@ spec:
 # 
   pipelineRef:
     name: branch-wrapping
+  serviceAccountName: galasa-build-bot
 # 
 # 
 # 
@@ -43,6 +46,12 @@ spec:
     - name: mavengpg
       secret:
         secretName: mavengpg
+    - name: githubcreds
+      secret:
+        secretName: github-token
+    - name: harborcreds
+      secret:
+        secretName: harbor-creds-yaml
   workspaces:
   - name: git-workspace
     volumeClaimTemplate:
