@@ -34,7 +34,7 @@ RUN mkdir /galasa/.galasa                          && \
     
 
 COPY trace-log4j.properties /galasa/
-COPY helm-post-install.sh /galasa/
+COPY set-external-env.sh /galasa/
     
 VOLUME /galasa/.galasa
 VOLUME /galasa/load
