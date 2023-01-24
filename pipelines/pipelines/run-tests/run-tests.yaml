@@ -43,8 +43,8 @@ spec:
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
         - --portfolio 
         - test.yaml 
-        - --throttle 
-        - '10' 
+        # - --throttle 
+        # - '10' 
         - --poll 
         - '10' 
         - --progress 
