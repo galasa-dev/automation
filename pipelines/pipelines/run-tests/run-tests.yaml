@@ -82,7 +82,7 @@ spec:
     - chmod  
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/galasa
     - name: script
       value: echo "hi" > file.txt   
     - name: image
@@ -113,7 +113,7 @@ spec:
     - ls  
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/galasa
     - name: script
       value: cat file.txt  
     - name: image
@@ -132,7 +132,7 @@ spec:
     - cat
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/galasa
     - name: command
       value:
         - runs 
@@ -155,7 +155,7 @@ spec:
     - run-prepare
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/galasa
     - name: command
       value:
         - runs 
