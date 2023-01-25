@@ -69,7 +69,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: script
-      value: pwd 
+      value: touch /workspace/git/$(context.pipelineRun.name)/test/file.txt   
     # - name: image
     #   value:
     workspaces:
