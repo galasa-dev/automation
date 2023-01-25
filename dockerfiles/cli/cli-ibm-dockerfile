@@ -12,4 +12,4 @@ RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
 # RUN addgroup galasa && \ 
 #     adduser -D -G galasa -h /galasa -s /bin/sh galasa 
 # WORKDIR /galasa
-USER galasa
+# USER galasa
