@@ -94,7 +94,7 @@ spec:
     taskRef:
       name: script
     runAfter:
-    - create-folder  
+    - chmod 
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -131,7 +131,7 @@ spec:
     - cat
     params:
     - name: context
-      value: $(context.pipelineRun.name)/test
+      value: $(context.pipelineRun.name)
     - name: command
       value:
         - runs 
@@ -154,7 +154,7 @@ spec:
     - run-prepare
     params:
     - name: context
-      value: $(context.pipelineRun.name)/test
+      value: $(context.pipelineRun.name)
     - name: command
       value:
         - runs 
