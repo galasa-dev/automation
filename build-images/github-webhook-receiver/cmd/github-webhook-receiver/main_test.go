@@ -559,3 +559,27 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 		assert.Equal(t, "opened", pPayload.Action, "Parsing payload failed to pick up the action.")
 	}
 }
+
+func TestIsExcludedWhenThereAreNoExclusionsShouldNotExclude(t *testing.T) {
+	excludedRepositories := make([]string, 0)
+	repoName := "notToBeExcludedRepo"
+
+	result := isExcluded(repoName, excludedRepositories)
+	assert.False(t, result, "Should not be excluded, but it was.")
+}
+
+func TestIsExcludedWhenThereAreTwoDifferingExclusionsShouldNotExclude(t *testing.T) {
+	excludedRepositories := []string {"notMatching1","notMatching2"}
+	repoName := "notToBeExcludedRepo"
+
+	result := isExcluded(repoName, excludedRepositories)
+	assert.False(t, result, "Should not be excluded, but it was.")
+}
+
+func TestIsExcludedShouldExcludeIfThereIsAMatch(t *testing.T) {
+	excludedRepositories := []string {"notMatching1","matching2"}
+	repoName := "matching2"
+
+	result := isExcluded(repoName, excludedRepositories)
+	assert.True(t, result, "Should be excluded, but it was not.")
+}
