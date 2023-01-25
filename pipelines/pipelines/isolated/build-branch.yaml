@@ -1157,6 +1157,46 @@ spec:
       - apps:Deployment:mvp-$(params.imageTag) 
       - --health   
 
+
+  - name: trigger-snapshot-integration
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment-mvp
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - snapshot-integration
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-snapshot-integration-$(params.toBranch)
+      - --param
+      - toBranch=integration
+      - --param
+      - fromBranch=main
+      - --param
+      - imageTag=integration
+      - --param
+      - appname=integration-maven-repos
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean
   #   taskRef: 
