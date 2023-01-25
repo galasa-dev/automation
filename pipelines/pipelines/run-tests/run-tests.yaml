@@ -67,7 +67,7 @@ spec:
       name: script
     params:
     - name: context
-      value: $(context.pipelineRun.name)/galasa
+      value: $(context.pipelineRun.name)
     - name: script
       value: pwd
     - name: image
@@ -82,7 +82,7 @@ spec:
     - chmod  
     params:
     - name: context
-      value: $(context.pipelineRun.name)/galasa
+      value: $(context.pipelineRun.name)
     - name: script
       value: echo "hi" > file.txt   
     - name: image
@@ -98,7 +98,7 @@ spec:
     - create-folder 
     params:
     - name: context
-      value: $(context.pipelineRun.name)/galasa
+      value: $(context.pipelineRun.name)
     - name: script
       value: ls  
     - name: image
@@ -113,7 +113,7 @@ spec:
     - ls  
     params:
     - name: context
-      value: $(context.pipelineRun.name)/galasa
+      value: $(context.pipelineRun.name)
     - name: script
       value: cat file.txt  
     - name: image
@@ -132,7 +132,7 @@ spec:
     - cat
     params:
     - name: context
-      value: $(context.pipelineRun.name)/galasa
+      value: $(context.pipelineRun.name)
     - name: command
       value:
         - runs 
@@ -155,7 +155,7 @@ spec:
     - run-prepare
     params:
     - name: context
-      value: $(context.pipelineRun.name)/galasa
+      value: $(context.pipelineRun.name)
     - name: command
       value:
         - runs 
