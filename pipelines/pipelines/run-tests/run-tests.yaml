@@ -138,8 +138,8 @@ spec:
   - name: run-prepare
     taskRef: 
       name: galasactl
-    # runAfter:
-    # - ls2
+    runAfter:
+    - ls2
     params:
     - name: context
       value: $(context.pipelineRun.name)/test
