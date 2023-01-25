@@ -105,33 +105,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: cd
-    taskRef:
-      name: script
-    runAfter:
-    - ls 
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: script
-      value: cd test  
-    # - name: image
-    #   value:
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace   
-  - name: ls2
-    taskRef:
-      name: script
-    runAfter:
-    - cd 
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/test
-    - name: script
-      value: ls  
-    # - name: image
-    #   value:
+  
     workspaces:
      - name: git-workspace
        workspace: git-workspace              
@@ -139,7 +113,7 @@ spec:
     taskRef: 
       name: galasactl
     runAfter:
-    - ls2
+    - ls
     params:
     - name: context
       value: $(context.pipelineRun.name)/test
