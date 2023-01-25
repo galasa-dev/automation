@@ -119,12 +119,27 @@ spec:
     #   value:
     workspaces:
      - name: git-workspace
-       workspace: git-workspace            
+       workspace: git-workspace   
+  - name: ls2
+    taskRef:
+      name: script
+    runAfter:
+    - cd 
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value: ls  
+    # - name: image
+    #   value:
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace              
   - name: run-prepare
     taskRef: 
       name: galasactl
     runAfter:
-    - chmod
+    - ls2
     params:
     - name: context
       value: $(context.pipelineRun.name)/test
