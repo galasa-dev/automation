@@ -70,8 +70,8 @@ spec:
       value: $(context.pipelineRun.name)
     - name: script
       value: echo "hi" > file.txt   
-    # - name: image
-    #   value:
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -85,8 +85,8 @@ spec:
       value: $(context.pipelineRun.name)
     - name: script
       value: chmod +rwx /workspace/git/$(context.pipelineRun.name)  
-    # - name: image
-    #   value:
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -100,8 +100,8 @@ spec:
       value: $(context.pipelineRun.name)
     - name: script
       value: ls  
-    # - name: image
-    #   value:
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -115,8 +115,8 @@ spec:
       value: $(context.pipelineRun.name)
     - name: script
       value: cat file.txt  
-    # - name: image
-    #   value:
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
@@ -141,7 +141,7 @@ spec:
         - --stream 
         - inttests 
         - --portfolio 
-        - /workspace/git/$(context.pipelineRun.name)/test.yaml 
+        - test.yaml 
         - --test 
         - local.CoreLocalJava11Ubuntu
     workspaces:
