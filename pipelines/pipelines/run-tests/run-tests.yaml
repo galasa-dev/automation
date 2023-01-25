@@ -127,7 +127,7 @@ spec:
     - cd 
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/test
     - name: script
       value: ls  
     # - name: image
