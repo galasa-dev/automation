@@ -9,127 +9,10 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  # params:
-  # - name: imageTag
-  #   type: string
-  #   default: main
-  # - name: appname
-  #   type: string
-  #   default: main-maven-repos
   tasks:
-  # - name: run-tests
-  #   taskRef: 
-  #     name: galasactl
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: command
-  #     value:
-  #       - runs 
-  #       - prepare 
-  #       - --bootstrap 
-  #       - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
-  #       - --stream 
-  #       - inttests 
-  #       - --portfolio 
-  #       - test.yaml 
-  #       - --test 
-  #       - local.CoreLocalJava11Ubuntu
-  #       - '&&'
-  #       - galasactl 
-  #       - runs 
-  #       - submit 
-  #       - --bootstrap 
-  #       - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
-  #       - --portfolio 
-  #       - test.yaml 
-  #       # - --throttle 
-  #       # - '10' 
-  #       # - --poll 
-  #       # - '10' 
-  #       # - --progress 
-  #       # - '1' 
-  #       - --override 
-  #       - galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr 
-  #       - --override 
-  #       - galasaecosystem.docker.version=integration 
-  #       - --reportyaml 
-  #       - tests.yaml 
-  #       - --reportjson 
-  #       - tests.json 
-  #       - --reportjunit 
-  #       - junit.xml
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace   
-  # - name: chmod
-  #   taskRef:
-  #     name: script
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: script
-  #     value: pwd
-  #   - name: image
-  #     value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace  
-  # - name: create-folder
-  #   taskRef:
-  #     name: script
-  #   runAfter:
-  #   - chmod  
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: script
-  #     value: echo "hi" > file.txt   
-  #   - name: image
-  #     value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  
-  # - name: ls
-  #   taskRef:
-  #     name: script
-  #   runAfter:
-  #   - create-folder 
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: script
-  #     value: ls  
-  #   - name: image
-  #     value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-  # - name: cat
-  #   taskRef:
-  #     name: script
-  #   runAfter:
-  #   - ls  
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: script
-  #     value: cat file.txt  
-  #   - name: image
-  #     value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace     
-  
-    # workspaces:
-    #  - name: git-workspace
-    #    workspace: git-workspace              
   - name: run-prepare
     taskRef: 
       name: galasactl
-    # runAfter:
-    # - cat
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -187,3 +70,42 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
+
+  - name: trigger-integration-to-prod
+    # when:
+    #   - input: "$(params.toBranch)"
+    #     operator: in
+    #     values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - runs-submit
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - integration-to-prod
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-integration-to-prod-$(params.toBranch)
+      - --param
+      - toBranch=prod
+      - --param
+      - fromBranch=integration
+      - --param
+      - imageTag=prod
+      - --param
+      - appname=prod-maven-repos
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace      
