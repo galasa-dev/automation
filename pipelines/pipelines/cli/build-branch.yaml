@@ -72,8 +72,6 @@ spec:
   - name: clone-cli
     taskRef: 
       name: git-clone
-    runAfter:
-    - git-verify  
     params:
     - name: url
       value: https://github.com/galasa-dev/cli
