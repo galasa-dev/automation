@@ -9,6 +9,7 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
+  params:
   tasks:
   - name: run-prepare
     taskRef: 
@@ -91,7 +92,7 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-integration-to-prod-$(params.toBranch)
+      - trigger-integration-to-prod-main
       - --param
       - toBranch=prod
       - --param
