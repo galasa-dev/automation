@@ -61,10 +61,25 @@ spec:
   #       - junit.xml
   #   workspaces:
   #    - name: git-workspace
-  #      workspace: git-workspace    
+  #      workspace: git-workspace   
+  - name: chmod
+    taskRef:
+      name: script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value: chmod +rwx /workspace/git/$(context.pipelineRun.name)  
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
   - name: create-folder
     taskRef:
       name: script
+    runAfter:
+    - chmod  
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -75,26 +90,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  - name: chmod
-    taskRef:
-      name: script
-    runAfter:
-    - create-folder  
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: script
-      value: chmod +rwx /workspace/git/$(context.pipelineRun.name)  
-    - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace   
+  
   - name: ls
     taskRef:
       name: script
     runAfter:
-    - chmod 
+    - create-folder 
     params:
     - name: context
       value: $(context.pipelineRun.name)
