@@ -79,7 +79,7 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
-    - runs-submit
+    - run-submit
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
