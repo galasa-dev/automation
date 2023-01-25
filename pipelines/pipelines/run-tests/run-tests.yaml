@@ -69,7 +69,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: script
-      value: mkdir test   
+      value: pwd 
     # - name: image
     #   value:
     workspaces:
