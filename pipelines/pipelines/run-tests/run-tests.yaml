@@ -67,7 +67,7 @@ spec:
       name: script
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/galasa
     - name: script
       value: pwd
     - name: image
@@ -98,7 +98,7 @@ spec:
     - create-folder 
     params:
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/galasa
     - name: script
       value: ls  
     - name: image
