@@ -118,8 +118,9 @@ spec:
     runAfter: 
     - clone-cli
     params:
+    # The context indicates which folder the build.gradle is in.
     - name: context
-      value: $(context.pipelineRun.name)/cli/galasa-parent
+      value: $(context.pipelineRun.name)/cli
     - name: buildArgs
       value:
         - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
@@ -128,6 +129,7 @@ spec:
     - name: command
       value: 
         - installJarsIntoTemplates
+        - --info
     workspaces:
     - name: git-workspace
       workspace: git-workspace
