@@ -6,6 +6,9 @@ kind: Pipeline
 metadata:
   name: pr-cli
   namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   workspaces:
   - name: git-workspace
@@ -29,6 +32,8 @@ spec:
   - name: action
     type: string
   tasks:
+
+  #----------------------------------------------------------------
   - name: git-verify
     taskRef:
       name: git-verify
@@ -39,6 +44,8 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
+  #----------------------------------------------------------------
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -58,6 +65,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+  #----------------------------------------------------------------
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -77,6 +86,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
+
+  #----------------------------------------------------------------
+  # Clone the CLI repo
   - name: clone-cli
     taskRef: 
       name: git-clone
@@ -97,12 +109,37 @@ spec:
      - name: output
        workspace: git-workspace      
 
+  #----------------------------------------------------------------
+  # Call gradle to pull-down dependencies we need and put them in 
+  # the correct places.
+  - name: gather-dependencies
+    taskRef: 
+      name: gradle-build
+    runAfter: 
+    - clone-cli
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli/galasa-parent
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/cli/repo"
+    - name: command
+      value: 
+        - installJarsIntoTemplates
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
 
+  #----------------------------------------------------------------
+  # Generate Go client code from the openapi.yaml so galasactl can 
+  # talk to the API server.
   - name: generate-api
     taskRef: 
       name: general-command
     runAfter:
-    - clone-cli
+    - gather-dependencies
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -125,6 +162,9 @@ spec:
      - name: git-workspace
        workspace: git-workspace         
 
+  #----------------------------------------------------------------
+  # The go.mod is out of date, as it doesn't include the generated code
+  # So remove it. It gets re-generated when we compile.
   - name: clear-mod
     taskRef:
       name: unix-command
@@ -142,6 +182,9 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
+  #----------------------------------------------------------------
+  # The go.sum is out of date, as it doesn't include the generated code
+  # So remove it. It gets re-generated when we compile.
   - name: clear-sum
     taskRef:
       name: unix-command
@@ -159,6 +202,9 @@ spec:
      - name: git-workspace
        workspace: git-workspace     
 
+  #----------------------------------------------------------------
+  # The go code needs to know which version of Galasa it is part of.
+  # So substitute an eye-catcher with the correct value.
   - name: update-version
     taskRef: 
       name: script
@@ -177,6 +223,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace 
 
+  #----------------------------------------------------------------
   - name: get-commit
     taskRef:
       name: get-commit
@@ -191,6 +238,9 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
+  #----------------------------------------------------------------
+  # Invoke the make command to build the go code, run unit tests and
+  # gather code coverage stats.
   - name: galasactl-make
     taskRef:
       name: make
@@ -203,6 +253,8 @@ spec:
      - name: git-workspace
        workspace: git-workspace    
 
+  #----------------------------------------------------------------
+  # Build a docker image with the command installed into it.
   - name: docker-build-cli
     taskRef: 
       name: docker-build
@@ -226,6 +278,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
+  #----------------------------------------------------------------
   - name: docker-build-cli-ibm
     taskRef: 
       name: docker-build
@@ -251,6 +304,7 @@ spec:
        workspace: git-workspace
 
 
+  #----------------------------------------------------------------
   - name: docker-build-cli-binary
     taskRef: 
       name: docker-build
@@ -273,7 +327,14 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
+
+  #----------------------------------------------------------------
+  # And finally... whether the above work or not, this gets called.
+  #----------------------------------------------------------------
   finally:
+
+  #----------------------------------------------------------------
+  # Tell the pull request the build succeeded/failed.
   - name: git-status
     when:
       - input: "$(tasks.git-verify.status)"

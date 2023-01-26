@@ -137,20 +137,41 @@ func handlerWithPayload(response http.ResponseWriter, request *http.Request, req
 		log.Printf("Pull request URL = %s\n", pullRequestUrl)
 		log.Printf("Status URL = %s\n", statusUrl)
 		log.Printf("gitHubIssue URL = %s\n", githubIssueUrl)
+		log.Printf("Repository name = %s\n", requestPayload.PullRequest.Repository.Name)
 
-		err = updateStatus("pending", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
-
-		if err != nil {
-			msg := "Couldn't update pull request state."
-			log.Println(msg)
-			http.Error(response, msg, http.StatusInternalServerError)
+		if isExcluded(requestPayload.PullRequest.Repository.Name, inputs.ExcludedRepositories) {
+			log.Printf("Ignoring. Repository '%s' is configured to be excluded from Tekton building.\n", requestPayload.PullRequest.Repository.Name)
 		} else {
+			err = updateStatus("pending", "Building will start soon...", inputs.GithubToken, pullRequestUrl, statusUrl, githubIssueUrl)
+
+			if err != nil {
+				msg := "Couldn't update pull request state."
+				log.Println(msg)
+				http.Error(response, msg, http.StatusInternalServerError)
+			}
+		}
+
+		if err == nil {
 			msg := "OK"
 			log.Println(msg)
 			fmt.Fprintf(response, msg)
 		}
 	}
 	return err
+}
+
+// isExcluded Figures out whether the specified repository name is one which has been excluded
+// from Tekton building. Returns true if it has been excluded, false otherwise.
+func isExcluded(repoName string, excludedRepoNames []string) bool {
+	var excluded bool = false
+
+	for _, excludedRepoName := range excludedRepoNames {
+		if repoName == excludedRepoName {
+			excluded = true
+			break
+		}
+	}
+	return excluded
 }
 
 func logRequestHeaders(request *http.Request) {
