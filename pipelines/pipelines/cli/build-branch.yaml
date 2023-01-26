@@ -106,6 +106,7 @@ spec:
     - name: command
       value: 
         - installJarsIntoTemplates
+        - --info
     workspaces:
     - name: git-workspace
       workspace: git-workspace
