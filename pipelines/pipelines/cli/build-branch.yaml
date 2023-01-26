@@ -46,9 +46,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: clone-framework
     taskRef: 
       name: git-clone

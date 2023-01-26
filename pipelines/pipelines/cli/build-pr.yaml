@@ -6,6 +6,9 @@ kind: Pipeline
 metadata:
   name: pr-cli
   namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   workspaces:
   - name: git-workspace
@@ -29,6 +32,8 @@ spec:
   - name: action
     type: string
   tasks:
+
+  #----------------------------------------------------------------
   - name: git-verify
     taskRef:
       name: git-verify
@@ -39,6 +44,8 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
+  #----------------------------------------------------------------
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -58,6 +65,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+  #----------------------------------------------------------------
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -110,12 +119,12 @@ spec:
     - clone-cli
     params:
     - name: context
-      value: $(context.pipelineRun.name)/framework/galasa-parent
+      value: $(context.pipelineRun.name)/cli/galasa-parent
     - name: buildArgs
       value:
         - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/cli/repo"
     - name: command
       value: 
         - installJarsIntoTemplates
@@ -128,7 +137,7 @@ spec:
   # talk to the API server.
   - name: generate-api
     taskRef: 
-      name: general-command
+      name: generate-command
     runAfter:
     - gather-dependencies
     params:
