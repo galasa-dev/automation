@@ -4,22 +4,22 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: branch-buildutils
+  name: buildutils-snapshot-main-to-prod
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: fromBranch
     type: string
     default: main
-  - name: refspec
+  - name: toBranch
     type: string
-    default: refs/heads/main:refs/heads/main
+    default: prod
   - name: imageTag
     type: string
-    default: main
+    default: prod
   - name: appname
     type: string
-    default: main-bld
+    default: prod-bld
   workspaces:
   - name: git-workspace
 # 
@@ -46,71 +46,39 @@ spec:
 # 
 # 
 #
-  - name: clone-buildutils
-    taskRef: 
-      name: git-clone
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/buildutils
-    - name: revision
-      value: $(params.branch)
-    - name: refspec
-      value: $(params.refspec)
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/buildutils
-    workspaces:
-     - name: output
-       workspace: git-workspace 
-# 
-# 
-#
-  - name: make
-    taskRef:
-      name: make
-    runAfter:
-      - clone-buildutils  
-    params:
-    - name: directory
-      value: $(context.pipelineRun.name)/buildutils
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace 
-# 
-# 
-# 
-  - name: build-galasabld-binary-downloadables
+  - name: snapshot-galasabld-binaries
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation
-    - make
+    - clone-automation  
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name) 
     - name: context
-      value: $(context.pipelineRun.name)/buildutils
+      value: $(context.pipelineRun.name) 
     - name: dockerfilePath
-      value: automation/dockerfiles/galasabld/galasabld-binary-dockerfile
+      value: automation/dockerfiles/snapshots/repo-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=branch=$(params.branch)"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasabld-binary-downloadables"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
+        - "--build-arg=branch=$(params.toBranch)"   
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
+       workspace: git-workspace     
 # 
 # 
-# 
+#
   - name: recycle-galasabld-binaries
     taskRef:
       name: argocd-cli
     runAfter:
-    - build-galasabld-binary-downloadables
+    - snapshot-galasabld-binaries
     params:
     - name: server
       value: argocd.galasa.dev
@@ -127,64 +95,74 @@ spec:
       - bld-$(params.imageTag)
 # 
 # 
+#
+  - name: wait-galasabld-binaries
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-galasabld-binaries
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:bld-$(params.imageTag)
+      - --health 
 # 
-  - name: build-galasabld-executable
+# 
+# 
+  - name: snapshot-galasabld-executable
     taskRef:
       name: docker-build
     runAfter:
-    - make
+    - clone-automation  
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name) 
     - name: context
-      value: $(context.pipelineRun.name)/buildutils
+      value: $(context.pipelineRun.name) 
     - name: dockerfilePath
-      value: automation/dockerfiles/galasabld/galasabld-dockerfile
+      value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasabld:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=platform=linux-amd64"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasabld"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"     
     workspaces:
      - name: git-workspace
        workspace: git-workspace
 # 
 # 
 # 
-  - name: build-galasabld-ibm-executable
+  - name: snapshot-galasabld-ibm-executable
     taskRef:
       name: docker-build
     runAfter:
-    - build-galasabld-executable
+    - clone-automation  
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name) 
     - name: context
-      value: $(context.pipelineRun.name)/buildutils
+      value: $(context.pipelineRun.name) 
     - name: dockerfilePath
-      value: automation/dockerfiles/galasabld/galasabld-ibm-dockerfile
+      value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasabld-ibm:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=$(params.imageTag)"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasabld-ibm"   
+        - "--build-arg=oldBranch=$(params.fromBranch)" 
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace  
