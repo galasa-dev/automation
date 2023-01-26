@@ -90,6 +90,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
   - name: gradle-build-framework
     taskRef:
       name: gradle-build

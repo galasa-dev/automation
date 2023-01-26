@@ -137,7 +137,7 @@ spec:
   # talk to the API server.
   - name: generate-api
     taskRef: 
-      name: generate-command
+      name: general-command
     runAfter:
     - gather-dependencies
     params:
