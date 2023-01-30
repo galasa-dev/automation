@@ -1,0 +1,101 @@
+#
+# Copyright contributors to the Galasa project
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-helm
+  namespace: galasa-build
+spec:
+  params:
+  - name: revision
+    type: string
+    default: HEAD
+  - name: imageTag
+    type: string
+    default: main
+  - name: appName
+    type: string
+    default: main-helm
+  workspaces:
+  - name: git-workspace
+#
+#
+#
+  tasks:
+  - name: install-ecosystem
+    taskRef:
+      name: argocd-cli
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - create
+      - $(params.appName)
+      - --project
+      - default
+      - --repo
+      - https://github.com/galasa-dev/helm
+      - --revision
+      - $(params.revision)
+      - --dest-server
+      - https://kubernetes.default.svc
+      - --dest-namespace
+      - galasa-development
+      - --path
+      - charts/ecosystem
+      - --helm-set
+      - externalHostname=c1.eu-gb.containers.cloud.ibm.com
+      - --helm-set
+      - galasaRegistry=harbor.galasa.dev/galasadev
+      - --helm-set
+      - galasaVersion=$(params.imageTag)
+      - --upsert
+#
+#
+#
+  - name: sync-app
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - install-ecosystem
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - sync
+      - $(params.appName)
+#
+#
+#
+  - name: wait-app
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - sync-app
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.appName)
+      - --health
+#
+#
+#
+  - name: helm-test
+    taskRef:
+      name: helm-cli
+    runAfter:
+    - wait-app
+    params:
+    - name: command
+      value:
+      - test
+      - $(params.appName)

@@ -1,0 +1,140 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pr-helm
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+  tasks:
+  - name: git-verify
+    taskRef:
+      name: git-verify
+    params:
+    - name: userId
+      value: $(params.userId)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: action
+      value: $(params.action)
+  - name: install-ecosystem
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - git-verify
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - create
+      - pr-$(params.baseRef)
+      - --project
+      - default
+      - --repo
+      - https://github.com/galasa-dev/helm
+      - --revision
+      - $(params.baseRef)
+      - --dest-server
+      - https://kubernetes.default.svc
+      - --dest-namespace
+      - galasa-development
+      - --path
+      - charts/ecosystem
+      - --helm-set
+      - externalHostname=c1.eu-gb.containers.cloud.ibm.com
+      - --helm-set
+      - galasaRegistry=harbor.galasa.dev/galasadev
+      - --helm-set
+      - galasaVersion=main
+      - --upsert
+  - name: sync-app
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - install-ecosystem
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - sync
+      - pr-$(params.baseRef)
+  - name: wait-app
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - sync-app
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.baseRef)
+      - --health
+  - name: helm-test
+    taskRef:
+      name: helm-cli
+    runAfter:
+    - wait-app
+    params:
+    - name: command
+      value:
+      - test
+      - $(params.baseRef)  
+  finally:
+  - name: cleanup-app
+    taskRef:
+      name: argocd-cli
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - delete
+      - $(params.baseRef)
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
+    taskRef:
+      name: git-status
+    params:
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
