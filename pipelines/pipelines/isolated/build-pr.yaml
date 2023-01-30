@@ -234,7 +234,8 @@ spec:
         - -f
         - pom.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -268,7 +269,8 @@ spec:
         - -f
         - pom2.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
@@ -302,7 +304,8 @@ spec:
         - -f
         - pom3.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -335,7 +338,8 @@ spec:
         - -f
         - pom4.xml
     - name: command    
-      value: process-sources   
+      value: 
+        - process-sources   
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -369,7 +373,8 @@ spec:
         - -f
         - pom5.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
@@ -402,7 +407,8 @@ spec:
         - -f
         - pom6.xml
     - name: command    
-      value: process-sources 
+      value: 
+        - process-sources 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -435,7 +441,8 @@ spec:
         - -f
         - pomJavaDoc.xml
     - name: command    
-      value: process-sources   
+      value: 
+        - process-sources   
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
@@ -468,7 +475,8 @@ spec:
         - -f
         - pomDocs.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
@@ -580,7 +588,8 @@ spec:
         - -f
         - pomZip.xml
     - name: command
-      value: deploy 
+      value: 
+        - deploy 
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
@@ -677,7 +686,8 @@ spec:
         - -f
         - pom.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -711,7 +721,8 @@ spec:
         - -f
         - pom2.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
@@ -745,7 +756,8 @@ spec:
         - -f
         - pom3.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -778,7 +790,8 @@ spec:
         - -f
         - pom4.xml
     - name: command    
-      value: process-sources   
+      value: 
+        - process-sources   
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -812,7 +825,8 @@ spec:
         - -f
         - pom5.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
@@ -845,7 +859,8 @@ spec:
         - -f
         - pom6.xml
     - name: command    
-      value: process-sources 
+      value: 
+        - process-sources 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -878,7 +893,8 @@ spec:
         - -f
         - pomJavaDoc.xml
     - name: command    
-      value: process-sources   
+      value: 
+        - process-sources   
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
@@ -911,7 +927,8 @@ spec:
         - -f
         - pomDocs.xml
     - name: command    
-      value: process-sources    
+      value: 
+        - process-sources    
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
@@ -1023,7 +1040,8 @@ spec:
         - -f
         - pomZip.xml
     - name: command
-      value: deploy 
+      value: 
+        - deploy 
     workspaces:
      - name: git-workspace
        workspace: git-workspace     

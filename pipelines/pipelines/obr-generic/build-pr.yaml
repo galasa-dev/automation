@@ -180,7 +180,7 @@ spec:
        workspace: git-workspace      
  
 
-  - name: branch-maven-build-obr-generic
+  - name: maven-build-obr-generic
     taskRef:
       name: maven-build
     runAfter: 
@@ -197,16 +197,17 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - dev.galasa:galasa-maven-plugin:0.15.0:obrembedded
     - name: command
-      value: process-sources
+      value: 
+        - process-sources
     workspaces:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: branch-docker-build-obr-generic
+  - name: docker-build-obr-generic
     taskRef:
       name: docker-build
     runAfter:
-      - branch-maven-build-obr-generic
+      - maven-build-obr-generic
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -230,13 +231,13 @@ spec:
     taskRef:
       name: script
     runAfter:
-      - branch-docker-build-obr-generic  
+      - docker-build-obr-generic  
     params:
     - name: context
       value: $(context.pipelineRun.name)
     - name: script
       value: cp -vr /opt/k8s/bin/kubectl 
-             /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/helm-post-install.sh 
+             /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/set-external-env.sh 
              /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties 
              /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/
     - name: image
@@ -245,7 +246,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace   
 
-  - name: branch-docker-build-amd64-embedded
+  - name: docker-build-amd64-embedded
     taskRef:
       name: docker-build
     runAfter:
@@ -270,11 +271,11 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  - name: branch-docker-build-ibm-embedded
+  - name: docker-build-ibm-embedded
     taskRef:
       name: docker-build
     runAfter:
-      - branch-docker-build-amd64-embedded
+      - docker-build-amd64-embedded
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)

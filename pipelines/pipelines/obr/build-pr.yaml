@@ -221,7 +221,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -284,7 +285,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -342,7 +344,7 @@ spec:
        workspace: git-workspace
   - name: maven-build-javadoc
     taskRef: 
-      name: maven-build
+      name: maven-build-java18
     runAfter: 
     - generate-javadoc
     params:
@@ -351,7 +353,8 @@ spec:
     - name: settingsLocation
       value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
     - name: command
-      value: deploy
+      value: 
+        - deploy
     - name: buildArgs
       value: 
         - "-Dgpg.skip=true"

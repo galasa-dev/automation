@@ -15,11 +15,19 @@ spec:
     type: string
   - name: command
     type: array
+  - name: tag
+    type: string
+    default: main
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/galasadev/galasabld:main
+    image: harbor.galasa.dev/galasadev/galasabld:$(params.tag)
     imagePullPolicy: Always
     command:
     - galasabld
     - $(params.command[*])
+    volumeMounts:
+    - name: githubcreds
+      mountPath: /creds
+    - name: harborcreds
+      mountPath: /harborcreds

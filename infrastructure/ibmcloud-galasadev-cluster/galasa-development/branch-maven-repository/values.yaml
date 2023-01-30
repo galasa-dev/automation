@@ -14,11 +14,16 @@ extensions:
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-extensions
   imageTag: main
+codecov:
+  deploy: false
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
+  imageTag: main      
 framework:
   deploy: false
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-framework
-  imageTag: main
+  imageTag: main 
 obr:
   deploy: false
   branch: main
@@ -47,22 +52,22 @@ p2:
 isolated:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-isolated
+  imageName: icr.io/galasadev/galasa-isolated-zip
   imageTag: main
 javadoc:
   deploy: false
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
   imageTag: main
+javadocsite:
+  deploy: false
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
+  imageTag: main  
 mvp:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-mvp
-  imageTag: main
-simplatform:
-  deploy: false
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-simplatform
+  imageName: icr.io/galasadev/galasa-mvp-zip
   imageTag: main
 wrapping:
   deploy: false

@@ -14,8 +14,17 @@ spec:
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
+  - name: imageTag
+    type: string
+    default: main
+  - name: appname
+    type: string
+    default: main-bld
   workspaces:
   - name: git-workspace
+# 
+# 
+#
   tasks:
   - name: clone-automation
     taskRef: 
@@ -34,6 +43,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+#
   - name: clone-buildutils
     taskRef: 
       name: git-clone
@@ -51,6 +63,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
+# 
+# 
+#
   - name: make
     taskRef:
       name: make
@@ -62,7 +77,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-  - name: build-galasabld-image
+# 
+# 
+# 
+  - name: build-galasabld-binary-downloadables
     taskRef:
       name: docker-build
     runAfter:
@@ -74,9 +92,56 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/buildutils
     - name: dockerfilePath
+      value: automation/dockerfiles/galasabld/galasabld-binary-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=branch=$(params.branch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: recycle-galasabld-binaries
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - build-galasabld-binary-downloadables
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - bld-$(params.imageTag)
+# 
+# 
+# 
+  - name: build-galasabld-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - make
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/buildutils
+    - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasabld:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -84,8 +149,69 @@ spec:
         - "--build-arg=platform=linux-amd64"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
-       
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: build-galasabld-ibm-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - build-galasabld-executable
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/buildutils
+    - name: dockerfilePath
+      value: automation/dockerfiles/galasabld/galasabld-ibm-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-ibm:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=branch=$(params.imageTag)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: trigger-snapshot-main-to-prod
+    when:
+      - input: "$(params.branch)"
+        operator: in
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - recycle-galasabld-binaries
+    - build-galasabld-ibm-executable
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - buildutils-snapshot-main-to-prod
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - buildutils-snapshot-
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
   # - name: git-clean

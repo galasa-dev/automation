@@ -14,6 +14,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -23,8 +26,17 @@ spec:
   - name: appname
     type: string
     default: main-maven-repos
+  - name: jacocoEnabled
+    type: string
+    default: "false"
+  - name: isRelease
+    type: string
+    default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -43,6 +55,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-gradle
     taskRef: 
       name: git-clone
@@ -60,6 +75,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: check-branch
     # Have to remove this when clause for now, as get-commit and the build task should runAfter this
     # but if this doesn't execute, the pipeline will stop. Need to improve in future.
@@ -79,6 +97,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -92,6 +113,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-gradle-build-gradle
     taskRef:
       name: gradle-build
@@ -105,6 +129,8 @@ spec:
         - "-PsourceMaven=https://repo.maven.apache.org/maven2/"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/gradle/repo"
+        - "-PjacocoEnabled=$(params.jacocoEnabled)"
+        - "-PisRelease=$(params.isRelease)"
     - name: command
       value: 
         - check
@@ -112,6 +138,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-gradle
     taskRef:
       name: docker-build
@@ -136,6 +165,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -155,6 +187,9 @@ spec:
       - Deployment
       - --resource-name
       - gradle-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -171,6 +206,9 @@ spec:
       - --resource
       - apps:Deployment:gradle-$(params.imageTag)
       - --health
+# 
+# 
+# 
   # Trigger the next Pipeline (branch-maven)
   - name: trigger-maven
     taskRef:
@@ -194,11 +232,18 @@ spec:
       - --param
       - toBranch=$(params.toBranch)
       - --param
+      - revision=$(params.revision)
+      - --param
       - refspec=$(params.refspec)
       - --param
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isRelease=$(params.isRelease)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template

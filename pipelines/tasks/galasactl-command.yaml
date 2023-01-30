@@ -1,0 +1,28 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: galasactl
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: command
+    type: array
+  - name: tag
+    type: string
+    default: main
+  steps:
+  - name: galasactl
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.tag)
+    imagePullPolicy: Always
+    command:
+    - galasactl
+    - $(params.command[*])

@@ -1,0 +1,26 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: general-command
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params: 
+  - name: context
+    type: string
+  - name: command
+    type: array
+  - name: image
+    type: string  
+    default: docker.io/library/busybox:latest
+  steps:
+  - name: command
+    workingDir: /workspace/git/$(params.context)
+    image: $(params.image)
+    command:
+      - $(params.command[*])

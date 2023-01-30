@@ -14,6 +14,9 @@ spec:
   - name: toBranch
     type: string
     default: main
+  - name: revision
+    type: string
+    default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
@@ -23,8 +26,17 @@ spec:
   - name: appname
     type: string
     default: main-maven-repos
+  - name: jacocoEnabled
+    type: string
+    default: "false"
+  - name: isRelease
+    type: string
+    default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -43,6 +55,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -60,11 +75,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
+# 
+# 
+# 
   - name: check-branch
-    # when: 
-    #   - input: "$(params.toBranch)"
-    #     operator: notin
-    #     values: ["main"]
     taskRef: 
       name: git-check-branch
     runAfter:
@@ -77,6 +91,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,6 +107,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-gradle-build-framework
     taskRef:
       name: gradle-build
@@ -103,6 +123,8 @@ spec:
         - "-PsourceMaven=https://development.galasa.dev/$(params.fromBranch)/maven-repo/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+        - "-PjacocoEnabled=$(params.jacocoEnabled)"
+        - "-PisRelease=$(params.isRelease)"
     - name: command
       value: 
         - check
@@ -110,6 +132,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-framework
     taskRef:
       name: docker-build
@@ -134,6 +159,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -153,6 +181,9 @@ spec:
       - Deployment
       - --resource-name
       - framework-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -169,6 +200,9 @@ spec:
       - --resource
       - apps:Deployment:framework-$(params.imageTag)
       - --health
+# 
+# 
+# 
   # Trigger the next Pipeline (branch-extensions)
   - name: trigger-extensions
     taskRef:
@@ -192,11 +226,18 @@ spec:
       - --param
       - toBranch=$(params.toBranch)
       - --param
+      - revision=$(params.revision)
+      - --param
       - refspec=$(params.refspec)
       - --param
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isRelease=$(params.isRelease)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
