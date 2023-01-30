@@ -4,15 +4,15 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: ibm-cloud-cli
+  name: ibmcloud-cli
   namespace: galasa-build
 spec:
   params:
   - name: command
     type: array       
   steps:
-  - name: ibm-cloud-cli-login
-    image: harbor.galasa.dev/common/ibm-cloud-cli:main
+  - name: ibmcloud-cli-login
+    image: harbor.galasa.dev/common/ibmcloud-cli:main
     imagePullPolicy: Always
     env:
     - name: IBMCLOUD_API_KEY
@@ -25,8 +25,8 @@ spec:
     - ibmcloud
     - login
 # 
-  - name: ibm-cloud-cli-command
-    image: harbor.galasa.dev/common/ibm-cloud-cli:main
+  - name: ibmcloud-cli-command
+    image: harbor.galasa.dev/common/ibmcloud-cli:main
     imagePullPolicy: Always
     env:
     - name: IBMCLOUD_API_KEY
