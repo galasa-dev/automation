@@ -218,6 +218,40 @@ spec:
       - --resource
       - apps:Deployment:inttests-$(params.imageTag)
       - --health
+# 
+# 
+# 
+  - name: trigger-snapshot-main-to-prod
+    when:
+      - input: "$(params.branch)"
+        operator: in
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - inttests-snapshot-main-to-prod
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - inttests-snapshot
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
  
       
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
