@@ -6,6 +6,8 @@ kind: Pipeline
 metadata:
   name: branch-automation
   namespace: galasa-build
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
   - name: branch
@@ -17,6 +19,9 @@ spec:
   workspaces:
   - name: git-workspace
   tasks:
+# 
+# 
+# 
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -34,6 +39,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -47,6 +55,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -64,6 +75,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: build-ghverify-image
     taskRef:
       name: docker-build
@@ -83,6 +97,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
+  #---------------------------------------------------------------------
+  # Github pull request status publisher tool
+  #---------------------------------------------------------------------
+  # Used in pipelines to tell the github PR whether a build passed or failed.
   - name: go-build-ghstatus
     taskRef:
       name: go-build
@@ -100,6 +120,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: build-ghstatus-image
     taskRef:
       name: docker-build
@@ -119,6 +142,13 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
+  #---------------------------------------------------------------------
+  # Github activity monitor
+  #---------------------------------------------------------------------
+  # Build a tool which monitors github for webhook events which have previously
+  # been delivered, and kick-off an internal pipeline to handle them.
   - name: go-build-ghmonitor
     taskRef:
       name: go-build
@@ -136,6 +166,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: build-ghmonitor-image
     taskRef:
       name: docker-build
@@ -154,7 +187,116 @@ spec:
       value: ""
     workspaces:
      - name: git-workspace
-       workspace: git-workspace     
+       workspace: git-workspace  
+
+
+  #---------------------------------------------------------------------
+  # Github webhook receiver
+  #---------------------------------------------------------------------
+  # A tool which is called by the webhook, responds OK, and 
+  # tells a pull request that a build is 'pending...'
+  #
+  # Build the go code.
+  - name: go-build-ghreceiver
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-receiver
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghreceiver
+      - cmd/github-webhook-receiver/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# Build the docker image (and push it to harbor)
+# 
+# 
+  - name: build-ghreceiver-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghreceiver
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-receiver
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/github-receiver-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghreceiver:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+# 
+# 
+#  Kick the argocd application to refresh, causing a re-deployment
+# 
+# 
+#  Note: The --exclude flags causes some repositories not to be told
+#  that a Tekton build is starting. All other PRs in repos in the organisation
+#  will receive notification that the Tekton build is starting shortly...
+#
+  - name: recycle-webhook-receiver-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - build-ghreceiver-image
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - github-webhook-receiver
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - github-webhook-receiver
+      - --exclude
+      - galasa.dev
+      - --exclude
+      - helm
+# 
+# 
+# Wait for the redeployment to complete.
+# 
+# 
+  - name: wait-webhook-receiver-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-webhook-receiver-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - github-webhook-receiver 
+      - --resource
+      - apps:Deployment:github-webhook-receiver
+      - --health
+
+
+  #---------------------------------------------------------------------
+  # GPG signing tool
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image.
   - name: build-gpg-image
     taskRef:
       name: docker-build
@@ -174,6 +316,12 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
+  #---------------------------------------------------------------------
+  # Kubectl tool
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image.
   - name: build-kubectl-image
     taskRef:
       name: docker-build
@@ -193,6 +341,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  #---------------------------------------------------------------------
+  # Git cli tool
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image
   - name: build-gitcli-image
     taskRef:
       name: docker-build
@@ -213,6 +366,11 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
+
+  #---------------------------------------------------------------------
+  # tkn cli tool - control tekton from within a tekton pipeline
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image
   - name: build-tkn-image
     taskRef:
       name: docker-build
@@ -232,6 +390,31 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
+
+  #---------------------------------------------------------------------
+  # openapi generation tools - turn openapi yaml files into generated code
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image
+  - name: build-openapi-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/openapi-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/openapi:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:

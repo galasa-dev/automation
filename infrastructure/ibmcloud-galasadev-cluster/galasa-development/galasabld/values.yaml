@@ -1,0 +1,7 @@
+#
+# Copyright contributors to the Galasa project 
+#
+namespace: galasa-development
+branch: main
+imageName: harbor.galasa.dev/galasadev/galasabld-binary-downloadables
+imageTag: main

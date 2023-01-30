@@ -1,0 +1,373 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: codecoverage
+  namespace: galasa-build
+spec:
+  params:
+  - name: imageTag
+    type: string
+    default: main
+  - name: appname
+    type: string
+    default: main-maven-repos
+  workspaces:
+  - name: git-workspace
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-framework
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/framework
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/framework
+    workspaces:
+     - name: output
+       workspace: git-workspace     
+  - name: clone-extensions
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/extensions
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/extensions
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-managers
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/managers
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/managers
+    workspaces:
+     - name: output
+       workspace: git-workspace     
+  - name: clone-obr
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/obr
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/obr
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+  - name: generate-pom-sources
+    taskRef: 
+      name: galasabld
+    runAfter:
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:    
+        - template
+        - --releaseMetadata
+        - /workspace/git/$(context.pipelineRun.name)/framework/release.yaml
+        - --releaseMetadata
+        - /workspace/git/$(context.pipelineRun.name)/extensions/release.yaml
+        - --releaseMetadata
+        - /workspace/git/$(context.pipelineRun.name)/managers/release.yaml
+        - --releaseMetadata
+        - /workspace/git/$(context.pipelineRun.name)/obr/release.yaml
+        - --template
+        - /workspace/git/$(context.pipelineRun.name)/obr/codecoveragetemplates/pomfetch.template
+        - --output
+        - pom.xml
+        - --codecoverage
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+
+  - name: cat-template
+    taskRef:
+      name: unix-command   
+    runAfter:
+    - generate-pom-sources
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+      - cat
+      - pom.xml       
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: fetch-maven-artefacts
+    taskRef:
+      name: maven-build
+    runAfter:
+    - cat-template
+    params:
+    - name: context       
+      value: $(context.pipelineRun.name)
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
+    - name: buildArgs
+      value: 
+        - -Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr
+        - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
+    - name: command
+      value: 
+        - process-sources      
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+
+  - name: run-tests
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - fetch-maven-artefacts
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - runs
+        - submit
+    #
+        - --stream
+        - inttests
+        - --tag
+        - codecoverage
+        - --trace
+    #
+        - --bootstrap
+        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - --throttle
+        - '5'
+        # - --throttlefile
+        # - throttle
+        - --poll
+        - '10'
+        - --progress
+        - '1'
+    #
+        - --reportyaml
+        - tests.yaml
+    #
+        - --override
+        - galasaecosystem.runtime.repository=http://development.galasa.dev/main/maven-repo/obr
+        - --override
+        - galasaecosystem.docker.version=codecov
+        - --override
+        - java.jacoco.code.coverage=true
+        - --override
+        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/main/execs
+        - --override
+        - java.jacoco.save.credentials=JACOCO
+        - --override
+        - zos.dse.tag.PRIMARY.imageid=MV2D
+        - --override
+        - zos.dse.tag.PRIMARY.clusterid=PLEX2
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
+
+
+  - name: cat-results
+    taskRef:
+      name: unix-command   
+    runAfter:
+    - run-tests
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+      - cat
+      - tests.xml       
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
+
+  - name: fetch-execs
+    taskRef: 
+      name: galasabld
+    runAfter:
+    - cat-results
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:    
+        - jacocofetch
+        - --results 
+        - tests.yaml 
+        - --output
+        - target/inttests
+        - --execs
+        - https://nexus.galasa.dev/repository/jacoco/main/execs  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+
+  - name: ls-execs
+    taskRef:
+      name: unix-command   
+    runAfter:
+    - run-tests
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+      - ls
+      - -l
+      - target/inttests/dev.galasa.inttests      
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace    
+
+  - name: build-unit-tests
+    taskRef:
+      name: script
+    runAfter:
+    - ls-execs
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value:  mkdir -p target/image/unit &&
+              java -jar target/org.jacoco.cli.jar merge target/unittests/*.exec --destfile target/image/unit/jacoco.exec &&
+              java -jar target/org.jacoco.cli.jar report target/image/unit/jacoco.exec --classfiles target/classes --sourcefiles target/sources --name 'Galasa CC Unit only' --html target/image/unit/ --xml target/image/unit/jacoco.xml
+    - name: image
+      value: docker.io/library/openjdk:11    
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace    
+
+  - name: build-integrated-tests
+    taskRef:
+      name: script
+    runAfter:
+    - build-unit-tests
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value:  mkdir -p target/image/integrated &&
+              java -jar target/org.jacoco.cli.jar merge target/inttests/dev.galasa.inttests/*.exec --destfile target/image/integrated/jacoco.exec &&
+              java -jar target/org.jacoco.cli.jar report target/image/integrated/jacoco.exec --classfiles target/classes --sourcefiles target/sources --name 'Galasa CC Integrated only' --html target/image/integrated/ --xml target/image/integrated/jacoco.xml
+    - name: image
+      value: docker.io/library/openjdk:11    
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace 
+
+  - name: build-combined-tests
+    taskRef:
+      name: script
+    runAfter:
+    - build-integrated-tests
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value:  mkdir -p target/image/combined &&
+              java -jar target/org.jacoco.cli.jar merge target/image/unit/jacoco.exec target/image/integrated/jacoco.exec --destfile target/image/combined/jacoco.exec &&
+              java -jar target/org.jacoco.cli.jar report target/image/combined/jacoco.exec --classfiles target/classes --sourcefiles target/sources --name 'Galasa CC Combined' --html target/image/combined/ --xml target/image/combined/jacoco.xml
+    - name: image
+      value: docker.io/library/openjdk:11    
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace 
+
+  - name: copy-dockerfiles
+    taskRef:
+      name: script
+    runAfter:
+    - build-combined-tests
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value: cp -v git/obr/codecoveragetemplates/* target/
+    # - name: image
+    #   value: docker.io/library/openjdk:11    
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace     
+
+  - name: docker-build
+    taskRef:
+      name: docker-build
+    runAfter:
+    - copy-dockerfiles
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/target
+    - name: dockerfilePath
+      value: ./Dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-codecoverage:$(params.imageTag)
+    - name: noPush
+      value: ""
+    # - name: buildArgs
+    #   value:
+    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
+    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace

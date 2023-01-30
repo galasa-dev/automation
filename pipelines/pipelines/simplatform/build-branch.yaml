@@ -22,9 +22,12 @@ spec:
     default: main
   - name: appname
     type: string
-    default: main-maven-repos
+    default: main-simplatform
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -43,6 +46,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-simplatform
     taskRef: 
       name: git-clone
@@ -50,7 +56,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/simplatform
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
       value: $(params.refspec)
     - name: depth
@@ -60,6 +66,25 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
+  - name: check-branch
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-simplatform  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/simplatform
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+# 
+# 
+#      
   - name: get-commit
     taskRef:
       name: get-commit
@@ -73,42 +98,33 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-  
-  # Current Simplatform pipeline does not have maven-gpg equivalent
-  # - name: maven-gpg
-  #   taskRef:
-  #     name: maven-gpg
-  #   runAfter:
-  #   - clone-simplatform 
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/simplatform
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-maven-build-simplatform-application
     taskRef:
       name: maven-build
     runAfter:
-    # - maven-gpg
     - clone-simplatform
     params:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-maven-build-simbank-tests
     taskRef:
       name: maven-build
@@ -121,15 +137,18 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/simplatform/repo"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-simplatform-repo
     taskRef:
       name: docker-build
@@ -155,6 +174,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-simplatform-jar
     taskRef:
       name: docker-build
@@ -172,13 +194,12 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:$(params.imageTag)
     - name: noPush
       value: ""
-    # - name: buildArgs
-    #   value:
-    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
-    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -198,6 +219,9 @@ spec:
       - Deployment
       - --resource-name
       - simplatform-$(params.imageTag)
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -214,6 +238,41 @@ spec:
       - --resource
       - apps:Deployment:simplatform-$(params.imageTag)
       - --health
+# 
+# 
+# 
+  # Trigger snapshot-simplatform (main to prod) when doing a Main Build
+  - name: snapshot-simplatform
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - snapshot-simplatform
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-snapshot-simplatform-
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace      
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # - name: git-clean

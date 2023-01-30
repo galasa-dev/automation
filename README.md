@@ -1,10 +1,12 @@
 # Galasa Automation Repository
 
-This repository is the single location for all the automation and CI/CD that occurs in Galasa. It currently breaks down into:
-1. build-images - any custom images required for the build process
-1. dockerfiles - all the organised dockerfiles for all the images built for galasa
-1. infrastructure - all the galasa infrastructure as code, including all the kubernetes setup
-1. pipelines - all the tekton components
+This repository is the single location for all the automation and CI/CD that occurs in Galasa. 
+
+Find out more about:
+1. [Build-images](#build-images) - custom images required for the build process
+1. [Dockerfiles](#dockerfiles) - the organised Dockerfiles for all the images built for galasa
+1. [Infrastructure](#infrastructure) - the Galasa infrastructure as code, including the Kubernetes set-up
+1. [Pipelines](#pipelines) - the components used in our Tekton build pipelines, such as Pipelines and Tasks
 
 
 # Build-images
@@ -34,16 +36,27 @@ This directory is the single location for all Dockerfiles needed to build the im
 | Go programs | ghstatus, ghverify, github-monitor |
 | Base image (All other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
 | Galasa core repositories | wrapping, gradle, maven, framework, extensions, managers, obr |
-| Galasa Eclipse plug-in | eclipse |
+| Galasa runtime images | obrGeneric, bootEmbedded, ibmBootEmbedded | 
+| Galasa Eclipse plug-in | eclipse, eclipse-p2 |
 | Galasa Isolated build | isolated, isolatedZip |
-| Galasa CLI tools | galasabld | 
+| Galasa Integrated tests | inttests |
+| Galasa CLI tools | galasabld, galasactl | 
 | Galasa Javadoc | javadoc-maven-repo, javadoc-site |
-| Galasa Simplatform | simplatform, simplatform-amd64 |
+| Galasa Simplatform | simplatform, simplatform-amd64, simbank webapp |
 
 
 # Infrastructure
 
-Documentation to be written.
+Galasa's infrastructure is currently spread across two Kubernetes clusters - an internal cluster and an external cluster. 
+
+cicsk8s:
+* All Tekton build pipelines are run on the internal cluster.
+* The Argo CD instance which controls all resources for the pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
+
+ibmcloud-galasadev-cluster: 
+* All Deployments, Services and Ingresses which make up our Maven artifact repositories are hosted on the external cluster.
+* The [Argo CD](argocd.galasa.dev) instance which controls the above resources is hosted on the external cluster.
+* Our image registry [Harbor](harbor.galasa.dev) is hosted on the external cluster.
 
 
 # Pipelines
@@ -79,6 +92,8 @@ You will also notice that the Dockerfiles for some components are FROM the previ
 
 ![](./docs-images/repo-links.png)
 
+_For more information about the Tasks used in the Pipelines, see the **Tasks** section of this README._
+
 ### PR builds (_pr-REPO-NAME_)
 
 PR builds are triggered when a pull request has been opened in one of Galasa's GitHub repositories. The build is done to check that all of the source code submitted in that PR compiles, builds, and that the unit tests pass. 
@@ -99,8 +114,39 @@ Each Main build also triggers the Main build of the next component in the chain.
 
 As well as being triggered from pushes/merges into main, a Main build can occur when a full Branch build of Galasa is started. _More information on this to come._
 
+### Branch builds (_branch-REPO-NAME_)
 
-_For more information about the Tasks used in the Pipelines, see the **Tasks** section of this README._
+Branch builds are triggered manually to build a branch's version of Galasa code and the corresponding images tagged with the branch name, such as galasa-obr:_{BRANCHNAME}_. These images can then be used to deploy a branch's version of the Maven artifact repositories, such as development.galasa.dev/_{BRANCHNAME}_/maven-repo/obr. 
+
+Branch builds do exactly the same thing as Main builds, just for other branches. This is useful as you may want to conduct regression testing against your branch before you merge your changes into the main branch, and you must provide Galasa's regression tests with an OBR Maven repository like the endpoint above, so will need to build your branch and create the Deployments for an OBR repo.
+
+To build changes across multiple GitHub repositories at the same time, the changes must be on the same branch.
+
+**How to do a branch build:**
+
+This example is for a branch build for branch iss001 that contains changes to Framework and Managers (Framework is the first pipeline).
+
+1. Before starting a branch build, you must set up an app on [Argo CD](argocd.galasa.dev) to control your Deployments.
+![](./docs-images/create-argocd-app.png)
+2. As Framework is the first pipeline in the chain that has changes to be built, you must set up Deployments for Framework and all other repos that come after it, so Framework, Extensions, Managers and OBR. You do this by overriding the values from values.yaml to _REPO_.deploy = true, _REPO_.branch = _BRANCH_ and _REPO_.imageTag = _BRANCH_.
+![](./docs-images/edit-values.png)
+3. The app and all of its resources will show as 'Unhealthy' at first, as the Docker images tagged with your branch name do not exist yet, as they have not been built.
+4. Manually start the first pipeline by executing a tkn command, passing in parameters. This command must be ran inside the automation directory, as it references the podTemplate and volumeClaimTemplate for the workspace. If you don't want to run this command inside the automation directory, change the paths to the templates. For our example, running inside the automation directory this would be the command:
+```
+tkn pipeline start branch-framework -n galasa-build \
+--prefix-name trigger-framework-branch \
+--workspace name=git-workspace,volumeClaimTemplateFile=pipelines/templates/git-workspace-template.yaml \
+--pod-template pipelines/templates/pod-template.yaml --serviceaccount galasa-build-bot \ 
+--param fromBranch=main \
+--param toBranch=iss001 \
+--param refspec=refs/heads/iss001:refs/heads/iss001 \
+--param imageTag=iss001 \
+--param appname=iss001-maven-repo
+```
+5. The first pipeline should start, and then will trigger the following pipeline in the chain by running a similar tkn command in a task at the end of the pipeline.
+6. After the OBR pipeline has successfully ran, go to your app on Argo CD and 'Sync' your resources.
+7. Your branch build is complete.
+8. Remember to delete your app from Argo CD and clear up your branch's images when you are done with your branch.
 
 
 **Automation**
@@ -157,6 +203,49 @@ branch-buildutils:
 The Docker image for the galasabld CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasabld/artifacts-tab).
 
 
+**CLI**
+
+These pipelines build the binaries for the galasactl CLI tool, the code for which is in the [CLI repository](https://github.com/galasa-dev/cli).
+
+pr-cli:
+1. git-verify
+1. clone-automation
+1. clone-framework
+1. clone-cli
+1. generate-api
+1. clear-mod
+1. clear-sum
+1. update-version
+1. get-commit
+1. galasactl-make
+1. docker-build-cli
+1. docker-build-cli-ibm
+1. docker-build-cli-binary
+1. git-status
+
+branch-cli:
+1. clone-automation
+1. clone-framework
+1. clone-cli
+1. check-branch
+1. generate-api
+1. clear-mod
+1. clear-sum
+1. update-version
+1. get-commit
+1. galasactl-make
+1. docker-build-cli
+1. docker-build-cli-ibm
+1. docker-build-cli-binary
+1. recycle-cli-binary
+1. wait-cli-binary
+
+The Docker image for the galasactl CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-amd64/artifacts-tab).
+
+The Docker image conatining the galasactl CLI binaries is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-binary-downloadables/artifacts-tab).
+
+The CLI binaries are downloadable from [here](https://development.galasa.dev/main/binary/cli).
+
 **Eclipse**
 
 These pipelines build the [Galasa Eclipse plug-in](https://github.com/galasa-dev/eclipse).
@@ -209,6 +298,7 @@ branch-extensions:
 1. branch-docker-build-extensions
 1. recycle-deployment
 1. wait-deployment
+1. trigger-managers
 
 The Docker image for the Extensions Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-extensions/artifacts-tab).
 
@@ -236,6 +326,7 @@ branch-framework:
 1. branch-docker-build-framework
 1. recycle-deployment
 1. wait-deployment
+1. trigger-extensions
 
 The Docker image for the Framework Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-framework/artifacts-tab).
 
@@ -263,20 +354,132 @@ branch-gradle:
 1. branch-docker-build-gradle
 1. recycle-deployment
 1. wait-deployment
+1. trigger-maven
 
 The Docker image for the Gradle Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-gradle/artifacts-tab).
 
 The Gradle Maven repository is [here](https://development.galasa.dev/main/maven-repo/gradle).
 
 
+**Integrated tests**
+
+These pipelines build the [Galasa Integrated tests](https://github.com/galasa-dev/integratedtests)
+
+pr-integratedtests:
+1. git-verify
+1. clone-automation
+1. clone-inttests
+1. get-commit
+1. branch-gradle-build-inttests
+1. branch-maven-build-inttests
+1. branch-docker-build-inttests
+1. git-status
+
+branch-integratedtests:
+1. clone-automation
+1. clone-inttests
+1. check-branch
+1. get-commit
+1. branch-gradle-build-inttests
+1. branch-maven-build-inttests
+1. branch-docker-build-inttests
+1. recycle-deployment
+1. wait-deployment
+
+The Docker image for the Integrated tests Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-inttests/artifacts-tab).
+
+The Integrated tests Maven repository is [here](https://development.galasa.dev/main/maven-repo/inttests).
+
 **Isolated**
 
-_Documentation to be written._
+These pipelines build the isolated and mvp images which are used to install Galasa offline. [Galasa Isolated](https://github.com/galasa-dev/isolated) 
 
 pr-isolated:
+1. git-verify
+1. clone-automation
+1. clone-obr
+1. clone-framework
+1. clone-extensions
+1. clone-isolated
+1. generate-pom
+1. maven-build-isolated1
+1. maven-build-isolated2
+1. maven-build-isolated3
+1. maven-build-isolated4
+1. maven-build-isolated5
+1. maven-build-isolated6
+1. maven-build-javadoc
+1. maven-build-docs
+1. copy-text-files
+1. docker-build-isolated
+1. docker-build-tar-isolated
+1. maven-build-isolated-zip
+1. docker-build-isolated-zip
+1. generate-pom-mvp
+1. maven-build-mvp1
+1. maven-build-mvp2
+1. maven-build-mvp3
+1. maven-build-mvp4
+1. maven-build-mvp5
+1. maven-build-mvp6
+1. maven-build-javadoc-mvp
+1. maven-build-docs-mvp
+1. copy-text-files-mvp
+1. docker-build-mvp
+1. docker-build-tar-mvp
+1. maven-build-mvp-zip
+1. docker-build-mvp-zip
+1. git-status
 
 branch-isolated:
+1. clone-automation
+1. clone-obr
+1. clone-framework
+1. clone-extensions
+1. clone-isolated
+1. check-branch
+1. generate-pom
+1. maven-build-isolated1
+1. maven-build-isolated2
+1. maven-build-isolated3
+1. maven-build-isolated4
+1. maven-build-isolated5
+1. maven-build-isolated6
+1. maven-build-javadoc
+1. maven-build-docs
+1. copy-text-files
+1. docker-build-isolated
+1. docker-build-tar-isolated
+1. maven-build-isolated-zip
+1. docker-build-isolated-zip
+1. recylce-deployment
+1. wait-deployment
+1. generate-pom-mvp
+1. maven-build-mvp1
+1. maven-build-mvp2
+1. maven-build-mvp3
+1. maven-build-mvp4
+1. maven-build-mvp5
+1. maven-build-mvp6
+1. maven-build-javadoc-mvp
+1. maven-build-docs-mvp
+1. copy-text-files-mvp
+1. docker-build-mvp
+1. docker-build-tar-mvp
+1. maven-build-mvp-zip
+1. docker-build-mvp-zip
+1. recylce-deployment-mvp
+1. wait-deployment-mvp
 
+The Docker image for the isolated build is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-isolated/artifacts-tab).
+
+The Docker image for isolated.tar is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-distribution/artifacts-tab). This image may be used if you want to host Galasa on an internal server to be accessed by other users. 
+
+The isolated zip file can be downloaded from [here](https://development.galasa.dev/main/maven-repo/isolated). It can then be extracted. The Docker image for this is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-isolated-zip/artifacts-tab).
+
+The Docker image for the mvp build is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-mvp/artifacts-tab). The mvp is similar to isolated but contains only the most used and most stable managers and tests.
+
+The mvp zip file can be downloaded from [here](https://development.galasa.dev/main/maven-repo/mvp). It can then be extracted. The Docker image for this is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-mvp-zip/artifacts-tab).
 
 **Managers**
 
@@ -299,6 +502,7 @@ branch-managers:
 1. branch-docker-build-managers
 1. recycle-deployment
 1. wait-deployment
+1. trigger-obr
 
 The Docker image for the Managers Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-managers/artifacts-tab).
 
@@ -328,6 +532,7 @@ branch-maven:
 1. branch-docker-build-maven
 1. recycle-deployment
 1. wait-deployment
+1. trigger-framework
 
 The Docker image for the Maven Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-maven/artifacts-tab).
 
@@ -393,6 +598,41 @@ The Docker image for the OBR Maven repo is [here](https://harbor.galasa.dev/harb
 The OBR Maven repository is [here](https://development.galasa.dev/main/maven-repo/obr).
 
 
+**OBR Generic**
+
+These pipelines build a generic Galasa OSGi Bundle Repository (OBR) and place it inside the bootEmbedded and ibmBootEmbedded images, which are used for running Galasa tests.
+
+pr-obr:
+1. git-verify
+1. clone-automation
+1. clone-framework
+1. clone-extensions
+1. clone-managers
+1. clone-obr
+1. maven-gpg
+1. generate-embedded
+1. maven-build-obr-generic
+1. docker-build-obr-generic
+1. copy-files
+1. docker-build-amd64-embedded
+1. docker-build-ibm-embedded
+1. git-status
+
+branch-obr:
+1. clone-automation
+1. clone-framework
+1. clone-extensions
+1. clone-managers
+1. clone-obr
+1. maven-gpg
+1. generate-embedded
+1. branch-maven-build-obr-generic
+1. branch-docker-build-obr-generic
+1. copy-files
+1. branch-docker-build-amd64-embedded
+1. branch-docker-build-ibm-embedded
+
+
 **Simplatform**
 
 These pipelines build the Galasa SimBank Eclipse plug-in, Simbank applications (_to-do_) and and set of sample Simbank tests, all stored in the [Simplatform repository](https://github.com/galasa-dev/simplatform).
@@ -447,6 +687,7 @@ branch-wrapping:
 1. branch-docker-build-wrapping
 1. recycle-deployment
 1. wait-deployment
+1. trigger-gradle
 
 The Docker image for the Wrapping Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-wrapping/artifacts-tab).
 
@@ -628,6 +869,17 @@ Parameters:
 
 This task uses the custom [kubectl image](https://harbor.galasa.dev/harbor/projects/5/repositories/kubectl/artifacts-tab).
 
+
+### script
+
+This task is used to perform a script.
+
+Parameters:
+* context: The directory to perform the command in.
+* script: A string containing the script to be performed
+* image: By default this uses busybox to contain most commands likely needed. However if other commands are needed then a custom image can be passed here.
+
+This task, by default, uses the latest [busybox image](https://hub.docker.com/_/busybox). Unless, an image is passed as a paramter.
 
 ### tkn-cli
 

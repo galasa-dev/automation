@@ -1,0 +1,233 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-integratedtests
+  namespace: galasa-build
+spec:
+  params:
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
+  - name: imageTag
+    type: string
+    default: main
+  - name: appname
+    type: string
+    default: main-inttests
+  workspaces:
+  - name: git-workspace
+# 
+# 
+# 
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: clone-inttests
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/integratedtests
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/inttests
+    workspaces:
+     - name: output
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: check-branch
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-inttests  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/inttests
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - clone-inttests
+    - check-branch
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: inttests
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
+# 
+# 
+# 
+  - name: branch-gradle-build-inttests
+    taskRef:
+      name: gradle-build
+    runAfter: 
+      - get-commit
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/inttests/galasa-inttests-parent
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/managers"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/inttests/repo"
+    - name: command
+      value: 
+        - publish
+        - publishToMavenLocal
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: branch-maven-build-inttests
+    taskRef:
+      name: maven-build
+    runAfter:
+    - branch-gradle-build-inttests
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/inttests/galasa-inttests-parent/dev.galasa.inttests.obr
+    - name: settingsLocation
+      value: /workspace/git/$(context.pipelineRun.name)/inttests/settings.xml
+    - name: buildArgs
+      value: 
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
+        - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/inttests/repo"
+        - "-Dgalasa.bootstrap=http://galasa-cicsk8s.hursley.ibm.com/bootstrap"
+        - "-Dgalasa.skip.deploytestcatatlog=true" 
+        - "-Dgalasa.skip.bundletestcatatlog=false"     
+    - name: command
+      value: 
+        - deploy 
+        - dev.galasa:galasa-maven-plugin:deploytestcat
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: branch-docker-build-inttests
+    taskRef:
+      name: docker-build
+    runAfter:
+      - branch-maven-build-inttests
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/inttests
+    - name: dockerfilePath
+      value: automation/dockerfiles/inttests/inttests-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-inttests:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=branch=$(params.fromBranch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - branch-docker-build-inttests
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - inttests-$(params.imageTag)
+# 
+# 
+# 
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:inttests-$(params.imageTag)
+      - --health
+ 
+      
+  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
+  # finally:
+  # - name: git-clean
+  #   taskRef: 
+  #     name: git-clean
+  #   params:
+  #   - name: subdirectory
+  #     value: $(context.pipelineRun.name)
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace

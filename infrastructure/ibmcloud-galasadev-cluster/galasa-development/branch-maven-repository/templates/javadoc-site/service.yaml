@@ -1,0 +1,33 @@
+# #
+# # Copyright contributors to the Galasa project 
+# # 
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     app: javadoc-site
+#   name: javadoc-site
+#   namespace: galasa-development
+# spec:
+#   ports:
+#     - port: 80
+#   selector:
+#     app: javadoc-site
+
+#
+# Copyright contributors to the Galasa project 
+# 
+{{ if .Values.javadocsite.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: javadocsite-{{ .Values.javadocsite.branch }}
+  name: javadocsite-{{ .Values.javadocsite.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: javadocsite-{{ .Values.javadocsite.branch }}
+{{ end }}    

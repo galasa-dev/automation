@@ -1,6 +1,7 @@
-FROM alpine
+FROM alpine:3.17.1
 
 ARG platform
 
 COPY bin/galasabld-${platform} /bin/galasabld
+
 ENTRYPOINT ["/bin/galasabld"]

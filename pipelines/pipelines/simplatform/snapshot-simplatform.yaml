@@ -1,0 +1,204 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: snapshot-simplatform
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
+    type: string
+    default: prod
+  - name: imageTag
+    type: string
+    default: prod
+  - name: appname
+    type: string
+    default: prod-simplatform
+    # For triggering Eclipse
+  - name: fromObrBranch
+    type: string
+    default: main
+  - name: toEclipseBranch
+    type: string
+    default: main
+  - name: eclipse-refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
+  - name: eclipse-imageTag
+    type: string
+    default: main
+  - name: eclipse-appname
+    type: string
+    default: main-maven-repos
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "1"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: snapshot-simplatform
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context 
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/repo-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-simplatform:$(params.toBranch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasa-simplatform"   
+        - "--build-arg=oldBranch=$(params.fromBranch)" 
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: recycle-simplatform
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-simplatform
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - simplatform-$(params.imageTag)
+
+  - name: wait-simplatform
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-simplatform
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:simplatform-$(params.imageTag)
+      - --health 
+#
+#
+#
+  - name: snapshot-simplatform-app
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/generic-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:$(params.toBranch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasa-simplatform-amd64"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  # Trigger Eclipse to do a Main Build with new Simplatform prod changes
+  - name: trigger-eclipse
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["prod"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-simplatform
+    - snapshot-simplatform-app
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-eclipse
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-eclipse-$(params.fromBranch)
+      - --param
+      - fromObrBranch=$(params.fromObrBranch)
+      - --param
+      - fromSimplatformBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toEclipseBranch)
+      - --param
+      - refspec=$(params.eclipse-refspec)
+      - --param
+      - imageTag=$(params.eclipse-imageTag)
+      - --param
+      - appname=$(params.eclipse-appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
