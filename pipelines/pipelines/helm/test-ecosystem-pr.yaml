@@ -51,13 +51,13 @@ spec:
       value:
       - app
       - create
-      - pr-$(params.baseRef)
+      - pr-$(params.headRef)
       - --project
       - default
       - --repo
       - https://github.com/galasa-dev/helm
       - --revision
-      - $(params.baseRef)
+      - $(params.headRef)
       - --dest-server
       - https://kubernetes.default.svc
       - --dest-namespace
@@ -83,7 +83,7 @@ spec:
       value:
       - app
       - sync
-      - pr-$(params.baseRef)
+      - pr-$(params.headRef)
   - name: wait-app
     taskRef:
       name: argocd-cli
@@ -96,7 +96,7 @@ spec:
       value:
       - app
       - wait
-      - $(params.baseRef)
+      - pr-$(params.headRef)
       - --health
   - name: helm-test
     taskRef:
@@ -107,7 +107,7 @@ spec:
     - name: command
       value:
       - test
-      - $(params.baseRef)  
+      - pr-$(params.headRef)  
   finally:
   - name: cleanup-app
     taskRef:
@@ -119,7 +119,7 @@ spec:
       value:
       - app
       - delete
-      - $(params.baseRef)
+      - pr-$(params.headRef)
   - name: git-status
     when:
       - input: "$(tasks.git-verify.status)"
