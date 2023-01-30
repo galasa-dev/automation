@@ -1,0 +1,13 @@
+#
+# Copyright contributors to the Galasa project 
+#
+ARG dockerRepository
+ARG branch
+FROM ${dockerRepository}/galasadev/galasabld:${branch}
+
+USER root
+
+COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
+COPY ibminter.pem /etc/ssl/certs/ibminter.pem
+RUN  cat /etc/ssl/certs/ibmroot.pem >> /etc/ssl/certs/ca-certificates.crt
+RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt

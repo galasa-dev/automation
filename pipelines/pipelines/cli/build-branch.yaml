@@ -46,9 +46,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -66,9 +65,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # Clone the CLI repo
   - name: clone-cli
     taskRef: 
       name: git-clone
@@ -86,9 +85,35 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace   
-# 
-# 
-#    
+
+  #----------------------------------------------------------------
+  # Call gradle to pull-down dependencies we need and put them in 
+  # the correct places.
+  - name: gather-dependencies
+    taskRef: 
+      name: gradle-build
+    runAfter: 
+    - clone-cli
+    params:
+    # The context indicates which folder the build.gradle is in.
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+    - name: command
+      value: 
+        - installJarsIntoTemplates
+        - --info
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+
+  #----------------------------------------------------------------
+  # Make sure the dependencies are all where we need them to be before we 
+  # generate code from the openapi file.
   - name: check-branch
     taskRef: 
       name: git-check-branch
@@ -96,6 +121,7 @@ spec:
     - clone-cli  
     - clone-automation
     - clone-framework
+    - gather-dependencies
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -104,9 +130,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # Generate Go client code from the openapi.yaml so galasactl can 
+  # talk to the API server.
   - name: generate-api
     taskRef: 
       name: general-command
@@ -133,9 +160,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # The go.mod is out of date, as it doesn't include the generated code
+  # So remove it. It gets re-generated when we compile.
   - name: clear-mod
     taskRef:
       name: unix-command
@@ -152,9 +180,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # The go.mod is out of date, as it doesn't include the generated code
+  # So remove it. It gets re-generated when we compile.
   - name: clear-sum
     taskRef:
       name: unix-command
@@ -171,9 +200,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # The go code needs to know which version of Galasa it is part of.
+  # So substitute an eye-catcher with the correct value.
   - name: update-version
     taskRef: 
       name: script
@@ -191,9 +221,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: get-commit
     taskRef:
       name: get-commit
@@ -207,9 +236,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # Invoke the make command to build the go code, run unit tests and
+  # gather code coverage stats.
   - name: galasactl-make
     taskRef:
       name: make
@@ -221,9 +251,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
+  # Build a docker image with the command installed into it.
   - name: docker-build-cli
     taskRef: 
       name: docker-build
@@ -246,9 +276,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: docker-build-cli-ibm
     taskRef: 
       name: docker-build
@@ -272,9 +301,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: docker-build-cli-binary
     taskRef: 
       name: docker-build
@@ -297,9 +325,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace          
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: recycle-cli-binary
     taskRef:
       name: argocd-cli
@@ -319,9 +346,8 @@ spec:
       - Deployment
       - --resource-name
       - cli-$(params.imageTag)
-# 
-# 
-# 
+
+  #----------------------------------------------------------------
   - name: wait-cli-binary
     taskRef:
       name: argocd-cli
@@ -339,6 +365,10 @@ spec:
       - apps:Deployment:cli-$(params.imageTag)
       - --health    
      
+
+  #----------------------------------------------------------------
+  # And finally... whether the above work or not, this gets called.
+  #----------------------------------------------------------------
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:

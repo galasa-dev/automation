@@ -552,43 +552,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace          
 
-  # - name: trigger-integration-to-prod
-  #   # when:
-  #   #   - input: "$(params.toBranch)"
-  #   #     operator: in
-  #   #     values: ["main"]
-  #   taskRef:
-  #     name: tkn-cli
-  #   runAfter:
-  #   - snapshot-ibm-boot-embedded
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)/automation
-  #   - name: command
-  #     value: 
-  #     - pipeline
-  #     - start
-  #     - integration-to-prod
-  #     - -n
-  #     - galasa-build
-  #     - --prefix-name 
-  #     - trigger-integration-to-prod-$(params.toBranch)
-  #     - --param
-  #     - toBranch=prod
-  #     - --param
-  #     - fromBranch=integration
-  #     - --param
-  #     - imageTag=prod
-  #     - --param
-  #     - appname=prod-maven-repos
-  #     - --workspace
-  #     - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-  #     - --pod-template
-  #     - ./pipelines/templates/pod-template.yaml
-  #     - --serviceaccount
-  #     - galasa-build-bot
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace      
+    
        
                
