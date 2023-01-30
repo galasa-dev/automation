@@ -21,8 +21,9 @@ var (
 		Run:     gatherInputs,
 	}
 
-	githubToken string
-	port        int32
+	githubToken   string
+	port          int32
+	excludedRepos []string
 )
 
 func init() {
@@ -31,6 +32,10 @@ func init() {
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.PersistentFlags().StringVarP(&githubToken, "githubtoken", "g",
 		defaultGitHubToken, "The github token. Defaults to value of the GITHUBTOKEN environment variable.")
+
+	excludeUsage := "Name of a repository which will be silently excluded from processing." +
+		"Multiple instance of this flag can be used to specify many repositories which are excluded."
+	rootCmd.Flags().StringSliceVar(&excludedRepos, "exclude", make([]string, 0), excludeUsage)
 }
 
 func GetInputs() (*env.Inputs, error) {
@@ -48,6 +53,7 @@ func GetInputs() (*env.Inputs, error) {
 		// Populate the structure
 		inputs.Port = port
 		inputs.GithubToken = githubToken
+		inputs.ExcludedRepositories = excludedRepos
 
 		// Do any validation we can.
 		err = env.ValidateGitHubToken(inputs.GithubToken)
