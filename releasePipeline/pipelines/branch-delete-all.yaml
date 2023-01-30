@@ -518,46 +518,46 @@ spec:
 #
   # - name: delete-image-isolated
   #   taskRef:
-  #     name: galasabld
+  #     name: galasabld OR <NEW_TASK>
   #   params:
   #   - name: context
   #     value: $(context.pipelineRun.name)
   #   - name: command
   #     value:
-  #       - harbor
-  #       - deleteimage
-  #       - --harbor
-  #       - harbor.galasa.dev
-  #       - --project
-  #       - galasadev
-  #       - --repository
   #       - galasa-isolated
-  #       - --tag
-  #       - $(params.distBranch)
-  #       - --credentials
-  #       - /harborcreds/harborcreds.yaml
 #
 #
+  # - name: delete-image-isolated-zip
+  #   taskRef:
+  #     name: galasabld OR <NEW_TASK>
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: command
+  #     value:
+  #       - galasa-isolated-zip
+# 
+# 
   # - name: delete-image-mvp
   #   taskRef:
-  #     name: galasabld
+  #     name: galasabld OR <NEW_TASK>
   #   params:
   #   - name: context
   #     value: $(context.pipelineRun.name)
   #   - name: command
   #     value:
-  #       - harbor
-  #       - deleteimage
-  #       - --harbor
-  #       - harbor.galasa.dev
-  #       - --project
-  #       - galasadev
-  #       - --repository
   #       - galasa-mvp
-  #       - --tag
-  #       - $(params.distBranch)
-  #       - --credentials
-  #       - /harborcreds/harborcreds.yaml
+#
+#
+  # - name: delete-image-mvp-zip
+  #   taskRef:
+  #     name: galasabld OR <NEW_TASK>
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: command
+  #     value:
+  #       - galasa-mvp-zip
 #
 #
 #
@@ -654,21 +654,10 @@ spec:
 #
   # - name: delete-image-resources
   #   taskRef:
-  #     name: galasabld
+  #     name: galasabld OR <NEW_TASK>
   #   params:
   #   - name: context
   #     value: $(context.pipelineRun.name)
   #   - name: command
   #     value:
-  #       - harbor
-  #       - deleteimage
-  #       - --harbor
-  #       - harbor.galasa.dev
-  #       - --project
-  #       - galasadev
-  #       - --repository
   #       - galasa-resources
-  #       - --tag
-  #       - $(params.distBranch)
-  #       - --credentials
-  #       - /harborcreds/harborcreds.yaml
