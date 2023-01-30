@@ -602,6 +602,8 @@ spec:
       - --prefix-name 
       - codecoverage
       - --param
+      - branch=$(params.toBranch)
+      - --param
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
