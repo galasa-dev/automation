@@ -8,17 +8,32 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: toBranch
+    type: string
+    default: main
+  - name: revision
     type: string
     default: main
   - name: refspec
     type: string
     default: refs/heads/main:refs/heads/main
+  - name: imageTag
+    type: string
+    default: main
   - name: appname
     type: string
     default: main-maven-repos
+  - name: jacocoEnabled
+    type: string
+    default: "false"
+  - name: isRelease
+    type: string
+    default: "false"
   workspaces:
   - name: git-workspace
+# 
+# 
+#
   tasks:
   - name: clone-automation
     taskRef: 
@@ -37,6 +52,12 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+#
+# Clone the main branch, even if this isn't for a main build
+# In the next task, the pipeline will switch to the correct branch
+# 
   - name: clone-wrapping
     taskRef: 
       name: git-clone
@@ -44,21 +65,40 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/wrapping
     - name: revision
-      value: $(params.branch)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: output
-       workspace: git-workspace  
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: check-branch
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-wrapping  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/wrapping
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+#     
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - clone-wrapping
+    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -67,17 +107,23 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: maven-gpg
     taskRef:
       name: maven-gpg
     runAfter:
-    - clone-wrapping 
+    - check-branch 
     params:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: branch-maven-build-wrapping
     taskRef:
       name: maven-build
@@ -87,18 +133,23 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/wrapping/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
+        - "-Dgalasa.jacocoEnabled=$(params.jacocoEnabled)"
+        - "-Dgalasa.isRelease=$(params.isRelease)"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: branch-docker-build-wrapping
     taskRef:
       name: docker-build
@@ -113,7 +164,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/wrapping/wrapping-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.branch)
+      value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -123,6 +174,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+#
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -141,7 +195,10 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - wrapping-$(params.branch)
+      - wrapping-$(params.toBranch)
+# 
+# 
+#
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -156,8 +213,11 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:wrapping-$(params.branch)
+      - apps:Deployment:wrapping-$(params.toBranch)
       - --health
+# 
+# 
+#
   # Trigger the next Pipeline (branch-gradle)
   - name: trigger-gradle
     taskRef:
@@ -175,17 +235,24 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-gradle-$(params.branch)
+      - trigger-gradle-$(params.toBranch)
       - --param
-      - fromBranch=$(params.branch)
+      - fromBranch=$(params.toBranch)
       - --param
-      - toBranch=$(params.branch)
+      - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param
-      - imageTag=$(params.branch)
+      - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isRelease=$(params.isRelease)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template

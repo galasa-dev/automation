@@ -13,8 +13,11 @@ spec:
     default: main
   - name: fromSimplatformBranch
     type: string
-    default: main
+    default: prod
   - name: toBranch
+    type: string
+    default: main
+  - name: revision
     type: string
     default: main
   - name: refspec
@@ -28,6 +31,9 @@ spec:
     default: main-maven-repos
   workspaces:
   - name: git-workspace
+# 
+# 
+# 
   tasks:
   - name: clone-automation
     taskRef: 
@@ -46,6 +52,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+# 
+# 
+# 
   - name: clone-eclipse
     taskRef: 
       name: git-clone
@@ -53,9 +62,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/eclipse
     - name: revision
-      value: $(params.toBranch)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -63,11 +72,31 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace  
+# 
+# 
+# 
+  - name: check-branch
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-eclipse  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/eclipse
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+# 
+# 
+#     
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
     - clone-eclipse
+    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -76,17 +105,24 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: maven-gpg
     taskRef:
       name: maven-gpg
     runAfter:
     - clone-eclipse 
+    - check-branch
     params:
     - name: context
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-maven-build-eclipse
     taskRef:
       name: maven-build
@@ -96,10 +132,9 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/gpg/settings.xml  
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgpg.skip=true"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
@@ -107,10 +142,14 @@ spec:
         - "-Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr"
         - "-Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform"
     - name: command
-      value: deploy
+      value: 
+        - deploy
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: branch-docker-build-eclipse
     taskRef:
       name: docker-build
@@ -135,7 +174,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
-
+# 
+# 
+# 
   - name: branch-docker-build-eclipse-p2
     taskRef:
       name: docker-build
@@ -156,6 +197,9 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
+# 
+# 
+# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -175,6 +219,9 @@ spec:
       - Deployment
       - --resource-name
       - eclipse-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -191,7 +238,9 @@ spec:
       - --resource
       - apps:Deployment:eclipse-$(params.imageTag) 
       - --health
-
+# 
+# 
+# 
   - name: recycle-deployment-p2
     taskRef:
       name: argocd-cli
@@ -211,6 +260,9 @@ spec:
       - Deployment
       - --resource-name
       - p2-$(params.imageTag) 
+# 
+# 
+# 
   - name: wait-deployment-p2
     taskRef:
       name: argocd-cli
@@ -227,6 +279,54 @@ spec:
       - --resource
       - apps:Deployment:p2-$(params.imageTag) 
       - --health    
+# 
+# 
+# 
+  # Trigger Isolated (when doing any kind of build)
+  - name: trigger-isolated
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment-p2
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-isolated
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-isolated-$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - fromObrBranch=$(params.toBranch)
+      - --param
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - fromJavadocBranch=$(params.toBranch)
+      - --param
+      - fromEclipseBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:

@@ -1,5 +1,6 @@
 # Used for kicking off pipelines using tkn CLI
 # A podTemplate file must be passed in
+# Includes all needed secrets
 
 volumes:
 - name: gradle-properties
@@ -11,3 +12,9 @@ volumes:
 - name: mavengpg
   secret:
     secretName: mavengpg
+- name: githubcreds
+  secret:
+    secretName: github-token
+- name: harborcreds
+  secret:
+    secretName: harbor-creds-yaml
