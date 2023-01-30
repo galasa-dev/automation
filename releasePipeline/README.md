@@ -98,7 +98,7 @@ All the tests must pass before moving on.
 
 ### Clean up
 
-1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in all repositories and the release tag images in Harbor. _This step currently has the delete for a few images commented out, as these need to be done manually on ICR for the time being._
+1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos.
 1. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
 <!-- 1. Do for both namespaces: 93-delete-namespace.sh - Delete the galasa-build namespace in both Kubernetes clusters. -->
 
