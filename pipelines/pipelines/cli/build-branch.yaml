@@ -8,7 +8,7 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: toBranch
+  - name: branch
     type: string
     default: main
   - name: revision
@@ -112,33 +112,16 @@ spec:
       workspace: git-workspace
 
   #----------------------------------------------------------------
-  # Make sure the dependencies are all where we need them to be before we 
-  # generate code from the openapi file.
-  - name: check-branch
-    taskRef: 
-      name: git-check-branch
-    runAfter:
-    - clone-cli  
-    - clone-automation
-    - clone-framework
-    - gather-dependencies
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: branch
-      value: $(params.toBranch)
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace 
-
-  #----------------------------------------------------------------
   # Generate Go client code from the openapi.yaml so galasactl can 
   # talk to the API server.
   - name: generate-api
     taskRef: 
       name: general-command
     runAfter:
-    - check-branch
+    - clone-automation
+    - clone-framework
+    - clone-cli
+    - gather-dependencies
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -321,7 +304,7 @@ spec:
       value: automation/dockerfiles/cli/cli-binary-dockerfile
     - name: buildArgs
       value:
-        - "--build-arg=branch=$(params.toBranch)"
+        - "--build-arg=branch=$(params.branch)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace          
