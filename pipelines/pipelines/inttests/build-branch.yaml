@@ -8,10 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: fromBranch
+  - name: branch
     type: string
     default: main
-  - name: toBranch
+  - name: revision
     type: string
     default: main
   - name: refspec
@@ -56,31 +56,15 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/integratedtests
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/inttests
     workspaces:
      - name: output
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: check-branch
-    taskRef: 
-      name: git-check-branch
-    runAfter:
-    - clone-inttests  
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/inttests
-    - name: branch
-      value: $(params.toBranch)
-    workspaces:
-     - name: git-workspace
        workspace: git-workspace
 # 
 # 
@@ -173,7 +157,7 @@ spec:
       value:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=$(params.fromBranch)"
+        - "--build-arg=branch=$(params.branch)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
