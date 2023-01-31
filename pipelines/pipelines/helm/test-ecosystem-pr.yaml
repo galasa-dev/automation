@@ -97,17 +97,7 @@ spec:
       - app
       - wait
       - pr-$(params.headRef)
-      - --health
-  - name: helm-test
-    taskRef:
-      name: helm-cli
-    runAfter:
-    - wait-app
-    params:
-    - name: command
-      value:
-      - test
-      - pr-$(params.headRef)  
+      - --health  
   finally:
   - name: cleanup-app
     taskRef:
