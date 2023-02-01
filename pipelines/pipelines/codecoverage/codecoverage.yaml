@@ -8,12 +8,15 @@ metadata:
   namespace: galasa-build
 spec:
   params:
+  - name: branch
+    type: string
+    default: codecov
   - name: imageTag
     type: string
-    default: main
+    default: codecov
   - name: appname
     type: string
-    default: main-maven-repos
+    default: codecov-maven-repos
   workspaces:
   - name: git-workspace
   tasks:
@@ -163,7 +166,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
     - name: buildArgs
       value: 
-        - -Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr
+        - -Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
     - name: command
       value: 
@@ -206,13 +209,13 @@ spec:
         - tests.yaml
     #
         - --override
-        - galasaecosystem.runtime.repository=http://development.galasa.dev/main/maven-repo/obr
+        - galasaecosystem.runtime.repository=http://development.galasa.dev/$(params.branch)/maven-repo/obr
         - --override
         - galasaecosystem.docker.version=codecov
         - --override
         - java.jacoco.code.coverage=true
         - --override
-        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/main/execs
+        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs
         - --override
         - java.jacoco.save.credentials=JACOCO
         - --override
@@ -256,7 +259,7 @@ spec:
         - --output
         - target/inttests
         - --execs
-        - https://nexus.galasa.dev/repository/jacoco/main/execs  
+        - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs  
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -364,10 +367,26 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-codecoverage:$(params.imageTag)
     - name: noPush
       value: ""
-    # - name: buildArgs
-    #   value:
-    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
-    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - codecov-$(params.imageTag)
