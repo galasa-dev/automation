@@ -11,7 +11,7 @@ spec:
   - name: revision
     type: string
     default: main
-  - name: imageTag
+  - name: bootEmbeddedImageTag
     type: string
     default: main
   - name: appName
@@ -51,7 +51,7 @@ spec:
       - --helm-set
       - galasaRegistry=harbor.galasa.dev/galasadev
       - --helm-set
-      - galasaVersion=$(params.imageTag)
+      - galasaVersion=$(params.bootEmbeddedImageTag)
       - --upsert
 #
 #
@@ -100,7 +100,7 @@ spec:
     - name: script
       value: java -jar boot.jar --obr file:galasa.obr --bootstrap http://$(params.appName)-api:8080/bootstrap --validateeco
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.revision)
+      value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.bootEmbeddedImageTag)
     workspaces:
     - name: git-workspace
       workspace: git-workspace
