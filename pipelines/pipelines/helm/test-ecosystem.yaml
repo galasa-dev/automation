@@ -98,7 +98,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: script
-      value: java -jar boot.jar --obr file:galasa.obr --bootstrap http://$(params.appName)-api:8080/bootstrap --validateeco
+      value: java -jar /galasa/boot.jar --obr file:galasa.obr --bootstrap http://$(params.appName)-api:8080/bootstrap --validateeco
     - name: image
       value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.bootEmbeddedImageTag)
     workspaces:
