@@ -8,10 +8,10 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: fromBranch
+  - name: branch
     type: string
     default: main
-  - name: toBranch
+  - name: revision
     type: string
     default: main
   - name: refspec
@@ -56,9 +56,9 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/integratedtests
     - name: revision
-      value: main
+      value: $(params.revision)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -69,28 +69,11 @@ spec:
 # 
 # 
 # 
-  - name: check-branch
-    taskRef: 
-      name: git-check-branch
-    runAfter:
-    - clone-inttests  
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/inttests
-    - name: branch
-      value: $(params.toBranch)
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
     - clone-inttests
-    - check-branch
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -173,7 +156,7 @@ spec:
       value:
         - "--build-arg=baseVersion=latest"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=$(params.fromBranch)"
+        - "--build-arg=branch=$(params.branch)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -218,6 +201,40 @@ spec:
       - --resource
       - apps:Deployment:inttests-$(params.imageTag)
       - --health
+# 
+# 
+# 
+  - name: trigger-snapshot-main-to-prod
+    when:
+      - input: "$(params.branch)"
+        operator: in
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - inttests-snapshot-main-to-prod
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - inttests-snapshot
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
  
       
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
