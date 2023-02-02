@@ -518,7 +518,7 @@ spec:
 #
   - name: delete-image-isolated
     taskRef:
-      name: ibm-cloud-cli
+      name: ibmcloud-cli
     params:
     - name: command
       value:
@@ -529,7 +529,7 @@ spec:
 #
   - name: delete-image-isolated-zip
     taskRef:
-      name: ibm-cloud-cli
+      name: ibmcloud-cli
     params:
     - name: command
       value:
@@ -540,7 +540,7 @@ spec:
 # 
   - name: delete-image-mvp
     taskRef:
-      name: ibm-cloud-cli
+      name: ibmcloud-cli
     params:
     - name: command
       value:
@@ -551,7 +551,7 @@ spec:
 #
   - name: delete-image-mvp-zip
     taskRef:
-      name: ibm-cloud-cli
+      name: ibmcloud-cli
     params:
     - name: command
       value:
@@ -654,7 +654,7 @@ spec:
 #
   - name: delete-image-resources
     taskRef:
-      name: ibm-cloud-cli
+      name: ibmcloud-cli
     params:
     - name: command
       value:
