@@ -1,0 +1,19 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kubectl
+  namespace: galasa-build
+spec:
+  params:
+  - name: command
+    type: array       
+  steps:
+  - name: kubectl
+    image: harbor.galasa.dev/common/kubectl:main
+    imagePullPolicy: Always
+    args:
+    - kubectl
+    - $(params.command)
