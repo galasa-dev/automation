@@ -1179,15 +1179,8 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-snapshot-integration-$(params.toBranch)
-      - --param
-      - toBranch=integration
-      - --param
-      - fromBranch=main
-      - --param
-      - imageTag=integration
-      - --param
-      - appname=integration-maven-repos
+      - trigger-snapshot-integration
+      - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
