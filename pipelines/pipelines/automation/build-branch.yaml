@@ -241,11 +241,8 @@ spec:
 # 
 # 
 #  Kick the argocd application to refresh, causing a re-deployment
+#
 # 
-# 
-#  Note: The --exclude flags causes some repositories not to be told
-#  that a Tekton build is starting. All other PRs in repos in the organisation
-#  will receive notification that the Tekton build is starting shortly...
 #
   - name: recycle-webhook-receiver-deployment
     taskRef:
@@ -266,10 +263,6 @@ spec:
       - Deployment
       - --resource-name
       - github-webhook-receiver
-      - --exclude
-      - galasa.dev
-      - --exclude
-      - helm
 # 
 # 
 # Wait for the redeployment to complete.
