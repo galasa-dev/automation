@@ -92,10 +92,6 @@ spec:
        workspace: git-workspace       
 
   - name: trigger-integration-to-prod
-    # when:
-    #   - input: "$(params.toBranch)"
-    #     operator: in
-    #     values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -111,15 +107,8 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-integration-to-prod-main
-      - --param
-      - toBranch=prod
-      - --param
-      - fromBranch=integration
-      - --param
-      - imageTag=prod
-      - --param
-      - appname=prod-maven-repos
+      - trigger-integration-to-prod
+      - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
