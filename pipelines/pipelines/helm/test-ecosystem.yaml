@@ -1,0 +1,148 @@
+#
+# Copyright contributors to the Galasa project
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-helm
+  namespace: galasa-build
+spec:
+  params:
+  - name: revision
+    type: string
+    default: main
+  - name: bootEmbeddedImageTag
+    type: string
+    default: main
+  - name: appName
+    type: string
+    default: main-helm
+  workspaces:
+  - name: git-workspace
+#
+#
+#
+  tasks:
+  - name: install-ecosystem
+    taskRef:
+      name: argocd-cli
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - create
+      - $(params.appName)
+      - --project
+      - default
+      - --repo
+      - https://github.com/galasa-dev/helm
+      - --revision
+      - $(params.revision)
+      - --dest-server
+      - https://kubernetes.default.svc
+      - --dest-namespace
+      - galasa-development
+      - --path
+      - charts/ecosystem
+      - --helm-set
+      - externalHostname=c1.eu-gb.containers.cloud.ibm.com
+      - --helm-set
+      - galasaRegistry=harbor.galasa.dev/galasadev
+      - --helm-set
+      - galasaVersion=$(params.bootEmbeddedImageTag)
+      - --upsert
+#
+#
+#
+  - name: sync-app
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - install-ecosystem
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - sync
+      - $(params.appName)
+#
+#
+#
+  - name: wait-app
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - sync-app
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.appName)
+      - --health
+#
+#
+#
+  - name: get-bootstrap
+    taskRef:
+      name: argocd-script
+    runAfter:
+    - wait-app
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value:
+        BOOTSTRAP_BASE_URI=$(argocd app diff $(params.appName) --server argocd.galasa.dev | \
+        grep -Eo "https?://c1.eu-gb.containers.cloud.ibm.com:[0-9]+") &&
+        echo "${BOOTSTRAP_BASE_URI}/bootstrap" | tee bootstrap.txt
+    - name: image
+      value: harbor.galasa.dev/common/argocd-cli:main
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+#
+#
+#
+  - name: test-ecosystem
+    taskRef:
+      name: script
+    runAfter:
+    - get-bootstrap
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: script
+      value:
+        BOOTSTRAP=$(cat bootstrap.txt) &&
+        echo ${BOOTSTRAP} &&
+        java -jar /galasa/boot.jar \
+          --obr file:galasa.obr \
+          --bootstrap ${BOOTSTRAP} \
+          --validateeco
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.bootEmbeddedImageTag)
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+#
+#
+#
+  finally:
+  - name: cleanup-app
+    taskRef:
+      name: argocd-cli
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - delete
+      - $(params.appName)

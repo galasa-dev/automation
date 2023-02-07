@@ -241,11 +241,8 @@ spec:
 # 
 # 
 #  Kick the argocd application to refresh, causing a re-deployment
+#
 # 
-# 
-#  Note: The --exclude flags causes some repositories not to be told
-#  that a Tekton build is starting. All other PRs in repos in the organisation
-#  will receive notification that the Tekton build is starting shortly...
 #
   - name: recycle-webhook-receiver-deployment
     taskRef:
@@ -266,10 +263,6 @@ spec:
       - Deployment
       - --resource-name
       - github-webhook-receiver
-      - --exclude
-      - galasa.dev
-      - --exclude
-      - helm
 # 
 # 
 # Wait for the redeployment to complete.
@@ -336,6 +329,30 @@ spec:
       value: automation/dockerfiles/common/kubectl-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/kubectl:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  #---------------------------------------------------------------------
+  # ArgoCD CLI tool
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image.
+  - name: build-argocdcli-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/argocd-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/argocd-cli:$(params.branch)
     - name: noPush
       value: ""
     workspaces:

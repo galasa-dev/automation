@@ -1,0 +1,37 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: argocd-script
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: script
+    type: string
+  - name: image
+    type: string
+    default: harbor.galasa.dev/common/argocd-cli:main
+  steps:
+  - name: argocd-script
+    workingDir: /workspace/git/$(params.context)
+    image: $(params.image)
+    imagePullPolicy: Always
+    env:
+    - name: ARGOCD_AUTH_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: argocd-token
+          key: argocd-token
+          optional: false
+    script: |
+      #!/bin/sh
+      set +e
+      $(params.script)
+     
