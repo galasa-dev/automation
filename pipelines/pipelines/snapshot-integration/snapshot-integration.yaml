@@ -522,10 +522,6 @@ spec:
 
 
   - name: trigger-run-tests
-    # when:
-    #   - input: "$(params.toBranch)"
-    #     operator: in
-    #     values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -541,7 +537,7 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-run-tests-$(params.toBranch)
+      - trigger-run-tests-integration
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
