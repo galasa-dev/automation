@@ -24,7 +24,6 @@ spec:
           key: argocd-token
           optional: false
     args:
-    - argocd
     - $(params.command)
     - "--server"
     - $(params.server)
