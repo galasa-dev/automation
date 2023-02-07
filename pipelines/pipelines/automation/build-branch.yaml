@@ -359,6 +359,26 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
+  - name: build-argocd-embedded-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/argocd-embedded-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/argocd-embedded:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
   #---------------------------------------------------------------------
   # Git cli tool
   #---------------------------------------------------------------------
