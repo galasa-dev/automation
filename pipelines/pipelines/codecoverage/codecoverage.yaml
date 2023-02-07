@@ -134,6 +134,7 @@ spec:
         - --output
         - pom.xml
         - --codecoverage
+        
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
@@ -222,6 +223,8 @@ spec:
         - zos.dse.tag.PRIMARY.imageid=MV2D
         - --override
         - zos.dse.tag.PRIMARY.clusterid=PLEX2
+        - --log
+        - '-'
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
