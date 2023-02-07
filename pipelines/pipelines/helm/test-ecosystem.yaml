@@ -99,8 +99,7 @@ spec:
       value: $(context.pipelineRun.name)
     - name: script
       value:
-        BOOTSTRAP_BASE_URI=$(argocd app diff $(params.appName) --server argocd.galasa.dev | \
-        grep -Eo "https?://c1.eu-gb.containers.cloud.ibm.com:[0-9]+") &&
+        BOOTSTRAP_BASE_URI=$(argocd app diff $(params.appName) --server argocd.galasa.dev | grep -Eo "https?://c1.eu-gb.containers.cloud.ibm.com:[0-9]+") &&
         echo "${BOOTSTRAP_BASE_URI}/bootstrap" | tee bootstrap.txt
     - name: image
       value: harbor.galasa.dev/common/argocd-embedded:main
