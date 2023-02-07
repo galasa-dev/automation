@@ -120,11 +120,7 @@ spec:
     - name: script
       value:
         BOOTSTRAP=$(cat bootstrap.txt) &&
-        echo ${BOOTSTRAP} &&
-        java -jar /galasa/boot.jar \
-          --obr file:galasa.obr \
-          --bootstrap ${BOOTSTRAP} \
-          --validateeco
+        java -jar /galasa/boot.jar --obr file:galasa.obr --bootstrap ${BOOTSTRAP} --validateeco
     - name: image
       value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.bootEmbeddedImageTag)
     workspaces:
