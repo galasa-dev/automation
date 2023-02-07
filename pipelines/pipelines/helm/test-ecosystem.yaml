@@ -103,7 +103,7 @@ spec:
         grep -Eo "https?://c1.eu-gb.containers.cloud.ibm.com:[0-9]+") &&
         echo "${BOOTSTRAP_BASE_URI}/bootstrap" | tee bootstrap.txt
     - name: image
-      value: harbor.galasa.dev/common/argocd-cli:main
+      value: harbor.galasa.dev/common/argocd-embedded:main
     workspaces:
     - name: git-workspace
       workspace: git-workspace
