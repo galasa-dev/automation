@@ -223,6 +223,7 @@ spec:
         - zos.dse.tag.PRIMARY.imageid=MV2D
         - --override
         - zos.dse.tag.PRIMARY.clusterid=PLEX2
+        - --noexitcodeontestfailures
         - --log
         - '-'
     workspaces:
