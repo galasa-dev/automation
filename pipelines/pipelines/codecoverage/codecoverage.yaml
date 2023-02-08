@@ -242,7 +242,7 @@ spec:
     - name: command
       value:
       - cat
-      - tests.xml       
+      - /workspace/git/$(context.pipelineRun.name)/tests.yaml       
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
@@ -261,7 +261,7 @@ spec:
         - --results 
         - tests.yaml 
         - --output
-        - target/inttests
+        - /workspace/git/$(context.pipelineRun.name)/target/inttests
         - --execs
         - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs  
     workspaces:
