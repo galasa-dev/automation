@@ -261,7 +261,7 @@ spec:
         - --results 
         - tests.yaml 
         - --output
-        - /workspace/git/$(context.pipelineRun.name)/target/inttests
+        - target/inttests
         - --execs
         - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs  
     workspaces:
@@ -272,7 +272,7 @@ spec:
     taskRef:
       name: unix-command   
     runAfter:
-    - run-tests
+    - fetch-execs
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -280,7 +280,7 @@ spec:
       value:
       - ls
       - -l
-      - target/inttests/dev.galasa.inttests      
+      - /workspace/git/$(context.pipelineRun.name)/target/inttests/dev.galasa.inttests      
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
