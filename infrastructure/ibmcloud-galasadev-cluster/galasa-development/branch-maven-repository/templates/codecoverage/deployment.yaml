@@ -15,7 +15,7 @@ spec:
       app: codecov-{{ .Values.codecov.branch }}
   template:
     metadata:
-      name: codcodecovecoverage-{{ .Values.codecov.branch }}
+      name: codecov-{{ .Values.codecov.branch }}
       labels:
         app: codecov-{{ .Values.codecov.branch }}
     spec:
