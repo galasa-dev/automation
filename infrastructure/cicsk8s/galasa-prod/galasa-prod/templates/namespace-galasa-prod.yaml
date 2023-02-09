@@ -1,0 +1,7 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: galasa-prod
