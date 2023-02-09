@@ -10,8 +10,6 @@ Galasa has been broken up into multiple components, and these components are onl
 
 1. Galasa (wrapping, gradle, maven, framework, extensions, managers, obr, eclipse, isolated)
 1. CLI (cli)
-<!-- 1. Docker Operator (docker-operator) -->
-<!-- 1. Kubernetes Operator (kubernetes-operator) -->
 
 The Galasa component is always released, but the others are only cloned, built, tested and released if there are changes.
 
@@ -42,15 +40,11 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 1. Ensure Kubernetes context is set to the internal cicsk8s cluster.
 1. Run `kubectl -n galasa-build create -f 10-clone-galasa.yaml` - Clone all the repos' main branches to release branches.
 1. Run `kubectl -n galasa-build create -f 11-clone-cli.yaml` - **Only if CLI being released** - Clone the repo's main branch to release branch.
-<!-- 1. Run `kubectl -n galasa-build create -f 12-clone-docker-operator.yaml` - **Only if Docker Operator being released** - Clone the repo's main branch to release branch.
-1. Run `kubectl -n galasa-build create -f 13-clone-kubernetes-operator.yaml` - **Only if Kubernetes Operator being released** - Clone the repo's main branch to release branch. -->
 
 ### Build the components
 
 1. Run `kubectl -n galasa-build create -f 20-build-galasa.yaml` - Build the Galasa main component. **After each repo's build, go to its maven repository and check that the artifacts have been signed, there should be .asc files present**
 1. Run `kubectl -n galasa-build create -f 21-build-cli.yaml` - **Only if CLI being released** - Build the CLI.
-<!-- 1. Run `kubectl -n galasa-build create -f 22-build-docker-operator.yaml` - **Only if Docker Operator being released** - Build the Docker Operator.
-1. Run `kubectl -n galasa-build create -f 23-build-kubernetes-operator.yaml` - **Only if Kubernetes Operator being released** - Build the Kubernetes Operator. -->
 
 ### Regression test
 
@@ -69,8 +63,18 @@ All the tests must pass before moving on.
 
 ### Deployment
 
-1. Amend 30-deploy-maven-galasa.yaml and amend the version parameter to the release.
-1. Run `kubectl -n galasa-build create -f 30-deploy-maven-galasa.yaml` - Deploy the maven artifacts to OSS Sonatype.
+<!-- Commenting out the steps below for now as they do not work. An item is open to fix this. Temporary steps to work around this below: -->
+<!-- 1. Amend 30-deploy-maven-galasa.yaml and amend the version parameter to the release.
+1. Run `kubectl -n galasa-build create -f 30-deploy-maven-galasa.yaml` - Deploy the maven artifacts to OSS Sonatype. -->
+1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor.
+1. Exec into the image so you can run commands from inside it, by running `docker run -it --entrypoint /bin/sh harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release`
+1. When inside the image, run `cd htdocs/dev/galasa`
+1. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them, `rm maven-metadata.xml` etc.
+1. Go to Vault and find the maven-creds secret, to use the username and password in the next step.
+1. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the Nexus staging repository:
+`galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>`
+1. `exit` the image.
+<!-- End of temporary steps -->
 1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document.
 1. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata.
 1. Wait until Maven Central is updated.
@@ -80,10 +84,6 @@ All the tests must pass before moving on.
 1. 34-deploy-docker-galasa.sh - Deploy the Container images to ICR.
 1. Amend 35-deploy-docker-cli.sh - **Only if CLI being released** - Set the version.
 1. 35-deploy-docker-cli.sh- **Only if CLI being released** - Deploy the CLI images to ICR.
-<!-- 1. Amend 36-deploy-docker-docker-operator.sh - **Only if Docker Operator being released** - Set the version.
-1. 36-deploy-docker-docker-operator.sh - **Only if Docker Operator being released** - Deploy the Docker Operator images to ICR.
-1. Amend 37-deploy-docker-kubernetes-operator.sh - **Only if Kubernetes Operator being released** - Set the version.
-1. 37-deploy-docker-kubernetes-operator.sh - **Only if Kubernetes Operator being released** - Deploy the Kubernetes Operator images to ICR. -->
 
 ### Update reference sites
 
@@ -99,12 +99,13 @@ All the tests must pass before moving on.
 ### Clean up
 
 1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos.
+<!-- Temporary step until we can automate deleting the 'release' images: -->
+1. Go to [Harbor](harbor.galasa.dev) and delete all images tagged 'release' (tick box next to image tagged 'release' and select Actions then Delete)
+1. Go to [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' (click three dots next to 'release' image and select Delete image)
+<!-- End of temporary steps-->
 1. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
-<!-- 1. Do for both namespaces: 93-delete-namespace.sh - Delete the galasa-build namespace in both Kubernetes clusters. -->
 
 ### Bump to new version
 
-1. Create a new Issue to cover the version bump and the appropriate branch development environment.
-1. 99-move-to-new-version.md - Change the repos and files as listed in this file.
-1. Run a complete build to verify everything looks ok.
-1. Raise PRs to push the version changes. Due to the nature of Galasa build, later PRs will fail until the previous PRs are pushed and built.
+1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
+1. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties: https://github.ibm.com/CICS/cicsts-galasa-config/blob/main/CPS.properties. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
