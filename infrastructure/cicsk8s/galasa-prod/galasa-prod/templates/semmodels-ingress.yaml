@@ -1,0 +1,23 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: semmodels-ingress
+  namespace: galasa-prod
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "semmodels.cicsk8s.hursley.ibm.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: semmodels
+            port:
+              number: 80
