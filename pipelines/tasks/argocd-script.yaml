@@ -17,7 +17,7 @@ spec:
     type: string
   - name: image
     type: string
-    default: harbor.galasa.dev/common/argocd-cli:main
+    default: harbor.galasa.dev/common/argocd-embedded:main
   steps:
   - name: argocd-script
     workingDir: /workspace/git/$(params.context)
