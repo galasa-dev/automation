@@ -15,7 +15,7 @@ function usage {
 Options are:
 --hostname <host_name> : The name/IP of the host running the ecosystem (mandatory).
 --prefix <service_prefix> : The prefix of the external services.
---ingress : Flag to enable Ingress.
+--ingress : Flag to indicate Ingress is being used.
 -h | --help : Display usage information.
 EOF
   return 0
