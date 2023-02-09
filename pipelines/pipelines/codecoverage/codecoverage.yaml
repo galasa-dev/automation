@@ -394,3 +394,20 @@ spec:
       - Deployment
       - --resource-name
       - codecov-$(params.imageTag)
+
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:codecov-$(params.imageTag)
+      - --health    
