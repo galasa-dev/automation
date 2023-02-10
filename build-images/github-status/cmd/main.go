@@ -38,8 +38,8 @@ func main() {
 			fmt.Printf("Error updating PR status: %s\n", err)
 			os.Exit(1)
 		}
-		failureUrl := fmt.Sprintf("https://tekton.galasa.dev/#/namespaces/galasa-pipelines/pipelineruns/%s", *pipelineRunName)
-		err1 := commentOnPr(fmt.Sprintf("Build failed, see %s for details", failureUrl), *pull)
+		failureUrl := fmt.Sprintf("http://localhost:8001/api/v1/namespaces/tekton-pipelines/services/tekton-dashboard:http/proxy/#/namespaces/galasa-build/pipelineruns/%s", *pipelineRunName)
+		err1 := commentOnPr(fmt.Sprintf("Build failed, see %s for details. If you are unable to do so, please contact a member of the Galasa team.", failureUrl), *pull)
 		if err1 != nil {
 			fmt.Println("Error commenting on PR: %s\n", err)
 			os.Exit(1)
