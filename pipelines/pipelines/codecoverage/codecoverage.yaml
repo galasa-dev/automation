@@ -8,12 +8,15 @@ metadata:
   namespace: galasa-build
 spec:
   params:
+  - name: branch
+    type: string
+    default: codecov
   - name: imageTag
     type: string
-    default: main
+    default: codecov
   - name: appname
     type: string
-    default: main-maven-repos
+    default: codecov-maven-repos
   workspaces:
   - name: git-workspace
   tasks:
@@ -131,6 +134,7 @@ spec:
         - --output
         - pom.xml
         - --codecoverage
+        
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
@@ -163,7 +167,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
     - name: buildArgs
       value: 
-        - -Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr
+        - -Dgalasa.source.repo=https://development.galasa.dev/$(params.branch)/maven-repo/obr
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
     - name: command
       value: 
@@ -206,19 +210,22 @@ spec:
         - tests.yaml
     #
         - --override
-        - galasaecosystem.runtime.repository=http://development.galasa.dev/main/maven-repo/obr
+        - galasaecosystem.runtime.repository=http://development.galasa.dev/$(params.branch)/maven-repo/obr
         - --override
         - galasaecosystem.docker.version=codecov
         - --override
         - java.jacoco.code.coverage=true
         - --override
-        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/main/execs
+        - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs
         - --override
         - java.jacoco.save.credentials=JACOCO
         - --override
         - zos.dse.tag.PRIMARY.imageid=MV2D
         - --override
         - zos.dse.tag.PRIMARY.clusterid=PLEX2
+        - --noexitcodeontestfailures
+        - --log
+        - '-'
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -235,7 +242,7 @@ spec:
     - name: command
       value:
       - cat
-      - tests.xml       
+      - /workspace/git/$(context.pipelineRun.name)/tests.yaml       
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
@@ -256,7 +263,7 @@ spec:
         - --output
         - target/inttests
         - --execs
-        - https://nexus.galasa.dev/repository/jacoco/main/execs  
+        - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs  
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
@@ -265,7 +272,7 @@ spec:
     taskRef:
       name: unix-command   
     runAfter:
-    - run-tests
+    - fetch-execs
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -273,7 +280,7 @@ spec:
       value:
       - ls
       - -l
-      - target/inttests/dev.galasa.inttests      
+      - /workspace/git/$(context.pipelineRun.name)/target/inttests/dev.galasa.inttests      
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
@@ -341,7 +348,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: script
-      value: cp -v git/obr/codecoveragetemplates/* target/
+      value: cp -v /workspace/git/$(context.pipelineRun.name)/obr/codecoveragetemplates/* /workspace/git/$(context.pipelineRun.name)/target/
     # - name: image
     #   value: docker.io/library/openjdk:11    
     workspaces:
@@ -364,10 +371,43 @@ spec:
       value: harbor.galasa.dev/galasadev/galasa-codecoverage:$(params.imageTag)
     - name: noPush
       value: ""
-    # - name: buildArgs
-    #   value:
-    #     - "--build-arg=dockerRepository=harbor.galasa.dev"
-    #     - "--build-arg=jdkImage=dockerhub/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - codecov-$(params.imageTag)
+
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:codecov-$(params.imageTag)
+      - --health    
