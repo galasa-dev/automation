@@ -1,0 +1,11 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapi-base
+  namespace: galasa-prod
+data:
+  apibase.js: |+
+    var galasaBootstrap = 'http://galasa-cicsk8s.hursley.ibm.com/bootstrap' 

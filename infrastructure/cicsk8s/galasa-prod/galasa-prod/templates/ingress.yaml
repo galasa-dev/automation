@@ -1,0 +1,49 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: galasa-prod
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "galasa-cicsk8s.hursley.ibm.com"
+    http:
+      paths:
+      # - pathType: Prefix
+      #   path: "/ExampleAppClientV855"
+      #   backend:
+      #     service:
+      #       name: catext-cicswebui
+      #       port:
+      #         number: 9080
+      # - pathType: Prefix
+      #   path: "/ExampleAppApi"
+      #   backend:
+      #     service:
+      #       name: catext-api
+      #       port:
+      #         number: 9080
+      # - pathType: Prefix
+      #   path: "/ExampleApp"
+      #   backend:
+      #     service:
+      #       name: catext-frontend
+      #       port:
+      #         number: 80
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: api
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/testcatalog"
+        backend:
+          service:
+            name: testcatalog
+            port:
+              number: 8080

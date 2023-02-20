@@ -1,0 +1,11 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: testcatalog-file
+  namespace: galasa-prod
+data:
+  dev.galasa.testcatalog.cfg: |
+    framework.testcatalog.directory=file:/galasa/testcatalog
