@@ -516,48 +516,48 @@ spec:
 #
 #
 #
-  # - name: delete-image-isolated
-  #   taskRef:
-  #     name: galasabld
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: command
-  #     value:
-  #       - harbor
-  #       - deleteimage
-  #       - --harbor
-  #       - harbor.galasa.dev
-  #       - --project
-  #       - galasadev
-  #       - --repository
-  #       - galasa-isolated
-  #       - --tag
-  #       - $(params.distBranch)
-  #       - --credentials
-  #       - /harborcreds/harborcreds.yaml
+  - name: delete-image-isolated
+    taskRef:
+      name: ibmcloud-cli
+    params:
+    - name: command
+      value:
+        - cr
+        - image-rm
+        - icr.io/galasadev/galasa-isolated:$(params.distBranch)
 #
 #
-  # - name: delete-image-mvp
-  #   taskRef:
-  #     name: galasabld
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: command
-  #     value:
-  #       - harbor
-  #       - deleteimage
-  #       - --harbor
-  #       - harbor.galasa.dev
-  #       - --project
-  #       - galasadev
-  #       - --repository
-  #       - galasa-mvp
-  #       - --tag
-  #       - $(params.distBranch)
-  #       - --credentials
-  #       - /harborcreds/harborcreds.yaml
+  - name: delete-image-isolated-zip
+    taskRef:
+      name: ibmcloud-cli
+    params:
+    - name: command
+      value:
+        - cr
+        - image-rm
+        - icr.io/galasadev/galasa-isolated-zip:$(params.distBranch)
+# 
+# 
+  - name: delete-image-mvp
+    taskRef:
+      name: ibmcloud-cli
+    params:
+    - name: command
+      value:
+        - cr
+        - image-rm
+        - icr.io/galasadev/galasa-mvp:$(params.distBranch)
+#
+#
+  - name: delete-image-mvp-zip
+    taskRef:
+      name: ibmcloud-cli
+    params:
+    - name: command
+      value:
+        - cr
+        - image-rm
+        - icr.io/galasadev/galasa-mvp-zip:$(params.distBranch)
 #
 #
 #
@@ -652,23 +652,12 @@ spec:
 #
 #######  Resources
 #
-  # - name: delete-image-resources
-  #   taskRef:
-  #     name: galasabld
-  #   params:
-  #   - name: context
-  #     value: $(context.pipelineRun.name)
-  #   - name: command
-  #     value:
-  #       - harbor
-  #       - deleteimage
-  #       - --harbor
-  #       - harbor.galasa.dev
-  #       - --project
-  #       - galasadev
-  #       - --repository
-  #       - galasa-resources
-  #       - --tag
-  #       - $(params.distBranch)
-  #       - --credentials
-  #       - /harborcreds/harborcreds.yaml
+  - name: delete-image-resources
+    taskRef:
+      name: ibmcloud-cli
+    params:
+    - name: command
+      value:
+        - cr
+        - image-rm
+        - icr.io/galasadev/galasa-resources:$(params.distBranch)

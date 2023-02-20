@@ -1,0 +1,40 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ibmcloud-cli
+  namespace: galasa-build
+spec:
+  params:
+  - name: command
+    type: array       
+  steps:
+  - name: ibmcloud-cli-login
+    image: harbor.galasa.dev/common/ibmcloud-cli:main
+    imagePullPolicy: Always
+    env:
+    - name: IBMCLOUD_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: ibmcloud-api-key
+          key: ibmcloud-api-key
+          optional: false
+    args:
+    - ibmcloud
+    - login
+# 
+  - name: ibmcloud-cli-command
+    image: harbor.galasa.dev/common/ibmcloud-cli:main
+    imagePullPolicy: Always
+    env:
+    - name: IBMCLOUD_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: ibmcloud-api-key
+          key: ibmcloud-api-key
+          optional: false
+    args:
+    - ibmcloud
+    - $(params.command)
