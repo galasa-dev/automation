@@ -15,7 +15,6 @@ function usage {
 Options are:
 --hostname <host_name> : The name/IP of the host running the ecosystem (mandatory).
 --prefix <service_prefix> : The prefix of the external services.
---ingress : Flag to indicate Ingress is being used.
 -h | --help : Display usage information.
 EOF
   return 0
@@ -35,8 +34,8 @@ function get_external_port {
   done
 
   if [[ -z "${port}" ]]; then
-      echo 1>&2 "Error: Failed to retrieve port for ${serviceName} after ${maxRetries} tries."
-      return 1
+    echo 1>&2 "Error: Failed to retrieve port for ${serviceName} after ${maxRetries} tries."
+    return 1
   fi
   echo "${port}"
   return 0
@@ -47,7 +46,6 @@ function get_external_port {
 #
 hostName=""
 prefix=""
-ingress=""
 
 while [ "$1" != "" ]; do
   case $1 in
@@ -56,8 +54,6 @@ while [ "$1" != "" ]; do
                       ;;
     --prefix )        shift
                       prefix="$1"
-                      ;;
-    --ingress )       ingress="true"
                       ;;
     -h | --help )     usage
                       return
@@ -70,9 +66,9 @@ while [ "$1" != "" ]; do
 done
 
 if [[ -z "${hostName}" ]]; then
-    echo "Error: Please specify --hostname <host_name>."
-    usage
-    return 1
+  echo "Error: Please specify --hostname <host_name>."
+  usage
+  return 1
 fi
 
 echo "HOSTNAME is ${hostName}"
@@ -81,14 +77,9 @@ echo "PREFIX is ${prefix}"
 #
 # Retrieve the port numbers of the Services for external access
 #
-etcdPort="2379"
-couchdbPort="5984"
-
-if [[ -z "${ingress}" ]]; then
-  echo "Retrieving external service ports..."
-  etcdPort=$(get_external_port "${prefix}etcd" "client")
-  couchdbPort=$(get_external_port "${prefix}couchdb" "http")
-fi
+echo "Retrieving external service ports..."
+etcdPort=$(get_external_port "${prefix}etcd" "client")
+couchdbPort=$(get_external_port "${prefix}couchdb" "http")
 
 echo "ETCD port is ${etcdPort}"
 echo "COUCHDB port is ${couchdbPort}"
