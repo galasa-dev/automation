@@ -34,8 +34,8 @@ function get_external_port {
   done
 
   if [[ -z "${port}" ]]; then
-      echo 1>&2 "Error: Failed to retrieve port for ${serviceName} after ${maxRetries} tries."
-      return 1
+    echo 1>&2 "Error: Failed to retrieve port for ${serviceName} after ${maxRetries} tries."
+    return 1
   fi
   echo "${port}"
   return 0
@@ -65,11 +65,10 @@ while [ "$1" != "" ]; do
   shift
 done
 
-if [ -z "${hostName}" ]
-  then
-    echo "Error: Please specify --hostname <host_name>."
-    usage
-    return 1
+if [[ -z "${hostName}" ]]; then
+  echo "Error: Please specify --hostname <host_name>."
+  usage
+  return 1
 fi
 
 echo "HOSTNAME is ${hostName}"
