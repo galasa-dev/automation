@@ -1,0 +1,21 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: codecov-ingress
+  namespace: galasa-prod
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "development.galasa.dev"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/codecov"
+        backend:
+          service:
+            name: codecov
+            port:
+              number: 80
