@@ -1,0 +1,48 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codecov
+  namespace: galasa-prod
+  labels:
+    app: codecov
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: codecov
+  template:
+    metadata:
+      name: codecov
+      labels:
+        app: codecov
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        applevel: critical
+      containers:
+      - name: codecov
+        image: harbor.galasa.dev/galasadev/galasa-codecoverage:codecov
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codecov
+  namespace: galasa-prod
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: codecov

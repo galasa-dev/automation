@@ -1,0 +1,12 @@
+#
+# Copyright contributors to the Galasa project 
+# 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bootstrap-file
+  namespace: galasa-prod
+data:
+  bootstrap.properties: |
+    framework.config.store=etcd:http://galasa-cicsk8s.hursley.ibm.com:32189
+    framework.extra.bundles=dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.phoenix2.manager
