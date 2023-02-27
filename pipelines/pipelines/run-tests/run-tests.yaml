@@ -28,7 +28,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: run-prepare
+  - name: runs-submit
     taskRef: 
       name: galasactl
     runAfter:
@@ -39,36 +39,13 @@ spec:
     - name: command
       value:
         - runs 
-        - prepare 
-        - --bootstrap 
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
-        - --stream 
-        - inttests 
-        - --portfolio 
-        - test.yaml 
-        - --test 
-        - local.CoreLocalJava11Ubuntu
-        - --log
+        - submit
+        - --log # Log to the console
         - '-'
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace   
-  - name: run-submit
-    taskRef: 
-      name: galasactl
-    runAfter:
-    - run-prepare
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - runs 
-        - submit 
         - --bootstrap 
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
-        - --portfolio 
-        - /workspace/git/$(context.pipelineRun.name)/test.yaml 
+        - --class
+        - dev.galasa.inttests/dev.galasa.inttests.core.local.CoreLocalJava11Ubuntu 
         - --throttle 
         - '10' 
         - --poll 
@@ -85,8 +62,6 @@ spec:
         - tests.json 
         - --reportjunit 
         - junit.xml
-        - --log
-        - '-'
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
