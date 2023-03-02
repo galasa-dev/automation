@@ -901,3 +901,13 @@ Parameters:
 * command: An array with the parts of the command to perform.
 
 This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
+
+
+## How to manually trigger a pipeline
+Use the `trigger-pipeline.sh` script to trigger one of the pipelines.
+The tool may not support all the pipelines yet, feel free to add ones which are missing.
+
+For example: To kick-off the extensions pipeline...
+```
+./trigger-pipeline.sh --extensions
+```
