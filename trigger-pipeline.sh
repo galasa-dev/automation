@@ -56,7 +56,14 @@ function usage {
     info "Syntax: trigger-pipeline.sh [OPTIONS]"
     cat << EOF
 Options are:
+--gradle
+--maven
+--framework
 --extensions
+--managers
+--obr
+--cli
+--eclipse
 
 Environment variables used:
 None
@@ -86,7 +93,21 @@ pipeline=""
 
 while [ "$1" != "" ]; do
     case $1 in
+        --gradle )              pipeline="gradle"
+                                ;;
+        --maven )               pipeline="maven"
+                                ;;
+        --framework )           pipeline="framework"
+                                ;;
         --extensions )          pipeline="extensions"
+                                ;;
+        --managers )            pipeline="managers"
+                                ;;
+        --obr )                 pipeline="obr"
+                                ;;
+        --cli )                 pipeline="cli"
+                                ;;
+        --eclipse )             pipeline="eclipse"
                                 ;;
         -h | --help )           usage
                                 exit
