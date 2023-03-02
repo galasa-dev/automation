@@ -141,7 +141,9 @@ spec:
     taskRef: 
       name: general-command
     runAfter:
+    # Note: We still need the framework code so we can pick up the openapi definitions.
     - gather-dependencies
+    - clone-framework
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
