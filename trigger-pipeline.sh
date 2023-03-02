@@ -56,6 +56,8 @@ function usage {
     info "Syntax: trigger-pipeline.sh [OPTIONS]"
     cat << EOF
 Options are:
+
+(from the 'main' build chain)
 --gradle
 --maven
 --framework
@@ -64,6 +66,12 @@ Options are:
 --obr
 --cli
 --eclipse
+
+(from stand-alone build pipelines)
+--wrapping
+--obr-generic
+--simplatform
+--isolated
 
 Environment variables used:
 None
@@ -109,6 +117,15 @@ while [ "$1" != "" ]; do
                                 ;;
         --eclipse )             pipeline="eclipse"
                                 ;;
+        --wrapping )            pipeline="wrapping"
+                                ;;
+        --obr-generic )         pipeline="obr-generic"
+                                ;;
+        --simplatform )         pipeline="simplatform"
+                                ;;
+        --isolated )            pipeline="isolated"
+                                ;;
+
         -h | --help )           usage
                                 exit
                                 ;;
