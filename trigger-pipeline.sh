@@ -66,8 +66,6 @@ Options are:
 --obr
 --cli
 --eclipse
-
-(from stand-alone build pipelines)
 --wrapping
 --obr-generic
 --simplatform
