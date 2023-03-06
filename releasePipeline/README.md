@@ -48,7 +48,7 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
 ### Regression test
 
-1. Amend 28-regression-test-galasa.yaml - Set the correct version, the bootVersion is unlikely to change.
+1. Amend 28-regression-test-galasa.yaml - Set the correct version for this release, and the bootVersion for galasa-boot (check [here](https://development.galasa.dev/main/maven-repo/obr/dev/galasa/galasa-boot/) for current galasa-boot version)
 1. Run `kubectl -n galasa-build create -f 28-regression-test-galasa.yaml` - Test Galasa.
 1. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
 1. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
