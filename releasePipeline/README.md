@@ -31,7 +31,21 @@ ibmcloud cr region-set global
 For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-build pr logs -f --last to watch it's progress. Only move onto the next command once the previous is completed successfully.
 
 
-## Release process
+## PRE-RELEASE PROCESS
+It may be beneficial to complete a pre-release before starting a vx.xx.x release of Galasa. This is to ensure the main Galasa component builds successfully and to iron out any problems before the actual release, as there will be a freeze on delivering code during this time. 
+
+**Do not check in any changes you make to files during this work item unless you are correcting a mistake - back out everything at the end**
+
+1. Ensure you have complered Steps 1, 2 and 3 of the 'Set up' section of this README
+1. Complete Steps 1, 3 and 4 of the 'Create branch and ArgoCD applications' section in the release process
+   - Before doing Step 1, in 02-create-argocd-apps.sh, do a find and replace on the word 'release' and change to 'prerelease'. 
+   - In Step 4, **ensure that the following parameters are set**: distBranch=prerelease, fromBranch=main
+1. Complete Step 1 of 'Build the components' **ensuring that the following parameters are set**: toBranch=prerelease, revision=prerelease, refspec=refs/heads/prerelease:refs/heads/prerelease, imageTag=prerelease, appname=prerelease-maven-repos, jacocoEnabled=false, isRelease=true
+1. Go to a maven artifact from each repository and check that the .asc files are present, which means the artifact has been signed. For example, https://development.galasa.dev/prerelease/maven-repo/wrapping/dev/galasa/com.auth0.jwt/<VERSION> should contain a file called com.auth0.jwt-<VERSION>.jar.asc.
+1. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
+
+
+## RELEASE PROCESS
 
 ### Create branch and ArgoCD applications
 
