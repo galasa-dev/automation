@@ -23,9 +23,6 @@ spec:
         - image: {{ .Values.codecov.imageName }}:{{ .Values.codecov.imageTag }}
           imagePullPolicy: Always
           name: codecov-{{ .Values.codecov.branch }}
-          env:
-          - name: CONTEXTROOT
-            value: {{ .Values.codecov.branch }}/codecov
           ports:
             - containerPort: 80
 {{ end }}
