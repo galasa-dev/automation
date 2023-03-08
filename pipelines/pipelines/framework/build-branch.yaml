@@ -28,7 +28,7 @@ spec:
     default: main-maven-repos
   - name: jacocoEnabled
     type: string
-    default: "false"
+    default: "true"
   - name: isRelease
     type: string
     default: "false"
