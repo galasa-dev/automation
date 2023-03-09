@@ -183,7 +183,7 @@ pr-cli:
 The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation and Framework repositories at the main branch, and then CLI repository at the PR's branch. The pipeline then uses Gradle to gather needed dependencies. Go client code is then generated from the openapi.yaml file in Framework so that the CLI can talk to the API server. The pipeline then clears the go.mod and go.sum as they are out of date, sets the Galasa version this build is part of, gets the commit SHA of the latest commit in the PR. The make command is then invoked to build the Go code, run unit tests and run code coverage. Finally, the CLI Docker images are built and the status of the pipleine is returned to the PR. 
 
 branch-cli:
-The pipeline clones the Automationm, Framework and CLI repositories at the main branch. The pipeline follows the same steps as pr-cli, apart from returning the status of the pipeline to a PR as this is for a main build. This pipeline however recycles the Maven repositories which publish the CLI binaries, and then triggers a snapshot-main-to-prod pipeline. 
+The pipeline clones the Automation, Framework and CLI repositories at the main branch. The pipeline follows the same steps as pr-cli, apart from returning the status of the pipeline to a PR as this is for a main build. This pipeline however recycles the Maven repositories which publish the CLI binaries, and then triggers a snapshot-main-to-prod pipeline. 
 
 The Docker image for the galasactl CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-amd64/artifacts-tab).
 
