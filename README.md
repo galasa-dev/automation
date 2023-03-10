@@ -620,3 +620,27 @@ Parameters:
 * command: An array with the parts of the command to perform.
 
 This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
+
+
+## How to manually trigger a pipeline
+Use the `trigger-pipeline.sh` script to trigger one of the main-line build pipelines.
+The tool may not support all the pipelines yet, feel free to add ones which are missing.
+
+For example: To kick-off the extensions pipeline...
+```
+./trigger-pipeline.sh --extensions
+```
+
+> Note: The pipelines kicked off are the mainline pipelines, not pull-request pipelines,
+so be careful as this will cause things to be published to the public repositories.
+
+This tool is useful if there is a glitch in the 'chain' or builds kicked off when 
+something on a `main` branch builds, but fails to kick-off the next build in the 'chain'.
+So you can re-start the chain of builds without resorting to submitting empty change-sets
+and another pull request. 
+
+ie: If the main builds fail and you want to re-start a build.
+
+This can be the case if we get environmental failures, for examople when argocd fails to 
+re-deploy one of the docker images from the build.
+
