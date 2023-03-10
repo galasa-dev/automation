@@ -102,7 +102,7 @@ spec:
       value:
         - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/cli/repo"
     - name: command
       value: 
         - installJarsIntoTemplates
