@@ -15,5 +15,4 @@ spec:
     image: harbor.galasa.dev/common/kubectl:main
     imagePullPolicy: Always
     args:
-    - kubectl
     - $(params.command)

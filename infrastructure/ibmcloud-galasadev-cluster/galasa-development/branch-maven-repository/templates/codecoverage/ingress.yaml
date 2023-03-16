@@ -24,6 +24,6 @@ spec:
             name: codecov-{{ .Values.codecov.branch }}
             port:
               number: 80
-        path: /{{ .Values.codecov.branch }}/codecov
+        path: /codecoverage
         pathType: Prefix
 {{ end }}

@@ -31,7 +31,21 @@ ibmcloud cr region-set global
 For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-build pr logs -f --last to watch it's progress. Only move onto the next command once the previous is completed successfully.
 
 
-## Release process
+## PRE-RELEASE PROCESS
+It may be beneficial to complete a pre-release before starting a vx.xx.x release of Galasa. This is to ensure the main Galasa component builds successfully and to iron out any problems before the actual release, as there will be a freeze on delivering code during this time. 
+
+**Do not check in any changes you make to files during this work item unless you are correcting a mistake - back out everything at the end**
+
+1. Ensure you have complered Steps 1, 2 and 3 of the 'Set up' section of this README
+1. Complete Steps 1, 3 and 4 of the 'Create branch and ArgoCD applications' section in the release process
+   - Before doing Step 1, in 02-create-argocd-apps.sh, do a find and replace on the word 'release' and change to 'prerelease'. 
+   - In Step 4, **ensure that the following parameters are set**: distBranch=prerelease, fromBranch=main
+1. Complete Step 1 of 'Build the components' **ensuring that the following parameters are set**: toBranch=prerelease, revision=prerelease, refspec=refs/heads/prerelease:refs/heads/prerelease, imageTag=prerelease, appname=prerelease-maven-repos, jacocoEnabled=false, isRelease=true
+1. Go to a maven artifact from each repository and check that the .asc files are present, which means the artifact has been signed. For example, https://development.galasa.dev/prerelease/maven-repo/wrapping/dev/galasa/com.auth0.jwt/<VERSION> should contain a file called com.auth0.jwt-<VERSION>.jar.asc.
+1. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
+
+
+## RELEASE PROCESS
 
 ### Create branch and ArgoCD applications
 
@@ -48,7 +62,7 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
 ### Regression test
 
-1. Amend 28-regression-test-galasa.yaml - Set the correct version, the bootVersion is unlikely to change.
+1. Amend 28-regression-test-galasa.yaml - Set the correct version for this release, and the bootVersion for galasa-boot (check [here](https://development.galasa.dev/main/maven-repo/obr/dev/galasa/galasa-boot/) for current galasa-boot version)
 1. Run `kubectl -n galasa-build create -f 28-regression-test-galasa.yaml` - Test Galasa.
 1. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
 1. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
@@ -98,10 +112,10 @@ All the tests must pass before moving on.
 
 ### Clean up
 
-1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos.
-<!-- Temporary step until we can automate deleting the 'release' images: -->
-1. Go to [Harbor](harbor.galasa.dev) and delete all images tagged 'release' (tick box next to image tagged 'release' and select Actions then Delete)
-1. Go to [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' (click three dots next to 'release' image and select Delete image)
+<!-- 1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos. -->
+<!-- Temporary steps until we can automate deleting the 'release' images: -->
+1. Go through the images in [Harbor](harbor.galasa.dev) and delete all images tagged 'release' that were built as part of this release (tick box next to image tagged 'release' and select Actions then Delete)
+1. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image)
 <!-- End of temporary steps-->
 1. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
 
