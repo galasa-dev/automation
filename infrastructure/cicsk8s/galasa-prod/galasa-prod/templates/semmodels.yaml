@@ -24,7 +24,8 @@ spec:
         applevel: critical
       containers:
       - name: semmodels
-        image: harbor.galasa.dev/galasadev/galasa-semmodels:prod
+        # We haven't yet pushed galasa-semmodels to the new Harbor
+        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-semmodels:prod
         imagePullPolicy: Always
         ports:
         - containerPort: 80
