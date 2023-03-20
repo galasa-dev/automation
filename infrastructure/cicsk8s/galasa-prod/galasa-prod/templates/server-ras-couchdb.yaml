@@ -22,7 +22,9 @@ spec:
     spec:
       containers:
       - name: couchdb
-        image: harbor.galasa.dev/galasadev/couchdb:2.3.1
+        image: docker.galasa.dev/couchdb:2.3.1
+        # Need to push couchdb image to new Harbor
+        # image: harbor.galasa.dev/galasadev/couchdb:2.3.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5984
@@ -31,7 +33,20 @@ spec:
           name: erlangbport
         - containerPort: 9100
         env:
-        # 
+#        - name: COUCHDB_USER
+#          value: "admin"
+#        - name: COUCHDB_PASSWORD
+#          value: "galasa"
+#        - name: NODE_NETBIOS_NAME
+#          valueFrom:
+#            fieldRef:
+#              fieldPath: metadata.name
+#        - name: NODENAME
+#          value: $(NODE_NETBIOS_NAME).ras
+#        - name: COUCHDB_SECRET
+#          value: "galasacluster"
+#        - name: ERL_FLAGS
+#          value: '-setcookie "galasacookiemonster"'
         livenessProbe:
           httpGet:
             path: /
