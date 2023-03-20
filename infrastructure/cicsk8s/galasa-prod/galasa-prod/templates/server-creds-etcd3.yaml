@@ -26,7 +26,9 @@ spec:
         applevel: critical
       containers:
       - name: etcd
-        image: harbor.galasa.dev/galasadev/etcd:v3.2.25
+        image: docker.galasa.dev/etcd:v3.2.25
+        # Need to push etcd image to new Harbor
+        # image: harbor.galasa.dev/galasadev/etcd:v3.2.25
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 2379
