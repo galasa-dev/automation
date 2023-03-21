@@ -1,0 +1,44 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-delete-all
+  namespace: galasa-build
+spec:
+  params:
+  - name: distBranch
+    type: string
+#
+#
+#
+  tasks:
+
+#
+#######  Gradle
+#
+ 
+#
+#
+#
+  - name: delete-image-gradle
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-gradle
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
