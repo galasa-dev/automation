@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: branch-delete-all
+  name: branch-delete-all-aaron
   namespace: galasa-build
 spec:
   params:
