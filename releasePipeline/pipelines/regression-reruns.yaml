@@ -50,6 +50,8 @@ spec:
   - name: runs-submit
     taskRef: 
       name: galasactl
+    runAfter:
+    - runs-prepare
     params:
     - name: context
       value: $(context.pipelineRun.name)
