@@ -25,6 +25,9 @@ spec:
     - name: githubcreds
       secret:
         secretName: github-token
+    - name: harborcreds
+      secret:
+        secretName: harbor-creds-yaml
 
   params:
   - name: distBranch
