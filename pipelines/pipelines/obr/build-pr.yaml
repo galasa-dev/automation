@@ -213,7 +213,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
@@ -277,7 +277,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
@@ -351,7 +351,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: command
       value: 
         - deploy
