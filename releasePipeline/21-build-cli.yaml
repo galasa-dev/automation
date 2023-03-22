@@ -13,7 +13,7 @@ metadata:
 #
 spec:
   params:
-  - name: toBranch
+  - name: branch
     value: release
   - name: revision
     value: release
@@ -32,6 +32,23 @@ spec:
 #
 #
 #
+  podTemplate:
+    volumes:
+    - name: gradle-properties
+      secret:
+        secretName: gradle-properties
+    - name: gpg-key
+      secret:
+        secretName: gpg-key
+    - name: mavengpg
+      secret:
+        secretName: mavengpg
+    - name: githubcreds
+      secret:
+        secretName: github-token
+    - name: harborcreds
+      secret:
+        secretName: harbor-creds-yaml
   workspaces:
   - name: git-workspace
     volumeClaimTemplate:
