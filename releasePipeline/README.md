@@ -73,31 +73,50 @@ All the tests must pass before moving on.
 
 ### Obtain release approval
 
-1. Ask the Team and Product managers for release approval.
+1. Ask the Team and Product managers for release approval by:
+   1. Seeking out the GHE issue related to the release you are working on.
+   2. Checking off the tasks that are listed in the issue.
+   3. Tagging approvers with a link to the regression test results.
+
+Have a look at the GHE issues for previous releases for examples on how this has been done before. 
 
 ### Deployment
 
 <!-- Commenting out the steps below for now as they do not work. An item is open to fix this. Temporary steps to work around this below: -->
 <!-- 1. Amend 30-deploy-maven-galasa.yaml and amend the version parameter to the release.
 1. Run `kubectl -n galasa-build create -f 30-deploy-maven-galasa.yaml` - Deploy the maven artifacts to OSS Sonatype. -->
-1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor.
-1. Exec into the image so you can run commands from inside it, by running `docker run -it --entrypoint /bin/sh harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release`
-1. When inside the image, run `cd htdocs/dev/galasa`
-1. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them, `rm maven-metadata.xml` etc.
-1. Go to Vault and find the maven-creds secret, to use the username and password in the next step.
-1. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the Nexus staging repository:
-`galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>`
-1. `exit` the image.
+1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor using:
+
+   ```
+   docker pull harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
+   ```
+
+2. Exec into the image so you can run commands from inside it by running:
+
+   ```
+   docker run -it --entrypoint /bin/sh harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
+   ```
+
+3. When inside the image, run `cd htdocs/dev/galasa`
+4. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them, `rm maven-metadata.xml` etc.
+5. Go to Vault and find the maven-creds secret, to use the username and password in the next step.
+6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the Nexus staging repository:
+
+   ```
+   galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>
+   ```
+
+7. `exit` the image.
 <!-- End of temporary steps -->
 1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document.
-1. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata.
-1. Wait until Maven Central is updated.
-1. Amend 33-resources-image.yaml - Set the version.
-1. Run `kubectl -n galasa-build create -f 33-resources-image.yaml` - Build the resources-image.
-1. Amend 34-deploy-docker-galasa.sh - Set the version.
-1. 34-deploy-docker-galasa.sh - Deploy the Container images to ICR.
-1. Amend 35-deploy-docker-cli.sh - **Only if CLI being released** - Set the version.
-1. 35-deploy-docker-cli.sh- **Only if CLI being released** - Deploy the CLI images to ICR.
+2. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata.
+3. Wait until Maven Central is updated.
+4. Amend 33-resources-image.yaml - Set the version.
+5. Run `kubectl -n galasa-build create -f 33-resources-image.yaml` - Build the resources-image.
+6. Amend 34-deploy-docker-galasa.sh - Set the version.
+7. 34-deploy-docker-galasa.sh - Deploy the Container images to ICR.
+8. Amend 35-deploy-docker-cli.sh - **Only if CLI being released** - Set the version.
+9. 35-deploy-docker-cli.sh- **Only if CLI being released** - Deploy the CLI images to ICR.
 
 ### Update reference sites
 
