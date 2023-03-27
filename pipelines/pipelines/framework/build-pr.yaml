@@ -28,7 +28,13 @@ spec:
     type: string
   - name: action
     type: string
+#
+#
+#
   tasks:
+#
+#
+#
   - name: git-verify
     taskRef:
       name: git-verify
@@ -39,6 +45,9 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+#
+#
+#
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -58,6 +67,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -77,6 +89,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,7 +105,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+#
+#
+#
   - name: gradle-build-framework
     taskRef:
       name: gradle-build
@@ -111,6 +128,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+#
+#
+#
   - name: docker-build-framework
     taskRef:
       name: docker-build
@@ -135,6 +155,59 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+#
+#
+#
+  - name: generate-api-docs
+    taskRef:
+      name: general-command
+    runAfter:
+    - clone-framework
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: image
+      value: harbor.galasa.dev/common/openapi:main
+    - name: command
+      value:
+        - java
+        - -jar
+        - /opt/openapi/openapi-generator-cli.jar
+        - generate
+        - -i
+        - /workspace/git/$(context.pipelineRun.name)/framework/openapi.yaml
+        - -g
+        - html2
+        - -o
+        - docs/generated/galasaapi
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: docker-build-restapidoc-site
+    taskRef:
+      name: docker-build
+    runAfter:
+    - generate-api-docs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.headSha)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/javadoc/restapidoc-site-dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   finally:
   - name: git-status
     when:
