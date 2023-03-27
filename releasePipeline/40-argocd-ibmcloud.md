@@ -5,4 +5,4 @@
    - default/javadoc-stable.yaml
    - default/p2stable.yaml
    - default/resources.yaml
-1. Let ArgoCD sync (Application = galasa-ibmcloud)
+2. Let ArgoCD sync the `galasa-ibmcloud` application running on the internal cluster
