@@ -201,7 +201,7 @@ spec:
     - name: noPush
       value: ""
     - name: dockerfilePath
-      value: automation/dockerfiles/javadoc/restapidoc-site-dockerfile
+      value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
     workspaces:
      - name: git-workspace
        workspace: git-workspace
