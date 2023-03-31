@@ -245,7 +245,26 @@ spec:
       value: --no-push
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace     
+  - name: build-swagger-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/swagger-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/swagger:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
   finally:
   - name: git-status
     when:
