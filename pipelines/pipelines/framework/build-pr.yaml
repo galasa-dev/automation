@@ -167,16 +167,16 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/framework
     - name: image
-      value: harbor.galasa.dev/common/openapi:main
+      value: harbor.galasa.dev/common/swagger:main
     - name: command
       value:
         - java
         - -jar
-        - /opt/openapi/openapi-generator-cli.jar
+        - /opt/swagger/swagger-codegen-cli.jar
         - generate
         - -i
         - /workspace/git/$(context.pipelineRun.name)/framework/openapi.yaml
-        - -g
+        - -l
         - html2
         - -o
         - docs/generated/galasaapi
