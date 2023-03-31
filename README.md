@@ -644,3 +644,6 @@ ie: If the main builds fail and you want to re-start a build.
 This can be the case if we get environmental failures, for examople when argocd fails to 
 re-deploy one of the docker images from the build.
 
+## How are the IBM build machines protected from malicious code in a fork-pull-request ?
+There are built-in protections to prevent malicious code being executed as part of a build process
+on the IBM build hardware. The mechanism is described [here](./docs/pull-request-build-authentication.md).
