@@ -452,6 +452,28 @@ spec:
      - name: git-workspace
        workspace: git-workspace 
 
+  # This image is used for executing the test scripts for galasactl
+  # The scripts require Java, Maven and Gradle use
+  - name: build-java-maven-gradle-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/java-maven-gradle-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/java-maven-gradle:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
   # finally:
