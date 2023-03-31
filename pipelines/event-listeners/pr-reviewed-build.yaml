@@ -42,6 +42,8 @@ spec:
           value: $(body.pull_request.base.ref)
         - name: git-pr-number
           value: $(body.pull_request.number)
+        # The userid passed is the id of the person who just submitted a review using 
+        # the approval/comment/request-changes github dialog
         - name: git-userid
           value: $(body.review.user.id)
         - name: git-action
