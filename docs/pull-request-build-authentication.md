@@ -29,9 +29,9 @@ recent web hook events it has sent out for the galasa-dev organisation.
 For each webhook event it finds in the Github events history, it sends the exact webhook payload to Tekton.
 When there are no more events to process in Github, the monitor saves a 'bookmark' of the latest event it has processed 
 and exits.
-When the monitor next wakes up, it reads the bookmark, and knows where to start 'replaying' the github events from, therebye avoiding issuing duplicate hook event copies to Tekton.
+When the monitor next wakes up, it reads the bookmark, and knows where to start 'replaying' the github events from, thereby avoiding issuing duplicate hook event copies to Tekton.
 4. The event indicating the PR was opened is sent to Tekton. The user id in the event is the id of the non-trusted developer.
-6. The `pr-builds` Tekton listener fires, and processes the 'PR open' event. The user id in the even is the id of the non-trusted developer still. 
+6. The `pr-builds` Tekton listener fires, and processes the 'PR open' event. The user id in the event is the id of the non-trusted developer still. 
 7. The listener kicks-off a component build on the CLI pr pipeline.
 8. The first step in the CLI pipeline is to vall the [verify program](../build-images/github-verify/), passing the userid from the event. ie: The non-trusted developer user id.
 9. The verify program calls into Github, to find the 'committers' team in the 'galasa-dev' organisation. It queries all the members of that team, and checks to see if the user-id being checked is in that team of trusted developers. In this case the non-trusted developer is not in the list, so the step in the CLI pipeline fails, and the PR code is never cloned or built. The verify program then adds a comment to the pull request "Approval from a committer needed" (or similar).
