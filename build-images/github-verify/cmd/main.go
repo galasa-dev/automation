@@ -29,7 +29,7 @@ var client = http.Client{
 //     (in which case the userId passed is the person who did the push/open/re-open)
 //   - Some pull request has been reviewed, and the comment "Approved for building"
 //     has been submitted as a review comment.
-//     (in which case the userId passed is hte person who did the review)
+//     (in which case the userId passed is the person who did the review)
 //
 // Objectives:
 //
