@@ -32,6 +32,9 @@ spec:
   - name: isRelease
     type: string
     default: "false"
+  - name: releaseVersion
+    type: string
+    default: "x.xx.x"
   workspaces:
   - name: git-workspace
 # 
@@ -200,6 +203,30 @@ spec:
       value: $(context.pipelineRun.name)
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.imageTag)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: release-docker-build-restapidoc-site
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["release"]
+    taskRef:
+      name: docker-build
+    runAfter:
+    - generate-api-docs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: icr.io/galasadev/galasa-restapidoc-amd64:$(params.releaseVersion)
     - name: context
       value: $(context.pipelineRun.name)/framework
     - name: noPush
