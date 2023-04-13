@@ -1,9 +1,0 @@
-FROM docker.io/library/openjdk:11
-
-RUN mkdir /opt/maven
-RUN curl -L https://downloads.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz -o /opt/maven/apache-maven-3.8.8-bin.tar.gz && tar -zxvf /opt/maven/apache-maven-3.8.8-bin.tar.gz -C /opt/maven/ && rm /opt/maven/apache-maven-3.8.8-bin.tar.gz
-ENV PATH=$PATH:/opt/maven/apache-maven-3.8.8/bin
-
-RUN mkdir /opt/gradle
-RUN curl -L https://services.gradle.org/distributions/gradle-6.8.2-bin.zip -o /tmp/gradle-6.8.2-bin.zip && unzip -d /opt/gradle /tmp/gradle-6.8.2-bin.zip && rm /tmp/gradle-6.8.2-bin.zip
-ENV PATH=$PATH:/opt/gradle/gradle-6.8.2/bin

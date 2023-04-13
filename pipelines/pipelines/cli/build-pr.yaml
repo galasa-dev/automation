@@ -274,7 +274,7 @@ spec:
     - name: command
       value: 
         - chmod
-        - '755'
+        - +x
         - test-galasactl-local.sh
     workspaces:
      - name: git-workspace
@@ -282,7 +282,7 @@ spec:
 # 
 # 
 # 
-  - name: chmod-ecosystem-script
+  - name: test-galasactl-local-maven-linux-amd64
     taskRef: 
       name: general-command
     runAfter:
@@ -291,11 +291,61 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
+      value: docker.io/library/maven:3.8.6-openjdk-11
+    - name: command
+      value: 
+        - ./test-galasactl-local.sh
+        - --binary
+        - galasactl-linux-amd64
+        - --buildTool
+        - maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: test-galasactl-local-gradle-linux-amd64
+    taskRef: 
+      name: general-command
+    runAfter:
+      - test-galasactl-local-maven-linux-amd64
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: docker.io/library/gradle:6.8.2-jdk11 
+    - name: command
+      value: 
+        - ./test-galasactl-local.sh
+        - --binary
+        - galasactl-linux-amd64
+        - --buildTool
+        - gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+# TO-DO Add tests for the other binaries, darwin etc
+# 
+# 
+# 
+  - name: chmod-ecosystem-script
+    taskRef: 
+      name: general-command
+    runAfter:
+      - test-galasactl-local-gradle-linux-amd64
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
       value: docker.io/library/bash:3.2.57
     - name: command
       value: 
         - chmod
-        - '755'
+        - +x
         - test-galasactl-ecosystem.sh
     workspaces:
      - name: git-workspace
@@ -303,7 +353,7 @@ spec:
 # 
 # 
 # 
-  - name: test-galasactl-local-linux-amd64
+  - name: test-galasactl-ecosystem-linux-amd64
     taskRef: 
       name: general-command
     runAfter:
@@ -312,32 +362,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: harbor.galasa.dev/common/java-maven-gradle:latest
-    - name: command
-      value: 
-        - ./test-galasactl-local.sh
-        - --binary
-        - galasactl-linux-amd64
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
-# TO-DO Add tests for the other binaries
-# 
-# 
-# 
-  - name: test-galasactl-ecosystem-linux-amd64
-    taskRef: 
-      name: general-command
-    runAfter:
-      - test-galasactl-local-linux-amd64
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: image
-      value: harbor.galasa.dev/common/java-maven-gradle:latest
+      value: docker.io/library/openjdk:11
     - name: command
       value: 
         - ./test-galasactl-ecosystem.sh
