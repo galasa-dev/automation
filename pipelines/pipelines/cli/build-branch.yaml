@@ -354,7 +354,7 @@ spec:
     taskRef: 
       name: docker-build
     runAfter:
-    - galasactl-make
+    - test-galasactl-ecosystem-linux-amd64
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
