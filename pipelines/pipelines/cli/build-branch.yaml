@@ -273,8 +273,6 @@ spec:
     - name: command
       value: 
         - ./test-galasactl-local.sh
-        - --binary
-        - galasactl-linux-amd64
         - --buildTool
         - maven
     workspaces:
@@ -296,8 +294,6 @@ spec:
     - name: command
       value: 
         - ./test-galasactl-local.sh
-        - --binary
-        - galasactl-linux-amd64
         - --buildTool
         - gradle
     workspaces:
@@ -344,8 +340,6 @@ spec:
     - name: command
       value: 
         - ./test-galasactl-ecosystem.sh
-        - --binary
-        - galasactl-linux-amd64
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
     workspaces:
