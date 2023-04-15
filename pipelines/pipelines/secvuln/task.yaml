@@ -1,0 +1,126 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: secvuln-report
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+    optional: false
+  params:
+  - name: mainRepo
+    type: string
+    default: https://galasadev-cicsk8s.hursley.ibm.com/main/maven/obr/
+  - name: remoteRepo
+    type: string
+    default: https://repo.maven.apache.org/maven2
+  - name: version
+    type: string
+  - name: dockerRepo
+    type: string
+    default: harbor-cicsk8s.hursley.ibm.com
+  steps:
+  - name: create-pseudo-maven-projects
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    command:
+    - galasabld
+    - secvuln
+    - maven
+    - --parent
+    - /workspace/git/security-scanning
+    - --pom
+    - $(params.mainRepo)dev/galasa/dev.galasa.uber.obr/$(params.version)/dev.galasa.uber.obr-$(params.version).pom
+    - --repo
+    - $(params.mainRepo)
+    - --repo
+    - $(params.remoteRepo)
+  - name: push-security-scanning-for-whitesource
+    workingDir: /workspace/git/security-scanning
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    script: |
+      #!/bin/sh
+      if git status | grep -q "Changes not staged for commit\|Untracked files"; then
+        git config user.email "'jade.carino@ibm.com'"
+        git config user.name "'Jade'"
+        git add .
+        git commit -m "Pseudo maven projects"
+        git branch temp
+        git checkout main
+        git merge temp
+        git push -u origin main;
+        else echo "Working tree for security-scanning clean";
+      fi
+  - name: generate-ossindex-reports-and-dep-trees
+    workingDir: /workspace/git/security-scanning
+    env: 
+    - name: SECRET_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: ossindex-creds
+          key: username
+          optional: false
+    - name: SECRET_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: ossindex-creds
+          key: password
+          optional: false
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    command: 
+    - mvn
+    - --settings
+    - settings.xml
+    - -Dusername=$(SECRET_USERNAME)
+    - -Dpassword=$(SECRET_PASSWORD)
+    - validate
+  - name: extract-reports-to-yaml
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    command:
+    - galasabld
+    - secvuln
+    - ossindex
+    - --parent
+    - /workspace/git/security-scanning
+    - --output
+    - /workspace/git/security-scanning/galasa-secvuln-yaml.yaml
+  - name: parse-yaml-to-markdown
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    command:
+    - galasabld
+    - secvuln
+    - report
+    - --extract
+    - /workspace/git/security-scanning/galasa-secvuln-yaml.yaml
+    - --acceptance
+    - https://raw.githubusercontent.com/galasa-dev/projectmanagement/main/override.yaml
+    - --template
+    - /workspace/git/release/markdown-template.txt
+    - --output
+    - /workspace/git/release/galasa-secvuln-markdown.md
+  - name: push-markdown-to-release-repo
+    image: $(params.dockerRepo)/galasadev/galasa-build
+    workingDir: /workspace/git/release
+    env: 
+    - name: GH_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: github-creds
+          key: password
+          optional: false
+    script: |
+      #!/bin/sh
+      if git status | grep -q "Changes not staged for commit\|Untracked files"; then
+        git config user.email "'jade.carino@ibm.com'"
+        git config user.name "'Jade'"
+        git add galasa-secvuln-markdown.md
+        git commit -m "Markdown"
+        git branch temp
+        git checkout working
+        git merge temp
+        git push -u origin working
+        gh pr create --reviewer jadecarino,hobbit1983 --title "Markdown" --body "Markdown";
+        else echo "No changes to Markdown since last pipeline run";
+      fi

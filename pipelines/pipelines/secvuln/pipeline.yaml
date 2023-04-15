@@ -1,0 +1,65 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: secvuln-report
+spec:
+  workspaces:
+  - name: git-workspace
+    optional: false
+  params:
+  - name: distBranch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: +refs/heads/main:refs/heads/main
+  - name: noPush
+    type: string
+    default: ""
+  - name: version
+    type: string
+  tasks:
+  - name: clone-security-scanning
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.ibm.com/galasa/security-scanning
+    - name: revision
+      value: $(params.distBranch)
+    - name: depth
+      value: "9999999"
+    - name: subdirectory
+      value: security-scanning
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: clone-release
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/test-release
+    - name: revision
+      value: working
+    - name: depth
+      value: "9999999"
+    - name: subdirectory
+      value: release
+    workspaces:
+     - name: output
+       workspace: git-workspace
+  - name: run-secvuln-report
+    taskRef:
+      name: secvuln-report
+    params:
+    - name: version
+      value: $(params.version)
+    runAfter:
+    - clone-security-scanning
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
