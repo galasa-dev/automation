@@ -379,6 +379,7 @@ spec:
       - imageTag=$(params.imageTag)
       - --param
       - appname=$(params.appname)
+      - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
