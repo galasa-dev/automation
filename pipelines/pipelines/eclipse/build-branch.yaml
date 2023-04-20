@@ -10,7 +10,7 @@ spec:
   params:
   - name: eclipseVersion
     type: string
-    default: photon
+    default: "2022-09"
   - name: fromObrBranch
     type: string
     default: main
