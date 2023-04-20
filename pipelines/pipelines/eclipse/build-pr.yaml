@@ -111,6 +111,8 @@ spec:
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
       value: /workspace/git/gpg/settings.xml  
+    - name: image
+      value: docker.io/library/maven:3.8.5-openjdk-17
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
