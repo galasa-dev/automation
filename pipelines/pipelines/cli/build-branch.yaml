@@ -8,7 +8,7 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: toBranch
     type: string
     default: main
   - name: revision
@@ -23,6 +23,12 @@ spec:
   - name: appname
     type: string
     default: main-cli
+  - name: fromSimplatformBranch
+    type: string
+    default: prod
+  - name: appnameIsolated
+    type: string
+    default: main-maven-repos
   workspaces:
   - name: git-workspace
 # 
@@ -462,12 +468,12 @@ spec:
       - --health    
      
   #----------------------------------------------------------------
-
+  # Trigger isolated when doing a Main Build
   - name: trigger-isolated
     when:
       - input: "$(params.toBranch)"
         operator: in
-        values: ["main","release"]
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -483,7 +489,7 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-isolated-main
+      - trigger-cli-main
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
@@ -493,7 +499,53 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace  
+
+  # Trigger Isolated (when doing any kind of build)
+  - name: trigger-isolated
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-cli-binary
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-isolated
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-isolated-$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - fromObrBranch=$(params.toBranch)
+      - --param
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - fromJavadocBranch=$(params.toBranch)
+      - --param
+      - fromEclipseBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appnameIsolated)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   #----------------------------------------------------------------
   # And finally... whether the above work or not, this gets called.
