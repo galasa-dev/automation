@@ -308,12 +308,12 @@ spec:
 # 
 # 
 # 
-  # Trigger CLI when doing a Main Build or Release
+  # Trigger CLI when doing a Main Build
   - name: trigger-cli
     when:
       - input: "$(params.toBranch)"
         operator: in
-        values: ["main","release"]
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -339,7 +339,7 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace  
 # 
 # 
 # 
@@ -348,7 +348,7 @@ spec:
     when:
       - input: "$(params.toBranch)"
         operator: notin
-        values: ["main","release"]
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
