@@ -65,7 +65,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 1. Amend 28-regression-test-galasa.yaml - Set the correct version for this release, and the bootVersion for galasa-boot (check [here](https://development.galasa.dev/main/maven-repo/obr/dev/galasa/galasa-boot/) for current galasa-boot version)
 2. Run `kubectl -n galasa-build create -f 28-regression-test-galasa.yaml` - Test Galasa.
 3. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
-4. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
+4. If there are any failures, amend 29-regression-reruns.yaml with the release version and galasa-boot version and then run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
 5. Repeat as required.
 6. Manually install and test the SimBank example in Eclipse.
 
