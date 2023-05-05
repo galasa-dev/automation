@@ -131,11 +131,7 @@ Have a look at the GHE issues for previous releases for examples on how this has
 
 ### Clean up
 
-<!-- 1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos. -->
-<!-- Temporary steps until we can automate deleting the 'release' images: -->
-1. Go through the images in [Harbor](harbor.galasa.dev) and delete all images tagged 'release' that were built as part of this release (tick box next to image tagged 'release' and select Actions then Delete)
-2. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image)
-<!-- End of temporary steps-->
+1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos.
 3. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
 
 ### Bump to new version
