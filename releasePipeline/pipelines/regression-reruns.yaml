@@ -7,6 +7,8 @@ metadata:
   name: regression-reruns
   namespace: galasa-build
 spec:
+  workspaces:
+  - name: git-workspace
 #
 #
 #
@@ -46,10 +48,15 @@ spec:
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
         - --log # Otherwise there is no output
         - "-"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
 
   - name: runs-submit
     taskRef: 
       name: galasactl
+    runAfter:
+    - runs-prepare
     params:
     - name: context
       value: $(context.pipelineRun.name)
@@ -58,7 +65,7 @@ spec:
         - runs
         - submit
         - --portfolio
-        - test.yaml
+        - /workspace/git/$(context.pipelineRun.name)/test.yaml
         - --trace
         - --bootstrap
         - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
@@ -84,3 +91,6 @@ spec:
         - galasaecosystem.galasaboot.version=$(params.bootVersion)
         - --log # Otherwise there is no output
         - "-"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   

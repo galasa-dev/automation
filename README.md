@@ -154,30 +154,10 @@ tkn pipeline start branch-framework -n galasa-build \
 These pipelines build all of the images used for Galasa's build pipelines, which are stored in the [Automation repository](https://github.com/galasa-dev/automation).
 
 pr-automation:
-1. git-verify
-1. clone-automation
-1. get-commit
-1. go-build-ghverify
-1. go-build-ghstatus
-1. build-gpg-image
-1. build-kubectl-image
-1. build-gitcli-image
-1. build-tkn-image
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the PR's branch, then gets the commit sha of the latest commit in the PR. The pipeline then builds the Go source code of the custom build images stored in the repository. The pipeline then reports the status of all of the builds back to the PR.
 
 branch-automation:
-1. clone-automation
-1. get-commit
-1. go-build-ghverify
-1. build-ghverify-image
-1. go-build-ghstatus
-1. build-ghstatus-image
-1. go-build-ghmonitor
-1. build-ghmonitor-image
-1. build-gpg-image
-1. build-kubectl-image
-1. build-gitcli-image
-1. build-tkn-image
+The pipeline first clones the main branch of the repository then gets the commit sha of the latest commit in the main branch. The pipeline then builds the Go source code of the custom build images stored in the repository. 
 
 Docker images built by these pipelines are pushed [here](https://harbor.galasa.dev/harbor/projects/5/repositories).
 
@@ -187,18 +167,10 @@ Docker images built by these pipelines are pushed [here](https://harbor.galasa.d
 These pipelines build the binaries for the galasabld CLI tool, the code for which is in the [Buildutils repository](https://github.com/galasa-dev/buildutils).
 
 pr-buildutils:
-1. git-verify
-1. clone-automation
-1. clone-buildutils
-1. make
-1. build-galasabld-image
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones both the Automation repository at the main branch and Buildutils repository at the PR's branch, then gets the commit sha of the latest commit in the Buildutils PR. The pipeline then executes the Buildutils' Makefile, then builds two binary images to run galasabld and an image to host the binaries in a Maven repository. The pipeline then reports the status of all of the builds back to the PR.
 
 branch-buildutils:
-1. clone-automation
-1. clone-buildutils
-1. make
-1. build-galasabld-image
+The pipeline first clones both the Automation and Buildutils repositories at the main branch. The pipeline then executes the Buildutils' Makefile, then builds two binary images to run galasabld and an image to host the binaries in a Maven repository. The Maven repository that publishes the binaries is then recycled, and a snapshot-main-to-prod pipeline is triggered.
 
 The Docker image for the galasabld CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasabld/artifacts-tab).
 
@@ -208,37 +180,10 @@ The Docker image for the galasabld CLI is pushed [here](https://harbor.galasa.de
 These pipelines build the binaries for the galasactl CLI tool, the code for which is in the [CLI repository](https://github.com/galasa-dev/cli).
 
 pr-cli:
-1. git-verify
-1. clone-automation
-1. clone-framework
-1. clone-cli
-1. generate-api
-1. clear-mod
-1. clear-sum
-1. update-version
-1. get-commit
-1. galasactl-make
-1. docker-build-cli
-1. docker-build-cli-ibm
-1. docker-build-cli-binary
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation and Framework repositories at the main branch, and then CLI repository at the PR's branch. The pipeline then uses Gradle to gather needed dependencies. Go client code is then generated from the openapi.yaml file in Framework so that the CLI can talk to the API server. The pipeline then clears the go.mod and go.sum as they are out of date, sets the Galasa version this build is part of, gets the commit SHA of the latest commit in the PR. The make command is then invoked to build the Go code, run unit tests and run code coverage. Finally, the CLI Docker images are built and the status of the pipleine is returned to the PR. 
 
 branch-cli:
-1. clone-automation
-1. clone-framework
-1. clone-cli
-1. check-branch
-1. generate-api
-1. clear-mod
-1. clear-sum
-1. update-version
-1. get-commit
-1. galasactl-make
-1. docker-build-cli
-1. docker-build-cli-ibm
-1. docker-build-cli-binary
-1. recycle-cli-binary
-1. wait-cli-binary
+The pipeline clones the Automation, Framework and CLI repositories at the main branch. The pipeline follows the same steps as pr-cli, apart from returning the status of the pipeline to a PR as this is for a main build. This pipeline however recycles the Maven repositories which publish the CLI binaries, and then triggers a snapshot-main-to-prod pipeline. 
 
 The Docker image for the galasactl CLI is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-amd64/artifacts-tab).
 
@@ -246,31 +191,16 @@ The Docker image conatining the galasactl CLI binaries is pushed [here](https://
 
 The CLI binaries are downloadable from [here](https://development.galasa.dev/main/binary/cli).
 
+
 **Eclipse**
 
 These pipelines build the [Galasa Eclipse plug-in](https://github.com/galasa-dev/eclipse).
 
 pr-eclipse:
-1. git-verify
-1. clone-automation
-1. clone-eclipse
-1. get-commit
-1. maven-gpg
-1. maven-build-eclipse
-1. docker-build-eclipse
-1. docker-build-eclipse-p2
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Eclipse repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then sets up the GPG key for Maven to use, then runs a Maven build of the repository. Docker images are then built to host the artefacts in a Maven repository, and to host the Eclipse plug-in. The pipeline then reports on the status of the builds back to the PR.
 
 branch-eclipse:
-1. clone-automation
-1. clone-eclipse
-1. get-commit
-1. maven-gpg
-1. branch-maven-build-eclipse
-1. branch-docker-build-eclipse
-1. branch-docker-build-eclipse-p2
-1. recycle-deployment
-1. wait-deployment
+The pipeline first clones the Automation and Eclipse repositories at the main branch, then gets the commit sha of the latest commit on the main branch. It then follows the same steps as pr-eclipse, apart from reporting back to a PR. Finally, the deployment which hosts the Maven repository is recycled to update it with the latest artefacts.
 
 The Docker image for the Maven repo for Eclipse is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-eclipse/artifacts-tab) and the image for the Eclipse P2 site is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-eclipse-p2/artifacts-tab).
 
@@ -282,23 +212,10 @@ The Eclipse Maven repository is [here](https://development.galasa.dev/main/maven
 These pipelines build the [Galasa Extensions](https://github.com/galasa-dev/extensions).
 
 pr-extensions:
-1. git-verify
-1. clone-automation
-1. clone-extensions
-1. get-commit
-1. gradle-build-extensions
-1. docker-build-extensions
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Extensions repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then runs a Gradle build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-extensions:
-1. clone-automation
-1. clone-extensions
-1. get-commit
-1. branch-gradle-build-extensions
-1. branch-docker-build-extensions
-1. recycle-deployment
-1. wait-deployment
-1. trigger-managers
+The pipeline first clones the Automation and Extensions repositories at the main branch. It then follows the same steps as pr-extensions other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository and the branch-managers pipeline is then triggered using the Tekton CLI.
 
 The Docker image for the Extensions Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-extensions/artifacts-tab).
 
@@ -310,23 +227,10 @@ The Extensions Maven repository is [here](https://development.galasa.dev/main/ma
 These pipelines build the [Galasa Framework](https://github.com/galasa-dev/framework)
 
 pr-framework:
-1. git-verify
-1. clone-automation
-1. clone-framework
-1. get-commit
-1. gradle-build-framework
-1. docker-build-framework
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Framework repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then runs a Gradle build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-framework:
-1. clone-automation
-1. clone-framework
-1. get-commit
-1. branch-gradle-build-framework
-1. branch-docker-build-framework
-1. recycle-deployment
-1. wait-deployment
-1. trigger-extensions
+The pipeline first clones the Automation and Framework repositories at the main branch. It then follows the same steps as pr-framework other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository. The branch-extensions pipeline is then triggered using the Tekton CLI.
 
 The Docker image for the Framework Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-framework/artifacts-tab).
 
@@ -338,27 +242,25 @@ The Framework Maven repository is [here](https://development.galasa.dev/main/mav
 These pipelines build the [Galasa Gradle plug-in](https://github.com/galasa-dev/gradle)
 
 pr-gradle:
-1. git-verify
-1. clone-automation
-1. clone-gradle
-1. get-commit
-1. gradle-build-gradle
-1. docker-build-gradle
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Gradle repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then runs a Gradle build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-gradle:
-1. clone-automation
-1. clone-gradle
-1. get-commit
-1. branch-gradle-build-gradle
-1. branch-docker-build-gradle
-1. recycle-deployment
-1. wait-deployment
-1. trigger-maven
+The pipeline first clones the Automation and Gradle repositories at the main branch. It then follows the same steps as pr-gradle other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository. The branch-maven pipeline is then triggered using the Tekton CLI.
 
 The Docker image for the Gradle Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-gradle/artifacts-tab).
 
 The Gradle Maven repository is [here](https://development.galasa.dev/main/maven-repo/gradle).
+
+
+**Helm**
+
+These pipelines test the Helm chart to install a Galasa ecosystem.
+
+pr-helm:
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin. It then attempts to install an ecosystem using the Helm chart by creating an ArgoCD app, syncs the app and waits for confirmation of app health. It then cleans up the app if successful and returns the status of the pipeline to the PR.
+
+branch-helm:
+This pipeline follows the same steps as pr-helm but for the main branch.
 
 
 **Integrated tests**
@@ -366,110 +268,30 @@ The Gradle Maven repository is [here](https://development.galasa.dev/main/maven-
 These pipelines build the [Galasa Integrated tests](https://github.com/galasa-dev/integratedtests)
 
 pr-integratedtests:
-1. git-verify
-1. clone-automation
-1. clone-inttests
-1. get-commit
-1. branch-gradle-build-inttests
-1. branch-maven-build-inttests
-1. branch-docker-build-inttests
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Integratedtests repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then runs both a Gradle build and a Maven build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-integratedtests:
-1. clone-automation
-1. clone-inttests
-1. check-branch
-1. get-commit
-1. branch-gradle-build-inttests
-1. branch-maven-build-inttests
-1. branch-docker-build-inttests
-1. recycle-deployment
-1. wait-deployment
+The pipeline first clones the Automation and Integratedtests repositories at the main branch. It then follows the same steps as pr-integratedtests other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository.
 
 The Docker image for the Integrated tests Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-inttests/artifacts-tab).
 
 The Integrated tests Maven repository is [here](https://development.galasa.dev/main/maven-repo/inttests).
+
 
 **Isolated**
 
 These pipelines build the isolated and mvp images which are used to install Galasa offline. [Galasa Isolated](https://github.com/galasa-dev/isolated) 
 
 pr-isolated:
-1. git-verify
-1. clone-automation
-1. clone-obr
-1. clone-framework
-1. clone-extensions
-1. clone-isolated
-1. generate-pom
-1. maven-build-isolated1
-1. maven-build-isolated2
-1. maven-build-isolated3
-1. maven-build-isolated4
-1. maven-build-isolated5
-1. maven-build-isolated6
-1. maven-build-javadoc
-1. maven-build-docs
-1. copy-text-files
-1. docker-build-isolated
-1. docker-build-tar-isolated
-1. maven-build-isolated-zip
-1. docker-build-isolated-zip
-1. generate-pom-mvp
-1. maven-build-mvp1
-1. maven-build-mvp2
-1. maven-build-mvp3
-1. maven-build-mvp4
-1. maven-build-mvp5
-1. maven-build-mvp6
-1. maven-build-javadoc-mvp
-1. maven-build-docs-mvp
-1. copy-text-files-mvp
-1. docker-build-mvp
-1. docker-build-tar-mvp
-1. maven-build-mvp-zip
-1. docker-build-mvp-zip
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. It then clones the Automation, Framework, Extensions, Managers and OBR repositories at the main branch and the Isolated repository at the PR's branch.
+
+galasabld is used to generate a pom template for the Isolated distribution of Galasa and then several different Maven builds are done to build the different dependencies, Javadoc and jars that the Isolated packages. The same is then done for the MVP distribution. 
+As the Docker images for this are so large, these are pushed to ICR instead of Harbor.
+
+The status of the pipeline is then returned to the PR.
 
 branch-isolated:
-1. clone-automation
-1. clone-obr
-1. clone-framework
-1. clone-extensions
-1. clone-isolated
-1. check-branch
-1. generate-pom
-1. maven-build-isolated1
-1. maven-build-isolated2
-1. maven-build-isolated3
-1. maven-build-isolated4
-1. maven-build-isolated5
-1. maven-build-isolated6
-1. maven-build-javadoc
-1. maven-build-docs
-1. copy-text-files
-1. docker-build-isolated
-1. docker-build-tar-isolated
-1. maven-build-isolated-zip
-1. docker-build-isolated-zip
-1. recylce-deployment
-1. wait-deployment
-1. generate-pom-mvp
-1. maven-build-mvp1
-1. maven-build-mvp2
-1. maven-build-mvp3
-1. maven-build-mvp4
-1. maven-build-mvp5
-1. maven-build-mvp6
-1. maven-build-javadoc-mvp
-1. maven-build-docs-mvp
-1. copy-text-files-mvp
-1. docker-build-mvp
-1. docker-build-tar-mvp
-1. maven-build-mvp-zip
-1. docker-build-mvp-zip
-1. recylce-deployment-mvp
-1. wait-deployment-mvp
+This pipeline follows the same steps as pr-isolated, apart from checking the author of the PR and reporting back to the PR. It also recycles the Maven repositories which host the deployed artefacts.
 
 The Docker image for the isolated build is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-isolated/artifacts-tab).
 
@@ -481,28 +303,16 @@ The Docker image for the mvp build is [here](https://harbor.galasa.dev/harbor/pr
 
 The mvp zip file can be downloaded from [here](https://development.galasa.dev/main/maven-repo/mvp). It can then be extracted. The Docker image for this is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-mvp-zip/artifacts-tab).
 
+
 **Managers**
 
 These pipelines build the [Galasa Managers](https://github.com/galasa-dev/managers)
 
 pr-managers:
-1. git-verify
-1. clone-automation
-1. clone-managers
-1. get-commit
-1. gradle-build-managers
-1. docker-build-managers
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Managers repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then runs a Gradle build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-managers:
-1. clone-automation
-1. clone-managers
-1. get-commit
-1. branch-gradle-build-managers
-1. branch-docker-build-managers
-1. recycle-deployment
-1. wait-deployment
-1. trigger-obr
+The pipeline first clones the Automation and Managers repositories at the main branch. It then follows the same steps as pr-managers other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository. The branch-obr pipeline is then triggered using the Tekton CLI.
 
 The Docker image for the Managers Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-managers/artifacts-tab).
 
@@ -514,25 +324,10 @@ The Managers Maven repository is [here](https://development.galasa.dev/main/mave
 These pipelines build the [Galasa Maven plug-in](https://github.com/galasa-dev/maven)
 
 pr-maven:
-1. git-verify
-1. clone-automation
-1. clone-maven
-1. get-commit
-1. maven-gpg
-1. maven-build-maven
-1. docker-build-maven
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Maven repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then sets up the GPG key for Maven to use, then runs a Maven build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-maven:
-1. clone-automation
-1. clone-maven
-1. get-commit
-1. maven-gpg
-1. branch-maven-build-maven
-1. branch-docker-build-maven
-1. recycle-deployment
-1. wait-deployment
-1. trigger-framework
+The pipeline first clones the Automation and Maven repositories at the main branch. It then follows the same steps as pr-maven other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository. The branch-framework pipeline is then triggered using the Tekton CLI.
 
 The Docker image for the Maven Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-maven/artifacts-tab).
 
@@ -546,52 +341,12 @@ These pipelines build the Galasa OSGi Bundle Repository (OBR) and the Javadoc fo
 The Javadoc is deployed to a Maven repository as a zip file, and also a Javadoc site.
 
 pr-obr:
-1. git-verify
-1. clone-automation
-1. clone-framework
-1. clone-extensions
-1. clone-managers
-1. clone-obr
-1. maven-gpg
-1. get-commit
-1. generate-bom
-1. list-bom
-1. maven-build-bom
-1. generate-obr
-1. list-obr
-1. maven-build-obr
-1. docker-build-obr
-1. generate-javadoc
-1. maven-build-javadoc
-1. docker-build-javadoc-site
-1. docker-build-javadoc-maven-repo
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. It then clones the Automation, Framework, Extensions and Managers repositories at the main branch, and the OBR repository at the PR's branch. It gets the commit sha of the latest commit in the PR, then sets up the GPG key for Maven to use. galasabld is used to generate a pom for the BOM of Galasa and this is then built with Maven. galasabld generates a template for the OBR pom and this is also built. A Docker image for the OBR is then built.
+
+galasabld is used to generate a template for the Javadoc pom and this is built with Maven. A Docker image for the artefacts and the Javadoc site is built. Finally the status of the pipeline is returned to the PR.
 
 branch-obr:
-1. clone-automation
-1. clone-framework
-1. clone-extensions
-1. clone-managers
-1. clone-obr
-1. maven-gpg
-1. get-commit
-1. generate-bom
-1. list-bom
-1. branch-maven-build-bom
-1. generate-obr
-1. list-obr
-1. branch-maven-build-obr
-1. branch-docker-build-obr
-1. recycle-obr-deployment
-1. wait-obr-deployment
-1. generate-javadoc
-1. maven-build-javadoc
-1. docker-build-javadoc-site
-1. docker-build-javadoc-maven-repo
-1. recycle-javadoc-maven-repo
-1. wait-javadoc-maven-repo
-1. recycle-javadoc-site
-1. recycle-javadoc-site
+This pipeline follows the same steps as pr-obr apart from verifying the author of or reporting back to a PR. It also recycles the deployments for the OBR Maven repository, Javadoc Maven repository and the Javadoc site. It finally triggers the branch-obr-generic pipeline. 
 
 The Docker image for the OBR Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr/artifacts-tab).
 
@@ -602,35 +357,11 @@ The OBR Maven repository is [here](https://development.galasa.dev/main/maven-rep
 
 These pipelines build a generic Galasa OSGi Bundle Repository (OBR) and place it inside the bootEmbedded and ibmBootEmbedded images, which are used for running Galasa tests.
 
-pr-obr:
-1. git-verify
-1. clone-automation
-1. clone-framework
-1. clone-extensions
-1. clone-managers
-1. clone-obr
-1. maven-gpg
-1. generate-embedded
-1. maven-build-obr-generic
-1. docker-build-obr-generic
-1. copy-files
-1. docker-build-amd64-embedded
-1. docker-build-ibm-embedded
-1. git-status
+pr-obr-generic:
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. It then clones the Automation, Framework, Extensions and Managers repositories at the main branch, and the OBR repository at the PR's branch. galasabld generates a pom for OBR generic and it is built with Maven, then a Docker image built. Property files are then copied to build the the runtimes of Galasa. The status of the pipeline is then returned to the PR. 
 
-branch-obr:
-1. clone-automation
-1. clone-framework
-1. clone-extensions
-1. clone-managers
-1. clone-obr
-1. maven-gpg
-1. generate-embedded
-1. branch-maven-build-obr-generic
-1. branch-docker-build-obr-generic
-1. copy-files
-1. branch-docker-build-amd64-embedded
-1. branch-docker-build-ibm-embedded
+branch-obr-generic:
+This pipeline follows the same steps as the pr-obr-generic pipeline other than verifying the author of or returning status back to a PR. It then triggers either the branch-eclipse pipeline or the branch-isolated pipeline depending on whether a Main build or Complete build is occurring.
 
 
 **Simplatform**
@@ -638,26 +369,10 @@ branch-obr:
 These pipelines build the Galasa SimBank Eclipse plug-in, Simbank applications (_to-do_) and and set of sample Simbank tests, all stored in the [Simplatform repository](https://github.com/galasa-dev/simplatform).
 
 pr-simplatform:
-1. git-verify
-1. clone-automation
-1. clone-simplatform
-1. get-commit
-1. maven-build-simplatform-application
-1. maven-build-simbank-tests
-1. docker-build-simplatform-repo
-1. docker-build-simplatform-jar
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The Automation repository is cloned at the main branch and the Simplatform repository at the PR's branch. It gets the commit sha of the latest commit in the PR, then sets up the GPG key for Maven to use. Maven builds the Simplatform application and then the Simbank tests. Docker builds the Simplatform artefacts and then an executable Jar for the Simplatform app. The status of the pipeline is then returned to the PR.  
 
 branch-simplatform:
-1. clone-automation
-1. clone-simplatform
-1. get-commit
-1. branch-maven-build-simplatform-application
-1. branch-maven-build-simbank-tests
-1. branch-docker-build-simplatform-repo
-1. branch-docker-build-simplatform-jar
-1. recycle-deployment
-1. wait-deployment
+This pipeline follows the same steps as pr-simplatform apart from verifying a PR's author or returning status to a PR. In addition, it recycles the deployment for the Simplatform Maven repository and then triggers a snapshot pipeline.
 
 The Docker image for the Simplatform Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-simplatform/artifacts-tab) and the image for the Simplatform AMD64 jar is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-simplatform-amd64/artifacts-tab).
 
@@ -669,29 +384,33 @@ The Simplatform Maven repository is [here](https://development.galasa.dev/main/m
 These pipelines build the [Wrapping repository](https://github.com/galasa-dev/wrapping). This repository wraps external Galasa dependencies that are not in an OSGi bundle into an OSGi bundle so it can be ran in Galasa.
 
 pr-wrapping:
-1. git-verify
-1. clone-automation
-1. clone-wrapping
-1. get-commit
-1. maven-gpg
-1. maven-build-wrapping
-1. docker-build-wrapping
-1. git-status
+The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Wrapping repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then sets up the GPG key for Maven to use, then runs a Maven build of the repository. A Docker image is then built to host the artefacts in a Maven repository. The pipeline then reports on the status of the builds back to the PR.
 
 branch-wrapping:
-1. clone-automation
-1. clone-wrapping
-1. get-commit
-1. maven-gpg
-1. branch-maven-build-wrapping
-1. branch-docker-build-wrapping
-1. recycle-deployment
-1. wait-deployment
-1. trigger-gradle
+The pipeline first clones the Automation and Wrapping repositories at the main branch. It then follows the same steps as pr-maven other than reporting back to a PR. The pipeline then recycles the deployment to host the Maven repository. The branch-gradle pipeline is then triggered using the Tekton CLI.
 
 The Docker image for the Wrapping Maven repo is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-wrapping/artifacts-tab).
 
 The Wrapping Maven repository is [here](https://development.galasa.dev/main/maven-repo/wrapping).
+
+
+**Miscellaneous**
+
+codecoverage: 
+This pipeline generates and deploys a [code coverage report](https://development.galasa.dev/codecoverage) for Galasa based on data from Jacoco.
+
+integration-to-prod:
+This pipeline snapshots the integration images and promotes them to prod. 
+
+recycle-ecosystem:
+This pipeline recycles deployments in the galasa-prod ecosystem: api, testcatalog, engine-controller, resource-monitor and metrics. This is triggered after code is promoted to production so that the ecosystem has the latest Galasa code.
+
+run-tests:
+This pipeline uses galasactl to run a test in the ecosystem against the integration images, before promoting integration to prod.
+
+snapshot-integration:
+This pipeline snapshots all of the main images and promotes them to integration.
+
 
 
 ## Tasks
@@ -901,3 +620,30 @@ Parameters:
 * command: An array with the parts of the command to perform.
 
 This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
+
+
+## How to manually trigger a pipeline
+Use the `trigger-pipeline.sh` script to trigger one of the main-line build pipelines.
+The tool may not support all the pipelines yet, feel free to add ones which are missing.
+
+For example: To kick-off the extensions pipeline...
+```
+./trigger-pipeline.sh --extensions
+```
+
+> Note: The pipelines kicked off are the mainline pipelines, not pull-request pipelines,
+so be careful as this will cause things to be published to the public repositories.
+
+This tool is useful if there is a glitch in the 'chain' or builds kicked off when 
+something on a `main` branch builds, but fails to kick-off the next build in the 'chain'.
+So you can re-start the chain of builds without resorting to submitting empty change-sets
+and another pull request. 
+
+ie: If the main builds fail and you want to re-start a build.
+
+This can be the case if we get environmental failures, for examople when argocd fails to 
+re-deploy one of the docker images from the build.
+
+## How are the IBM build machines protected from malicious code in a fork-pull-request ?
+There are built-in protections to prevent malicious code being executed as part of a build process
+on the IBM build hardware. The mechanism is described [here](./docs/pull-request-build-authentication.md).

@@ -212,7 +212,7 @@ spec:
         - --override
         - galasaecosystem.runtime.repository=http://development.galasa.dev/$(params.branch)/maven-repo/obr
         - --override
-        - galasaecosystem.docker.version=codecov
+        - galasaecosystem.docker.version=$(params.branch)
         - --override
         - java.jacoco.code.coverage=true
         - --override

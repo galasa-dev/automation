@@ -111,13 +111,15 @@ spec:
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
       value: /workspace/git/gpg/settings.xml  
+    - name: image
+      value: docker.io/library/maven:3.8.5-openjdk-17
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
+        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/2022-09"
         - "-Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform"
     - name: command

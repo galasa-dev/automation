@@ -33,7 +33,7 @@ spec:
         - --branch
         - $(params.distBranch)
         - --credentials
-        - /creds/githubcreds.yaml
+        - /creds/githubcreds.yaml        
 #
 #######  Wrapping
 #
@@ -54,6 +54,29 @@ spec:
         - $(params.distBranch)
         - --credentials
         - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-wrapping
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-wrapping
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml        
 #
 #######  Gradle
 #
@@ -88,7 +111,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -131,7 +154,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -174,7 +197,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -217,7 +240,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -260,7 +283,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -303,7 +326,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -326,7 +349,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -349,7 +372,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -372,7 +395,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -395,7 +418,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -418,7 +441,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -461,7 +484,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -484,7 +507,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -594,7 +617,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -617,7 +640,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository
@@ -640,7 +663,7 @@ spec:
         - harbor
         - deleteimage
         - --harbor
-        - harbor.galasa.dev
+        - https://harbor.galasa.dev
         - --project
         - galasadev
         - --repository

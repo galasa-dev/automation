@@ -38,6 +38,9 @@ argocd app create release-maven-repos \
                   --helm-set javadocsite.branch=release \
                   --helm-set javadocsite.imageTag=release \
                   --helm-set javadocsite.deploy=true \
+                  --helm-set restApiDocSite.branch=release \
+                  --helm-set restApiDocSite.imageTag=release \
+                  --helm-set restApiDocSite.deploy=true \
                   --helm-set eclipse.branch=release \
                   --helm-set eclipse.imageTag=release \
                   --helm-set eclipse.deploy=true \

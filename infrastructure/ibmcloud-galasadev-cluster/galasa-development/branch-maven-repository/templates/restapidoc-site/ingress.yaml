@@ -1,11 +1,11 @@
 #
 # Copyright contributors to the Galasa project 
 # 
-{{ if .Values.codecov.deploy }}
+{{ if .Values.restApiDocSite.deploy }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: codecov-{{ .Values.codecov.branch }}
+  name: restapidocsite-{{ .Values.restApiDocSite.branch }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
@@ -21,9 +21,9 @@ spec:
       paths:
       - backend:
           service:
-            name: codecov-{{ .Values.codecov.branch }}
+            name: restapidocsite-{{ .Values.restApiDocSite.branch }}
             port:
               number: 80
-        path: /codecoverage
+        path: /{{ .Values.restApiDocSite.branch }}/restapidoc-site
         pathType: Prefix
 {{ end }}
