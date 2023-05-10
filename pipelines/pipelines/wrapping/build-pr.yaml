@@ -110,7 +110,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/wrapping/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
