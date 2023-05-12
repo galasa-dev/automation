@@ -308,12 +308,9 @@ spec:
 # 
 # 
 # 
-  # Trigger CLI when doing a Main Build
+
+  # Trigger CLI 
   - name: trigger-cli
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -329,44 +326,7 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-cli-main
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
-# 
-# 
-# 
-  # Trigger Eclipse when doing a Complete Build/Branch Build 
-  - name: trigger-eclipse
-    when:
-      - input: "$(params.toBranch)"
-        operator: notin
-        values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - branch-docker-build-ibm-embedded
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - branch-eclipse
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-eclipse-$(params.toBranch)
-      - --param
-      - fromObrBranch=$(params.toBranch)
+      - trigger-cli-$(params.toBranch)
       - --param
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
@@ -377,6 +337,8 @@ spec:
       - refspec=$(params.refspec)
       - --param
       - imageTag=$(params.imageTag)
+      - --param
+      - appnameCli=$(params.toBranch)-cli
       - --param
       - appname=$(params.appname)
       - --use-param-defaults
