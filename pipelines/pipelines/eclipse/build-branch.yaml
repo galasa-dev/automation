@@ -287,8 +287,8 @@ spec:
 # 
 # 
 # 
-  # Trigger CLI (when doing any kind of build)
-  - name: trigger-cli
+  # Trigger Isolated
+  - name: trigger-isolated
     taskRef:
       name: tkn-cli
     runAfter:
@@ -300,7 +300,7 @@ spec:
       value: 
       - pipeline
       - start
-      - branch-cli
+      - branch-isolated
       - -n
       - galasa-build
       - --prefix-name 
@@ -310,13 +310,19 @@ spec:
       - --param
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
+      - fromObrBranch=$(params.fromObrBranch)
+      - --param
+      - fromJavadocBranch=$(params.toBranch)
+      - --param
+      - fromEclipseBranch=$(params.toBranch)
+      - --param
       - revision=$(params.revision)
       - --param
       - refspec=$(params.refspec)
       - --param
       - imageTag=$(params.imageTag)
       - --param
-      - appnameIsolated=$(params.appname)
+      - appname=$(params.appname)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
