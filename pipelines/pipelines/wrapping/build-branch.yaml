@@ -118,8 +118,6 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
-    - name: settingsDirectory
-      value: /workspace/git/$(context.pipelineRun.name)/wrapping/gpg
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -135,7 +133,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/wrapping/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
