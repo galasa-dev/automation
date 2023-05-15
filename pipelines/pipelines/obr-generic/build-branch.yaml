@@ -340,7 +340,7 @@ spec:
       - --param
       - appnameCli=$(params.toBranch)-cli
       - --param
-      - appname=$(params.appname)
+      - appnameMavenRepos=$(params.appname)
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
