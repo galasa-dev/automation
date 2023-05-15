@@ -55,10 +55,12 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 4. Run `kubectl -n galasa-build create -f 10-clone-galasa.yaml` - Clone all the repos' main branches to release branches.
 5. Run `kubectl -n galasa-build create -f 11-clone-cli.yaml` - **Only if CLI being released** - Clone the repo's main branch to release branch.
 
+
 ### Build the components
 
 1. Run `kubectl -n galasa-build create -f 20-build-galasa.yaml` - Build the Galasa main component. **After each repo's build, go to its maven repository and check that the artifacts have been signed, there should be .asc files present**
 2. Run `kubectl -n galasa-build create -f 21-build-cli.yaml` - **Only if CLI being released** - Build the CLI.
+
 
 ### Regression test
 
@@ -71,6 +73,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 
 All the tests must pass before moving on.
 
+
 ### Obtain release approval
 
 1. Ask the Team and Product managers for release approval by:
@@ -79,6 +82,7 @@ All the tests must pass before moving on.
    3. Tagging approvers with a link to the regression test results.
 
 Have a look at the GHE issues for previous releases for examples on how this has been done before. 
+
 
 ### Deployment
 
@@ -118,10 +122,12 @@ Have a look at the GHE issues for previous releases for examples on how this has
 15. Amend 35-deploy-docker-cli.sh - **Only if CLI being released** - Set the version.
 16. 35-deploy-docker-cli.sh- **Only if CLI being released** - Deploy the CLI images to ICR.
 
+
 ### Update reference sites
 
 1. 40-argocd-ibmcloud.md - Follow the instructions to update the IBM Cloud Galasa external sites.
 2. 41-eclipse-marketplace.md - Follow the instructions to update the Eclipse Marketplace to advertise the latest Eclipse plugin.
+
 
 ### Tag release and deploy CLI
 
@@ -129,12 +135,21 @@ Have a look at the GHE issues for previous releases for examples on how this has
 2. Run `kubectl -n galasa-build create -f 50-tag-galasa.yaml` - Tag the release on ALL repos.
 3. 52-deploy-cli-release.md - **Only if CLI being released** - Follow instructions to deploy the CLI to the repo release.
 
-### Clean up
-
-1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos.
-3. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
 
 ### Bump to new version
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
 2. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties: https://github.ibm.com/CICS/cicsts-galasa-config/blob/main/CPS.properties. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
+3. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasa-cli-ibm-amd64 to 'stable' (regression testing uses galasa-cli-ibm-amd64:stable):
+```
+docker pull harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release
+docker image tag harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+docker image push harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+```
+
+
+### Clean up
+
+1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the 'release' branch in the GitHub repositories and the images in Harbor tagged 'release'.
+2. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image). _This is a temporary step that we are working to automate._
+3. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
