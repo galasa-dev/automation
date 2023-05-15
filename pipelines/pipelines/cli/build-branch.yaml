@@ -26,7 +26,7 @@ spec:
   - name: fromSimplatformBranch
     type: string
     default: prod
-  - name: appname
+  - name: appnameMavenRepos
     type: string
     default: main-maven-repos
   workspaces:
@@ -442,7 +442,7 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appname)
+      - $(params.appnameCli)
       - restart 
       - --kind 
       - Deployment
@@ -462,7 +462,7 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appname)
+      - $(params.appnameCli)
       - --resource
       - apps:Deployment:cli-$(params.imageTag)
       - --health    
@@ -504,7 +504,7 @@ spec:
       - --param
       - imageTag=$(params.imageTag)
       - --param
-      - appname=$(params.appname)
+      - appnameMavenRepos=$(params.appnameMavenRepos)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template

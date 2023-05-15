@@ -34,7 +34,7 @@ spec:
   - name: imageTag
     type: string
     default: main
-  - name: appname
+  - name: appnameMavenRepos
     type: string
     default: main-maven-repos
 # 
@@ -635,7 +635,7 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - restart
       - --kind 
       - Deployment
@@ -656,7 +656,7 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - --resource
       - apps:Deployment:isolated-$(params.imageTag) 
       - --health
@@ -1131,7 +1131,7 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - restart
       - --kind 
       - Deployment
@@ -1152,7 +1152,7 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - --resource
       - apps:Deployment:mvp-$(params.imageTag) 
       - --health   
