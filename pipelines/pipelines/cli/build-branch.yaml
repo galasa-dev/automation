@@ -8,7 +8,7 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: branch
+  - name: toBranch
     type: string
     default: main
   - name: revision
@@ -20,9 +20,15 @@ spec:
   - name: imageTag
     type: string
     default: main
-  - name: appname
+  - name: appnameCli
     type: string
     default: main-cli
+  - name: fromSimplatformBranch
+    type: string
+    default: prod
+  - name: appnameMavenRepos
+    type: string
+    default: main-maven-repos
   workspaces:
   - name: git-workspace
 # 
@@ -436,7 +442,7 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appname)
+      - $(params.appnameCli)
       - restart 
       - --kind 
       - Deployment
@@ -456,17 +462,15 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appname)
+      - $(params.appnameCli)
       - --resource
       - apps:Deployment:cli-$(params.imageTag)
       - --health    
      
   #----------------------------------------------------------------
-  - name: trigger-snapshot-main-to-prod
-    when:
-      - input: "$(params.branch)"
-        operator: in
-        values: ["main"]
+
+  # Trigger Eclipse 
+  - name: trigger-eclipse
     taskRef:
       name: tkn-cli
     runAfter:
@@ -478,12 +482,29 @@ spec:
       value: 
       - pipeline
       - start
-      - cli-snapshot-main-to-prod
+      - branch-eclipse
       - -n
       - galasa-build
       - --prefix-name 
-      - cli-snapshot
-      - --use-param-defaults
+      - trigger-eclipse-$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - fromObrBranch=$(params.toBranch)
+      - --param
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - fromJavadocBranch=$(params.toBranch)
+      - --param
+      - fromEclipseBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appnameMavenRepos=$(params.appnameMavenRepos)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
