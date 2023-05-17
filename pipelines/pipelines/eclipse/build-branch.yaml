@@ -29,7 +29,7 @@ spec:
   - name: imageTag
     type: string
     default: main
-  - name: appname
+  - name: appnameMavenRepos
     type: string
     default: main-maven-repos
   workspaces:
@@ -218,7 +218,7 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - restart
       - --kind 
       - Deployment
@@ -239,7 +239,7 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - --resource
       - apps:Deployment:eclipse-$(params.imageTag) 
       - --health
@@ -259,7 +259,7 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - restart
       - --kind 
       - Deployment
@@ -280,14 +280,14 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appname)
+      - $(params.appnameMavenRepos)
       - --resource
       - apps:Deployment:p2-$(params.imageTag) 
       - --health    
 # 
 # 
 # 
-  # Trigger Isolated (when doing any kind of build)
+  # Trigger Isolated
   - name: trigger-isolated
     taskRef:
       name: tkn-cli
@@ -308,9 +308,9 @@ spec:
       - --param
       - toBranch=$(params.toBranch)
       - --param
-      - fromObrBranch=$(params.toBranch)
-      - --param
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - fromObrBranch=$(params.fromObrBranch)
       - --param
       - fromJavadocBranch=$(params.toBranch)
       - --param
@@ -322,7 +322,7 @@ spec:
       - --param
       - imageTag=$(params.imageTag)
       - --param
-      - appname=$(params.appname)
+      - appnameMavenRepos=$(params.appnameMavenRepos)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
