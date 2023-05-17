@@ -167,6 +167,7 @@ spec:
       name: general-command
     runAfter:
     - clone-framework
+    - clone-automation
     params:
     - name: context
       value: $(context.pipelineRun.name)/framework
