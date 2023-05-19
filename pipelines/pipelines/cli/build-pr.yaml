@@ -162,6 +162,7 @@ spec:
         - -o
         - pkg/galasaapi
         - --additional-properties=packageName=galasaapi
+        - --global-property=apiTests=false
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
