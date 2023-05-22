@@ -24,6 +24,14 @@ spec:
     command:
     - mkdir
     - $(params.settingsDirectory)
+  - name: change-dir-permissions
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/common/gpg:latest
+    imagePullPolicy: Always
+    command:
+    - chmod
+    - '700'
+    - $(params.settingsDirectory)
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gpg:main
