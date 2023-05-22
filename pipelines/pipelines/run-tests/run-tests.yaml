@@ -76,7 +76,7 @@ spec:
         - --progress 
         - '1' 
         - --override 
-        - galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr 
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/integration/maven-repo/obr/
         - --override 
         - galasaecosystem.docker.version=integration 
         - --reportyaml 
