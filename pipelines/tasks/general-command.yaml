@@ -22,5 +22,6 @@ spec:
   - name: command
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
+    imagePullPolicy: Always
     command:
       - $(params.command[*])
