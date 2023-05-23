@@ -306,15 +306,15 @@ spec:
       - --prefix-name 
       - trigger-isolated-$(params.toBranch)
       - --param
-      - toBranch=$(params.toBranch)
+      - fromObrBranch=$(params.fromObrBranch)
       - --param
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
-      - --param
-      - fromObrBranch=$(params.fromObrBranch)
       - --param
       - fromJavadocBranch=$(params.toBranch)
       - --param
       - fromEclipseBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
       - --param
       - revision=$(params.revision)
       - --param
