@@ -519,12 +519,12 @@ spec:
     - name: buildArgs
       value:
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/main/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
@@ -1015,12 +1015,12 @@ spec:
     - name: buildArgs
       value:
         - -Dgalasa.target.repo=file:target/isolated/maven
-        - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
-        - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
-        - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
+        - -Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr
+        - -Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform
+        - -Dgalasa.javadoc.repo=https://development.galasa.dev/main/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://nexus.galasa.dev/repository/docs/
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
+        - -Dgalasa.eclipse.repo=https://development.galasa.dev/main/maven-repo/eclipse
         # - --settings
         # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
