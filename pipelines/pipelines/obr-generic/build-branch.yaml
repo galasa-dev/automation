@@ -328,8 +328,6 @@ spec:
       - --prefix-name 
       - trigger-cli-$(params.toBranch)
       - --param
-      - fromSimplatformBranch=$(params.fromSimplatformBranch)
-      - --param
       - toBranch=$(params.toBranch)
       - --param
       - revision=$(params.revision)
@@ -339,6 +337,8 @@ spec:
       - imageTag=$(params.imageTag)
       - --param
       - appnameCli=$(params.toBranch)-cli
+      - --param
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
       - appnameMavenRepos=$(params.appname)
       - --workspace
