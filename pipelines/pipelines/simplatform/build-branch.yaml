@@ -110,7 +110,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
     - name: settingsLocation
-      value: /workspace/git/gpg/settings.xml
+      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
     - name: buildArgs
       value:
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
