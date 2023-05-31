@@ -5,7 +5,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: recycle-ecosystem
-  namespace: galasa-build
+  namespace: galasa-prod
 spec:
 #
 #
