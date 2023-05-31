@@ -659,7 +659,7 @@ spec:
       - start
       - recycle-ecosystem
       - -n
-      - galasa-build
+      - galasa-prod
       - --prefix-name 
       - recycle-ecosystem
       - --use-param-defaults
@@ -668,7 +668,7 @@ spec:
       - --pod-template
       - ./pipelines/templates/pod-template.yaml
       - --serviceaccount
-      - galasa-build-bot
+      - galasa-prod-bot
     workspaces:
      - name: git-workspace
        workspace: git-workspace
