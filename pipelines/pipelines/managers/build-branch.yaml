@@ -131,6 +131,7 @@ spec:
       value: 
         - check
         - publish
+        - "--info"
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
