@@ -32,6 +32,19 @@ spec:
         - rollout
         - restart
         - deployment/api
+  - name: wait-api
+    taskRef:
+      name: kubectl
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/api
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -39,7 +52,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -48,6 +61,19 @@ spec:
         - rollout
         - restart
         - deployment/testcatalog
+  - name: wait-testcatalog
+    taskRef:
+      name: kubectl
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/testcatalog
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -55,7 +81,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -64,6 +90,19 @@ spec:
         - rollout
         - restart
         - deployment/engine-controller
+  - name: wait-engine-controller
+    taskRef:
+      name: kubectl
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/engine-controller
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -71,7 +110,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -80,6 +119,19 @@ spec:
         - rollout
         - restart
         - deployment/resource-monitor
+  - name: wait-resource-monitor
+    taskRef:
+      name: kubectl
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/resource-monitor
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -87,7 +139,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -96,3 +148,16 @@ spec:
         - rollout
         - restart
         - deployment/metrics
+  - name: wait-metrics
+    taskRef:
+      name: kubectl
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/metrics
+        - -w
+        - --timeout=3m
