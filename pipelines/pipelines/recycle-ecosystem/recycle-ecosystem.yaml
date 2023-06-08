@@ -1,98 +1,98 @@
-# #
-# # Copyright contributors to the Galasa project 
-# #
-# apiVersion: tekton.dev/v1beta1
-# kind: Pipeline
-# metadata:
-#   name: recycle-ecosystem
-#   namespace: galasa-prod
-# spec:
-# #
-# #
-# #
-#   params:
-#   - name: ecosystemNamespace
-#     type: string
-#     default: galasa-prod
-# #
-# #
-# #
-#   tasks:
-# #
-# #
-# #
-#   - name: recycle-api
-#     taskRef:
-#       name: kubectl
-#     params:
-#     - name: command
-#       value: 
-#         - -n 
-#         - $(params.ecosystemNamespace)
-#         - rollout
-#         - restart
-#         - deployment/api
-# #
-# #
-# #
-#   - name: recycle-testcatalog
-#     taskRef:
-#       name: kubectl
-#     runAfter:
-#     - recycle-api
-#     params:
-#     - name: command
-#       value: 
-#         - -n 
-#         - $(params.ecosystemNamespace)
-#         - rollout
-#         - restart
-#         - deployment/testcatalog
-# #
-# #
-# #
-#   - name: recycle-engine-controller
-#     taskRef:
-#       name: kubectl
-#     runAfter:
-#     - recycle-api
-#     params:
-#     - name: command
-#       value: 
-#         - -n 
-#         - $(params.ecosystemNamespace)
-#         - rollout
-#         - restart
-#         - deployment/engine-controller
-# #
-# #
-# #
-#   - name: recycle-resource-monitor
-#     taskRef:
-#       name: kubectl
-#     runAfter:
-#     - recycle-api
-#     params:
-#     - name: command
-#       value: 
-#         - -n 
-#         - $(params.ecosystemNamespace)
-#         - rollout
-#         - restart
-#         - deployment/resource-monitor
-# #
-# #
-# #
-#   - name: recycle-metrics
-#     taskRef:
-#       name: kubectl
-#     runAfter:
-#     - recycle-api
-#     params:
-#     - name: command
-#       value: 
-#         - -n 
-#         - $(params.ecosystemNamespace)
-#         - rollout
-#         - restart
-#         - deployment/metrics
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: recycle-ecosystem
+  namespace: galasa-prod
+spec:
+#
+#
+#
+  params:
+  - name: ecosystemNamespace
+    type: string
+    default: galasa-prod
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: recycle-api
+    taskRef:
+      name: kubectl
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - restart
+        - deployment/api
+#
+#
+#
+  - name: recycle-testcatalog
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-api
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - restart
+        - deployment/testcatalog
+#
+#
+#
+  - name: recycle-engine-controller
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-api
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - restart
+        - deployment/engine-controller
+#
+#
+#
+  - name: recycle-resource-monitor
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-api
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - restart
+        - deployment/resource-monitor
+#
+#
+#
+  - name: recycle-metrics
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-api
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - restart
+        - deployment/metrics
