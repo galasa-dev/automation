@@ -29,6 +29,9 @@ spec:
   - name: jacocoEnabled
     type: string
     default: "true"
+  # isMainOrRelease accepts a true or false value which is passed to the Gradle build script as a build argument later.
+  # When set to true, Gradle will complete signing tasks like signing artifacts with a GPG key.
+  # Should be set to true for Main or Release builds. Set to false if doing a branch build.
   - name: isMainOrRelease
     type: string
     default: "true"
