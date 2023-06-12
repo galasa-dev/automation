@@ -22,7 +22,7 @@ spec:
     value: release-maven-repos
   - name: jacocoEnabled
     value: "false"
-  - name: isRelease
+  - name: isMainOrRelease
     value: "true"
 # 
 # 

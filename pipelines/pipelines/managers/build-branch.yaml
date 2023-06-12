@@ -29,9 +29,9 @@ spec:
   - name: jacocoEnabled
     type: string
     default: "true"
-  - name: isRelease
+  - name: isMainOrRelease
     type: string
-    default: "false"
+    default: "true"
   workspaces:
   - name: git-workspace
 # 
@@ -126,7 +126,7 @@ spec:
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
         - "-PjacocoEnabled=$(params.jacocoEnabled)"
-        - "-PisRelease=$(params.isRelease)"
+        - "-PisMainOrRelease=$(params.isMainOrRelease)"
     - name: command
       value: 
         - check
