@@ -142,6 +142,7 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
         - "-Dgalasa.jacocoEnabled=$(params.jacocoEnabled)"
+        - "-Dgalasa.isRelease=$(params.isMainOrRelease)"
     - name: command
       value: 
         - deploy
