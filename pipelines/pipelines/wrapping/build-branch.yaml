@@ -26,6 +26,8 @@ spec:
   - name: jacocoEnabled
     type: string
     default: "true"
+  # isMainOrRelease accepts a true or false value which is passed to any Gradle build script as a build argument later.
+  # Not used in this pipeline as is a Maven build but needs passing through to the next build for the Gradle repository.
   - name: isMainOrRelease
     type: string
     default: "true"
@@ -140,7 +142,6 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
         - "-Dgalasa.jacocoEnabled=$(params.jacocoEnabled)"
-        - "-Dgalasa.isMainOrRelease=$(params.isMainOrRelease)"
     - name: command
       value: 
         - deploy
