@@ -71,7 +71,7 @@ spec:
     taskRef:
       name: unix-command
     runAfter:
-    - generate-api
+    - clone-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
@@ -106,6 +106,23 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-
-  
+#----------------------------------------------------------------
+  # Tell the pull request the build succeeded/failed.
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
+    taskRef:
+      name: git-status
+    params:
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)  
