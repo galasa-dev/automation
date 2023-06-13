@@ -68,13 +68,15 @@ spec:
   #----------------------------------------------------------------
   # run unit tests
   - name: test-webui
-    taskRef:
-      name: unix-command
+    taskRef: 
+      name: general-command
     runAfter:
     - clone-webui
     params:
     - name: context
-      value: $(context.pipelineRun.name)/webui/galasa-ui
+      value: $(context.pipelineRun.name)/webui
+    - name: image
+      value:  docker.io/library/node:16.20-bookworm     
     - name: command
       value:
         - npm 
