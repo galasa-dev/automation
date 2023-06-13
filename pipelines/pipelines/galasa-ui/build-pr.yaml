@@ -109,6 +109,10 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 #----------------------------------------------------------------
+# And finally... whether the above work or not, this gets called.
+#----------------------------------------------------------------
+  finally:
+#----------------------------------------------------------------
   # Tell the pull request the build succeeded/failed.
   - name: git-status
     when:
