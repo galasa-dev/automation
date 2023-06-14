@@ -114,30 +114,30 @@ spec:
 #
 #
 #
-  - name: snapshot-mvp
-    taskRef:
-      name: docker-build
-    runAfter:
-    - wait-obr   
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/repo-dockerfile
-    - name: imageName
-      value: icr.io/galasadev/galasa-mvp-zip:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=icr.io"         
-        - "--build-arg=image=galasa-mvp-zip"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
+  # - name: snapshot-mvp
+  #   taskRef:
+  #     name: docker-build
+  #   runAfter:
+  #   - wait-obr   
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name) 
+  #   - name: context
+  #     value: $(context.pipelineRun.name) 
+  #   - name: dockerfilePath
+  #     value: automation/dockerfiles/snapshots/repo-dockerfile
+  #   - name: imageName
+  #     value: icr.io/galasadev/galasa-mvp-zip:$(params.toBranch)
+  #   - name: noPush
+  #     value: ""
+  #   - name: buildArgs
+  #     value:
+  #       - "--build-arg=dockerRepository=icr.io"         
+  #       - "--build-arg=image=galasa-mvp-zip"   
+  #       - "--build-arg=oldBranch=$(params.fromBranch)"   
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace  
 #
 #
 #
@@ -145,7 +145,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - snapshot-mvp
+    - wait-obr
     params:
     - name: server
       value: argocd.galasa.dev
@@ -182,30 +182,30 @@ spec:
 #
 #
 #
-  - name: snapshot-isolated
-    taskRef:
-      name: docker-build
-    runAfter:
-    - wait-mvp  
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/repo-dockerfile
-    - name: imageName
-      value: icr.io/galasadev/galasa-isolated-zip:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=icr.io"         
-        - "--build-arg=image=galasa-isolated-zip"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
+  # - name: snapshot-isolated
+  #   taskRef:
+  #     name: docker-build
+  #   runAfter:
+  #   - wait-mvp  
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name) 
+  #   - name: context
+  #     value: $(context.pipelineRun.name) 
+  #   - name: dockerfilePath
+  #     value: automation/dockerfiles/snapshots/repo-dockerfile
+  #   - name: imageName
+  #     value: icr.io/galasadev/galasa-isolated-zip:$(params.toBranch)
+  #   - name: noPush
+  #     value: ""
+  #   - name: buildArgs
+  #     value:
+  #       - "--build-arg=dockerRepository=icr.io"         
+  #       - "--build-arg=image=galasa-isolated-zip"   
+  #       - "--build-arg=oldBranch=$(params.fromBranch)"   
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace  
 #
 #
 #
@@ -213,7 +213,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - snapshot-isolated
+    - wait-mvp
     params:
     - name: server
       value: argocd.galasa.dev
