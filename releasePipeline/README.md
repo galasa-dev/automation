@@ -69,19 +69,26 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 3. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
 4. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
 5. Repeat as required.
-6. Manually install and test the SimBank example in Eclipse.
 
 All the tests must pass before moving on.
+
+
+### Test the Eclipse plug-in and Simbank tests manually
+
+1. Follow the [instructions](https://galasa.dev/docs/getting-started/installing-online) provided in our documentation to install the Eclipse plug-in, but instead of installing from https://p2.galasa.dev, install the release candidate from https://development.galasa.dev/release/maven-repo/p2/. Ensure you are using a [supporting version of Eclipse](https://galasa.dev/docs/getting-started) and Java 11.
+2. Follow the [instructions](https://galasa.dev/docs/getting-started/simbank) provided to explore Simbank and run the supplied Simbank tests. Complete both sections 'Creating an example Galasa project using Maven' and 'Creating an example Galasa project using Gradle'. You will need to update your Galasa preferences (Eclipse > Settings > Galasa) and set the Remote Maven URI to https://development.galasa.dev/release/maven-repo/obr so Galasa can access the code to be released.
 
 
 ### Obtain release approval
 
 1. Ask the Team and Product managers for release approval by:
-   1. Seeking out the GHE issue related to the release you are working on.
+   1. Finding the GitHub issue related to the release you are working on in the GHE repository cics/cics-ts-tracking.
    2. Checking off the tasks that are listed in the issue.
-   3. Tagging approvers with a link to the regression test results.
+   3. Commenting, ensuring to tag the approvers (Roger and Simon) with a link to the regression test results for the 'release' branch on the Phoenix dashboard. Explain any failures that are due to external problems if necessary. Confirm manual installation of Eclipse plug-in and Simbank were successful.
 
 Have a look at the GHE issues for previous releases for examples on how this has been done before. 
+
+Once an approver has approved, you can move on.
 
 
 ### Deployment
