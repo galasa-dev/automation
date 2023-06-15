@@ -69,7 +69,7 @@ spec:
   # run unit tests
   - name: test-webui
     taskRef: 
-      name: general-command
+      name: script
     runAfter:
     - clone-webui
     params:
@@ -77,12 +77,10 @@ spec:
       value: $(context.pipelineRun.name)/webui
     - name: image
       value:  docker.io/library/node:16.20-bookworm     
-    - name: command
-      value:
-        - npm 
-        - test
-        - -- 
-        - --watchAll=false
+    - name: script
+      value:  
+        cd galasa-ui
+        npm test -- --watchAll=false 
     workspaces:
      - name: git-workspace
        workspace: git-workspace
