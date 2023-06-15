@@ -35,6 +35,8 @@ spec:
   - name: wait-api
     taskRef:
       name: kubectl
+    runAfter:
+    - recycle-api
     params:
     - name: command
       value: 
@@ -64,6 +66,8 @@ spec:
   - name: wait-testcatalog
     taskRef:
       name: kubectl
+    runAfter:
+    - recycle-testcatalog
     params:
     - name: command
       value: 
@@ -93,6 +97,8 @@ spec:
   - name: wait-engine-controller
     taskRef:
       name: kubectl
+    runAfter:
+    - recycle-engine-controller
     params:
     - name: command
       value: 
@@ -122,6 +128,8 @@ spec:
   - name: wait-resource-monitor
     taskRef:
       name: kubectl
+    runAfter:
+    - recycle-resource-monitor
     params:
     - name: command
       value: 
@@ -151,6 +159,8 @@ spec:
   - name: wait-metrics
     taskRef:
       name: kubectl
+    runAfter:
+    - recycle-metrics
     params:
     - name: command
       value: 
