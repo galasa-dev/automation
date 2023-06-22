@@ -68,12 +68,32 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
+# Install the webui's dependencies
+  - name: npm-install-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - clone-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - install
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
 # Run the webui's unit tests
   - name: test-webui
     taskRef:
       name: general-command
     runAfter:
-    - clone-webui
+    - npm-install-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
@@ -90,12 +110,33 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
+# Build the webui
+  - name: npm-build-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - test-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - run
+        - build
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
 # Build Docker image and push to harbor
   - name: docker-build-webui
     taskRef:
       name: docker-build
     runAfter:
-    - test-webui
+    - npm-build-webui
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
