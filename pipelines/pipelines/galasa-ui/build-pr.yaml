@@ -112,8 +112,8 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
-# And finally, update the status of the Tekton check in the pull request
-# to either passed/failed.
+# And finally... whether the above works or not, update the status
+# of the Tekton check in the pull request to either passed/failed.
   finally:
   - name: git-status
     when:
