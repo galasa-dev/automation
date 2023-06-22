@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-webui
+  name: branch-webui
   namespace: galasa-build
   # Tell ArgoCD never to prune this pipeline definition.
   annotations:
@@ -13,45 +13,19 @@ spec:
   workspaces:
   - name: git-workspace
   params:
-  - name: headRef
+  - name: toBranch
     type: string
-  - name: headSha
+    default: main
+  - name: imageTag
     type: string
-  - name: baseRef
-    type: string
-  - name: prUrl
-    type: string
-  - name: statusesUrl
-    type: string
-  - name: issueUrl
-    type: string
-  - name: userId
-    type: string
-  - name: prNumber
-    type: string
-  - name: action
-    type: string
-
-#----------------------------------------------------------------
-  tasks:
-  - name: git-verify
-    taskRef:
-      name: git-verify
-    params:
-    - name: userId
-      value: $(params.userId)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: action
-      value: $(params.action)
+    default: main
 
 #----------------------------------------------------------------
 # Clone the webui repository
+  tasks:
   - name: clone-webui
     taskRef:
       name: git-clone
-    runAfter:
-    - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/webui
@@ -68,12 +42,28 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
+# Switch to the given branch if it exists
+  - name: check-branch
+    taskRef:
+      name: git-check-branch
+    runAfter:
+    - clone-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
 # Run the webui's unit tests
   - name: test-webui
     taskRef:
       name: general-command
     runAfter:
-    - clone-webui
+    - check-branch
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
@@ -90,7 +80,7 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
-# Build Docker image and push to harbor
+# Build docker image and push to harbor
   - name: docker-build-webui
     taskRef:
       name: docker-build
@@ -100,7 +90,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-ui:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasa-ui:$(params.imageTag)
     - name: context
       value: $(context.pipelineRun.name)/web-ui/galasa-ui
     - name: noPush
@@ -110,26 +100,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-#----------------------------------------------------------------
-# And finally... whether the above works or not, update the status
-# of the Tekton check in the pull request to either passed/failed.
-  finally:
-  - name: git-status
-    when:
-      - input: "$(tasks.git-verify.status)"
-        operator: in
-        values: ["Succeeded"]
-    taskRef:
-      name: git-status
-    params:
-    - name: status
-      value: $(tasks.status)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: statusesUrl
-      value: $(params.statusesUrl)
-    - name: issueUrl
-      value: $(params.issueUrl)
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
