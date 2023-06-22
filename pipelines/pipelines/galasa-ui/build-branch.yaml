@@ -79,7 +79,7 @@ spec:
 
 #----------------------------------------------------------------
 # Run the webui's unit tests
-  - name: test-webui
+  - name: npm-test-webui
     taskRef:
       name: general-command
     runAfter:
@@ -105,7 +105,7 @@ spec:
     taskRef:
       name: general-command
     runAfter:
-    - test-webui
+    - npm-test-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
