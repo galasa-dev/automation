@@ -143,11 +143,11 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-ui:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)/webui/galasa-ui
+      value: $(context.pipelineRun.name)/webui
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/webui/galasa-ui/Dockerfile
+      value: webui/galasa-ui/Dockerfile
     workspaces:
      - name: git-workspace
        workspace: git-workspace
