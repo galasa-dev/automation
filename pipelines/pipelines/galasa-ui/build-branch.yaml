@@ -137,7 +137,7 @@ spec:
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
-      value: galasa-ui/Dockerfile
+      value: webui/galasa-ui/Dockerfile
     workspaces:
      - name: git-workspace
        workspace: git-workspace
