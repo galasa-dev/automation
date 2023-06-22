@@ -133,7 +133,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-ui:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/webui
+      value: $(context.pipelineRun.name)/webui/galasa-ui
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
