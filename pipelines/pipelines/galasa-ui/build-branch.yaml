@@ -135,7 +135,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
     - name: noPush
-      value: "--no-push"
+      value: ""
     - name: dockerfilePath
       value: webui/galasa-ui/Dockerfile
     workspaces:
