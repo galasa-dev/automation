@@ -53,3 +53,16 @@ argocd app create release-maven-repos \
                   --helm-set mvp.branch=release \
                   --helm-set mvp.imageTag=release \
                   --helm-set mvp.deploy=true 
+
+argocd app create release-cli \
+                  --project default \
+                  --sync-policy auto \
+                  --sync-option Prune=true \
+                  --self-heal \
+                  --repo https://github.com/galasa-dev/automation \
+                  --revision HEAD  \
+                  --path infrastructure/ibmcloud-galasadev-cluster/galasa-development/cli \
+                  --dest-server https://kubernetes.default.svc \
+                  --dest-namespace galasa-development \
+                  --helm-set branch=release \
+                  --helm-set imageTag=release                   
