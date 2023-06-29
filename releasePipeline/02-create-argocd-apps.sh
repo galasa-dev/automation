@@ -1,28 +1,35 @@
 #!/bin/bash
 
+#-----------------------------------------------------------------------------------------                   
+#
+# Objectives: Creates an argocd application which does some mysterious things... what ?
+#
+# Environment variable over-rides:
+# 
+#-----------------------------------------------------------------------------------------                   
 
 
+function ask_user_for_release_type {
+    PS3="Select the type of release process please: "
+    select lng in release pre-release
+    do
+        case $lng in
+            "release")
+                export release_type="release"
+                break
+                ;;
+            "pre-release")
+                export release_type="prerelease"
+                break
+                ;;
+            *)
+            echo "Unrecognised input.";;
+        esac
+    done
+    echo "Chosen type of release process: ${release_type}"
+}
 
-
-PS3="Select the type of release process please: "
-
-select lng in release pre-release
-do
-    case $lng in
-        "release")
-            release_type="release"
-            break
-            ;;
-        "pre-release")
-            release_type="prerelease"
-            break
-            ;;
-        *)
-           echo "Unrecognised input.";;
-    esac
-done
-
-echo "Chosen type of release process: ${release_type}"
+ask_user_for_release_type
 
 set -e
                   
@@ -89,4 +96,6 @@ argocd app create ${release_type}-cli \
                   --dest-server https://kubernetes.default.svc \
                   --dest-namespace galasa-development \
                   --helm-set branch=${release_type} \
-                  --helm-set imageTag=${release_type}                   
+                  --helm-set imageTag=${release_type}      
+
+             
