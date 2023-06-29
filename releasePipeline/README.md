@@ -37,9 +37,9 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 **Do not check in any changes you make to files during this work item unless you are correcting a mistake - back out everything at the end**
 
 1. Ensure you have complered Steps 1, 2 and 3 of the 'Set up' section of this README
-2. Complete Steps 1, 3 and 4 of the 'Create branch and ArgoCD applications' section in the release process
+2. Complete Steps 1, 2 and 3 of the 'Create branch and ArgoCD applications' section in the release process
    - Before doing Step 1, in 02-create-argocd-apps.sh, do a find and replace on the word 'release' and change to 'prerelease'. 
-   - In Step 4, **ensure that the following parameters are set**: distBranch=prerelease, fromBranch=main
+   - In Step 3, **ensure that the following parameters are set**: distBranch=prerelease, fromBranch=main
 3. Complete Step 1 of 'Build the components' **ensuring that the following parameters are set**: toBranch=prerelease, revision=prerelease, refspec=refs/heads/prerelease:refs/heads/prerelease, imageTag=prerelease, appname=prerelease-maven-repos, jacocoEnabled=false, isMainOrRelease=true
 4. Go to a maven artifact from each repository and check that the .asc files are present, which means the artifact has been signed. For example, https://development.galasa.dev/prerelease/maven-repo/wrapping/dev/galasa/com.auth0.jwt/<VERSION> should contain a file called com.auth0.jwt-<VERSION>.jar.asc.
 5. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
@@ -50,16 +50,13 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 ### Create branch and ArgoCD applications
 
 1. 02-create-argocd-apps.sh - Create the Deployments and Tekton resources in Kubernetes.
-2. 03-create-argocd-cli-app.sh - **Only if CLI being released** - Create the Deployments and Tekton resources in Kubernetes.
-3. Ensure Kubernetes context is set to the internal cicsk8s cluster.
-4. Run `kubectl -n galasa-build create -f 10-clone-galasa.yaml` - Clone all the repos' main branches to release branches.
-5. Run `kubectl -n galasa-build create -f 11-clone-cli.yaml` - **Only if CLI being released** - Clone the repo's main branch to release branch.
+2. Ensure Kubernetes context is set to the internal cicsk8s cluster.
+3. Run `kubectl -n galasa-build create -f 10-clone-galasa.yaml` - Clone all the repos' main branches to release branches.
 
 
 ### Build the components
 
 1. Run `kubectl -n galasa-build create -f 20-build-galasa.yaml` - Build the Galasa main component. **After each repo's build, go to its maven repository and check that the artifacts have been signed, there should be .asc files present**
-2. Run `kubectl -n galasa-build create -f 21-build-cli.yaml` - **Only if CLI being released** - Build the CLI.
 
 
 ### Regression test
@@ -140,7 +137,7 @@ Once an approver has approved, you can move on.
 
 1. Amend 50-tag-galasa.yaml - Update the tag name, must be prefixed with lowercase v.
 2. Run `kubectl -n galasa-build create -f 50-tag-galasa.yaml` - Tag the release on ALL repos.
-3. 52-deploy-cli-release.md - **Only if CLI being released** - Follow instructions to deploy the CLI to the repo release.
+3. 52-deploy-cli-release.md - Follow instructions to deploy the CLI to the repo release.
 
 
 ### Bump to new version
@@ -159,4 +156,5 @@ docker image push harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
 
 1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the 'release' branch in the GitHub repositories and the images in Harbor tagged 'release'.
 2. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image). _This is a temporary step that we are working to automate._
-3. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
+3. Repeat steps 1 and 2 but with the branch 'prerelease'
+4. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
