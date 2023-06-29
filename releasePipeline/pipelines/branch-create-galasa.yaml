@@ -4,7 +4,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: branch-clone-galasa
+  name: branch-create-galasa
   namespace: galasa-build
 spec:
   params:
