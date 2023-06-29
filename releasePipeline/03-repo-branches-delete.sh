@@ -163,6 +163,12 @@ EOF
             info "Pipeline run completed OK."
             break
         fi
+
+        if [[ "${status}" == "False" ]]; then
+            error "Pipeline run $pipeline_run_name failed."
+            exit 1
+            break
+        fi
     done
     
     if [ ${COUNTER} -ge $MAX_WAIT_ITERATIONS ]; then 
