@@ -17,12 +17,13 @@ The Galasa component is always released, but the others are only cloned, built, 
 ## Set up
 
 1. Clone the 'automation' repository, main branch. All the yaml and scripts you will be using can be found in the releasePipeline folder.
-2. Log into ArgoCD `argocd login --sso argocd.galasa.dev`
-3. Log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
-4. Ensure you have the latest galasabld program from https://development.galasa.dev/prod/binary/bld/ and it is on the path.
-5. jq needs to be installed.
-6. watch needs to be installed.
-7. IBM Cloud CLI needs to be installed and logged in:
+2. Ensure argocd is installed. The argocd cli can be downloaded [here]( https://argo-cd.readthedocs.io/en/stable/cli_installation/).
+3. Log into ArgoCD `argocd login --sso argocd.galasa.dev`
+4. You will need to log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
+5. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
+6. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
+7. watch needs to be installed.
+8. IBM Cloud CLI needs to be installed and logged in:
 ```
 ibmcloud login --sso
 ibmcloud cr region-set global
@@ -36,7 +37,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 
 **Do not check in any changes you make to files during this work item unless you are correcting a mistake - back out everything at the end**
 
-1. Ensure you have complered Steps 1, 2 and 3 of the 'Set up' section of this README
+1. Ensure you have completed Steps 1, 2 and 3 of the 'Set up' section of this README
 2. Complete Steps 1, 2 and 3 of the 'Create branch and ArgoCD applications' section in the release process
    - Before doing Step 1, in 02-create-argocd-apps.sh, do a find and replace on the word 'release' and change to 'prerelease'. 
    - In Step 3, **ensure that the following parameters are set**: distBranch=prerelease, fromBranch=main
@@ -49,7 +50,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 
 ### Create branch and ArgoCD applications
 
-1. 02-create-argocd-apps.sh - Create the Deployments and Tekton resources in Kubernetes.
+1. [02-create-argocd-apps.sh](./02-create-argocd-apps.sh) - Create the Deployments and Tekton resources in Kubernetes.
 2. Ensure Kubernetes context is set to the internal cicsk8s cluster.
 3. Run `kubectl -n galasa-build create -f 10-clone-galasa.yaml` - Clone all the repos' main branches to release branches.
 
