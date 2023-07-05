@@ -156,3 +156,12 @@ run_command docker push icr.io/galasadev/galasa-javadoc-amd64:latest
 run_command docker push icr.io/galasadev/galasa-restapidoc-amd64:latest
 run_command docker push icr.io/galasadev/galasa-boot-embedded-amd64:latest
 run_command docker push icr.io/galasadev/galasa-resources:latest
+
+# And now for the CLI images...
+run_command docker pull harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM
+run_command docker tag harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM \
+           icr.io/galasadev/galasa-cli-amd64:$TO
+run_command docker tag harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM \
+           icr.io/galasadev/galasa-cli-amd64:latest
+run_command docker push icr.io/galasadev/galasa-cli-amd64:$TO
+run_command docker push icr.io/galasadev/galasa-cli-amd64:latest
