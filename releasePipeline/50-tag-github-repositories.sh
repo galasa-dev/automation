@@ -1,5 +1,12 @@
-#!/bin/bash
+#! /usr/bin/env bash 
 
+#-----------------------------------------------------------------------------------------                   
+#
+# Objectives: To tag all the repositories in github.
+#
+# Environment variable over-rides:
+# None.
+#-----------------------------------------------------------------------------------------                   
 
 # Where is this script executing from ?
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null ;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
@@ -51,6 +58,14 @@ bold() { printf "${bold}%s${reset}\n" "$@"
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
 }
 
+
+#-----------------------------------------------------------------------------------------                   
+# Main logic.
+#-----------------------------------------------------------------------------------------   
+
+mkdir -p ${WORKSPACE_DIR}/temp
+
+
 function get_galasa_version_to_be_released {
     h1 "Working out the version of Galasa to test and release."
 
@@ -69,55 +84,84 @@ function get_galasa_version_to_be_released {
     export galasa_version
 }
 
-function run_command {
-    cmd=$*
-    h2 "Running command: $cmd..."
-    $cmd
+
+function set_kubernetes_context {
+    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
+    kubectl config set-context cicsk8s --namespace=galasa-build
     rc=$?
     if [[ "${rc}" != "0" ]]; then 
-        error "Command failed. rc=$rc. Command is $cmd"
+        error "Failed. rc=${rc}"
         exit 1
     fi
-    success "OK"
+    
 }
 
-#-----------------------------------------------------------------------------------------                   
-# Main logic.
-#-----------------------------------------------------------------------------------------   
+function tag_galasa_github_repositories {
 
+    h1 "Tagging the github repositories..."
+
+    cd ${WORKSPACE_DIR}/temp
+    yaml_file=${WORKSPACE_DIR}/temp/tag-galasa-repositories.yaml
+    cat << EOF > $yaml_file
+#
+# Copyright contributors to the Galasa project 
+#
+kind: PipelineRun
+apiVersion: tekton.dev/v1beta1
+metadata:
+  generateName: tag-galasa-
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
+#
+#
+#
+spec:
+#
+#
+#
+  pipelineRef:
+    name: branch-tag-galasa
+  
+  serviceAccountName: galasa-build-bot
+
+  podTemplate:
+    volumes:
+    - name: githubcreds
+      secret:
+        secretName: github-token
+    - name: harborcreds
+      secret:
+        secretName: harbor-creds-yaml
+
+  params:
+  - name: distBranch
+    value: "release"
+#
+#  Tag must be in the format v0.0.0
+#
+  - name: tag
+    value: "v${galasa_version}"
+EOF
+
+    cmd="kubectl -n galasa-build create -f $yaml_file"
+    info "Command is $cmd"
+    $cmd
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to create the resources image. rc=$rc"
+        exit 1
+    fi
+
+    success "Resources image build pipeline kicked off OK."
+}
+
+set_kubernetes_context
 get_galasa_version_to_be_released
 
-set -e
+tag_galasa_github_repositories
 
-FROM=release
-
-TO=${galasa_version}
-
-h1 "Deploying CLI image into IBM container registry"
-
-run_command ibmcloud cr login
-
-
-
-
-run_command docker pull harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM
-
-
-
-run_command docker tag harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM                      \
-           icr.io/galasadev/galasa-cli-amd64:$TO
-
-
-
-run_command docker tag harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM                       \
-           icr.io/galasadev/galasa-cli-amd64:latest
-
-
-
-
-run_command docker push icr.io/galasadev/galasa-cli-amd64:$TO
-
-
-
-run_command docker push icr.io/galasadev/galasa-cli-amd64:latest
+note "Now wait for the 'tag-galasa-*' pipeline to complete."
+note "Expect it to take about a minute."
+note "Check that it passed"
 
