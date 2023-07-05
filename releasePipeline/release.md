@@ -27,7 +27,13 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 5. Run [20-build-all-code..sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
 6. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). 
 All the tests must pass before moving on.
-For the ones which fail, run them individually (ask someone how to do this). As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
+
+For the ones which fail, run them individually :
+  a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
+  b. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
+  c. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
+  d. Repeat as required.
+
 
 ### Test the Eclipse plug-in and Simbank tests manually
 
@@ -108,7 +114,7 @@ docker image push harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
 
 ### Clean up
 
-1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the 'release' branch in the GitHub repositories and the images in Harbor tagged 'release'.
+1. Run `03-repo-branches-delete.sh` - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories and the images in Harbor tagged 'release'.
 2. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image). _This is a temporary step that we are working to automate._
 3. Repeat steps 1 and 2 but with the branch 'prerelease'
 4. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
