@@ -73,3 +73,7 @@ These are manual steps to bump the version of Galasa to the next version.
     f. mvp/pomZip.xml
 
     g. Open PR for these changes and merge into main
+
+6. Upgrade CLI
+
+    a. Change the VERSION file
