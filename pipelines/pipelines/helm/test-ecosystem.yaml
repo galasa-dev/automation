@@ -85,7 +85,11 @@ spec:
       - app
       - wait
       - $(params.appName)
-      - --health
+      - --resource
+      - apps:Deployment:$(params.appName)-api
+#
+#
+#
   finally:
   - name: cleanup-app
     taskRef:
