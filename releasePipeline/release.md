@@ -27,6 +27,7 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 5. Run [20-build-all-code..sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
 6. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). 
 All the tests must pass before moving on.
+For the ones which fail, run them individually (ask someone how to do this). As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
 
 ### Test the Eclipse plug-in and Simbank tests manually
 
