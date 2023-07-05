@@ -78,7 +78,6 @@ Once an approver has approved, you can move on.
 9. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
 11. run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
 14. run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
-15. run 35-deploy-docker-cli.sh - **Only if CLI being released** - It finds the version number we are releasing automatically. Deploy the CLI images to ICR.
 
 
 ### Update reference sites
