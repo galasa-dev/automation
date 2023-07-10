@@ -65,7 +65,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/helm/charts
     - name: image
-      value: alpine/helm:3.12.1
+      value: docker.io/alpine/helm:3.12.1
     - name: command
       value:
       - install
@@ -82,8 +82,6 @@ spec:
       - --set
       - dex.config.issuer=http://cicsk8sm.hursley.ibm.com/dex
       - --wait
-      - --timeout
-      - 5m
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -98,7 +96,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/helm
     - name: image
-      value: alpine/helm:3.12.1
+      value: docker.io/alpine/helm:3.12.1
     - name: command
       value:
       - uninstall
