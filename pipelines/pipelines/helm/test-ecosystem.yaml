@@ -68,6 +68,7 @@ spec:
       value: docker.io/alpine/helm:3.12.1
     - name: command
       value:
+      - helm
       - install
       - helm-$(params.branch)
       - ./ecosystem
@@ -99,6 +100,7 @@ spec:
       value: docker.io/alpine/helm:3.12.1
     - name: command
       value:
+      - helm
       - uninstall
       - helm-$(params.branch)
     workspaces:
