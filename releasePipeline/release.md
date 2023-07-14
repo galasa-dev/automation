@@ -114,7 +114,7 @@ docker image push harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
 
 ### Clean up
 
-1. Run `03-repo-branches-delete.sh` - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories and the images in Harbor tagged 'release'.
+1. Run `03-repo-branches-delete.sh` - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories and the images in Harbor tagged 'release'. Takes less than a minute.
 2. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image). _This is a temporary step that we are working to automate._
 3. Repeat steps 1 and 2 but with the branch 'prerelease'
 4. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
