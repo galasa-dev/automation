@@ -14,6 +14,9 @@ These are manual steps to bump the version of Galasa to the next version.
 
     Make sure the main build this starts is complete (runs all the way to Isolated and finishes) before moving on to the next step, or the following builds will fail. **If you merge the PRs in a random order, for example, Eclipse before Framework, the Eclipse build will be looking for the next version of Framework, but that might not have been built yet.**
 
+2. Upgrade Managers
+   As above, using the `build-locally.sh` script.
+
 3. Upgrade OBR
 
     a. Create branch
