@@ -115,8 +115,6 @@ spec:
     taskRef:
       name: gradle-build
     runAfter:
-    - clone-automation
-    - clone-extensions
     - clone-obr
     workspaces:
     - name: git-workspace
@@ -138,6 +136,8 @@ spec:
     taskRef:
       name: maven-gpg
     runAfter:
+    - clone-automation
+    - clone-extensions
     - download-dependencies
     params:
     - name: context 

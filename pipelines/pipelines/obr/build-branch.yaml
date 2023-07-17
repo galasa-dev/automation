@@ -51,26 +51,6 @@ spec:
        workspace: git-workspace
 # 
 # 
-# 
-  - name: clone-framework
-    taskRef: 
-      name: git-clone
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/framework
-    - name: revision
-      value: $(params.revision)
-    - name: refspec
-      value: $(params.refspec)
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/framework
-    workspaces:
-     - name: output
-       workspace: git-workspace 
-# 
-# 
 #     
   - name: clone-extensions
     taskRef: 
@@ -88,27 +68,7 @@ spec:
       value: $(context.pipelineRun.name)/extensions
     workspaces:
      - name: output
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: clone-managers
-    taskRef: 
-      name: git-clone
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/managers
-    - name: revision
-      value: $(params.revision)
-    - name: refspec
-      value: $(params.refspec)
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/managers
-    workspaces:
-     - name: output
-       workspace: git-workspace  
+       workspace: git-workspace 
 # 
 # 
 #    
@@ -169,6 +129,32 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+  
+
+  # Gather all the gradle dependencies.
+  # ... into the $(context.pipelineRun.name)/obr/dependency-download/build/dependencies folder.
+  # For example: 
+  # dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml
+  # dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml
+  - name: download-dependencies
+    taskRef:
+      name: gradle-build
+    runAfter:
+    - clone-obr
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/obr/dependency-download
+    - name: buildArgs
+      value: 
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/managers"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/obr/repo"
+    - name: command
+      value: 
+        - getDeps
 # 
 # 
 #  
@@ -176,10 +162,9 @@ spec:
     taskRef:
       name: maven-gpg
     runAfter:
+    - download-dependencies
     - clone-automation
-    - clone-framework
     - clone-extensions
-    - clone-managers
     - clone-obr
     - check-branch
     params:
@@ -219,11 +204,11 @@ spec:
       value:       
         - "template"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
         - "--template"
