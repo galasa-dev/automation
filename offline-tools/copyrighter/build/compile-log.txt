@@ -1,0 +1,34 @@
+mkdir -p build
+go test -v -cover -coverprofile=build/coverage.out -coverpkg ./pkg/cmd ./pkg/...
+=== RUN   TestCanAddCopyrightWhenNoneExistsAlready
+--- PASS: TestCanAddCopyrightWhenNoneExistsAlready (0.00s)
+=== RUN   TestCopyrightAddedToOriginalContent
+--- PASS: TestCopyrightAddedToOriginalContent (0.00s)
+=== RUN   TestCopyrightWhereNoneExistsAddedToStartOfFile
+--- PASS: TestCopyrightWhereNoneExistsAddedToStartOfFile (0.00s)
+=== RUN   TestCopyrightNotAddedWhenPresentAlready
+--- PASS: TestCopyrightNotAddedWhenPresentAlready (0.00s)
+=== RUN   TestCanStripOutFirstCommentAndTrailingWhiteSpace
+--- PASS: TestCanStripOutFirstCommentAndTrailingWhiteSpace (0.00s)
+=== RUN   TestCanStripOutFirstCommentWhenThereIsNoComment
+--- PASS: TestCanStripOutFirstCommentWhenThereIsNoComment (0.00s)
+=== RUN   TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement
+--- PASS: TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement (0.00s)
+=== RUN   TestCanStripOutFirstCommentLeadingTextShouldBePreserved
+--- PASS: TestCanStripOutFirstCommentLeadingTextShouldBePreserved (0.00s)
+=== RUN   TestStrippingOutFirstCommentWithNoClosingTagFailsWithError
+--- PASS: TestStrippingOutFirstCommentWithNoClosingTagFailsWithError (0.00s)
+=== RUN   TestClosingCommentIsBeforeOpeningCommentFailsWithError
+--- PASS: TestClosingCommentIsBeforeOpeningCommentFailsWithError (0.00s)
+PASS
+	github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd	coverage: 100.0% of statements in ./pkg/cmd
+ok  	github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd	0.832s	coverage: 100.0% of statements in ./pkg/cmd
+go tool cover -func=build/coverage.out > build/coverage.txt
+cat build/coverage.txt
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:33:	Execute				0.0%
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:36:	addNewCopyrightAtStart		100.0%
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:49:	setCopyright			100.0%
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:58:	stripOutExistingCopyright	100.0%
+total:												(statements)			100.0%
+go tool cover -html=build/coverage.out -o build/coverage.html
+CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o bin/galasacopyrighter-darwin-arm64 ./cmd/galasacopyrighter	
