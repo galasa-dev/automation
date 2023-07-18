@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/files"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -189,4 +190,33 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 	// Then..
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
+}
+
+func TestAppliesChangesToJavaFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.java", `Java source code`)
+
+	err := processFolder(fs, "/my/folder/")
+
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.java")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Java source code")
+	assert.Contains(t, contents, "Copyright")
+}
+
+func TestDoesNotApplyChangesToTextFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.txt", `Java source code`)
+
+	err := processFolder(fs, "/my/folder/")
+
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.txt")
+	assert.Nil(t, err)
+	assert.Equal(t, contents, "Java source code")
 }
