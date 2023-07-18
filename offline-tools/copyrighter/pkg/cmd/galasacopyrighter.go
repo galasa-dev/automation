@@ -76,7 +76,7 @@ func processFile(fs files.FileSystem, filePath string) error {
 	println(fmt.Sprintf("Processing file %s", filePath))
 
 	var err error = nil
-	if strings.HasSuffix(filePath, ".java") {
+	if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") {
 		contents, err := fs.ReadTextFile(filePath)
 		if err == nil {
 			newContents, err := setCopyright(contents)
