@@ -29,6 +29,7 @@ const (
 	COMMENT_CONTINUE_JAVA = " *"
 	COMMENT_END_JAVA      = " */"
 	COMMENT_DOUBLE_STROKE = "//"
+	COMMENT_BASH_SCRIPT   = "#"
 )
 
 func Execute() {

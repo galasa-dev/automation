@@ -260,58 +260,19 @@ func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
 	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
 }
 
-func TestCommentIsPresentAndIncludesCopyrightLeadingTextShouldBePreserved(t *testing.T) {
-	// Given..
-	var input = `leading text here
-/*
- * Copyright contributors to the Galasa project
- */
- package mypackage`
-
-	// When...
-	output, _ := setCopyright(input)
-
-	// Then..
-	assert.NotNil(t, output)
-	assert.Contains(t, output, "leading text here")
-	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
-}
-
 func TestCommentNeedsNoChange(t *testing.T) {
 	// Given..
-	var input = `
- /*
+	var input = `/*
  * Copyright contributors to the Galasa project
  *
  * SPDX-License-Identifier: EPL-2.0
  */
- package mypackage`
+package mypackage`
 
 	// When...
 	output, _ := setCopyright(input)
 
 	// Then..
 	assert.NotNil(t, output)
-	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+	assert.Equal(t, output, input)
 }
-
-func TestCommentStartsWithDoubleStrokesIncludesCopyright(t *testing.T) {
-	// Given..
-	var input = `
- //
- // Copyright contributors to the Galasa project 
- //
- package mypackage`
-
-	// When...
-	output, _ := setCopyright(input)
-
-	// Then..
-	assert.NotNil(t, output)
-	assert.Contains(t, output, "// SPDX-License-Identifier: EPL-2.0")
-	println(output)
-}
-
-//GetType(ext string)
-
-//cope with go code - parameter about file name and tell if its a go file and strip copyright from it

@@ -1,5 +1,0 @@
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:33:	Execute				0.0%
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:36:	addNewCopyrightAtStart		100.0%
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:49:	setCopyright			100.0%
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:58:	stripOutExistingCopyright	100.0%
-total:												(statements)			100.0%
