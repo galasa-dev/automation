@@ -158,7 +158,14 @@ func stripOutExistingCopyright(input string) (string, error) <span class="cov8" 
 
                                 <span class="cov8" title="1">afterFirstCommentEnder := input[startIndexOfFollowingInput:]
 
-                                output = beforeFirstCommentInput + afterFirstCommentEnder</span>
+                                //checking if the comment contains the old copyright text
+                                commentToCheck := input[firstCommentOpener:startIndexOfFollowingInput]
+                                if strings.Contains(commentToCheck, "Copyright ") </span><span class="cov8" title="1">{
+                                        println("HERE")
+                                        output = beforeFirstCommentInput + afterFirstCommentEnder
+                                }</span> else<span class="cov8" title="1"> {
+                                        output = "\n" + beforeFirstCommentInput + "\n" + commentToCheck + afterFirstCommentEnder
+                                }</span>
                         }
                 }
 
