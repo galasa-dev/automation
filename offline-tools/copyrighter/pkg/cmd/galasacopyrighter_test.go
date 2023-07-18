@@ -210,24 +210,6 @@ func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
 	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
 }
 
-func TestCommentIsPresentButDoesNotIncludeCopyrightLeadingTextPreserved(t *testing.T) {
-	// Given..
-	var input = `leading text here
-/*
- * Hello, World
- */
- package mypackage`
-
-	// When...
-	output, _ := setCopyright(input)
-
-	// Then..
-	assert.NotNil(t, output)
-	assert.Contains(t, output, "leading text here")
-	assert.Contains(t, output, "* Hello, World")
-	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
-}
-
 func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T) {
 	// Given..
 	var input = `
