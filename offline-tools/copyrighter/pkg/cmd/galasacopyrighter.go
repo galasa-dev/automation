@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/files"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,10 @@ var (
 		Short:   "Tool to set copyright headers into source files.",
 		Long:    `A tool for setting Galasa copyright headers into source files.`,
 		Version: "1.0",
+		Run:     executeCommand,
 	}
+
+	folderPath string
 )
 
 const (
@@ -30,7 +34,58 @@ const (
 	COMMENT_END_JAVA      = " */"
 )
 
+func init() {
+	cmd := RootCmd
+	cmd.PersistentFlags().StringVarP(&folderPath, "folder", "f", "", "The folder containing files which needs transforming.")
+	cmd.MarkFlagRequired("folder")
+}
+
 func Execute() {
+	err := RootCmd.Execute()
+	if err != nil {
+		println(err.Error())
+	}
+}
+
+func executeCommand(cmd *cobra.Command, args []string) {
+	fs := files.NewOSFileSystem()
+	processFolder(fs, folderPath)
+}
+
+// Everything from here on down can be easily unit tested.
+func processFolder(fs files.FileSystem, folderPath string) error {
+	filesToProcess, err := fs.GetAllFilesInFolder(folderPath)
+	if err == nil {
+		errorCount := 0
+		for _, filePath := range filesToProcess {
+
+			processingError := processFile(fs, filePath)
+			if processingError != nil {
+				println(processingError.Error())
+				errorCount += 1
+			}
+		}
+		if errorCount > 0 {
+			err = fmt.Errorf("Failure. Found %d errors.", errorCount)
+		}
+	}
+	return err
+}
+
+func processFile(fs files.FileSystem, filePath string) error {
+	println(fmt.Sprintf("Processing file %s", filePath))
+
+	var err error = nil
+	if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") {
+		contents, err := fs.ReadTextFile(filePath)
+		if err == nil {
+			newContents, err := setCopyright(contents)
+			if err == nil {
+				fs.WriteTextFile(filePath, newContents)
+			}
+		}
+	}
+	return err
 }
 
 func addNewCopyrightAtStart(input string) string {

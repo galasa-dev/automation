@@ -93,7 +93,7 @@ function allow_tool_to_execute {
 
 function run_tool {
     h2 "Running the galasacopyrighter tool..."
-    cmd="$GALASACOPYRIGHTER"
+    cmd="$GALASACOPYRIGHTER $*"
     info "Calling $cmd"
     $cmd
     rc=$?
@@ -106,4 +106,4 @@ function run_tool {
 
 set_tool_version
 allow_tool_to_execute
-run_tool
+run_tool $*
