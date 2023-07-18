@@ -7,6 +7,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/files"
@@ -38,6 +39,8 @@ func init() {
 	cmd := RootCmd
 	cmd.PersistentFlags().StringVarP(&folderPath, "folder", "f", "", "The folder containing files which needs transforming.")
 	cmd.MarkFlagRequired("folder")
+
+	cmd.SetOut(os.Stdout)
 }
 
 func Execute() {
@@ -73,15 +76,29 @@ func processFolder(fs files.FileSystem, folderPath string) error {
 }
 
 func processFile(fs files.FileSystem, filePath string) error {
-	println(fmt.Sprintf("Processing file %s", filePath))
 
 	var err error = nil
-	if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
-		contents, err := fs.ReadTextFile(filePath)
-		if err == nil {
-			newContents, err := setCopyright(contents)
+
+	if strings.Contains(filePath, "/.git/") {
+		// Don't process files in the .git folders...
+	} else {
+		var contents string = ""
+		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
+			contents, err = fs.ReadTextFile(filePath)
 			if err == nil {
-				fs.WriteTextFile(filePath, newContents)
+				newContents, err := setCopyright(contents)
+				if err == nil {
+					fs.WriteTextFile(filePath, newContents)
+				}
+			}
+		} else {
+			contents, err = fs.ReadTextFile(filePath)
+			if strings.Contains(contents, "Copyright") {
+				if strings.Contains(contents, "Galasa") {
+					fmt.Printf("Tool not able to process a file which contains a Galasa copyright statement: %s\n", filePath)
+				} else {
+					fmt.Printf("Tool not able to process a file which contains a non-Galasa copyright statement: %s\n", filePath)
+				}
 			}
 		}
 	}
