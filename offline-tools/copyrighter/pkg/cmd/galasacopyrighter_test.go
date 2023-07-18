@@ -224,7 +224,7 @@ func TestDoesNotApplyChangesToTextFileInFolder(t *testing.T) {
 func TestAppliesChangesToGoFileInFolder(t *testing.T) {
 	fs := files.NewMockFileSystem()
 	fs.MkdirAll("/my/folder/")
-	fs.WriteTextFile("/my/folder/myJavaFile.go", `Java source code`)
+	fs.WriteTextFile("/my/folder/myJavaFile.go", `Go source code`)
 
 	err := processFolder(fs, "/my/folder/")
 
@@ -232,6 +232,21 @@ func TestAppliesChangesToGoFileInFolder(t *testing.T) {
 
 	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.go")
 	assert.Nil(t, err)
-	assert.Contains(t, contents, "Java source code")
+	assert.Contains(t, contents, "Go source code")
+	assert.Contains(t, contents, "Copyright")
+}
+
+func TestAppliesChangesToJavaScriptFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.js", `Javascript source code`)
+
+	err := processFolder(fs, "/my/folder/")
+
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.js")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Javascript source code")
 	assert.Contains(t, contents, "Copyright")
 }
