@@ -190,3 +190,128 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
+
+func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
+	// Given..
+	var input = `
+/*
+ * Hello, World
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "* Hello, World")
+	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
+	//println(output)
+}
+
+func TestCommentIsPresentButDoesNotIncludeCopyrightLeadingTextPreserved(t *testing.T) {
+	// Given..
+	var input = `leading text here
+/*
+ * Hello, World
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "leading text here")
+	assert.Contains(t, output, "* Hello, World")
+	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
+}
+
+func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T) {
+	// Given..
+	var input = `
+*/
+ * Hello, World
+ /*
+ package mypackage`
+
+	// When...
+	_, err := setCopyright(input)
+
+	// Then..
+	//println(output)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
+}
+
+func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
+	// Given..
+	var input = `
+/*
+ * Copyright contributors to the Galasa project
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
+func TestCommentIsPresentAndIncludesCopyrightLeadingTextShouldBePreserved(t *testing.T) {
+	// Given..
+	var input = `leading text here
+/*
+ * Copyright contributors to the Galasa project
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "leading text here")
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
+func TestCommentNeedsNoChange(t *testing.T) {
+	// Given..
+	var input = `
+ /*
+ * Copyright contributors to the Galasa project
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
+func TestCommentStartsWithDoubleStrokesIncludesCopyright(t *testing.T) {
+	// Given..
+	var input = `
+ //
+ // Copyright contributors to the Galasa project 
+ //
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "// SPDX-License-Identifier: EPL-2.0")
+	println(output)
+}
+
+//GetType(ext string)
+
+//cope with go code - parameter about file name and tell if its a go file and strip copyright from it

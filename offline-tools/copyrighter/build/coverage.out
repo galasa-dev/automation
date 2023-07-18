@@ -13,6 +13,8 @@ github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrig
 github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:79.9,81.44 2 1
 github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:81.44,83.7 1 1
 github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:83.12,84.12 1 1
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:88.5,90.62 2 1
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:94.8,96.3 1 1
-github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:97.2,97.20 1 1
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:88.5,92.55 3 1
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:92.55,95.6 2 1
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:95.11,97.6 1 1
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:101.8,103.3 1 1
+github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/cmd/galasacopyrighter.go:104.2,104.20 1 1
