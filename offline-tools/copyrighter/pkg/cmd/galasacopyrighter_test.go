@@ -99,7 +99,7 @@ func TestCopyrightNotAddedWhenPresentAlready(t *testing.T) {
 func TestCanStripOutFirstCommentAndTrailingWhiteSpace(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright contributors to the Galasa project
+ * Copyright line here
  *
  * SPDX-License-Identifier: EPL-2.0
  */       ` + "\t" + "\n" + "package mypackage"
@@ -111,6 +111,7 @@ func TestCanStripOutFirstCommentAndTrailingWhiteSpace(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, output)
 	assert.Equal(t, output, "package mypackage")
+	assert.NotContains(t, output, "Copyright line here")
 }
 
 func TestCanStripOutFirstCommentWhenThereIsNoComment(t *testing.T) {
@@ -129,7 +130,7 @@ func TestCanStripOutFirstCommentWhenThereIsNoComment(t *testing.T) {
 func TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright contributors to the Galasa project
+ * Copyright is present here
  */
  package mypackage`
 
@@ -140,6 +141,7 @@ func TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement(t *testing.
 	assert.Nil(t, err)
 	assert.NotNil(t, output)
 	assert.Equal(t, output, "package mypackage")
+	assert.NotContains(t, output, "Copyright is present here")
 }
 
 func TestCanStripOutFirstCommentLeadingTextShouldBePreserved(t *testing.T) {
@@ -163,7 +165,7 @@ func TestStrippingOutFirstCommentWithNoClosingTagFailsWithError(t *testing.T) {
 	// Given..
 	var input = `
 /*
- * Copyright contributors to the Galasa project
+ * Copyright is found here
  
  package mypackage`
 
@@ -206,7 +208,6 @@ func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
 	assert.NotNil(t, output)
 	assert.Contains(t, output, "* Hello, World")
 	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
-	//println(output)
 }
 
 func TestCommentIsPresentButDoesNotIncludeCopyrightLeadingTextPreserved(t *testing.T) {
@@ -239,7 +240,6 @@ func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T)
 	_, err := setCopyright(input)
 
 	// Then..
-	//println(output)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
@@ -248,7 +248,7 @@ func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
 	// Given..
 	var input = `
 /*
- * Copyright contributors to the Galasa project
+ * CCopyright(c) is found here
  */
  package mypackage`
 
@@ -258,6 +258,7 @@ func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
 	// Then..
 	assert.NotNil(t, output)
 	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+	assert.NotContains(t, output, "Copyright(c) is found here")
 }
 
 func TestCommentNeedsNoChange(t *testing.T) {
