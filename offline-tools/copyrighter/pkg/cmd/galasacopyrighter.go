@@ -28,8 +28,6 @@ const (
 	COMMENT_START_JAVA    = "/*"
 	COMMENT_CONTINUE_JAVA = " *"
 	COMMENT_END_JAVA      = " */"
-	COMMENT_DOUBLE_STROKE = "//"
-	COMMENT_BASH_SCRIPT   = "#"
 )
 
 func Execute() {
@@ -91,7 +89,7 @@ func stripOutExistingCopyright(input string) (string, error) {
 
 				//checking if the comment contains the old copyright text
 				commentToCheck := input[firstCommentOpener:startIndexOfFollowingInput]
-				if strings.Contains(commentToCheck, "Copyright ") {
+				if strings.Contains(commentToCheck, "Copyright") {
 					output = beforeFirstCommentInput + afterFirstCommentEnder
 				} else {
 					output = "\n" + beforeFirstCommentInput + "\n" + commentToCheck + afterFirstCommentEnder
