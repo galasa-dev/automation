@@ -259,3 +259,20 @@ package mypackage`
 	assert.NotNil(t, output)
 	assert.Equal(t, output, input)
 }
+
+func TestReplaceCommentAtStartOfYamlFile(t *testing.T) {
+	// Given..
+	var input = `# Copyright contributors to the Galasa project
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
+	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+}
