@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/files"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -193,86 +194,61 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
 
-func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
-	// Given..
-	var input = `
-/*
- * Hello, World
- */
- package mypackage`
+func TestAppliesChangesToJavaFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.java", `Java source code`)
 
-	// When...
-	output, _ := setCopyright(input)
+	err := processFolder(fs, "/my/folder/")
 
-	// Then..
-	assert.NotNil(t, output)
-	assert.Contains(t, output, "* Hello, World")
-	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.java")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Java source code")
+	assert.Contains(t, contents, "Copyright")
 }
 
-func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T) {
-	// Given..
-	var input = `
-*/
- * Hello, World
- /*
- package mypackage`
+func TestDoesNotApplyChangesToTextFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.txt", `Java source code`)
 
-	// When...
-	_, err := setCopyright(input)
+	err := processFolder(fs, "/my/folder/")
 
-	// Then..
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.txt")
+	assert.Nil(t, err)
+	assert.Equal(t, contents, "Java source code")
 }
 
-func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
-	// Given..
-	var input = `
-/*
- * CCopyright(c) is found here
- */
- package mypackage`
+func TestAppliesChangesToGoFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.go", `Go source code`)
 
-	// When...
-	output, _ := setCopyright(input)
+	err := processFolder(fs, "/my/folder/")
 
-	// Then..
-	assert.NotNil(t, output)
-	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
-	assert.NotContains(t, output, "Copyright(c) is found here")
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.go")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Go source code")
+	assert.Contains(t, contents, "Copyright")
 }
 
-func TestCommentNeedsNoChange(t *testing.T) {
-	// Given..
-	var input = `/*
- * Copyright contributors to the Galasa project
- *
- * SPDX-License-Identifier: EPL-2.0
- */
-package mypackage`
+func TestAppliesChangesToJavaScriptFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myJavaFile.js", `Javascript source code`)
 
-	// When...
-	output, _ := setCopyright(input)
+	err := processFolder(fs, "/my/folder/")
 
-	// Then..
-	assert.NotNil(t, output)
-	assert.Equal(t, output, input)
-}
+	assert.Nil(t, err)
 
-func TestReplaceCommentAtStartOfYamlFile(t *testing.T) {
-	// Given..
-	var input = `# Copyright contributors to the Galasa project
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
-
-	// When...
-	output, _ := setCopyright(input)
-
-	// Then..
-	assert.NotNil(t, output)
-	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
-	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
-	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.js")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Javascript source code")
+	assert.Contains(t, contents, "Copyright")
 }

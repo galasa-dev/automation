@@ -7,8 +7,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
+	"github.com/galasa.dev/automation/offline-tools/copyrighter/pkg/files"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +20,10 @@ var (
 		Short:   "Tool to set copyright headers into source files.",
 		Long:    `A tool for setting Galasa copyright headers into source files.`,
 		Version: "1.0",
+		Run:     executeCommand,
 	}
+
+	folderPath string
 )
 
 const (
@@ -31,7 +36,74 @@ const (
 	COMMENT_BASH          = "#"
 )
 
+func init() {
+	cmd := RootCmd
+	cmd.PersistentFlags().StringVarP(&folderPath, "folder", "f", "", "The folder containing files which needs transforming.")
+	cmd.MarkFlagRequired("folder")
+
+	cmd.SetOut(os.Stdout)
+}
+
 func Execute() {
+	err := RootCmd.Execute()
+	if err != nil {
+		println(err.Error())
+	}
+}
+
+func executeCommand(cmd *cobra.Command, args []string) {
+	fs := files.NewOSFileSystem()
+	processFolder(fs, folderPath)
+}
+
+// Everything from here on down can be easily unit tested.
+func processFolder(fs files.FileSystem, folderPath string) error {
+	filesToProcess, err := fs.GetAllFilesInFolder(folderPath)
+	if err == nil {
+		errorCount := 0
+		for _, filePath := range filesToProcess {
+
+			processingError := processFile(fs, filePath)
+			if processingError != nil {
+				println(processingError.Error())
+				errorCount += 1
+			}
+		}
+		if errorCount > 0 {
+			err = fmt.Errorf("Failure. Found %d errors.", errorCount)
+		}
+	}
+	return err
+}
+
+func processFile(fs files.FileSystem, filePath string) error {
+
+	var err error = nil
+
+	if strings.Contains(filePath, "/.git/") {
+		// Don't process files in the .git folders...
+	} else {
+		var contents string = ""
+		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
+			contents, err = fs.ReadTextFile(filePath)
+			if err == nil {
+				newContents, err := setCopyright(contents)
+				if err == nil {
+					fs.WriteTextFile(filePath, newContents)
+				}
+			}
+		} else {
+			contents, err = fs.ReadTextFile(filePath)
+			if strings.Contains(contents, "Copyright") {
+				if strings.Contains(contents, "Galasa") {
+					fmt.Printf("Tool not able to process a file which contains a Galasa copyright statement: %s\n", filePath)
+				} else {
+					fmt.Printf("Tool not able to process a file which contains a non-Galasa copyright statement: %s\n", filePath)
+				}
+			}
+		}
+	}
+	return err
 }
 
 func addNewCopyrightAtStart(input string) string {
