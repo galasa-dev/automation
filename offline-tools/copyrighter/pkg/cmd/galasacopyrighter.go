@@ -28,6 +28,7 @@ const (
 	COMMENT_START_JAVA    = "/*"
 	COMMENT_CONTINUE_JAVA = " *"
 	COMMENT_END_JAVA      = " */"
+	COMMENT_BASH          = "#"
 )
 
 func Execute() {
@@ -48,9 +49,18 @@ func addNewCopyrightAtStart(input string) string {
 
 func setCopyright(input string) (string, error) {
 	var output string = ""
-	inputWithNoCopyright, err := stripOutExistingCopyright(input)
-	if err == nil {
-		output = addNewCopyrightAtStart(inputWithNoCopyright)
+	var inputWithNoCopyright string = ""
+	var err error
+
+	if input[0] == '#' { //files with bash comments
+		inputWithNoCopyright = stripOutExistingCopyrightBash(input)
+		output = addNewCopyrightAtStartBash(inputWithNoCopyright)
+
+	} else { //for files which have opening and closing comments
+		inputWithNoCopyright, err = stripOutExistingCopyright(input)
+		if err == nil {
+			output = addNewCopyrightAtStart(inputWithNoCopyright)
+		}
 	}
 	return output, err
 }
@@ -101,4 +111,31 @@ func stripOutExistingCopyright(input string) (string, error) {
 		output = input
 	}
 	return output, err
+}
+
+func stripOutExistingCopyrightBash(input string) string {
+	var output string
+	firstCommentBash := strings.Index(input, COMMENT_BASH)
+	firstNewLine := strings.Index(input, "\n") + 1
+
+	commentToCheck := input[firstCommentBash:firstNewLine]
+
+	if strings.Contains(commentToCheck, "Copyright") && strings.Contains(commentToCheck, "Galasa") {
+		output = input[firstNewLine:]
+	}
+
+	return output
+}
+
+func addNewCopyrightAtStartBash(input string) string {
+	var buffer = strings.Builder{}
+
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
+	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_CONTRIBUTORS))
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
+	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_LICENSE))
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
+	buffer.WriteString(input)
+
+	return buffer.String()
 }
