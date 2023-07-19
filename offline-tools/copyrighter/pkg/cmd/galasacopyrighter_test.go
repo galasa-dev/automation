@@ -193,6 +193,89 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
+func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
+	// Given..
+	var input = `
+/*
+ * Hello, World
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "* Hello, World")
+	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
+}
+
+func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T) {
+	// Given..
+	var input = `
+*/
+ * Hello, World
+ /*
+ package mypackage`
+
+	// When...
+	_, err := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
+}
+
+func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
+	// Given..
+	var input = `
+/*
+ * CCopyright(c) is found here
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+	assert.NotContains(t, output, "Copyright(c) is found here")
+}
+
+func TestCommentNeedsNoChange(t *testing.T) {
+	// Given..
+	var input = `/*
+ * Copyright contributors to the Galasa project
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package mypackage`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Equal(t, output, input)
+}
+
+func TestReplaceCommentAtStartOfYamlFile(t *testing.T) {
+	// Given..
+	var input = `# Copyright contributors to the Galasa project
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:`
+
+	// When...
+	output, _ := setCopyright(input)
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
+	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+}
 
 func TestAppliesChangesToJavaFileInFolder(t *testing.T) {
 	fs := files.NewMockFileSystem()
