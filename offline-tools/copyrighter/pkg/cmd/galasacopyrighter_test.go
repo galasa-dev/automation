@@ -193,6 +193,7 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
+
 func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
 	// Given..
 	var input = `
