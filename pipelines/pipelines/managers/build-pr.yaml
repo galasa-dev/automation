@@ -29,8 +29,6 @@ spec:
   - name: action
     type: string
   tasks:
-
-
   - name: git-verify
     taskRef:
       name: git-verify
@@ -41,8 +39,6 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
-
-
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -62,8 +58,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
-
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -83,8 +77,6 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-
-
   - name: get-commit
     taskRef:
       name: get-commit
@@ -98,8 +90,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-
   - name: gradle-build-managers
     taskRef:
       name: gradle-build
@@ -121,8 +111,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-
   - name: docker-build-managers
     taskRef:
       name: docker-build
@@ -147,8 +135,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-       
   finally:
   - name: git-status
     when:
