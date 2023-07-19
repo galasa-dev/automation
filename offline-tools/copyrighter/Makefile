@@ -6,7 +6,9 @@ all: tests galasacopyrighter
 galasacopyrighter: bin/galasacopyrighter-darwin-arm64 
 
 galasacopyrighter-source : \
-	./cmd/galasacopyrighter/*.go 
+	./cmd/galasacopyrighter/*.go \
+	./pkg/cmd/*.go \
+	./pkg/files/*.go
 
 tests: galasacopyrighter-source build/coverage.txt build/coverage.html
 
