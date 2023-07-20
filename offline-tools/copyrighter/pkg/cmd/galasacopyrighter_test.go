@@ -21,7 +21,7 @@ func TestCanAddCopyrightWhenNoneExistsAlready(t *testing.T) {
 	}
 	`
 
-	output, err := setCopyright(input)
+	output, err := setCopyright(input, " *")
 
 	assert.NotNil(t, output)
 	assert.Nil(t, err)
@@ -44,7 +44,7 @@ func TestCopyrightAddedToOriginalContent(t *testing.T) {
 	`
 
 	// When...
-	output, err := setCopyright(input)
+	output, err := setCopyright(input, " *")
 
 	// Then..
 	assert.Nil(t, err)
@@ -54,7 +54,7 @@ func TestCopyrightAddedToOriginalContent(t *testing.T) {
 	assert.Greater(t, packageLineLocation, 0, "Original file content should be returned with the copyright.")
 }
 
-func TestCopyrightWhereNoneExistsAddedToStartOfFile(t *testing.T) {
+func TestCopyrightNotAddedWhenPresentAlready(t *testing.T) {
 	// Given..
 	var input = `/*
  * Copyright contributors to the Galasa project
@@ -68,7 +68,7 @@ class AClass {
 `
 
 	// When...
-	output, err := setCopyright(input)
+	output, err := setCopyright(input, " *")
 
 	// Then..
 	assert.NotNil(t, output)
@@ -81,7 +81,7 @@ class AClass {
 	assert.Equal(t, licenseLineCount, 1, "License line has been repeated.")
 }
 
-func TestCopyrightNotAddedWhenPresentAlready(t *testing.T) {
+func TestCopyrightWhereNoneExistsAddedToStartOfFile(t *testing.T) {
 	// Given..
 	var input = `package mypackage
 	class AClass {
@@ -90,7 +90,7 @@ func TestCopyrightNotAddedWhenPresentAlready(t *testing.T) {
 	`
 
 	// When...
-	output, err := setCopyright(input)
+	output, err := setCopyright(input, " *")
 
 	// Then..
 	assert.Nil(t, err)
@@ -100,19 +100,19 @@ func TestCopyrightNotAddedWhenPresentAlready(t *testing.T) {
 func TestCanStripOutFirstCommentAndTrailingWhiteSpace(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright line here
+ * Copyright line here IBM
  *
  * SPDX-License-Identifier: EPL-2.0
  */       ` + "\t" + "\n" + "package mypackage"
 
 	// When...
-	output, err := stripOutExistingCopyright(input)
+	output, err, _ := stripOutExistingCopyright(input)
 
 	// Then..
 	assert.Nil(t, err)
 	assert.NotNil(t, output)
 	assert.Equal(t, output, "package mypackage")
-	assert.NotContains(t, output, "Copyright line here")
+	assert.NotContains(t, output, "Copyright line here IBM")
 }
 
 func TestCanStripOutFirstCommentWhenThereIsNoComment(t *testing.T) {
@@ -120,7 +120,7 @@ func TestCanStripOutFirstCommentWhenThereIsNoComment(t *testing.T) {
 	var input = `package mypackage`
 
 	// When...
-	output, err := stripOutExistingCopyright(input)
+	output, err, _ := stripOutExistingCopyright(input)
 
 	// Then..
 	assert.Nil(t, err)
@@ -131,18 +131,18 @@ func TestCanStripOutFirstCommentWhenThereIsNoComment(t *testing.T) {
 func TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright is present here
+ * Copyright in Galasa file
  */
  package mypackage`
 
 	// When...
-	output, err := stripOutExistingCopyright(input)
+	output, err, _ := stripOutExistingCopyright(input)
 
 	// Then..
 	assert.Nil(t, err)
 	assert.NotNil(t, output)
 	assert.Equal(t, output, "package mypackage")
-	assert.NotContains(t, output, "Copyright is present here")
+	assert.NotContains(t, output, "Copyright in Galasa file")
 }
 
 func TestCanStripOutFirstCommentLeadingTextShouldBePreserved(t *testing.T) {
@@ -154,7 +154,7 @@ func TestCanStripOutFirstCommentLeadingTextShouldBePreserved(t *testing.T) {
  package mypackage`
 
 	// When...
-	output, err := stripOutExistingCopyright(input)
+	output, err, _ := stripOutExistingCopyright(input)
 
 	// Then..
 	assert.Nil(t, err)
@@ -166,12 +166,12 @@ func TestStrippingOutFirstCommentWithNoClosingTagFailsWithError(t *testing.T) {
 	// Given..
 	var input = `
 /*
- * Copyright is found here
- 
+ * Copyright is Galasa found here
+
  package mypackage`
 
 	// When...
-	_, err := stripOutExistingCopyright(input)
+	_, err, _ := stripOutExistingCopyright(input)
 
 	// Then..
 	assert.NotNil(t, err)
@@ -187,31 +187,31 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
  package mypackage`
 
 	// When...
-	_, err := stripOutExistingCopyright(input)
+	_, err, _ := stripOutExistingCopyright(input)
 
 	// Then..
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
 
-func TestCommentIsPresentButDoesNotIncludeCopyright(t *testing.T) {
+func TestCommentIsPresentButDoesNotIncludeCopyrightToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `
 /*
- * Hello, World
+ * Hello, World Copyright
  */
  package mypackage`
 
 	// When...
-	output, _ := setCopyright(input)
+	output, _ := setCopyright(input, " *")
 
 	// Then..
 	assert.NotNil(t, output)
-	assert.Contains(t, output, "* Hello, World")
-	assert.Contains(t, output, "* Copyright contributors to the Galasa project")
+	assert.Contains(t, output, "* Hello, World Copyright")
+	assert.NotContains(t, output, "* Copyright contributors to the Galasa project")
 }
 
-func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T) {
+func TestCommentDoesNotIncludeCopyrightToBeRemovedButStartsWithClosingComment(t *testing.T) {
 	// Given..
 	var input = `
 */
@@ -220,28 +220,46 @@ func TestCommentDoesNotIncludeCopyrightButStartsWithClosingComment(t *testing.T)
  package mypackage`
 
 	// When...
-	_, err := setCopyright(input)
+	_, err := setCopyright(input, " *")
 
 	// Then..
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "closing comment marker found before the starting comment marker")
 }
 
-func TestCommentIsPresentAndIncludesCopyright(t *testing.T) {
+func TestCommentIsPresentAndIncludesCopyrightToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `
 /*
- * CCopyright(c) is found here
+ * Copyright IBM is found here
  */
  package mypackage`
 
 	// When...
-	output, _ := setCopyright(input)
+	output, _ := setCopyright(input, " *")
 
 	// Then..
 	assert.NotNil(t, output)
 	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
-	assert.NotContains(t, output, "Copyright(c) is found here")
+	assert.NotContains(t, output, "Copyright IBM is found here")
+}
+
+func TestCommentIsPresentButDoesIncludesCopyrightToBeRemovedAndHasLeadingText(t *testing.T) {
+	// Given..
+	var input = `leading text
+/*
+ * IBM is found here
+ */
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, " *")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "leading text")
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+	assert.Contains(t, output, "IBM is found here")
 }
 
 func TestCommentNeedsNoChange(t *testing.T) {
@@ -254,14 +272,29 @@ func TestCommentNeedsNoChange(t *testing.T) {
 package mypackage`
 
 	// When...
-	output, _ := setCopyright(input)
+	output, _ := setCopyright(input, " *")
 
 	// Then..
 	assert.NotNil(t, output)
 	assert.Equal(t, output, input)
 }
 
-func TestReplaceCommentAtStartOfYamlFile(t *testing.T) {
+func TestCopyrightCommentIsNotToBeRemoved(t *testing.T) {
+	// Given..
+	var input = `/*
+ * Copyright contributors to Shrek
+ */
+package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, " *")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Equal(t, output, input)
+}
+
+func TestReplaceCopyrightCommentAtStartOfYamlFile(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
 apiVersion: v1
@@ -269,13 +302,46 @@ kind: PersistentVolumeClaim
 metadata:`
 
 	// When...
-	output, _ := setCopyright(input)
+	output, _ := setCopyright(input, "#")
 
 	// Then..
 	assert.NotNil(t, output)
 	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
 	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+}
+
+func TestAddCopyrightWhereThereIsNoneInYamlFile(t *testing.T) {
+	// Given..
+	var input = `apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
+	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+}
+
+func TestCommentIsPresentButDoesIncludesCopyrightToBeRemovedAndHasLeadingTextYaml(t *testing.T) {
+	// Given..
+	var input = `leading text
+ # IBM is found here
+ 
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "leading text")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
+	assert.Contains(t, output, "IBM is found here")
 }
 
 func TestAppliesChangesToJavaFileInFolder(t *testing.T) {
@@ -334,5 +400,20 @@ func TestAppliesChangesToJavaScriptFileInFolder(t *testing.T) {
 	contents, err := fs.ReadTextFile("/my/folder/myJavaFile.js")
 	assert.Nil(t, err)
 	assert.Contains(t, contents, "Javascript source code")
+	assert.Contains(t, contents, "Copyright")
+}
+
+func TestAppliesChangesToYamlFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myYamlFile.yaml", `Yaml source code`)
+
+	err := processFolder(fs, "/my/folder/")
+
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myYamlFile.yaml")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Yaml source code")
 	assert.Contains(t, contents, "Copyright")
 }
