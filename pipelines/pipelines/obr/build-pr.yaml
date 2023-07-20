@@ -107,22 +107,7 @@ spec:
      - name: output
        workspace: git-workspace
 
-  # List the contents of the workspace.
-  - name: debug-workspace
-    taskRef:
-      name: download-dependencies
-    runAfter:
-    - maven-gpg
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value: 
-        - /bin/tree
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
+  
   # Gather all the gradle dependencies.
   # ... into the $(context.pipelineRun.name)/obr/dependency-download/build/dependencies folder.
   # For example: 
@@ -149,6 +134,22 @@ spec:
       value: 
         - getDeps
 
+
+  # List the contents of the workspace.
+  - name: debug-workspace
+    taskRef:
+      name: general-command
+    runAfter:
+    - download-dependencies
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - /bin/tree
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   - name: maven-gpg
     taskRef:
