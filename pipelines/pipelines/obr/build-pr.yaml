@@ -41,6 +41,8 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
+
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -105,6 +107,21 @@ spec:
      - name: output
        workspace: git-workspace
 
+  # List the contents of the workspace.
+  - name: debug-workspace
+    taskRef:
+      name: download-dependencies
+    runAfter:
+    - maven-gpg
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - /bin/tree
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   # Gather all the gradle dependencies.
   # ... into the $(context.pipelineRun.name)/obr/dependency-download/build/dependencies folder.
@@ -127,6 +144,7 @@ spec:
         - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/managers"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/obr/repo"
+        - "--debug"
     - name: command
       value: 
         - getDeps
@@ -309,6 +327,7 @@ spec:
       name: docker-build
     runAfter:
       - maven-build-obr
+      - get-commit
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
