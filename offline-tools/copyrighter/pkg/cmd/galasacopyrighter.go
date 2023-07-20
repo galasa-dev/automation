@@ -70,7 +70,7 @@ func processFolder(fs files.FileSystem, folderPath string) error {
 			}
 		}
 		if errorCount > 0 {
-			err = fmt.Errorf("Failure. Found %d errors.", errorCount)
+			err = fmt.Errorf("failure. Found %d errors", errorCount)
 		}
 	}
 	return err
@@ -79,15 +79,21 @@ func processFolder(fs files.FileSystem, folderPath string) error {
 func processFile(fs files.FileSystem, filePath string) error {
 
 	var err error = nil
+	var commentType string
 
 	if strings.Contains(filePath, "/.git/") {
 		// Don't process files in the .git folders...
 	} else {
 		var contents string = ""
-		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
+		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") || strings.HasSuffix(filePath, ".yaml") {
 			contents, err = fs.ReadTextFile(filePath)
+			if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
+				commentType = COMMENT_CONTINUE_JAVA
+			} else if strings.HasSuffix(filePath, ".yaml") {
+				commentType = COMMENT_BASH
+			}
 			if err == nil {
-				newContents, err := setCopyright(contents)
+				newContents, err := setCopyright(contents, commentType)
 				if err == nil {
 					fs.WriteTextFile(filePath, newContents)
 				}
@@ -97,6 +103,8 @@ func processFile(fs files.FileSystem, filePath string) error {
 			if strings.Contains(contents, "Copyright") {
 				if strings.Contains(contents, "Galasa") {
 					fmt.Printf("Tool not able to process a file which contains a Galasa copyright statement: %s\n", filePath)
+				} else if strings.Contains(contents, "IBM") {
+					fmt.Printf("Tool not able to process a file which contains a IBM copyright statement: %s\n", filePath)
 				} else {
 					fmt.Printf("Tool not able to process a file which contains a non-Galasa copyright statement: %s\n", filePath)
 				}
@@ -119,25 +127,37 @@ func addNewCopyrightAtStart(input string) string {
 	return buffer.String()
 }
 
-func setCopyright(input string) (string, error) {
+func setCopyright(input string, commentType string) (string, error) {
 	var output string = ""
 	var inputWithNoCopyright string = ""
+	var dontAddCopyright bool
 	var err error
 
-	if input[0] == '#' { //files with bash comments
-		inputWithNoCopyright = stripOutExistingCopyrightBash(input)
-		output = addNewCopyrightAtStartBash(inputWithNoCopyright)
+	firstBashComment := strings.Index(input, COMMENT_BASH)
 
-	} else { //for files which have opening and closing comments
-		inputWithNoCopyright, err = stripOutExistingCopyright(input)
+	if commentType == COMMENT_CONTINUE_JAVA { //file contains opening and closing coments
+		inputWithNoCopyright, err, dontAddCopyright = stripOutExistingCopyright(input)
+		if dontAddCopyright {
+			return input, err
+		}
 		if err == nil {
 			output = addNewCopyrightAtStart(inputWithNoCopyright)
 		}
+	} else if commentType == COMMENT_BASH { //file contains bash comments
+		if firstBashComment != -1 {
+			inputWithNoCopyright = stripOutExistingCopyrightBash(input)
+			output = addNewCopyrightAtStartBash(inputWithNoCopyright)
+		} else {
+			output = addNewCopyrightAtStartBash(input)
+		}
+
 	}
+
 	return output, err
 }
 
-func stripOutExistingCopyright(input string) (string, error) {
+func stripOutExistingCopyright(input string) (string, error, bool) {
+	var dontAddCopyright bool
 	var err error = nil
 	var output string
 	firstCommentOpener := strings.Index(input, COMMENT_START_JAVA)
@@ -169,12 +189,15 @@ func stripOutExistingCopyright(input string) (string, error) {
 
 				afterFirstCommentEnder := input[startIndexOfFollowingInput:]
 
-				//checking if the comment contains the old copyright text
 				commentToCheck := input[firstCommentOpener:startIndexOfFollowingInput]
-				if strings.Contains(commentToCheck, "Copyright") {
+				if copyrightContainsIBMOrGalasa(commentToCheck) {
 					output = beforeFirstCommentInput + afterFirstCommentEnder
+					dontAddCopyright = false
+				} else if strings.Contains(commentToCheck, "Copyright") {
+					dontAddCopyright = true
 				} else {
-					output = "\n" + beforeFirstCommentInput + "\n" + commentToCheck + afterFirstCommentEnder
+					output = beforeFirstCommentInput + "\n" + commentToCheck + afterFirstCommentEnder
+					dontAddCopyright = false
 				}
 			}
 		}
@@ -182,18 +205,29 @@ func stripOutExistingCopyright(input string) (string, error) {
 	} else {
 		output = input
 	}
-	return output, err
+	return output, err, dontAddCopyright
 }
 
 func stripOutExistingCopyrightBash(input string) string {
 	var output string
+	var currentNewLineIndex int
+	var formerNewLineIndex int
 	firstCommentBash := strings.Index(input, COMMENT_BASH)
-	firstNewLine := strings.Index(input, "\n") + 1
+	formerNewLineIndex = strings.Index(input, "\n") + 1
 
-	commentToCheck := input[firstCommentBash:firstNewLine]
+	if formerNewLineIndex < firstCommentBash {
+		currentNewLineIndex = strings.Index(input[formerNewLineIndex:], "\n")
+		currentNewLineIndex += formerNewLineIndex
+	} else {
+		currentNewLineIndex = formerNewLineIndex
+	}
 
-	if strings.Contains(commentToCheck, "Copyright") && strings.Contains(commentToCheck, "Galasa") {
-		output = input[firstNewLine:]
+	commentToCheck := input[firstCommentBash:currentNewLineIndex]
+
+	if copyrightContainsIBMOrGalasa(commentToCheck) {
+		output = input[currentNewLineIndex:]
+	} else {
+		output = input
 	}
 
 	return output
@@ -202,12 +236,23 @@ func stripOutExistingCopyrightBash(input string) string {
 func addNewCopyrightAtStartBash(input string) string {
 	var buffer = strings.Builder{}
 
-	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
 	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_CONTRIBUTORS))
 	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
-	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_LICENSE))
-	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
+	buffer.WriteString(fmt.Sprintf("%s %s\n\n", COMMENT_BASH, COPYRIGHT_LINE_LICENSE))
 	buffer.WriteString(input)
 
 	return buffer.String()
+}
+
+func copyrightContainsIBMOrGalasa(commentToCheck string) bool {
+	removeComment := false
+
+	if strings.Contains(commentToCheck, "Copyright") {
+		if strings.Contains(commentToCheck, "IBM") {
+			removeComment = true
+		} else if strings.Contains(commentToCheck, "Galasa") {
+			removeComment = true
+		}
+	}
+	return removeComment
 }
