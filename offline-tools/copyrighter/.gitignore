@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-build/
-bin/
-temp/
-=======
 **/build/
 **/bin/
 bin/
 build/
->>>>>>> origin/main
