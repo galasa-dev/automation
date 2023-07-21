@@ -474,6 +474,50 @@ package mypackage`
 
 }
 
+func TestOnlyHasCommentsAndNoneToBeRemovedYaml(t *testing.T) {
+	// Given..
+	var input = `#leading text
+
+#package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "leading text")
+	assert.Contains(t, output, "package mypackage")
+	if !strings.HasPrefix(output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`) {
+		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
+	}
+}
+
+func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
+	// Given..
+	var input = `#Copyright and IBM
+
+#package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "Copyright and IBM")
+	assert.Contains(t, output, "package mypackage")
+	if !strings.HasPrefix(output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`) {
+		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
+	}
+}
+
 func TestCopyrightCommentNeedsNoChangeYamlFile(t *testing.T) {
 	// Given..
 	var input = `#
