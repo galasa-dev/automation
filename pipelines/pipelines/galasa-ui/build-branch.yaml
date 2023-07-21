@@ -78,12 +78,35 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
+# Generate gRPC types for the webui
+  - name: generate-grpc-types
+    taskRef:
+      name: general-command
+    runAfter:
+    - npm-install-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - ./node_modules/.bin/proto-loader-gen-types
+        - src/utils/grpc/dex.proto
+        - -O
+        - src/generated/grpc
+        - --grpcLib=@grpc/grpc-js
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
 # Run the webui's unit tests
   - name: npm-test-webui
     taskRef:
       name: general-command
     runAfter:
-    - npm-install-webui
+    - generate-grpc-types
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
