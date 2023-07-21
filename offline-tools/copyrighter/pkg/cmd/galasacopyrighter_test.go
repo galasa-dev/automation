@@ -294,7 +294,7 @@ package mypackage`
 	assert.Equal(t, output, input)
 }
 
-func TestReplaceOneLineCopyrightCommentAtStartOfYamlFile(t *testing.T) {
+func TestReplaceOneLineCopyrightBashComment(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
 apiVersion: v1
@@ -309,9 +309,12 @@ metadata:`
 	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
 	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+
+	assert.Equal(t, 1, strings.Count(output, "Copyright contributors"), "Repeated")
+
 }
 
-func TestReplaceMultipleLineCopyrightCommentAtStartOfYamlFile(t *testing.T) {
+func TestReplaceMultipleLineCopyrightWithLeadingAndEndingHash(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project
@@ -327,13 +330,34 @@ metadata:`
 
 	// Then..
 	assert.NotNil(t, output)
-	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
+	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\n# Property")
 	assert.NotContains(t, output, "Property of IBM")
 	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
 }
 
-func TestReplaceMultipleLineCopyrightCommentWithoutEndingBashOfYamlFile(t *testing.T) {
+func TestReplaceSingleLineCopyrightWithLeadingAndEndingHash(t *testing.T) {
+	// Given..
+	var input = `#
+# Copyright contributors to the Galasa project
+#
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
+	assert.NotContains(t, output, "Property of IBM")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
+	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+
+}
+
+func TestReplaceMultipleLineCopyrightCommentWithoutEndingHash(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project
@@ -348,13 +372,14 @@ metadata:`
 
 	// Then..
 	assert.NotNil(t, output)
-	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
-	assert.NotContains(t, output, "Property of IBM")
+	assert.NotContains(t, output, "IBM")
+	assert.Contains(t, output, "Copyright contributors to the Galasa project")
 	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+	assert.Equal(t, 1, strings.Count(output, "Copyright contributors"), "Repeated")
 }
 
-func TestReplaceMultipleLineCopyrightCommentWithoutLeadingAndEndingBashOfYamlFile(t *testing.T) {
+func TestReplaceMultipleLineCopyrightCommentWithoutLeadingAndEndingHash(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
 # Property of IBM
@@ -372,9 +397,10 @@ metadata:`
 	assert.NotContains(t, output, "Property of IBM")
 	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+	assert.Equal(t, 1, strings.Count(output, "Copyright contributors"), "Repeated")
 }
 
-func TestReplaceCopyrightCommentAtStartOfYamlFileWithLeadingBashButNoOtherComments(t *testing.T) {
+func TestReplaceCopyrightCommentAtStartOfFileWithLeadingHashButNoOtherComments(t *testing.T) {
 	// Given..
 	var input = `#
 Copyright contributors to the Galasa project
@@ -390,6 +416,7 @@ metadata:`
 	assert.NotContains(t, output, "# Copyright contributors to the Galasa project\napiVersion:")
 	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
+	assert.Equal(t, 2, strings.Count(output, "Copyright"), "Repeated")
 }
 
 func TestAddCopyrightWhereThereIsNoneInYamlFile(t *testing.T) {
@@ -426,7 +453,7 @@ func TestDoesNotIncludeCopyrightToBeRemovedButHasLeadingTextYaml(t *testing.T) {
 }
 
 // leading text with copyright to be removed
-func TestIncludesCopyrightToBeRemovedButHasLeadingTextYaml(t *testing.T) {
+func TestIncludesCopyrightToBeRemovedButHasLeadingTextHash(t *testing.T) {
 	// Given..
 	var input = `leading text
 # Copyright IBM is found here
@@ -450,7 +477,6 @@ package mypackage`
 
 }
 
-// leading text, nno comment
 func TestAddCopyrightCommentToStartWheretThereAreNoCommentsTextYaml(t *testing.T) {
 	// Given..
 	var input = `leading text
@@ -516,6 +542,37 @@ func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
 #`) {
 		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
 	}
+}
+
+func TestSpaceAtStartOfFileWIthCopyrightBashCommentToBeRemoved(t *testing.T) {
+	// Given..
+	var input = `
+#Copyright and IBM
+
+#package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "Copyright and IBM")
+	assert.Contains(t, output, "package mypackage")
+}
+
+func TestSingleCopyrightCommentToBeRemovedWithLeadingAndClosingBash(t *testing.T) {
+	// Given..
+	var input = `#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "#\n\napiVersion")
 }
 
 func TestCopyrightCommentNeedsNoChangeYamlFile(t *testing.T) {
