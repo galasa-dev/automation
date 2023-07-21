@@ -33,7 +33,7 @@ const (
 	COMMENT_START_JAVA    = "/*"
 	COMMENT_CONTINUE_JAVA = " *"
 	COMMENT_END_JAVA      = " */"
-	COMMENT_BASH          = "#"
+	COMMENT_HASH          = "#"
 )
 
 func init() {
@@ -85,30 +85,40 @@ func processFile(fs files.FileSystem, filePath string) error {
 		// Don't process files in the .git folders...
 	} else {
 		var contents string = ""
-		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") || strings.HasSuffix(filePath, ".yaml") {
+
+		commentType = ""
+		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
+			commentType = COMMENT_CONTINUE_JAVA
+		} else if strings.HasSuffix(filePath, ".yaml") {
+			commentType = COMMENT_HASH
+		}
+
+		if commentType != "" {
 			contents, err = fs.ReadTextFile(filePath)
-			if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
-				commentType = COMMENT_CONTINUE_JAVA
-			} else if strings.HasSuffix(filePath, ".yaml") {
-				commentType = COMMENT_BASH
-			}
+
 			if err == nil {
 				newContents, err := setCopyright(contents, commentType)
+
 				if err == nil {
 					fs.WriteTextFile(filePath, newContents)
 				}
 			}
 		} else {
-			contents, err = fs.ReadTextFile(filePath)
-			if strings.Contains(contents, "Copyright") {
-				if strings.Contains(contents, "Galasa") {
-					fmt.Printf("Tool not able to process a file which contains a Galasa copyright statement: %s\n", filePath)
-				} else if strings.Contains(contents, "IBM") {
-					fmt.Printf("Tool not able to process a file which contains a IBM copyright statement: %s\n", filePath)
-				} else {
-					fmt.Printf("Tool not able to process a file which contains a non-Galasa copyright statement: %s\n", filePath)
-				}
-			}
+			err = cantProcessFile(fs, filePath)
+		}
+	}
+	return err
+}
+
+func cantProcessFile(fs files.FileSystem, filePath string) error {
+	contents, err := fs.ReadTextFile(filePath)
+	if strings.Contains(contents, "Copyright") {
+		if strings.Contains(contents, "Galasa") {
+			fmt.Printf("Tool not able to process a file which contains a Galasa copyright statement: %s\n", filePath)
+		} else if strings.Contains(contents, "IBM") {
+			fmt.Printf("Tool not able to process a file which contains a IBM copyright statement: %s\n", filePath)
+		} else {
+			fmt.Printf("Tool not able to process a file which contains a non-Galasa copyright statement: %s\n", filePath)
 		}
 	}
 	return err
@@ -133,7 +143,7 @@ func setCopyright(input string, commentType string) (string, error) {
 	var dontAddCopyright bool
 	var err error
 
-	firstBashComment := strings.Index(input, COMMENT_BASH)
+	firstHashComment := strings.Index(input, COMMENT_HASH)
 
 	if commentType == COMMENT_CONTINUE_JAVA { //file contains opening and closing coments
 		inputWithNoCopyright, err, dontAddCopyright = stripOutExistingCopyright(input)
@@ -143,16 +153,16 @@ func setCopyright(input string, commentType string) (string, error) {
 		if err == nil {
 			output = addNewCopyrightAtStart(inputWithNoCopyright)
 		}
-	} else if commentType == COMMENT_BASH { //file contains bash comments
-		if firstBashComment != -1 {
-			inputWithNoCopyright, dontAddCopyright = stripOutExistingCopyrightBash(input)
+	} else if commentType == COMMENT_HASH { //file contains hash comments
+		if firstHashComment != -1 {
+			inputWithNoCopyright, dontAddCopyright = stripOutExistingCopyrightHash(input)
 			if dontAddCopyright {
 				return input, err
 			} else {
-				output = addNewCopyrightAtStartBash(inputWithNoCopyright)
+				output = addNewCopyrightAtStartHash(inputWithNoCopyright)
 			}
 		} else {
-			output = addNewCopyrightAtStartBash(input)
+			output = addNewCopyrightAtStartHash(input)
 		}
 
 	}
@@ -205,40 +215,39 @@ func stripOutExistingCopyright(input string) (string, error, bool) {
 	return output, err, dontAddCopyright
 }
 
-func stripOutExistingCopyrightBash(input string) (string, bool) {
+func stripOutExistingCopyrightHash(input string) (string, bool) {
 	var output string
-	var firstBash int
-	var lastBash int
+	var firstHash int
+	var lastHash int
 	var newLine int
 	var commentToCheck string
 	var leadingText string
 	var dontAddCopyright = false
 
-	firstBash = strings.Index(input, COMMENT_BASH)
+	firstHash = strings.Index(input, COMMENT_HASH)
 	newLine = strings.Index(input, "\n")
 
 	//for leading texts with comments
-	if newLine < firstBash {
+	if newLine < firstHash {
 		leadingText = input[:newLine]
-		newLine += strings.Index(input[firstBash:], "\n") + 1
+		newLine += strings.Index(input[firstHash:], "\n") + 1
 	}
 
 	if input[newLine+1] != '#' { //for one line comment
-		lastBash = newLine
+		lastHash = newLine
 	} else { // for multi-line comment
-		//think about whitespace??
 		for {
 			newLine += strings.Index(input[newLine+1:], "\n") + 1
 			if input[newLine+1] == '#' {
 				//move on to find next newLine
 			} else if input[newLine+1] != '#' {
-				lastBash = newLine
+				lastHash = newLine
 				break
 			}
 		}
 	}
 
-	commentToCheck = input[firstBash:lastBash]
+	commentToCheck = input[firstHash:lastHash]
 
 	if commentNeedsNoChange(commentToCheck) {
 		dontAddCopyright = true
@@ -247,9 +256,9 @@ func stripOutExistingCopyrightBash(input string) (string, bool) {
 
 	if copyrightContainsIBMOrGalasa(commentToCheck) {
 		if leadingText != "" {
-			output = "\n" + leadingText + input[lastBash+1:]
+			output = "\n" + leadingText + input[lastHash+1:]
 		} else {
-			output = input[lastBash:]
+			output = input[lastHash:]
 		}
 	} else {
 		output = input
@@ -258,14 +267,14 @@ func stripOutExistingCopyrightBash(input string) (string, bool) {
 	return output, dontAddCopyright
 }
 
-func addNewCopyrightAtStartBash(input string) string {
+func addNewCopyrightAtStartHash(input string) string {
 	var buffer = strings.Builder{}
 
-	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
-	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_CONTRIBUTORS))
-	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
-	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_LICENSE))
-	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_HASH))
+	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_HASH, COPYRIGHT_LINE_CONTRIBUTORS))
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_HASH))
+	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_HASH, COPYRIGHT_LINE_LICENSE))
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_HASH))
 	buffer.WriteString(input)
 
 	return buffer.String()
