@@ -145,8 +145,12 @@ func setCopyright(input string, commentType string) (string, error) {
 		}
 	} else if commentType == COMMENT_BASH { //file contains bash comments
 		if firstBashComment != -1 {
-			inputWithNoCopyright = stripOutExistingCopyrightBash(input)
-			output = addNewCopyrightAtStartBash(inputWithNoCopyright)
+			inputWithNoCopyright, dontAddCopyright = stripOutExistingCopyrightBash(input)
+			if dontAddCopyright {
+				return input, err
+			} else {
+				output = addNewCopyrightAtStartBash(inputWithNoCopyright)
+			}
 		} else {
 			output = addNewCopyrightAtStartBash(input)
 		}
@@ -178,14 +182,7 @@ func stripOutExistingCopyright(input string) (string, error, bool) {
 				startIndexOfFollowingInput := firstCommentEnder + len(COMMENT_END_JAVA)
 
 				// Skip to the next newline... so that newline gets stripped also.
-				for {
-					c := input[startIndexOfFollowingInput]
-					if c == ' ' || c == '\t' || c == '\n' {
-						startIndexOfFollowingInput += 1
-					} else {
-						break
-					}
-				}
+				startIndexOfFollowingInput = findNextNoneWhiteSpaceCharacter(input, startIndexOfFollowingInput)
 
 				afterFirstCommentEnder := input[startIndexOfFollowingInput:]
 
@@ -208,51 +205,104 @@ func stripOutExistingCopyright(input string) (string, error, bool) {
 	return output, err, dontAddCopyright
 }
 
-func stripOutExistingCopyrightBash(input string) string {
+func stripOutExistingCopyrightBash(input string) (string, bool) {
 	var output string
-	var currentNewLineIndex int
-	var formerNewLineIndex int
-	firstCommentBash := strings.Index(input, COMMENT_BASH)
-	formerNewLineIndex = strings.Index(input, "\n") + 1
+	var firstBash int
+	var lastBash int
+	var newLine int
+	var commentToCheck string
+	var leadingText string
+	var dontAddCopyright = false
 
-	if formerNewLineIndex < firstCommentBash {
-		currentNewLineIndex = strings.Index(input[formerNewLineIndex:], "\n")
-		currentNewLineIndex += formerNewLineIndex
-	} else {
-		currentNewLineIndex = formerNewLineIndex
+	firstBash = strings.Index(input, COMMENT_BASH)
+	newLine = strings.Index(input, "\n")
+
+	//for leading texts with comments
+	if newLine < firstBash {
+		leadingText = input[:newLine]
+		newLine += strings.Index(input[firstBash:], "\n") + 1
 	}
 
-	commentToCheck := input[firstCommentBash:currentNewLineIndex]
+	if input[newLine+1] != '#' { //for one line comment
+		lastBash = newLine
+	} else { // for multi-line comment
+		//think about whitespace??
+		for {
+			newLine += strings.Index(input[newLine+1:], "\n") + 1
+			if input[newLine+1] == '#' {
+				//move on to find next newLine
+			} else if input[newLine+1] != '#' {
+				lastBash = newLine
+				break
+			}
+		}
+	}
+
+	commentToCheck = input[firstBash:lastBash]
+
+	if commentNeedsNoChange(commentToCheck) {
+		dontAddCopyright = true
+		return input, dontAddCopyright
+	}
 
 	if copyrightContainsIBMOrGalasa(commentToCheck) {
-		output = input[currentNewLineIndex:]
+		if leadingText != "" {
+			output = "\n" + leadingText + input[lastBash+1:]
+		} else {
+			output = input[lastBash:]
+		}
 	} else {
 		output = input
 	}
 
-	return output
+	return output, dontAddCopyright
 }
 
 func addNewCopyrightAtStartBash(input string) string {
 	var buffer = strings.Builder{}
 
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
 	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_CONTRIBUTORS))
 	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
-	buffer.WriteString(fmt.Sprintf("%s %s\n\n", COMMENT_BASH, COPYRIGHT_LINE_LICENSE))
+	buffer.WriteString(fmt.Sprintf("%s %s\n", COMMENT_BASH, COPYRIGHT_LINE_LICENSE))
+	buffer.WriteString(fmt.Sprintf("%s\n", COMMENT_BASH))
 	buffer.WriteString(input)
 
 	return buffer.String()
 }
 
 func copyrightContainsIBMOrGalasa(commentToCheck string) bool {
-	removeComment := false
+	var removeComment bool
 
-	if strings.Contains(commentToCheck, "Copyright") {
-		if strings.Contains(commentToCheck, "IBM") {
-			removeComment = true
-		} else if strings.Contains(commentToCheck, "Galasa") {
+	if strings.Contains(commentToCheck, "Property of IBM") {
+		removeComment = true
+	} else if strings.Contains(commentToCheck, "Copyright") {
+		if strings.Contains(commentToCheck, "IBM") || strings.Contains(commentToCheck, "Galasa") {
 			removeComment = true
 		}
+	} else {
+		removeComment = false
 	}
 	return removeComment
+}
+
+func findNextNoneWhiteSpaceCharacter(input string, startIndexOfFollowingInput int) int {
+	for {
+		c := input[startIndexOfFollowingInput]
+		if c == ' ' || c == '\t' || c == '\n' {
+			startIndexOfFollowingInput += 1
+		} else {
+			break
+		}
+	}
+	return startIndexOfFollowingInput
+}
+
+func commentNeedsNoChange(commentToCheck string) bool {
+	standardCopyright := `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`
+	return commentToCheck == standardCopyright
 }
