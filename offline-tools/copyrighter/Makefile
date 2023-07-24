@@ -1,6 +1,9 @@
 #
 # Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 all: tests galasacopyrighter
 
 galasacopyrighter: bin/galasacopyrighter-darwin-arm64 
