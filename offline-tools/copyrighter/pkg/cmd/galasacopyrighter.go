@@ -89,7 +89,7 @@ func processFile(fs files.FileSystem, filePath string) error {
 		commentType = ""
 		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
 			commentType = COMMENT_CONTINUE_JAVA
-		} else if strings.HasSuffix(filePath, ".yaml") {
+		} else if strings.HasSuffix(filePath, ".yaml") || strings.HasSuffix(filePath, ".sh") {
 			commentType = COMMENT_HASH
 		}
 
@@ -118,7 +118,7 @@ func cantProcessFile(fs files.FileSystem, filePath string) error {
 		} else if strings.Contains(contents, "IBM") {
 			fmt.Printf("Tool not able to process a file which contains a IBM copyright statement: %s\n", filePath)
 		} else {
-			fmt.Printf("Tool not able to process a file which contains a non-Galasa copyright statement: %s\n", filePath)
+			fmt.Printf("Tool not able to process a file which contains a non-Galasa/IBM copyright statement: %s\n", filePath)
 		}
 	}
 	return err
@@ -142,8 +142,7 @@ func setCopyright(input string, commentType string) (string, error) {
 	var inputWithNoCopyright string = ""
 	var dontAddCopyright bool
 	var err error
-
-	firstHashComment := strings.Index(input, COMMENT_HASH)
+	var newLine int
 
 	if commentType == COMMENT_CONTINUE_JAVA { //file contains opening and closing coments
 		inputWithNoCopyright, err, dontAddCopyright = stripOutExistingCopyright(input)
@@ -154,15 +153,40 @@ func setCopyright(input string, commentType string) (string, error) {
 			output = addNewCopyrightAtStart(inputWithNoCopyright)
 		}
 	} else if commentType == COMMENT_HASH { //file contains hash comments
-		if firstHashComment != -1 {
-			inputWithNoCopyright, dontAddCopyright = stripOutExistingCopyrightHash(input)
-			if dontAddCopyright {
-				return input, err
+
+		firstHash := strings.Index(input, COMMENT_HASH)
+		if firstHash != -1 {
+			newLine = strings.Index(input[firstHash:], "\n") + 1
+		}
+		//check if it's a bash script
+		firstLineOfFile := input[:newLine]
+
+		if fileIsBashScript(firstLineOfFile) {
+			newFirstHash := strings.Index(input[newLine:], COMMENT_HASH)
+
+			if newFirstHash != -1 {
+				inputWithNoCopyright, dontAddCopyright = stripOutExistingCopyrightHash(input[newLine:])
+				if dontAddCopyright {
+					return input, err
+				} else {
+					output = firstLineOfFile + "\n" + addNewCopyrightAtStartHash(inputWithNoCopyright)
+				}
 			} else {
-				output = addNewCopyrightAtStartHash(inputWithNoCopyright)
+				output = firstLineOfFile + "\n" + addNewCopyrightAtStartHash(input[newLine:])
 			}
-		} else {
-			output = addNewCopyrightAtStartHash(input)
+
+		} else { //yaml file with comments
+			if firstHash != -1 {
+				inputWithNoCopyright, dontAddCopyright = stripOutExistingCopyrightHash(input)
+				if dontAddCopyright {
+					return input, err
+				} else {
+					output = addNewCopyrightAtStartHash(inputWithNoCopyright)
+				}
+			} else {
+				output = addNewCopyrightAtStartHash(input)
+				return output, err
+			}
 		}
 
 	}
@@ -200,7 +224,7 @@ func stripOutExistingCopyright(input string) (string, error, bool) {
 				if copyrightContainsIBMOrGalasa(commentToCheck) {
 					output = beforeFirstCommentInput + afterFirstCommentEnder
 					dontAddCopyright = false
-				} else if strings.Contains(commentToCheck, "Copyright") {
+				} else if strings.Contains(commentToCheck, "Copyright") { //copyright of external party
 					dontAddCopyright = true
 				} else {
 					output = beforeFirstCommentInput + "\n" + commentToCheck + afterFirstCommentEnder
@@ -224,6 +248,7 @@ func stripOutExistingCopyrightHash(input string) (string, bool) {
 	var leadingText string
 	var dontAddCopyright = false
 
+	input = strings.TrimSpace(input)
 	firstHash = strings.Index(input, COMMENT_HASH)
 	newLine = strings.Index(input, "\n")
 
@@ -251,17 +276,20 @@ func stripOutExistingCopyrightHash(input string) (string, bool) {
 
 	if commentNeedsNoChange(commentToCheck) {
 		dontAddCopyright = true
-		return input, dontAddCopyright
-	}
-
-	if copyrightContainsIBMOrGalasa(commentToCheck) {
-		if leadingText != "" {
-			output = "\n" + leadingText + input[lastHash+1:]
-		} else {
-			output = input[lastHash:]
-		}
-	} else {
 		output = input
+	} else {
+		if copyrightContainsIBMOrGalasa(commentToCheck) {
+			if leadingText != "" {
+				output = "\n" + leadingText + input[lastHash+1:]
+			} else {
+				output = input[lastHash:]
+			}
+		} else if strings.Contains(commentToCheck, "Copyright") { //copyright of external party
+			dontAddCopyright = true
+			output = input
+		} else {
+			output = input
+		}
 	}
 
 	return output, dontAddCopyright
@@ -314,4 +342,9 @@ func commentNeedsNoChange(commentToCheck string) bool {
 # SPDX-License-Identifier: EPL-2.0
 #`
 	return commentToCheck == standardCopyright
+}
+
+func fileIsBashScript(firstLineToCheck string) bool {
+	firstLineToCheck = strings.TrimSpace(firstLineToCheck)
+	return strings.HasPrefix(firstLineToCheck, "#!")
 }
