@@ -282,7 +282,7 @@ package mypackage`
 func TestCopyrightCommentIsNotToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright contributors to Shrek
+ * Copyright contributions of Shrek
  */
 package mypackage`
 
@@ -294,7 +294,7 @@ package mypackage`
 	assert.Equal(t, output, input)
 }
 
-func TestReplaceOneLineCopyrightBashComment(t *testing.T) {
+func TestReplaceOneLineCopyrightHashCommentYaml(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
 apiVersion: v1
@@ -314,7 +314,7 @@ metadata:`
 
 }
 
-func TestReplaceMultipleLineCopyrightWithLeadingAndEndingHash(t *testing.T) {
+func TestReplaceMultipleLineCopyrightWithLeadingAndEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project
@@ -336,7 +336,7 @@ metadata:`
 	assert.Contains(t, output, "apiVersion: v1\nkind: PersistentVolumeClaim")
 }
 
-func TestReplaceSingleLineCopyrightWithLeadingAndEndingHash(t *testing.T) {
+func TestReplaceSingleLineCopyrightWithLeadingAndEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project
@@ -357,7 +357,7 @@ metadata:`
 
 }
 
-func TestReplaceMultipleLineCopyrightCommentWithoutEndingHash(t *testing.T) {
+func TestReplaceMultipleLineCopyrightCommentWithoutEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project
@@ -379,7 +379,7 @@ metadata:`
 	assert.Equal(t, 1, strings.Count(output, "Copyright contributors"), "Repeated")
 }
 
-func TestReplaceMultipleLineCopyrightCommentWithoutLeadingAndEndingHash(t *testing.T) {
+func TestReplaceMultipleLineCopyrightCommentWithoutLeadingAndEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
 # Property of IBM
@@ -400,7 +400,7 @@ metadata:`
 	assert.Equal(t, 1, strings.Count(output, "Copyright contributors"), "Repeated")
 }
 
-func TestReplaceCopyrightCommentAtStartOfFileWithLeadingHashButNoOtherComments(t *testing.T) {
+func TestReplaceCopyrightCommentAtStartOfFileWithLeadingHashButNoOtherCommentsYaml(t *testing.T) {
 	// Given..
 	var input = `#
 Copyright contributors to the Galasa project
@@ -453,7 +453,7 @@ func TestDoesNotIncludeCopyrightToBeRemovedButHasLeadingTextYaml(t *testing.T) {
 }
 
 // leading text with copyright to be removed
-func TestIncludesCopyrightToBeRemovedButHasLeadingTextHash(t *testing.T) {
+func TestIncludesCopyrightToBeRemovedButHasLeadingTextHashYaml(t *testing.T) {
 	// Given..
 	var input = `leading text
 # Copyright IBM is found here
@@ -544,7 +544,7 @@ func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
 	}
 }
 
-func TestSpaceAtStartOfFileWIthCopyrightBashCommentToBeRemoved(t *testing.T) {
+func TestSpaceAtStartOfFileWIthCopyrightHashCommentToBeRemovedYaml(t *testing.T) {
 	// Given..
 	var input = `
 #Copyright and IBM
@@ -560,7 +560,7 @@ func TestSpaceAtStartOfFileWIthCopyrightBashCommentToBeRemoved(t *testing.T) {
 	assert.Contains(t, output, "package mypackage")
 }
 
-func TestSingleCopyrightCommentToBeRemovedWithLeadingAndClosingBash(t *testing.T) {
+func TestSingleCopyrightCommentToBeRemovedWithLeadingAndClosingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project 
@@ -575,7 +575,22 @@ apiVersion: apps/v1`
 	assert.Contains(t, output, "#\n\napiVersion")
 }
 
-func TestCopyrightCommentNeedsNoChangeYamlFile(t *testing.T) {
+func TestCopyrightCommentIsNotToBeRemovedYaml(t *testing.T) {
+	// Given..
+	var input = `#
+# Copyright contributions of Shrek
+#
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Equal(t, output, input)
+}
+
+func TestCopyrightCommentNeedsNoChangeYaml(t *testing.T) {
 	// Given..
 	var input = `#
 # Copyright contributors to the Galasa project
@@ -595,6 +610,215 @@ bundles:
 # Manager
 #
 	`
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Equal(t, output, input)
+}
+
+func TestAddCopyrightWhenNoOtherCommentIsPresentBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestCommentIsPresentButDoesNotContainCopyrightBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+
+#what is this info here?
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "#what is this info here?")
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestReplaceCopyrightBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+
+#Copyright of IBM
+#and Galasa
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestReplaceCopyrightCommentBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+#Copyright of IBM
+#and Galasa
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestReplaceCopyrightWithMultipleNewLinesBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash 
+
+
+#Copyright of IBM
+#and Galasa
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestReplaceCopyrightWithLeadingHashBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+#
+#Copyright of IBM
+#and Galasa
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestCommentDoesNotContainCopyrightAndHasLeadingTextBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+
+hello world!
+#what copyright info is this?
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "#what copyright info is this?")
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestNoCopyrightChangeNeededBashScript(t *testing.T) {
+	// Given..
+	var input = `#!/usr/bin/env bash
+
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: apps/v1`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#!/usr/bin/env bash`) {
+		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
+	}
+	assert.Contains(t, output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`)
+	assert.Contains(t, output, "apiVersion: apps/v1")
+}
+
+func TestCopyrightCommentIsNotToBeRemovedBashScript(t *testing.T) {
+	// Given..
+	var input = `#! /usr/bin/env bash
+# Copyright contributions of Shrek
+#
+apiVersion: apps/v1`
+
 	// When...
 	output, _ := setCopyright(input, "#")
 
@@ -674,5 +898,20 @@ func TestAppliesChangesToYamlFileInFolder(t *testing.T) {
 	contents, err := fs.ReadTextFile("/my/folder/myYamlFile.yaml")
 	assert.Nil(t, err)
 	assert.Contains(t, contents, "Yaml source code")
+	assert.Contains(t, contents, "Copyright")
+}
+
+func TestAppliesChangesToBashScriptFileInFolder(t *testing.T) {
+	fs := files.NewMockFileSystem()
+	fs.MkdirAll("/my/folder/")
+	fs.WriteTextFile("/my/folder/myBashFile.sh", `Bash source code`)
+
+	err := processFolder(fs, "/my/folder/")
+
+	assert.Nil(t, err)
+
+	contents, err := fs.ReadTextFile("/my/folder/myBashFile.sh")
+	assert.Nil(t, err)
+	assert.Contains(t, contents, "Bash source code")
 	assert.Contains(t, contents, "Copyright")
 }
