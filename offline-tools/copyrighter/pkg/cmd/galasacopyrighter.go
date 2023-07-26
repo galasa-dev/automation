@@ -77,7 +77,6 @@ func processFolder(fs files.FileSystem, folderPath string) error {
 }
 
 func processFile(fs files.FileSystem, filePath string) error {
-
 	var err error = nil
 	var commentType string
 
@@ -87,7 +86,7 @@ func processFile(fs files.FileSystem, filePath string) error {
 		var contents string = ""
 
 		commentType = ""
-		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") {
+		if strings.HasSuffix(filePath, ".java") || strings.HasSuffix(filePath, ".go") || strings.HasSuffix(filePath, ".js") || strings.HasSuffix(filePath, ".scss") || strings.HasSuffix(filePath, ".ts") || strings.HasSuffix(filePath, ".tsx") {
 			commentType = COMMENT_CONTINUE_JAVA
 		} else if strings.HasSuffix(filePath, ".yaml") || strings.HasSuffix(filePath, ".sh") {
 			commentType = COMMENT_HASH
@@ -252,10 +251,10 @@ func stripOutExistingCopyrightHash(input string) (string, bool) {
 	firstHash = strings.Index(input, COMMENT_HASH)
 	newLine = strings.Index(input, "\n")
 
-	//for leading texts with comments
-	if newLine < firstHash {
+	//for leading texts
+	for newLine < firstHash {
 		leadingText = input[:newLine]
-		newLine += strings.Index(input[firstHash:], "\n") + 1
+		newLine += strings.Index(input[firstHash:], "\n")
 	}
 
 	if input[newLine+1] != '#' { //for one line comment
@@ -337,10 +336,10 @@ func findNextNoneWhiteSpaceCharacter(input string, startIndexOfFollowingInput in
 
 func commentNeedsNoChange(commentToCheck string) bool {
 	standardCopyright := `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`
 	return commentToCheck == standardCopyright
 }
 
