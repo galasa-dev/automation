@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: Build all the code in github release/prerelease branches.
