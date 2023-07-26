@@ -15,10 +15,10 @@ import (
 
 func TestCanAddCopyrightWhenNoneExistsAlready(t *testing.T) {
 	var input = `package mypackage
-	class AClass {
-		// Does nothing.
-	}
-	`
+	 class AClass {
+		 // Does nothing.
+	 }
+	 `
 
 	output, err := setCopyright(input, " *")
 
@@ -26,10 +26,10 @@ func TestCanAddCopyrightWhenNoneExistsAlready(t *testing.T) {
 	assert.Nil(t, err)
 
 	if !strings.HasPrefix(output, `/*
- * Copyright contributors to the Galasa project
- *
- * SPDX-License-Identifier: EPL-2.0
- */`) {
+  * Copyright contributors to the Galasa project
+  *
+  * SPDX-License-Identifier: EPL-2.0
+  */`) {
 		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
 	}
 }
@@ -37,10 +37,10 @@ func TestCanAddCopyrightWhenNoneExistsAlready(t *testing.T) {
 func TestCopyrightAddedToOriginalContent(t *testing.T) {
 	// Given..
 	var input = `package mypackage
-	class AClass {
-		// Does nothing.
-	}
-	`
+	 class AClass {
+		 // Does nothing.
+	 }
+	 `
 
 	// When...
 	output, err := setCopyright(input, " *")
@@ -56,15 +56,15 @@ func TestCopyrightAddedToOriginalContent(t *testing.T) {
 func TestCopyrightNotAddedWhenPresentAlready(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright contributors to the Galasa project
- *
- * SPDX-License-Identifier: EPL-2.0
- */
-package mypackage
-class AClass {
-	// Does nothing.
-}
-`
+  * Copyright contributors to the Galasa project
+  *
+  * SPDX-License-Identifier: EPL-2.0
+  */
+ package mypackage
+ class AClass {
+	 // Does nothing.
+ }
+ `
 
 	// When...
 	output, err := setCopyright(input, " *")
@@ -83,10 +83,10 @@ class AClass {
 func TestCopyrightWhereNoneExistsAddedToStartOfFile(t *testing.T) {
 	// Given..
 	var input = `package mypackage
-	class AClass {
-		// Does nothing.
-	}
-	`
+	 class AClass {
+		 // Does nothing.
+	 }
+	 `
 
 	// When...
 	output, err := setCopyright(input, " *")
@@ -99,10 +99,10 @@ func TestCopyrightWhereNoneExistsAddedToStartOfFile(t *testing.T) {
 func TestCanStripOutFirstCommentAndTrailingWhiteSpace(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright line here IBM
- *
- * SPDX-License-Identifier: EPL-2.0
- */       ` + "\t" + "\n" + "package mypackage"
+  * Copyright line here IBM
+  *
+  * SPDX-License-Identifier: EPL-2.0
+  */       ` + "\t" + "\n" + "package mypackage"
 
 	// When...
 	output, err, _ := stripOutExistingCopyright(input)
@@ -130,9 +130,9 @@ func TestCanStripOutFirstCommentWhenThereIsNoComment(t *testing.T) {
 func TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright in Galasa file
- */
- package mypackage`
+  * Copyright in Galasa file
+  */
+  package mypackage`
 
 	// When...
 	output, err, _ := stripOutExistingCopyright(input)
@@ -147,10 +147,10 @@ func TestCanStripOutFirstCommentMostCommonExistingCopyrightStatement(t *testing.
 func TestCanStripOutFirstCommentLeadingTextShouldBePreserved(t *testing.T) {
 	// Given..
 	var input = `leading text here
-/*
- * Copyright contributors to the Galasa project
- */
- package mypackage`
+ /*
+  * Copyright contributors to the Galasa project
+  */
+  package mypackage`
 
 	// When...
 	output, err, _ := stripOutExistingCopyright(input)
@@ -164,10 +164,10 @@ func TestCanStripOutFirstCommentLeadingTextShouldBePreserved(t *testing.T) {
 func TestStrippingOutFirstCommentWithNoClosingTagFailsWithError(t *testing.T) {
 	// Given..
 	var input = `
-/*
- * Copyright is Galasa found here
-
- package mypackage`
+ /*
+  * Copyright is Galasa found here
+ 
+  package mypackage`
 
 	// When...
 	_, err, _ := stripOutExistingCopyright(input)
@@ -180,10 +180,10 @@ func TestStrippingOutFirstCommentWithNoClosingTagFailsWithError(t *testing.T) {
 func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 	// Given..
 	var input = `
-*/
- * Copyright contributors to the Galasa project
- /*
- package mypackage`
+ */
+  * Copyright contributors to the Galasa project
+  /*
+  package mypackage`
 
 	// When...
 	_, err, _ := stripOutExistingCopyright(input)
@@ -196,10 +196,10 @@ func TestClosingCommentIsBeforeOpeningCommentFailsWithError(t *testing.T) {
 func TestCommentIsPresentButDoesNotIncludeCopyrightToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `
-/*
- * Hello, World Copyright
- */
- package mypackage`
+ /*
+  * Hello, World Copyright
+  */
+  package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, " *")
@@ -213,10 +213,10 @@ func TestCommentIsPresentButDoesNotIncludeCopyrightToBeRemoved(t *testing.T) {
 func TestCommentDoesNotIncludeCopyrightToBeRemovedButStartsWithClosingComment(t *testing.T) {
 	// Given..
 	var input = `
-*/
- * Hello, World
- /*
- package mypackage`
+ */
+  * Hello, World
+  /*
+  package mypackage`
 
 	// When...
 	_, err := setCopyright(input, " *")
@@ -229,10 +229,10 @@ func TestCommentDoesNotIncludeCopyrightToBeRemovedButStartsWithClosingComment(t 
 func TestCommentIsPresentAndIncludesCopyrightToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `
-/*
- * Copyright IBM is found here
- */
- package mypackage`
+ /*
+  * Copyright IBM is found here
+  */
+  package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, " *")
@@ -246,10 +246,10 @@ func TestCommentIsPresentAndIncludesCopyrightToBeRemoved(t *testing.T) {
 func TestCommentIsPresentButDoesIncludesCopyrightToBeRemovedAndHasLeadingText(t *testing.T) {
 	// Given..
 	var input = `leading text
-/*
- * IBM is found here
- */
- package mypackage`
+ /*
+  * IBM is found here
+  */
+  package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, " *")
@@ -264,11 +264,11 @@ func TestCommentIsPresentButDoesIncludesCopyrightToBeRemovedAndHasLeadingText(t 
 func TestCommentNeedsNoChange(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright contributors to the Galasa project
- *
- * SPDX-License-Identifier: EPL-2.0
- */
-package mypackage`
+  * Copyright contributors to the Galasa project
+  *
+  * SPDX-License-Identifier: EPL-2.0
+  */
+ package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, " *")
@@ -278,12 +278,26 @@ package mypackage`
 	assert.Equal(t, output, input)
 }
 
+func TestReplaceOneLineCopyrightCommentSCSS_TS_TSXFile(t *testing.T) {
+	// Given..
+	var input = `/*Copyright contributiors of Galasa*/
+ package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, " *")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "/*Copyright contributiors of Galasa*/")
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
 func TestCopyrightCommentIsNotToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `/*
- * Copyright contributions of Shrek
- */
-package mypackage`
+  * Copyright contributions of Shrek
+  */
+ package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, " *")
@@ -296,9 +310,9 @@ package mypackage`
 func TestReplaceOneLineCopyrightHashCommentYaml(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -316,13 +330,13 @@ metadata:`
 func TestReplaceMultipleLineCopyrightWithLeadingAndEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
-# Copyright contributors to the Galasa project
-# Property of IBM
-#
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ # Copyright contributors to the Galasa project
+ # Property of IBM
+ #
+ 
+ apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -338,11 +352,11 @@ metadata:`
 func TestReplaceSingleLineCopyrightWithLeadingAndEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
-# Copyright contributors to the Galasa project
-#
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ # Copyright contributors to the Galasa project
+ #
+ apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -359,12 +373,12 @@ metadata:`
 func TestReplaceMultipleLineCopyrightCommentWithoutEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
-# Copyright contributors to the Galasa project
-# Property of IBM
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ # Copyright contributors to the Galasa project
+ # Property of IBM
+ 
+ apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -381,11 +395,11 @@ metadata:`
 func TestReplaceMultipleLineCopyrightCommentWithoutLeadingAndEndingHashYaml(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
-# Property of IBM
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ # Property of IBM
+ 
+ apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -402,10 +416,10 @@ metadata:`
 func TestReplaceCopyrightCommentAtStartOfFileWithLeadingHashButNoOtherCommentsYaml(t *testing.T) {
 	// Given..
 	var input = `#
-Copyright contributors to the Galasa project
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ Copyright contributors to the Galasa project
+ apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -421,8 +435,8 @@ metadata:`
 func TestAddCopyrightWhereThereIsNoneInYamlFile(t *testing.T) {
 	// Given..
 	var input = `apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:`
+ kind: PersistentVolumeClaim
+ metadata:`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -437,9 +451,9 @@ metadata:`
 func TestDoesNotIncludeCopyrightToBeRemovedButHasLeadingTextYaml(t *testing.T) {
 	// Given..
 	var input = `leading text
- # IBM is found here
-
- package mypackage`
+  # IBM is found here
+ 
+  package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -451,13 +465,12 @@ func TestDoesNotIncludeCopyrightToBeRemovedButHasLeadingTextYaml(t *testing.T) {
 	assert.Contains(t, output, "IBM is found here")
 }
 
-// leading text with copyright to be removed
 func TestIncludesCopyrightToBeRemovedButHasLeadingTextHashYaml(t *testing.T) {
 	// Given..
 	var input = `leading text
-# Copyright IBM is found here
-
-package mypackage`
+ # Copyright IBM is found here
+ 
+ package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -467,10 +480,10 @@ package mypackage`
 	assert.Contains(t, output, "leading text")
 	assert.NotContains(t, output, "IBM is found here Copyright")
 	if !strings.HasPrefix(output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`) {
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`) {
 		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
 	}
 
@@ -479,8 +492,8 @@ package mypackage`
 func TestAddCopyrightCommentToStartWheretThereAreNoCommentsTextYaml(t *testing.T) {
 	// Given..
 	var input = `leading text
-
-package mypackage`
+ 
+ package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -490,10 +503,10 @@ package mypackage`
 	assert.Contains(t, output, "leading text")
 	assert.NotContains(t, output, "IBM is found here Copyright")
 	if !strings.HasPrefix(output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`) {
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`) {
 		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
 	}
 
@@ -502,8 +515,8 @@ package mypackage`
 func TestOnlyHasCommentsAndNoneToBeRemovedYaml(t *testing.T) {
 	// Given..
 	var input = `#leading text
-
-#package mypackage`
+ 
+ #package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -513,10 +526,10 @@ func TestOnlyHasCommentsAndNoneToBeRemovedYaml(t *testing.T) {
 	assert.Contains(t, output, "leading text")
 	assert.Contains(t, output, "package mypackage")
 	if !strings.HasPrefix(output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`) {
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`) {
 		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
 	}
 }
@@ -524,8 +537,8 @@ func TestOnlyHasCommentsAndNoneToBeRemovedYaml(t *testing.T) {
 func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
 	// Given..
 	var input = `#Copyright and IBM
-
-#package mypackage`
+ 
+ #package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -535,10 +548,10 @@ func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
 	assert.NotContains(t, output, "Copyright and IBM")
 	assert.Contains(t, output, "package mypackage")
 	if !strings.HasPrefix(output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`) {
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`) {
 		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
 	}
 }
@@ -546,9 +559,9 @@ func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
 func TestSpaceAtStartOfFileWIthCopyrightHashCommentToBeRemovedYaml(t *testing.T) {
 	// Given..
 	var input = `
-#Copyright and IBM
-
-#package mypackage`
+ #Copyright and IBM
+ 
+ #package mypackage`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -562,9 +575,9 @@ func TestSpaceAtStartOfFileWIthCopyrightHashCommentToBeRemovedYaml(t *testing.T)
 func TestSingleCopyrightCommentToBeRemovedWithLeadingAndClosingHashYaml(t *testing.T) {
 	// Given..
 	var input = `#
-# Copyright contributors to the Galasa project 
-#
-apiVersion: apps/v1`
+ # Copyright contributors to the Galasa project 
+ #
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -577,9 +590,9 @@ apiVersion: apps/v1`
 func TestCopyrightCommentIsNotToBeRemovedYaml(t *testing.T) {
 	// Given..
 	var input = `#
-# Copyright contributions of Shrek
-#
-apiVersion: apps/v1`
+ # Copyright contributions of Shrek
+ #
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -592,23 +605,23 @@ apiVersion: apps/v1`
 func TestCopyrightCommentNeedsNoChangeYaml(t *testing.T) {
 	// Given..
 	var input = `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#
-
-apiVersion: galasa.dev/v1alpha
-kind: Release
-metadata:
-name: galasa-release
-
-managers:
-bundles:
-
-#
-# Manager
-#
-	`
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #
+ 
+ apiVersion: galasa.dev/v1alpha
+ kind: Release
+ metadata:
+ name: galasa-release
+ 
+ managers:
+ bundles:
+ 
+ #
+ # Manager
+ #
+	 `
 	// When...
 	output, _ := setCopyright(input, "#")
 
@@ -617,11 +630,113 @@ bundles:
 	assert.Equal(t, output, input)
 }
 
+func TestAddCopyrightWhenNoOtherCommentIsPresentYaml(t *testing.T) {
+	// Given..
+	var input = `apiVersion: v1
+ kind: PersistentVolumeClaim
+ metadata:
+ name: galasa-build-source-pvc
+ namespace: tekton
+	 spec:
+	 apiVersion: v1
+	 kind: PersistentVolumeClaim
+	 metadata:
+	   name: galasa-build-source-pvc
+	   namespace: tekton
+	 spec:`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`) {
+		assert.Fail(t, "Copyright statement is absent", output)
+	}
+	assert.Contains(t, output, "apiVersion: v1\nkind")
+}
+
+func TestAddCopyrightWhereThereAreMultipleNonCopyrightHashCommentInFileYaml(t *testing.T) {
+	// Given..
+	var input = `apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: argocd-cm
+   namespace: argocd
+   labels:
+	 app.kubernetes.io/name: argocd-cm
+	 app.kubernetes.io/part-of: argocd
+ data:
+	 url: https://argocd.galasa.dev
+ #
+ #
+ #
+   accounts.galasa: "apiKey,login"
+   accounts.galasa.enabled: "true"
+ #
+ #
+ #`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`) {
+		assert.Fail(t, "Copyright statement is absent", output)
+	}
+	assert.Contains(t, output, `data:
+	 url: https://argocd.galasa.dev
+ #
+ #
+ #`)
+	assert.Contains(t, output, "apiVersion: v1\nkind")
+}
+
+func TestAddCopyrightWhenCommentNotToBeReplacedYaml(t *testing.T) {
+	// Given..
+	var input = `#!/bin/bash
+ 
+ #--------------------------------------------------------------------------
+ #
+ # Objective: Set environment variables for external ecosystem services
+ #
+ #--------------------------------------------------------------------------
+ 
+ #
+ # Functions`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, "#!/bin/bash") {
+		assert.Fail(t, "Copyright statement is absent", output)
+	}
+	assert.Contains(t, output, `#
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
+	assert.Contains(t, output, `#--------------------------------------------------------------------------
+ #`)
+	println(output)
+}
+
 func TestAddCopyrightWhenNoOtherCommentIsPresentBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-
-apiVersion: apps/v1`
+ 
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -632,19 +747,19 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
 
 func TestCommentIsPresentButDoesNotContainCopyrightBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-
-#what is this info here?
-apiVersion: apps/v1`
+ 
+ #what is this info here?
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -655,10 +770,10 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "#what is this info here?")
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
@@ -666,10 +781,10 @@ apiVersion: apps/v1`
 func TestReplaceCopyrightBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-
-#Copyright of IBM
-#and Galasa
-apiVersion: apps/v1`
+ 
+ #Copyright of IBM
+ #and Galasa
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -680,19 +795,19 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
 
 func TestReplaceCopyrightCommentBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-#Copyright of IBM
-#and Galasa
-apiVersion: apps/v1`
+ #Copyright of IBM
+ #and Galasa
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -703,21 +818,21 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
 
 func TestReplaceCopyrightWithMultipleNewLinesBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash 
-
-
-#Copyright of IBM
-#and Galasa
-apiVersion: apps/v1`
+ 
+ 
+ #Copyright of IBM
+ #and Galasa
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -728,20 +843,20 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
 
 func TestReplaceCopyrightWithLeadingHashBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-#
-#Copyright of IBM
-#and Galasa
-apiVersion: apps/v1`
+ #
+ #Copyright of IBM
+ #and Galasa
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -752,20 +867,20 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
 
 func TestCommentDoesNotContainCopyrightAndHasLeadingTextBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-
-hello world!
-#what copyright info is this?
-apiVersion: apps/v1`
+ 
+ hello world!
+ #what copyright info is this?
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -776,10 +891,10 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "#what copyright info is this?")
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
@@ -787,13 +902,13 @@ apiVersion: apps/v1`
 func TestNoCopyrightChangeNeededBashScript(t *testing.T) {
 	// Given..
 	var input = `#!/usr/bin/env bash
-
-#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#
-apiVersion: apps/v1`
+ 
+ #
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
@@ -804,19 +919,19 @@ apiVersion: apps/v1`
 		assert.Fail(t, "Bash Script must start with '#!/usr/bin/env bash'. output:\n%s", output)
 	}
 	assert.Contains(t, output, `#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#`)
+ # Copyright contributors to the Galasa project
+ #
+ # SPDX-License-Identifier: EPL-2.0
+ #`)
 	assert.Contains(t, output, "apiVersion: apps/v1")
 }
 
 func TestCopyrightCommentIsNotToBeRemovedBashScript(t *testing.T) {
 	// Given..
 	var input = `#! /usr/bin/env bash
-# Copyright contributions of Shrek
-#
-apiVersion: apps/v1`
+ # Copyright contributions of Shrek
+ #
+ apiVersion: apps/v1`
 
 	// When...
 	output, _ := setCopyright(input, "#")
