@@ -4,10 +4,19 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     app: javadoc-site
+#   name: javadoc-site
+#   namespace: galasa-development
+# spec:
+#   ports:
+#     - port: 80
+#   selector:
+#     app: javadoc-site
 
-#
-# Copyright contributors to the Galasa project 
-# 
 {{ if .Values.javadocsite.deploy }}
 apiVersion: v1
 kind: Service
