@@ -1,8 +1,11 @@
 #! /usr/bin/env bash
 
-#-----------------------------------------------------------------------------------------
-# Objective: Run regression tests from a given branch in a given repo.
-#-----------------------------------------------------------------------------------------
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
 cd "${BASEDIR}/.."
 WORKSPACE_DIR=$(pwd)

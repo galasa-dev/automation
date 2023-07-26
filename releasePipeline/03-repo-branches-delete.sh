@@ -1,12 +1,11 @@
 #! /usr/bin/env bash 
 
-#-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Deletes all the release-type branches in each github repo
+# Copyright contributors to the Galasa project
 #
-# Environment variable over-rides:
-# 
-#-----------------------------------------------------------------------------------------                   
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 # Where is this script executing from ?
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null ;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
@@ -182,5 +181,3 @@ EOF
 ask_user_for_release_type
 set_kubernetes_context
 delete_branches
-
-

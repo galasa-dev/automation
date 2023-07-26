@@ -278,6 +278,20 @@ package mypackage`
 	assert.Equal(t, output, input)
 }
 
+func TestReplaceOneLineCopyrightCommentSCSS_TS_TSXFile(t *testing.T) {
+	// Given..
+	var input = `/*Copyright contributiors of Galasa*/
+package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, " *")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "/*Copyright contributiors of Galasa*/")
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
 func TestCopyrightCommentIsNotToBeRemoved(t *testing.T) {
 	// Given..
 	var input = `/*
@@ -451,7 +465,6 @@ func TestDoesNotIncludeCopyrightToBeRemovedButHasLeadingTextYaml(t *testing.T) {
 	assert.Contains(t, output, "IBM is found here")
 }
 
-// leading text with copyright to be removed
 func TestIncludesCopyrightToBeRemovedButHasLeadingTextHashYaml(t *testing.T) {
 	// Given..
 	var input = `leading text
@@ -615,6 +628,77 @@ bundles:
 	// Then..
 	assert.NotNil(t, output)
 	assert.Equal(t, output, input)
+}
+
+func TestAddCopyrightWhenNoOtherCommentIsPresentYaml(t *testing.T) {
+	// Given..
+	var input = `apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+name: galasa-build-source-pvc
+namespace: tekton
+	spec:
+	apiVersion: v1
+	kind: PersistentVolumeClaim
+	metadata:
+	  name: galasa-build-source-pvc
+	  namespace: tekton
+	spec:`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`) {
+		assert.Fail(t, "Copyright statement is absent", output)
+	}
+	assert.Contains(t, output, "apiVersion: v1\nkind")
+}
+
+func TestAddCopyrightWhereThereAreMultipleNonCopyrightHashCommentInFileYaml(t *testing.T) {
+	// Given..
+	var input = `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+	url: https://argocd.galasa.dev
+#
+#
+#
+  accounts.galasa: "apiKey,login"
+  accounts.galasa.enabled: "true"
+#
+#
+#`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	if !strings.HasPrefix(output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`) {
+		assert.Fail(t, "Copyright statement is absent", output)
+	}
+	assert.Contains(t, output, `data:
+	url: https://argocd.galasa.dev
+#
+#
+#`)
+	assert.Contains(t, output, "apiVersion: v1\nkind")
 }
 
 func TestAddCopyrightWhenNoOtherCommentIsPresentBashScript(t *testing.T) {

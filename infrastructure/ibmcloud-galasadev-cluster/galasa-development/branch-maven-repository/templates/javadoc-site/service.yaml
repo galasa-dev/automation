@@ -1,18 +1,9 @@
-# #
-# # Copyright contributors to the Galasa project 
-# # 
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   labels:
-#     app: javadoc-site
-#   name: javadoc-site
-#   namespace: galasa-development
-# spec:
-#   ports:
-#     - port: 80
-#   selector:
-#     app: javadoc-site
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 #
 # Copyright contributors to the Galasa project 
@@ -30,4 +21,4 @@ spec:
     - port: 80
   selector:
     app: javadocsite-{{ .Values.javadocsite.branch }}
-{{ end }}    
+{{ end }}

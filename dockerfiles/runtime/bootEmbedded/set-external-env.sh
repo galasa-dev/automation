@@ -1,10 +1,11 @@
 #!/bin/bash
 
-#--------------------------------------------------------------------------
 #
-# Objective: Set environment variables for external ecosystem services
+# Copyright contributors to the Galasa project
 #
-#--------------------------------------------------------------------------
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 #
 # Functions

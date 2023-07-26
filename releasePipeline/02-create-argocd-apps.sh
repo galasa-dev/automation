@@ -1,12 +1,11 @@
 #!/bin/bash
 
-#-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Creates an argocd application which does some mysterious things... what ?
+# Copyright contributors to the Galasa project
 #
-# Environment variable over-rides:
-# 
-#-----------------------------------------------------------------------------------------                   
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 
 function ask_user_for_release_type {
@@ -96,6 +95,4 @@ argocd app create ${release_type}-cli \
                   --dest-server https://kubernetes.default.svc \
                   --dest-namespace galasa-development \
                   --helm-set branch=${release_type} \
-                  --helm-set imageTag=${release_type}      
-
-             
+                  --helm-set imageTag=${release_type}

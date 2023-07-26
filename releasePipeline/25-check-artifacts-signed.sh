@@ -1,12 +1,11 @@
 #! /usr/bin/env bash 
 
-#-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Check that the built artifacts are all signed.
+# Copyright contributors to the Galasa project
 #
-# Environment variable over-rides:
-# 
-#-----------------------------------------------------------------------------------------                   
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 # Where is this script executing from ?
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null ;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
@@ -162,4 +161,3 @@ for github_repo_name in ${repo_list[@]}; do
 done
 
 success "All checks done and passed."
-

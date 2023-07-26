@@ -1,12 +1,11 @@
 #! /usr/bin/env bash 
 
-#-----------------------------------------------------------------------------------------                   
 #
-# Objectives: To create the resources image.
+# Copyright contributors to the Galasa project
 #
-# Environment variable over-rides:
-# None.
-#-----------------------------------------------------------------------------------------                   
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 # Where is this script executing from ?
 BASEDIR=$(dirname "$0");pushd $BASEDIR 2>&1 >> /dev/null ;BASEDIR=$(pwd);popd 2>&1 >> /dev/null
@@ -163,4 +162,3 @@ get_galasa_version_to_be_released
 create_resources_image
 
 note "Now wait for the 'resources-*' pipeline to complete."
-
