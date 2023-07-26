@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: To tag all the repositories in github.
@@ -164,4 +169,3 @@ tag_galasa_github_repositories
 note "Now wait for the 'tag-galasa-*' pipeline to complete."
 note "Expect it to take about a minute."
 note "Check that it passed"
-

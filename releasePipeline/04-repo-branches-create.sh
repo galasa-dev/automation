@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: Creates a new branch to use in each repo.
@@ -189,5 +194,3 @@ EOF
 ask_user_for_release_type
 set_kubernetes_context
 create_branches
-
-
