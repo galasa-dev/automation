@@ -1,6 +1,9 @@
-# #
-# # Copyright contributors to the Galasa project 
-# # 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 # apiVersion: apps/v1
 # kind: Deployment
 # metadata:
@@ -30,9 +33,6 @@
 #               name: javadoc-site
 
 
-#
-# Copyright contributors to the Galasa project 
-# 
 {{ if .Values.javadocsite.deploy }}
 apiVersion: apps/v1
 kind: Deployment
@@ -60,4 +60,4 @@ spec:
             value: {{ .Values.javadocsite.branch }}/javadoc-site
           ports:
             - containerPort: 80
-{{ end }}              
+{{ end }}

@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: Check that the built artifacts are all signed.
@@ -162,4 +167,3 @@ for github_repo_name in ${repo_list[@]}; do
 done
 
 success "All checks done and passed."
-

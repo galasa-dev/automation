@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: Build all the code in github release/prerelease branches.
@@ -198,5 +203,3 @@ EOF
 ask_user_for_release_type
 set_kubernetes_context
 build_all_code
-
-

@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -140,4 +143,4 @@ spec:
   #     value: $(context.pipelineRun.name)
   #   workspaces:
   #    - name: git-workspace
-  #      workspace: git-workspace  
+  #      workspace: git-workspace
