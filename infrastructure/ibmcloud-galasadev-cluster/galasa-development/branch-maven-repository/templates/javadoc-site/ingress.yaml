@@ -1,6 +1,9 @@
-# #
-# # Copyright contributors to the Galasa project 
-# # 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 # apiVersion: networking.k8s.io/v1
 # kind: Ingress
 # metadata:
@@ -27,10 +30,6 @@
 #         pathType: Prefix
 
 
-
-#
-# Copyright contributors to the Galasa project 
-# 
 {{ if .Values.javadocsite.deploy }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
