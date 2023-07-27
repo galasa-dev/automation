@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -28,4 +31,4 @@ spec:
     script: |
       #!/bin/sh
       set +e
-      cp -vr $(params.source) $(params.destination) 
+      cp -vr $(params.source) $(params.destination)

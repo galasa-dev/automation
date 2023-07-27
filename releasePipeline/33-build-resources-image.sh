@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: To create the resources image.
@@ -163,4 +168,3 @@ get_galasa_version_to_be_released
 create_resources_image
 
 note "Now wait for the 'resources-*' pipeline to complete."
-

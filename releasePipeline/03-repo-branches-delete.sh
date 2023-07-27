@@ -1,5 +1,10 @@
 #! /usr/bin/env bash 
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------                   
 #
 # Objectives: Deletes all the release-type branches in each github repo
@@ -182,5 +187,3 @@ EOF
 ask_user_for_release_type
 set_kubernetes_context
 delete_branches
-
-
