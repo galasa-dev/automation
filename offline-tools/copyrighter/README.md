@@ -10,7 +10,7 @@ The tool ensures files have a copyright comment like the one below:<br />
 
 
 ## Files that the tool is able to process
-- Files with /* */ type comments:<br />
+- Files with /* */ or // type comments:<br />
     Java (.java), Go (.go), JavaScript (.js), Sass (.scss), TypeScript (.ts), TypeScript with JSX (.tsx)<br />
 - Files with # type comments:<br />
     Yaml (.yaml), Bash Script (.sh)<br />
