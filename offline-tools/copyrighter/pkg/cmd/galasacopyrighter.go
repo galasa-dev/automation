@@ -390,10 +390,12 @@ func findNextNoneWhiteSpaceCharacter(input string, startIndexOfFollowingInput in
 }
 
 func commentNeedsNoChange(commentToCheck string) bool {
-	if strings.Contains(commentToCheck, "# Copyright contributors to the Galasa project") && strings.Contains(commentToCheck, "# SPDX-License-Identifier: EPL-2.0") {
-		return true
-	}
-	return false
+	standardCopyright := `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`
+	return commentToCheck == strings.TrimSpace(standardCopyright)
 }
 
 func fileIsBashScript(firstLineToCheck string) bool {
