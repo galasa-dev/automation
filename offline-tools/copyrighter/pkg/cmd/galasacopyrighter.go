@@ -34,6 +34,7 @@ const (
 	COMMENT_CONTINUE_JAVA = " *"
 	COMMENT_END_JAVA      = " */"
 	COMMENT_HASH          = "#"
+	COMMENT_STROKE        = "//"
 )
 
 func init() {
@@ -144,7 +145,12 @@ func setCopyright(input string, commentType string) (string, error) {
 	var newLine int
 
 	if commentType == COMMENT_CONTINUE_JAVA { //file contains opening and closing coments
-		inputWithNoCopyright, err, dontAddCopyright = stripOutExistingCopyright(input)
+		//remove any IBM/Galasa double stroke copyright comment
+		input, dontAddCopyright = checkForDoubleStrokeCopyrightComments(input)
+		if !dontAddCopyright { //for any double stroke non-Galasa/IBM comment, skip looking for copyright again
+			inputWithNoCopyright, err, dontAddCopyright = stripOutExistingCopyright(input)
+		}
+
 		if dontAddCopyright {
 			return input, err
 		}
@@ -238,6 +244,56 @@ func stripOutExistingCopyright(input string) (string, error, bool) {
 	return output, err, dontAddCopyright
 }
 
+func checkForDoubleStrokeCopyrightComments(input string) (string, bool) {
+	var output string
+	var firstStroke int
+	var lastStroke int
+	var newLine int
+	var commentToCheck string
+	var dontAddCopyright = false
+
+	if strings.Contains(input, COMMENT_STROKE) {
+		input = strings.TrimSpace(input)
+		firstStroke = strings.Index(input, COMMENT_STROKE)
+		newLine = strings.Index(input, "\n")
+
+		//for leading texts
+		for newLine < firstStroke {
+			newLine += strings.Index(input[firstStroke:], "\n")
+		}
+
+		//finding where the comment ends
+		if !strings.Contains(input[newLine+1:newLine+4], COMMENT_STROKE) { //for one line comment
+			lastStroke = newLine + 1
+		} else { // for multi-line comment
+			for {
+				if !strings.Contains(input[newLine+1:], "\n") {
+					lastStroke = len(input)
+					break
+				}
+				newLine += strings.Index(input[newLine+1:], "\n") + 1
+
+				if strings.Contains(input[newLine+1:newLine+3], COMMENT_STROKE) {
+					//move on to find next newLine
+				} else if !strings.Contains(input[newLine+1:newLine+3], COMMENT_STROKE) {
+					lastStroke = newLine
+					break
+				}
+			}
+		}
+
+		commentToCheck = input[firstStroke:lastStroke]
+
+		if copyrightContainsIBMOrGalasa(commentToCheck) {
+			input = strings.ReplaceAll(input, commentToCheck, "")
+		} else if strings.Contains(commentToCheck, "Copyright") {
+			dontAddCopyright = true
+		}
+	}
+	output = input
+	return output, dontAddCopyright
+}
+
 func stripOutExistingCopyrightHash(input string) (string, bool) {
 	var output string
 	var firstHash int
@@ -256,18 +312,17 @@ func stripOutExistingCopyrightHash(input string) (string, bool) {
 		leadingText = input[:newLine]
 		newLine += strings.Index(input[firstHash:], "\n")
 	}
-
-	if input[newLine+1] != '#' { //for one line comment
-		lastHash = newLine
-	} else { // for multi-line comment
-		for {
-			newLine += strings.Index(input[newLine+1:], "\n") + 1
-			if input[newLine+1] == '#' {
-				//move on to find next newLine
-			} else if input[newLine+1] != '#' {
-				lastHash = newLine
+	//finding where the comment ends
+	for {
+		if input[newLine+1] != '#' {
+			lastHash = newLine
+			break
+		} else {
+			if !strings.Contains(input[newLine+1:], "\n") {
+				lastHash = len(input)
 				break
 			}
+			newLine += strings.Index(input[newLine+1:], "\n") + 1
 		}
 	}
 
@@ -281,13 +336,13 @@ func stripOutExistingCopyrightHash(input string) (string, bool) {
 			if leadingText != "" {
 				output = "\n" + leadingText + input[lastHash+1:]
 			} else {
-				output = input[lastHash:]
+				output = "\n" + input[lastHash:]
 			}
 		} else if strings.Contains(commentToCheck, "Copyright") { //copyright of external party
 			dontAddCopyright = true
 			output = input
 		} else {
-			output = input
+			output = "\n" + input
 		}
 	}
 
@@ -336,11 +391,11 @@ func findNextNoneWhiteSpaceCharacter(input string, startIndexOfFollowingInput in
 
 func commentNeedsNoChange(commentToCheck string) bool {
 	standardCopyright := `#
- # Copyright contributors to the Galasa project
- #
- # SPDX-License-Identifier: EPL-2.0
- #`
-	return commentToCheck == standardCopyright
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`
+	return strings.TrimSpace(commentToCheck) == standardCopyright
 }
 
 func fileIsBashScript(firstLineToCheck string) bool {
