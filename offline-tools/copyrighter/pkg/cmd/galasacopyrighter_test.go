@@ -416,6 +416,41 @@ package mypackage`
 	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
 }
 
+func TestWholeFileIsACopyrightCommentToBeReplacedDoubleStroke(t *testing.T) {
+	// Given..
+	var input = `//
+//Copyright contributors to Galasa
+//
+//remove me!`
+
+	// When...
+	output, _ := setCopyright(input, " *")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "//Copyright contributors to Galasa")
+	assert.NotContains(t, output, "//remove me!")
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
+func TestWholeFileContainsCommentsWithACopyrightCommentToBeReplacesDoubleStroke(t *testing.T) {
+	// Given..
+	var input = `//
+//Copyright contributors to Galasa
+//
+
+//don't remove me!`
+
+	// When...
+	output, _ := setCopyright(input, " *")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "//Copyright contributors to Galasa")
+	assert.Contains(t, output, "//don't remove me!")
+	assert.Contains(t, output, "* SPDX-License-Identifier: EPL-2.0")
+}
+
 func TestReplaceOneLineCopyrightHashCommentYaml(t *testing.T) {
 	// Given..
 	var input = `# Copyright contributors to the Galasa project
@@ -630,8 +665,50 @@ func TestOnlyHasCommentsAndNoneToBeRemovedYaml(t *testing.T) {
 
 	// Then..
 	assert.NotNil(t, output)
-	assert.Contains(t, output, "leading text")
-	assert.Contains(t, output, "package mypackage")
+	assert.Contains(t, output, "#leading text")
+	assert.Contains(t, output, "#package mypackage")
+	if !strings.HasPrefix(output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`) {
+		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
+	}
+}
+func TestWholeContentIsACommentWithCopyrightToBeRemovedYaml(t *testing.T) {
+	// Given..
+	var input = `#Copyright and IBM
+#
+#package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.NotContains(t, output, "Copyright and IBM")
+	assert.NotContains(t, output, "#package mypackage")
+	if !strings.HasPrefix(output, `#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#`) {
+		assert.Fail(t, "Copyright statement is not at the start of the output. output:\n%s", output)
+	}
+}
+
+func TestWholeContentIsACommentNoCopyrightToBeRemovedYaml(t *testing.T) {
+	// Given..
+	var input = `#sgdg
+#
+#package mypackage`
+
+	// When...
+	output, _ := setCopyright(input, "#")
+
+	// Then..
+	assert.NotNil(t, output)
+	assert.Contains(t, output, "#package mypackage")
 	if !strings.HasPrefix(output, `#
 # Copyright contributors to the Galasa project
 #
@@ -653,7 +730,7 @@ func TestOnlyHasCommentsAndCopyrightCommentToBeRemovedYaml(t *testing.T) {
 	// Then..
 	assert.NotNil(t, output)
 	assert.NotContains(t, output, "Copyright and IBM")
-	assert.Contains(t, output, "package mypackage")
+	assert.Contains(t, output, "#package mypackage")
 	if !strings.HasPrefix(output, `#
 # Copyright contributors to the Galasa project
 #
@@ -677,6 +754,7 @@ func TestSpaceAtStartOfFileWIthCopyrightHashCommentToBeRemovedYaml(t *testing.T)
 	assert.NotNil(t, output)
 	assert.NotContains(t, output, "Copyright and IBM")
 	assert.Contains(t, output, "package mypackage")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 }
 
 func TestSingleCopyrightCommentToBeRemovedWithLeadingAndClosingHashYaml(t *testing.T) {
@@ -684,6 +762,7 @@ func TestSingleCopyrightCommentToBeRemovedWithLeadingAndClosingHashYaml(t *testi
 	var input = `#
 # Copyright contributors to the Galasa project 
 #
+
 apiVersion: apps/v1`
 
 	// When...
@@ -691,7 +770,8 @@ apiVersion: apps/v1`
 
 	// Then..
 	assert.NotNil(t, output)
-	assert.Contains(t, output, "#\n\napiVersion")
+	assert.Contains(t, output, "\n\napiVersion")
+	assert.Contains(t, output, "# SPDX-License-Identifier: EPL-2.0")
 }
 
 func TestCopyrightCommentIsNotToBeRemovedYaml(t *testing.T) {
