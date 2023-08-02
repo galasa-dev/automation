@@ -262,11 +262,17 @@ func checkForDoubleStrokeCopyrightComments(input string) (string, bool) {
 			newLine += strings.Index(input[firstStroke:], "\n")
 		}
 
+		//finding where the comment ends
 		if !strings.Contains(input[newLine+1:newLine+4], COMMENT_STROKE) { //for one line comment
 			lastStroke = newLine + 1
 		} else { // for multi-line comment
 			for {
+				if !strings.Contains(input[newLine+1:], "\n") {
+					lastStroke = len(input)
+					break
+				}
 				newLine += strings.Index(input[newLine+1:], "\n") + 1
+
 				if strings.Contains(input[newLine+1:newLine+3], COMMENT_STROKE) {
 					//move on to find next newLine
 				} else if !strings.Contains(input[newLine+1:newLine+3], COMMENT_STROKE) {
@@ -306,25 +312,23 @@ func stripOutExistingCopyrightHash(input string) (string, bool) {
 		leadingText = input[:newLine]
 		newLine += strings.Index(input[firstHash:], "\n")
 	}
-
-	if input[newLine+1] != '#' { //for one line comment
-		lastHash = newLine
-	} else { // for multi-line comment
-		for {
-			newLine += strings.Index(input[newLine+1:], "\n") + 1
-			if input[newLine+1] == '#' {
-				//move on to find next newLine
-			} else if input[newLine+1] != '#' {
-				lastHash = newLine
+	//finding where the comment ends
+	for {
+		if input[newLine+1] != '#' {
+			lastHash = newLine
+			break
+		} else {
+			if !strings.Contains(input[newLine+1:], "\n") {
+				lastHash = len(input)
 				break
 			}
+			newLine += strings.Index(input[newLine+1:], "\n") + 1
 		}
 	}
 
 	commentToCheck = input[firstHash:lastHash]
 
 	if commentNeedsNoChange(commentToCheck) {
-		print("true")
 		dontAddCopyright = true
 		output = input
 	} else {
