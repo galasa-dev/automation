@@ -395,7 +395,7 @@ func commentNeedsNoChange(commentToCheck string) bool {
 #
 # SPDX-License-Identifier: EPL-2.0
 #`
-	return commentToCheck == strings.TrimSpace(standardCopyright)
+	return strings.TrimSpace(commentToCheck) == standardCopyright
 }
 
 func fileIsBashScript(firstLineToCheck string) bool {
