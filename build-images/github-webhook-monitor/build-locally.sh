@@ -44,7 +44,7 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Functions
 #-----------------------------------------------------------------------------------------                   
 function usage {
-    info "Syntax: run-locally.sh [OPTIONS]"
+    info "Syntax: build-locally.sh [OPTIONS]"
     cat << EOF
 Options are:
 None

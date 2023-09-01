@@ -170,3 +170,5 @@ success "New binaries built - OK"
 h2 "Use the results.."
 info "Binary executable programs are found in the 'bin' folder."
 ls ${BASEDIR}/build-images/github-webhook-receiver/bin | grep -v "gendocs"
+
+

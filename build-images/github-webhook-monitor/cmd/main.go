@@ -24,21 +24,20 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var token string
-var orgName *string
-var triggerMapPath *string
-var triggerMap mapper.Config
-var hookId *string
-var latestIdPath string
+const BOOKMARK_FILE_PATH_DEFAULT = "/mnt/latestId"
 
-var latestDeliveryId string
-
-const latestIdPathDefault = "/mnt/latestId"
-
-var client = http.Client{
-
-	Timeout: time.Second * 30,
-}
+var (
+	client = http.Client{
+		Timeout: time.Second * 30,
+	}
+	token            string
+	orgName          *string
+	triggerMapPath   *string
+	triggerMap       mapper.Config
+	hookId           *string
+	latestIdPath     string
+	latestDeliveryId string
+)
 
 /*
 *
@@ -241,7 +240,7 @@ func parseArgsAndConfigs() {
 	// E.g. -hook=000000
 	hookId = flag.String("hook", "", "Id for Webhook to watch")
 
-	latestIdPathRef := flag.String("bookmark", latestIdPathDefault, "bookmark file. Holds our last-read event.")
+	latestIdPathRef := flag.String("bookmark", BOOKMARK_FILE_PATH_DEFAULT, "bookmark file. Holds our last-read event.")
 
 	flag.Parse()
 

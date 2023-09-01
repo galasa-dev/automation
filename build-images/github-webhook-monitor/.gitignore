@@ -1,5 +1,6 @@
 config.yaml
 latestId
 
+build/
 temp/
-bin/*
+bin/
