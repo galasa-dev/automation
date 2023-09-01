@@ -29,20 +29,23 @@ var orgName *string
 var triggerMapPath *string
 var triggerMap mapper.Config
 var hookId *string
+var latestIdPath string
 
 var latestDeliveryId string
 
-const latestIdPath = "/mnt/latestId"
+const latestIdPathDefault = "/mnt/latestId"
 
 var client = http.Client{
 
 	Timeout: time.Second * 30,
 }
 
-/**
+/*
+*
 This poll logic needs to is given a webhook id, then search all deliveries from the webhook cross referencing a mounted mapper config
 
 Arguments required:
+
 	String Github Org - which org we are watching
 	String Github Token - access token
 	String Hook ID - mostly to save api calls
@@ -211,6 +214,7 @@ func githubGet(url string, headers map[string]string) *http.Response {
 
 // Write to file in truncate mode to record last actioned ID.
 func updateBookmark(id string) {
+	log.Printf("Info: Updating bookmark file with event id %s\n", id)
 	f, err := os.OpenFile(latestIdPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -223,15 +227,31 @@ func updateBookmark(id string) {
 func parseArgsAndConfigs() {
 	// Set with K8s secret mount
 	token = os.Getenv("GITHUBTOKEN")
+	if token == "" {
+		log.Fatal("Environment variable GITHUBTOKEN is not set")
+	}
+	log.Printf("Info: github token is %s\n", token)
 
 	// E.g. -org=galasa-dev
 	orgName = flag.String("org", "", "Name of github Organisation we are monitoring")
+
 	// E.g. -trigger-map=/home/user/map
 	triggerMapPath = flag.String("trigger-map", "", "Yaml config map for routing triggers to event listeners")
+
 	// E.g. -hook=000000
 	hookId = flag.String("hook", "", "Id for Webhook to watch")
 
+	latestIdPathRef := flag.String("bookmark", latestIdPathDefault, "bookmark file. Holds our last-read event.")
+
 	flag.Parse()
+
+	latestIdPath = *latestIdPathRef
+
+	log.Printf("Info: github organisation is %s\n", *orgName)
+	log.Printf("Info: trigger-map is at %s\n", *triggerMapPath)
+	log.Printf("Info: Hook id is %s\n", *hookId)
+	log.Printf("Info: Bookmark file: %s\n", latestIdPath)
+
 	if *hookId == "" {
 		log.Fatal("An webhook id must be passed. Please use the -hook flag.")
 	}
@@ -248,9 +268,9 @@ func parseArgsAndConfigs() {
 
 	b, err = ioutil.ReadFile(latestIdPath)
 	if err != nil {
-		log.Println("Failed to find latestId file")
+		log.Printf("Warning: Failed to find bookmark file %s . Assuming that there was no previous activity we care above.\n", latestIdPath)
 		return
 	}
 	latestDeliveryId = string(b)
-	log.Printf("LatestID is %s", latestDeliveryId)
+	log.Printf("Info: LatestID rad from bookmark is %s\n", latestDeliveryId)
 }
