@@ -508,11 +508,12 @@ spec:
       value: 
         mkdir bin && 
         cd bin && 
-        wget https://development.galasa.dev/main/binary/cli/galasactl-darwin-amd64 &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-darwin-x86_64 &&
         wget https://development.galasa.dev/main/binary/cli/galasactl-darwin-arm64 &&
-        wget https://development.galasa.dev/main/binary/cli/galasactl-linux-amd64 &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-linux-x86_64 &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-linux-arm64 &&
         wget https://development.galasa.dev/main/binary/cli/galasactl-linux-s390x &&
-        wget https://development.galasa.dev/main/binary/cli/galasactl-windows-amd64.exe &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-windows-x86_64.exe &&
         cd ..
     workspaces:
       - name: git-workspace
@@ -1061,11 +1062,12 @@ spec:
       value: 
         mkdir bin && 
         cd bin && 
-        wget https://development.galasa.dev/main/binary/cli/galasactl-darwin-amd64 &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-darwin-x86_64 &&
         wget https://development.galasa.dev/main/binary/cli/galasactl-darwin-arm64 &&
-        wget https://development.galasa.dev/main/binary/cli/galasactl-linux-amd64 &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-linux-x86_64 &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-linux-arm64 &&
         wget https://development.galasa.dev/main/binary/cli/galasactl-linux-s390x &&
-        wget https://development.galasa.dev/main/binary/cli/galasactl-windows-amd64.exe &&
+        wget https://development.galasa.dev/main/binary/cli/galasactl-windows-x86_64.exe &&
         cd ..
     workspaces:
       - name: git-workspace
