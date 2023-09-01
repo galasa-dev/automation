@@ -83,9 +83,6 @@ function set_tool_version {
     esac
 
     architecture=$(uname -m)
-    if [[ "${architecture}" == "x86_64" ]]; then
-        architecture="amd64"
-    fi
 
     export GALASACOPYRIGHTER="${BASEDIR}/bin/galasacopyrighter-${os}-${architecture}"
 }
