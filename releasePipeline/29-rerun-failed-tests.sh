@@ -84,9 +84,6 @@ function calculate_galasactl_executable {
     esac
 
     architecture=$(uname -m)
-    if [[ "${architecture}" == "x86_64" ]]; then
-        architecture="amd64"
-    fi
 
     export galasactl_full_name="galasactl-${os}-${architecture}"
     info "galasactl binary is ${galasactl_full_name}"
