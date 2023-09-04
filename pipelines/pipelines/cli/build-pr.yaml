@@ -394,7 +394,7 @@ spec:
       value: automation/dockerfiles/cli/cli-dockerfile
     - name: buildArgs
       value:
-        - "--build-arg=platform=linux-amd64"
+        - "--build-arg=platform=linux-x86_64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
