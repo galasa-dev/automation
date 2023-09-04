@@ -1,43 +1,53 @@
 #
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#
-
+# Copyright contributors to the Galasa project 
+# 
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: branch-obr
+  name: pr-obr
   namespace: galasa-build
 spec:
-  params:
-  - name: fromBranch
-    type: string
-    default: main
-  - name: toBranch
-    type: string
-    default: main
-  - name: revision
-    type: string
-    default: main
-  - name: refspec
-    type: string
-    default: refs/heads/main:refs/heads/main
-  - name: imageTag
-    type: string
-    default: main
-  - name: appname
-    type: string
-    default: main-maven-repos
   workspaces:
   - name: git-workspace
-# 
-# 
-# 
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
   tasks:
+
+
+  - name: git-verify
+    taskRef:
+      name: git-verify
+    params:
+    - name: userId
+      value: $(params.userId)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: action
+      value: $(params.action)
+
+
   - name: clone-automation
     taskRef: 
       name: git-clone
+    runAfter:
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
@@ -52,39 +62,43 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
-#     
+ 
+
+  # We pull a release.yaml file out of the extensions repo to combine into the uber-obr.
   - name: clone-extensions
     taskRef: 
       name: git-clone
+    runAfter:
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/extensions
     - name: revision
-      value: $(params.revision)
+      value: main
     - name: refspec
-      value: $(params.refspec)
+      value: refs/heads/main:refs/heads/main
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/extensions
     workspaces:
      - name: output
-       workspace: git-workspace
-# 
-# 
-#    
+       workspace: git-workspace  
+
+
+  # We need the source code for the OBR project.
   - name: clone-obr
     taskRef: 
       name: git-clone
+    runAfter:
+      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: main
+      value: $(params.baseRef)
     - name: refspec
-      value: refs/heads/main:refs/heads/main
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
     - name: depth
       value: "99999999"
     - name: subdirectory
@@ -92,71 +106,71 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
-# 
-  - name: clone-buildutils
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["release"]
-    taskRef: 
-      name: git-clone
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/buildutils
-    - name: revision
-      value: main
-    - name: refspec
-      value: refs/heads/main:refs/heads/main
-    - name: depth
-      value: "1"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/buildutils
-    workspaces:
-     - name: output
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: check-branch
-    taskRef: 
-      name: git-check-branch
+
+  
+  # Gather all the gradle dependencies.
+  # ... into the $(context.pipelineRun.name)/obr/dependency-download/build/dependencies folder.
+  # For example: 
+  # dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml
+  # dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml
+  - name: download-dependencies
+    taskRef:
+      name: gradle-build
     runAfter:
-    - clone-obr  
+    - clone-obr
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
     params:
     - name: context
-      value: $(context.pipelineRun.name)/obr
-    - name: branch
-      value: $(params.toBranch)
+      value: $(context.pipelineRun.name)/obr/dependency-download
+    - name: buildArgs
+      value: 
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/managers"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/obr/repo"
+        - "--debug"
+    - name: command
+      value: 
+        - getDeps
+
+
+  # List the contents of the workspace.
+  - name: debug-workspace
+    taskRef:
+      name: general-command
+    runAfter:
+    - download-dependencies
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - /bin/tree
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
-# 
-# 
-#  
+       workspace: git-workspace
+
   - name: maven-gpg
     taskRef:
       name: maven-gpg
     runAfter:
     - clone-automation
     - clone-extensions
-    - clone-obr
-    - check-branch
+    - download-dependencies
     params:
     - name: context 
       value: $(context.pipelineRun.name)/obr
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
+
+
   - name: get-commit
     taskRef:
       name: get-commit
     runAfter:
-    - check-branch
+    - clone-obr
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -165,6 +179,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
 
   # Download the dependencies that the OBR has using gradle infrastructure.
   # This downloads release.yaml files where they are made available to following steps.
@@ -187,9 +202,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
+
+
+  # Combine all the separate release.yaml files into one pom.xml bom
   - name: generate-bom
     taskRef:
       name: galasabld
@@ -203,11 +218,11 @@ spec:
       value:       
         - "template"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml"
+        - "$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml"
+        - "$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
         - "--template"
@@ -218,9 +233,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-# 
-# 
-#
+
+
+  # Debugging... list the pom.xml which we now have.
   - name: list-bom
     taskRef: 
       name: unix-command
@@ -236,10 +251,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-# 
-# 
-#
-  - name: branch-maven-build-bom
+
+
+  - name: maven-build-bom
     taskRef:
       name: maven-build
     runAfter: 
@@ -251,7 +265,8 @@ spec:
       value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
@@ -260,14 +275,13 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-# 
-# 
-#
+
+
   - name: generate-obr
     taskRef:
       name: galasabld
     runAfter:
-    - branch-maven-build-bom
+    - maven-build-bom
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
@@ -290,9 +304,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
+
+
   - name: list-obr
     taskRef:
       name: unix-command
@@ -308,10 +321,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
-  - name: branch-maven-build-obr
+
+
+  - name: maven-build-obr
     taskRef:
       name: maven-build
     runAfter:
@@ -323,7 +335,8 @@ spec:
       value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/repo"
     - name: command
@@ -332,14 +345,14 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
-  - name: branch-docker-build-obr
+
+
+  - name: docker-build-obr
     taskRef:
       name: docker-build
     runAfter:
-      - branch-maven-build-obr
+      - maven-build-obr
+      - get-commit
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -348,121 +361,25 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/obr/obr-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.headSha)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=tag=main"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# When doing a release of Galasa, we need an OBR image with the galasabld executable inside it 
-# 
-#
-  - name: make
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["release"]
-    taskRef:
-      name: make
-    runAfter:
-      - clone-buildutils
-      - branch-docker-build-obr  
-    params:
-    - name: directory
-      value: $(context.pipelineRun.name)/buildutils
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: docker-build-obr-with-galasabld
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["release"]
-    taskRef:
-      name: docker-build
-    runAfter:
-    - make
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/buildutils
-    - name: dockerfilePath
-      value: automation/dockerfiles/obr/obr-galasabld-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=tag=release"
-        - "--build-arg=platform=linux-amd64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
 
-# 
-# 
-  - name: recycle-obr-deployment
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - branch-docker-build-obr
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - obr-$(params.imageTag)
-# 
-# 
-#
-  - name: wait-obr-deployment
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-obr-deployment
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appname)
-      - --resource
-      - apps:Deployment:obr-$(params.imageTag)
-      - --health
-# 
-# 
-#
 ### JAVADOC
-# 
-# 
-#
+  
+  # Combine all the release.yaml files into one.
   - name: generate-javadoc
     taskRef: 
       name: galasabld
     runAfter:
-    - wait-obr-deployment
+    - docker-build-obr
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
@@ -485,32 +402,13 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
-  - name: cat-javadoc-pom
-    taskRef:
-      name: unix-command   
-    runAfter:
-    - generate-javadoc
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/obr/javadocs
-    - name: command
-      value:
-      - cat
-      - pom.xml       
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-#
+
+
   - name: maven-build-javadoc
     taskRef: 
       name: maven-build-java18
     runAfter: 
-    - cat-javadoc-pom
+    - generate-javadoc
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
@@ -521,16 +419,16 @@ spec:
         - deploy
     - name: buildArgs
       value: 
-        - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/managers"
+        - "-Dgpg.skip=true"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
+
+
   - name: docker-build-javadoc-site
     taskRef: 
       name: docker-build
@@ -540,7 +438,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.headSha)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: noPush
@@ -550,9 +448,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
+
+
   - name: docker-build-javadoc-maven-repo
     taskRef: 
       name: docker-build
@@ -562,7 +459,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo:$(params.headSha)
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs/docker
     - name: noPush
@@ -576,134 +473,29 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
-  - name: recycle-javadoc-maven-repo
+
+
+  finally:
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
     taskRef:
-      name: argocd-cli
-    runAfter:
-    - docker-build-javadoc-maven-repo
+      name: git-status
     params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - javadoc-$(params.imageTag)
-# 
-# 
-#
-  - name: wait-javadoc-maven-repo
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-javadoc-maven-repo
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appname)
-      - --resource
-      - apps:Deployment:javadoc-$(params.imageTag)
-      - --health
-# 
-# 
-#
-  - name: recycle-javadoc-site
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - wait-javadoc-maven-repo
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - javadocsite-$(params.imageTag)
-# 
-# 
-#
-  - name: wait-javadoc-site
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-javadoc-site
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appname)
-      - --resource
-      - apps:Deployment:javadocsite-$(params.imageTag)
-      - --health
-# 
-# 
-#
-# Trigger obr-generic
-  - name: trigger-obr-generic
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - wait-javadoc-site
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - branch-obr-generic
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-obr-generic-$(params.toBranch)
-      - --param
-      - fromBranch=$(params.toBranch)
-      - --param
-      - toBranch=$(params.toBranch)
-      - --param
-      - revision=$(params.revision)
-      - --param
-      - refspec=$(params.refspec)
-      - --param
-      - imageTag=$(params.imageTag)
-      - --param
-      - appname=$(params.appname)
-      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace    
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
 
   # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
   # - name: git-clean
   #   taskRef: 
   #     name: git-clean

@@ -32,6 +32,8 @@ spec:
   - name: action
     type: string
   tasks:
+
+
   - name: git-verify
     taskRef:
       name: git-verify
@@ -42,6 +44,8 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
+
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -61,25 +65,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-framework
-    taskRef: 
-      name: git-clone
-    runAfter:
-      - git-verify
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/framework
-    - name: revision
-      value: main
-    - name: refspec
-      value: refs/heads/main:refs/heads/main
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/framework
-    workspaces:
-     - name: output
-       workspace: git-workspace     
+
+
   - name: clone-extensions
     taskRef: 
       name: git-clone
@@ -99,25 +86,7 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-  - name: clone-managers
-    taskRef: 
-      name: git-clone
-    runAfter:
-      - git-verify
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/managers
-    - name: revision
-      value: main
-    - name: refspec
-      value: refs/heads/main:refs/heads/main
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/managers
-    workspaces:
-     - name: output
-       workspace: git-workspace     
+  
   - name: clone-obr
     taskRef: 
       name: git-clone
@@ -137,14 +106,14 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+
   - name: maven-gpg
     taskRef:
       name: maven-gpg
     runAfter:
     - clone-automation
-    - clone-framework
     - clone-extensions
-    - clone-managers
     - clone-obr
     params:
     - name: context 
@@ -152,6 +121,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: get-commit
     taskRef:
       name: get-commit
@@ -165,11 +136,37 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
+  # Download the dependencies that the OBR has using gradle infrastructure.
+  # This downloads release.yaml files where they are made available to following steps.
+  - name: download-dependencies
+    taskRef:
+      name: gradle-build
+    runAfter:
+    - clone-obr
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/obr/dependency-download
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/obr/repo"
+    - name: command
+      value: 
+        - getDeps
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+
   - name: generate-bom
     taskRef:
       name: galasabld
     runAfter:
     - maven-gpg
+    - download-dependencies
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
@@ -177,11 +174,11 @@ spec:
       value:       
         - "template"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
         - "--template"
@@ -192,6 +189,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+
+
   - name: list-bom
     taskRef: 
       name: unix-command
@@ -207,6 +206,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+
+
   - name: maven-build-bom
     taskRef:
       name: maven-build
@@ -229,6 +230,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+
+
   - name: generate-obr
     taskRef:
       name: galasabld
@@ -241,11 +244,11 @@ spec:
       value:       
         - "template"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
         - "--template"
@@ -256,6 +259,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: list-obr
     taskRef:
       name: unix-command
@@ -271,6 +276,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: maven-build-obr
     taskRef:
       name: maven-build
@@ -293,6 +300,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: docker-build-obr
     taskRef:
       name: docker-build
@@ -330,11 +339,11 @@ spec:
       value: 
         - "template"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/framework/release.yaml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.framework.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/extensions/release.yaml"
         - "--releaseMetadata"
-        - "/workspace/git/$(context.pipelineRun.name)/managers/release.yaml"
+        - "/workspace/git/$(context.pipelineRun.name)/obr/dependency-download/build/dependencies/dev.galasa.managers.manifest.yaml"
         - "--releaseMetadata"
         - "/workspace/git/$(context.pipelineRun.name)/obr/release.yaml"
         - "--template"
@@ -345,6 +354,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: maven-build-javadoc
     taskRef: 
       name: maven-build-java18
@@ -368,6 +379,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: docker-build-javadoc-site
     taskRef: 
       name: docker-build
@@ -387,6 +400,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: docker-build-javadoc-maven-repo
     taskRef: 
       name: docker-build
@@ -410,7 +425,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   finally:
+
   - name: git-status
     when:
       - input: "$(tasks.git-verify.status)"
