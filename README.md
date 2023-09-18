@@ -426,18 +426,6 @@ Parameters:
 This task uses the custom [argocd-cli image](https://harbor.galasa.dev/harbor/projects/5/repositories/argocd-cli/artifacts-tab). 
 
 
-### copy
-
-This task performs a simple copy from one location to another.
-
-Parameters:
-* context: The directory to perform the command in
-* source: The from location.
-* destination: The to location.
-
-This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
-
-
 ### galasabld
 
 This task uses the galasabld CLI to perform galasabld commands, such as galasabld template.
