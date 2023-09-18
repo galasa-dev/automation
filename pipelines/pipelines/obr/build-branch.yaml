@@ -242,7 +242,7 @@ spec:
 #
   - name: list-bom
     taskRef: 
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-bom
     params:
@@ -314,7 +314,7 @@ spec:
 #
   - name: list-obr
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-obr
     params:
@@ -509,7 +509,7 @@ spec:
 #
   - name: cat-javadoc-pom
     taskRef:
-      name: unix-command   
+      name: general-command
     runAfter:
     - generate-javadoc
     params:

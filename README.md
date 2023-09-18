@@ -611,17 +611,6 @@ Parameters:
 This task uses the custom [tkn image](https://harbor.galasa.dev/harbor/projects/5/repositories/tkn/artifacts-tab).
 
 
-### unix-command
-
-This task is used to perform Unix commands. 
-
-Parameters:
-* context: The directory to perform the command in.
-* command: An array with the parts of the command to perform.
-
-This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
-
-
 ## How to manually trigger a pipeline
 Use the `trigger-pipeline.sh` script to trigger one of the main-line build pipelines.
 The tool may not support all the pipelines yet, feel free to add ones which are missing.
