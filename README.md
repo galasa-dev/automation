@@ -90,7 +90,7 @@ In the pipelines, you will see that during some of the Maven or Gradle builds, t
 
 You will also notice that the Dockerfiles for some components are FROM the previous component.
 
-![](./docs-images/repo-links.png)
+![](./docs/repo-links.png)
 
 _For more information about the Tasks used in the Pipelines, see the **Tasks** section of this README._
 
@@ -127,9 +127,9 @@ To build changes across multiple GitHub repositories at the same time, the chang
 This example is for a branch build for branch iss001 that contains changes to Framework and Managers (Framework is the first pipeline).
 
 1. Before starting a branch build, you must set up an app on [Argo CD](argocd.galasa.dev) to control your Deployments.
-![](./docs-images/create-argocd-app.png)
+![](./docs/create-argocd-app.png)
 2. As Framework is the first pipeline in the chain that has changes to be built, you must set up Deployments for Framework and all other repos that come after it, so Framework, Extensions, Managers and OBR. You do this by overriding the values from values.yaml to _REPO_.deploy = true, _REPO_.branch = _BRANCH_ and _REPO_.imageTag = _BRANCH_.
-![](./docs-images/edit-values.png)
+![](./docs/edit-values.png)
 3. The app and all of its resources will show as 'Unhealthy' at first, as the Docker images tagged with your branch name do not exist yet, as they have not been built.
 4. Manually start the first pipeline by executing a tkn command, passing in parameters. This command must be ran inside the automation directory, as it references the podTemplate and volumeClaimTemplate for the workspace. If you don't want to run this command inside the automation directory, change the paths to the templates. For our example, running inside the automation directory this would be the command:
 ```
