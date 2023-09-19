@@ -144,7 +144,7 @@ spec:
 
   - name: cat-template
     taskRef:
-      name: unix-command   
+      name: general-command
     runAfter:
     - generate-pom-sources
     params:
@@ -236,7 +236,7 @@ spec:
 
   - name: cat-results
     taskRef:
-      name: unix-command   
+      name: general-command 
     runAfter:
     - run-tests
     params:
@@ -273,7 +273,7 @@ spec:
 
   - name: ls-execs
     taskRef:
-      name: unix-command   
+      name: general-command
     runAfter:
     - fetch-execs
     params:

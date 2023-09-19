@@ -159,7 +159,7 @@ spec:
   # So remove it. It gets re-generated when we compile.
   - name: clear-mod
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-api
     params:
@@ -179,7 +179,7 @@ spec:
   # So remove it. It gets re-generated when we compile.
   - name: clear-sum
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - clear-mod
     params:
