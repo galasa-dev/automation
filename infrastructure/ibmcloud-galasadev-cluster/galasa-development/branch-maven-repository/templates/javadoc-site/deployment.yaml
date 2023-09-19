@@ -4,35 +4,6 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: javadoc-site
-#   namespace: galasa-development
-# spec:
-#   revisionHistoryLimit: 1
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: javadoc-site
-#   template:
-#     metadata:
-#       name: javadoc-site
-#       labels:
-#         app: javadoc-site
-#     spec:
-#       containers:
-#         - image: harbor.galasa.dev/galasadev/galasa-javadoc-site:main
-#           imagePullPolicy: Always
-#           name: javadoc-site
-#           env:
-#           - name: CONTEXTROOT
-#             value: /main/javadoc-site
-#           ports:
-#             - containerPort: 80
-#               name: javadoc-site
-
-
 {{ if .Values.javadocsite.deploy }}
 apiVersion: apps/v1
 kind: Deployment
