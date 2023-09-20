@@ -286,7 +286,7 @@ spec:
 # 
 # 
 # 
-  - name: test-galasactl-local-maven-linux-amd64
+  - name: test-galasactl-local-maven-linux-x86-64
     taskRef: 
       name: general-command
     runAfter:
@@ -307,11 +307,11 @@ spec:
 # 
 # 
 # 
-  - name: test-galasactl-local-gradle-linux-amd64
+  - name: test-galasactl-local-gradle-linux-x86-64
     taskRef: 
       name: general-command
     runAfter:
-      - test-galasactl-local-maven-linux-amd64
+      - test-galasactl-local-maven-linux-x86-64
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -336,7 +336,7 @@ spec:
     taskRef: 
       name: general-command
     runAfter:
-      - test-galasactl-local-gradle-linux-amd64
+      - test-galasactl-local-gradle-linux-x86-64
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -353,7 +353,7 @@ spec:
 # 
 # 
 # 
-  - name: test-galasactl-ecosystem-linux-amd64
+  - name: test-galasactl-ecosystem-linux-x86-64
     taskRef: 
       name: general-command
     runAfter:
@@ -380,7 +380,7 @@ spec:
     taskRef: 
       name: docker-build
     runAfter:
-    - test-galasactl-ecosystem-linux-amd64
+    - test-galasactl-ecosystem-linux-x86-64
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
