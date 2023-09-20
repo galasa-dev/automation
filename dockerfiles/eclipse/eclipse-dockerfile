@@ -1,12 +1,5 @@
-# ARG fromImage
-# FROM ${fromImage}
-
-# COPY repo/ /usr/local/apache2/htdocs/
-# COPY eclipse.githash /usr/local/apache2/htdocs/eclipse.githash
-
 ARG baseVersion
 ARG dockerRepository
 FROM ${dockerRepository}/galasadev/galasa-base:${baseVersion}
 
 COPY repo/ /usr/local/apache2/htdocs/
-#COPY eclipse.githash /usr/local/apache2/htdocs/eclipse.githash

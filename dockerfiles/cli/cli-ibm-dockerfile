@@ -8,8 +8,3 @@ COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
 COPY ibminter.pem /etc/ssl/certs/ibminter.pem
 RUN  cat /etc/ssl/certs/ibmroot.pem >> /etc/ssl/certs/ca-certificates.crt
 RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
-
-# RUN addgroup galasa && \ 
-#     adduser -D -G galasa -h /galasa -s /bin/sh galasa 
-# WORKDIR /galasa
-# USER galasa
