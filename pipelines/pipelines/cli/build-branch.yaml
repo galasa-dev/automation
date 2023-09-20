@@ -515,19 +515,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  #----------------------------------------------------------------
-  # And finally... whether the above work or not, this gets called.
-  #----------------------------------------------------------------
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
