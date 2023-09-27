@@ -77,3 +77,41 @@ metadata:
 ```
 
 The above has been applied to the `harbor.yaml` this folder.
+
+## Copy common images from the old cluster harbor to the new one...
+```
+export OLD_HARBOR="harbor.galasa.dev"
+export NEW_HARBOR="harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+
+function copy_image {
+  harbor_project=$1
+  image=$2
+  tag=":$3"
+  echo "copying image $harbor_project/$image:$tag from ${OLD_HARBOR} to ${NEW_HARBOR}"
+  docker pull ${OLD_HARBOR}/${harbor_project}/${image}${tag}
+  rc=$?; if [[ "${rc}" != 0 ]]; then echo ">>>> Failed to pull" ; return 1 ; else
+    docker tag ${OLD_HARBOR}/${harbor_project}/${image}${tag} ${NEW_HARBOR}/${harbor_project}/${image}${tag}
+    rc=$?; if [[ "${rc}" != 0 ]]; then echo ">>>> Failed to tag" ; return 1 ; else
+      docker push ${NEW_HARBOR}/${harbor_project}/${image}${tag}
+      rc=$?; if [[ "${rc}" != 0 ]]; then echo ">>>> Failed to push" return 1 ; else
+      fi
+    fi
+  fi
+  return 0
+}
+
+copy_image common swagger main
+copy_image common openapi main
+copy_image common argocd-embedded main
+copy_image common ghreceiver main
+copy_image common tkn main
+copy_image common alpine-test test
+copy_image common argocd-cli main
+copy_image common ghmonitor main
+copy_image common ghstatus main
+copy_image common ghverify main
+copy_image common galasabld 
+copy_image common gitcli main
+copy_image common kubectl main
+copy_image common gpg main
+```
