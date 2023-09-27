@@ -17,3 +17,15 @@ kubectl get ExternalSecrets
 ```
 kubectl rollout restart -n argocd deployments argocd-applicationset-controller argocd-dex-server argocd-notifications-controller argocd-redis argocd-repo-server argocd-server
 ```
+
+## After installation
+- create connections to github repositories
+  - Log in using the admin account
+  - Settings -> Repositories -> Add Github repo using HTTPS 
+  - Add https://github.com/galasa-dev/helm.git
+  - Add https://github.com/galasa-dev/automation.git
+  
+- Allocate a CLI token for the automation to use to contact argocd
+  - name example: planb-argocd-cli-token
+  - Log in using the admin account
+  - Settings -> Accounts -> select Galasa account -> allocate new CLI token
