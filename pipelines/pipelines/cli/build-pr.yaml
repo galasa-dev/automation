@@ -459,7 +459,7 @@ spec:
   # Build a docker image with the command installed into it.
   - name: docker-build-cli
     taskRef: 
-      name: docker-build-cli-cluster
+      name: docker-build
     runAfter:
     - test-galasactl-ecosystem-linux-x86-64
     params:
