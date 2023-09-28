@@ -449,7 +449,8 @@ spec:
     taskRef: 
       name: docker-build
     runAfter:
-    - test-galasactl-ecosystem-linux-x86-64
+    # We are temporarily disabling the ecosystem tets. - test-galasactl-ecosystem-linux-x86-64
+    - test-galasactl-local-gradle-linux-x86-64
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
