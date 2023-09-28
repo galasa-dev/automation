@@ -485,7 +485,7 @@ spec:
     taskRef: 
       name: docker-build
     runAfter:
-    - docker-build-cli-cluster
+    - docker-build-cli
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
