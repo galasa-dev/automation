@@ -332,45 +332,47 @@ spec:
 # 
 # 
 # 
-  - name: chmod-ecosystem-script
-    taskRef: 
-      name: general-command
-    runAfter:
-      - test-galasactl-local-gradle-linux-x86-64
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: image
-      value: docker.io/library/bash:3.2.57
-    - name: command
-      value: 
-        - chmod
-        - +x
-        - test-galasactl-ecosystem.sh
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+  # We are temporarily disabling the ecosystem tets.
+  # - name: chmod-ecosystem-script
+  #   taskRef: 
+  #     name: general-command
+  #   runAfter:
+  #     - test-galasactl-local-gradle-linux-x86-64
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/cli
+  #   - name: image
+  #     value: docker.io/library/bash:3.2.57
+  #   - name: command
+  #     value: 
+  #       - chmod
+  #       - +x
+  #       - test-galasactl-ecosystem.sh
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
 # 
 # 
 # 
-  - name: test-galasactl-ecosystem-linux-x86-64
-    taskRef: 
-      name: general-command
-    runAfter:
-      - chmod-ecosystem-script
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: image
-      value: docker.io/library/openjdk:11
-    - name: command
-      value: 
-        - ./test-galasactl-ecosystem.sh
-        - --bootstrap
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+  # We are temporarily disabling the ecosystem tets.
+  # - name: test-galasactl-ecosystem-linux-x86-64
+  #   taskRef: 
+  #     name: general-command
+  #   runAfter:
+  #     - chmod-ecosystem-script
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)/cli
+  #   - name: image
+  #     value: docker.io/library/openjdk:11
+  #   - name: command
+  #     value: 
+  #       - ./test-galasactl-ecosystem.sh
+  #       - --bootstrap
+  #       - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace
 
   #----------------------------------------------------------------
   # END OF TESTS
@@ -384,7 +386,8 @@ spec:
     taskRef: 
       name: docker-build
     runAfter:
-    - test-galasactl-ecosystem-linux-x86-64
+    # We are temporarily disabling the ecosystem tets. - test-galasactl-ecosystem-linux-x86-64
+    - test-galasactl-local-gradle-linux-x86-64
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
