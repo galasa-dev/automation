@@ -596,7 +596,7 @@ spec:
     - name: authSecretName
       value: planb-argocd-token
     - name: authSecretKey
-      value: planb-argocd-token
+      value: token
 
   #----------------------------------------------------------------
 
