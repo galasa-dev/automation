@@ -571,6 +571,10 @@ spec:
       - Deployment
       - --resource-name
       - cli-$(params.imageTag)
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
 
   #----------------------------------------------------------------
   - name: wait-cli-binary-planb
@@ -589,7 +593,10 @@ spec:
       - --resource
       - apps:Deployment:cli-$(params.imageTag)
       - --health    
-     
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: planb-argocd-token
 
   #----------------------------------------------------------------
 
