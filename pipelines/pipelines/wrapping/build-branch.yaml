@@ -155,6 +155,38 @@ spec:
 # 
 # 
 #
+  #----------------------------------------------------------------
+  # Build images for 
+  # https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: branch-docker-build-wrapping-planb
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - branch-maven-build-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/wrapping
+    - name: dockerfilePath
+      value: automation/dockerfiles/wrapping/wrapping-dockerfile
+    - name: imageName
+      value: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-wrapping:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for 
+  # harbor.galasa.dev
+  #----------------------------------------------------------------
   - name: branch-docker-build-wrapping
     taskRef:
       name: docker-build
@@ -182,6 +214,60 @@ spec:
 # 
 # 
 #
+  #----------------------------------------------------------------
+  # Recycle deployments for
+  # https://argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: recycle-deployment-planb
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - branch-docker-build-wrapping-planb
+    params:
+    - name: server
+      value: argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart
+      - --kind 
+      - Deployment
+      - --resource-name
+      - wrapping-$(params.toBranch)
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
+# 
+# 
+#
+  - name: wait-deployment-planb
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment-planb
+    params:
+    - name: server
+      value: argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:wrapping-$(params.toBranch)
+      - --health
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
+  #----------------------------------------------------------------
+  # Recycle deployments for 
+  # argocd.galasa.dev
+  #----------------------------------------------------------------
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -228,6 +314,7 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
+    - wait-deployment-planb
     - wait-deployment
     params:
     - name: context

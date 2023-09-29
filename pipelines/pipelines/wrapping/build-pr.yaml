@@ -9,6 +9,9 @@ kind: Pipeline
 metadata:
   name: pr-wrapping
   namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   workspaces:
   - name: git-workspace
@@ -126,6 +129,38 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for 
+  # https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: docker-build-wrapping-planb
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - maven-build-wrapping
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/wrapping
+    - name: dockerfilePath
+      value: automation/dockerfiles/wrapping/wrapping-dockerfile
+    - name: imageName
+      value: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-wrapping:$(params.headSha)
+    - name: noPush
+      value: "--no-push"
+    - name: buildArgs
+      value:
+        - "--build-arg=baseVersion=latest"
+        - "--build-arg=dockerRepository=harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for 
+  # harbor.galasa.dev
+  #----------------------------------------------------------------
   - name: docker-build-wrapping
     taskRef:
       name: docker-build
@@ -142,7 +177,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-wrapping:$(params.headSha)
     - name: noPush
-      value: ""
+      value: "--no-push"
     - name: buildArgs
       value:
         - "--build-arg=baseVersion=latest"
