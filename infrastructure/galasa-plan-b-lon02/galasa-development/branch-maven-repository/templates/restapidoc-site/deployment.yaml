@@ -1,0 +1,34 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+{{ if .Values.restApiDocSite.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restapidocsite-{{ .Values.restApiDocSite.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restapidocsite-{{ .Values.restApiDocSite.branch }}
+  template:
+    metadata:
+      name: restapidocsite-{{ .Values.restApiDocSite.branch }}
+      labels:
+        app: restapidocsite-{{ .Values.restApiDocSite.branch }}
+    spec:
+      containers:
+        - image: {{ .Values.restApiDocSite.imageName }}:{{ .Values.restApiDocSite.imageTag }}
+          imagePullPolicy: Always
+          name: restapidocsite-{{ .Values.restApiDocSite.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.restApiDocSite.branch }}/restapidoc-site
+          ports:
+            - containerPort: 80
+{{ end }}
