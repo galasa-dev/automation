@@ -1,0 +1,84 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+
+namespace: galasa-development
+
+managers:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-managers
+  imageTag: integration
+extensions:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-extensions
+  imageTag: integration
+codecov:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-codecoverage
+  imageTag: integration      
+framework:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-framework
+  imageTag: integration 
+obr:
+  deploy: true
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-obr
+  imageTag: integration
+maven:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-maven
+  imageTag: integration
+gradle:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-gradle
+  imageTag: integration
+eclipse:
+  deploy: true
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-eclipse
+  imageTag: integration
+p2:
+  deploy: true
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-p2
+  imageTag: integration  
+isolated:
+  deploy: true
+  branch: integration
+  imageName: icr.io/galasadev/galasa-isolated-zip
+  imageTag: integration
+javadoc:
+  deploy: true
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-javadoc-maven-repo
+  imageTag: integration
+javadocsite:
+  deploy: true
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-javadoc-site
+  imageTag: integration  
+restApiDocSite:
+  deploy: true
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-restapidoc-site
+  imageTag: integration 
+mvp:
+  deploy: true
+  branch: integration
+  imageName: icr.io/galasadev/galasa-mvp-zip
+  imageTag: integration
+wrapping:
+  deploy: false
+  branch: integration
+  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-wrapping
+  imageTag: integration
