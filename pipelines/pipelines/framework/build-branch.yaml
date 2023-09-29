@@ -9,9 +9,6 @@ kind: Pipeline
 metadata:
   name: branch-framework
   namespace: galasa-build
-    # Tell ArgoCD never to prune this pipeline definition.
-  annotations:
-    argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
   - name: fromBranch
