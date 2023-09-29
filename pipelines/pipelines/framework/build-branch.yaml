@@ -9,6 +9,9 @@ kind: Pipeline
 metadata:
   name: branch-framework
   namespace: galasa-build
+    # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
   - name: fromBranch
@@ -141,6 +144,37 @@ spec:
 # 
 # 
 # 
+  #----------------------------------------------------------------
+  # Build images for 
+  # https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: branch-docker-build-framework-planb
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - branch-gradle-build-framework
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: dockerfilePath
+      value: automation/dockerfiles/framework/framework-dockerfile
+    - name: imageName
+      value: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-framework:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=dockerRepository=harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for harbor.galasa.dev
+  #----------------------------------------------------------------
   - name: branch-docker-build-framework
     taskRef:
       name: docker-build
@@ -197,6 +231,32 @@ spec:
 #
 #
 #
+  #----------------------------------------------------------------
+  # Build images for 
+  # https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: docker-build-restapidoc-site-planb
+    taskRef:
+      name: docker-build
+    runAfter:
+    - generate-api-docs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-restapidoc-site:$(params.imageTag)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for harbor.galasa.dev
+  #----------------------------------------------------------------
   - name: docker-build-restapidoc-site
     taskRef:
       name: docker-build
@@ -219,6 +279,109 @@ spec:
 #
 #
 #
+  #----------------------------------------------------------------
+  # Recycle deployments for 
+  # https://argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: recycle-deployment-planb
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - branch-docker-build-framework-planb
+    params:
+    - name: server
+      value: argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - framework-$(params.imageTag)
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
+# 
+# 
+# 
+  - name: wait-deployment-planb
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment-planb
+    params:
+    - name: server
+      value: argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname) 
+      - --resource
+      - apps:Deployment:framework-$(params.imageTag)
+      - --health
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
+# 
+# 
+# 
+  - name: recycle-restapidoc-site-deployment-planb
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build-restapidoc-site-planb
+    params:
+    - name: server
+      value: argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+    - name: command
+      value:
+      - app
+      - actions
+      - run
+      - $(params.appname)
+      - restart
+      - --kind
+      - Deployment
+      - --resource-name
+      - restapidocsite-$(params.imageTag)
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
+# 
+# 
+# 
+  - name: wait-restapidoc-site-deployment-planb
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-restapidoc-site-deployment-planb
+    params:
+    - name: server
+      value: argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:restapidocsite-$(params.imageTag)
+      - --health
+    - name: authSecretName
+      value: planb-argocd-token
+    - name: authSecretKey
+      value: token
+  #----------------------------------------------------------------
+  # Recycle deployments for 
+  # argocd.galasa.dev
+  #----------------------------------------------------------------
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -306,7 +469,10 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
+    - wait-deployment-planb
+    - wait-restapidoc-site-deployment-planb
     - wait-deployment
+    - wait-restapidoc-site-deployment
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation

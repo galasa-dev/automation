@@ -9,6 +9,9 @@ kind: Pipeline
 metadata:
   name: pr-framework
   namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   workspaces:
   - name: git-workspace
@@ -134,6 +137,37 @@ spec:
 #
 #
 #
+  #----------------------------------------------------------------
+  # Build images for 
+  # https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: docker-build-framework-planb
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - gradle-build-framework
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: dockerfilePath
+      value: automation/dockerfiles/framework/framework-dockerfile
+    - name: imageName
+      value: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-framework:$(params.headSha)
+    - name: noPush
+      value: "--no-push"
+    - name: buildArgs
+      value:
+        - "--build-arg=tag=main"
+        - "--build-arg=dockerRepository=harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for harbor.galasa.dev
+  #----------------------------------------------------------------
   - name: docker-build-framework
     taskRef:
       name: docker-build
@@ -150,7 +184,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-framework:$(params.headSha)
     - name: noPush
-      value: ""
+      value: "--no-push"
     - name: buildArgs
       value:
         - "--build-arg=tag=main"
@@ -190,6 +224,32 @@ spec:
 #
 #
 #
+  #----------------------------------------------------------------
+  # Build images for 
+  # https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud
+  #----------------------------------------------------------------
+  - name: docker-build-restapidoc-site-planb
+    taskRef:
+      name: docker-build
+    runAfter:
+    - generate-api-docs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-restapidoc-site:$(params.headSha)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: noPush
+      value: "--no-push"
+    - name: dockerfilePath
+      value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+  #----------------------------------------------------------------
+  # Build images for harbor.galasa.dev
+  #----------------------------------------------------------------
   - name: docker-build-restapidoc-site
     taskRef:
       name: docker-build
@@ -203,7 +263,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/framework
     - name: noPush
-      value: ""
+      value: "--no-push"
     - name: dockerfilePath
       value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
     workspaces:
