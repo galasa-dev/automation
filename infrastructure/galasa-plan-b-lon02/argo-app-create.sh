@@ -65,6 +65,8 @@ function create_application {
     app_name=$1
     repo_path=$2
 
+    h2 "Creating argocd application ${app_name}"
+
     argocd app create ${app_name} \
     --repo https://github.com/galasa-dev/automation.git \
     --path ${base_git_repo_path}/${repo_path} \
@@ -73,6 +75,11 @@ function create_application {
     --dest-namespace galasa-development \
     --project default 
     rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to create application ${app_name}. rc=${rc}" ; exit 1 ; fi
+
+    cmd="argocd app sync ${app_name}"
+    info "Command to run is $cmd"
+    $cmd
+    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to sync application ${app_name}. rc=${rc}" ; exit 1 ; fi
 }
 
 function create_helm_application {
@@ -100,6 +107,11 @@ function create_helm_application {
     info "Command to run is $cmd"
     $cmd
     rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to set values into application ${app_name}. rc=${rc}" ; exit 1 ; fi
+
+    cmd="argocd app sync ${app_name}"
+    info "Command to run is $cmd"
+    $cmd
+    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to sync application ${app_name}. rc=${rc}" ; exit 1 ; fi
 }
 
 function delete_application {
@@ -114,13 +126,15 @@ function delete_application {
 }
 
 # delete_application "codecov-maven-repos"
-
 # create_helm_application "codecov-maven-repos" \
 # "galasa-development/branch-maven-repository" \
 # "values-used-by-different-argo-apps/codecov-maven-repos.yaml"
 
+# delete_application "github-copyright"
 # create_application "github-copyright" "galasa-development/github-copyright"
-# create_application "github-webhook_receiver" "galasa-development/github-copyright"
+
+# delete_application "github-webhook-receiver"
+# create_application "github-webhook-receiver" "galasa-development/github-webhook-receiver"
 
 # delete_application "integration-maven-repos"
 # create_helm_application "integration-maven-repos" \
@@ -132,10 +146,18 @@ function delete_application {
 # "galasa-development/branch-maven-repository" \
 # "values-used-by-different-argo-apps/main-maven-repos.yaml"
 
+# delete_application "prod-maven-repos"
+# create_helm_application "prod-maven-repos" \
+# "galasa-development/branch-maven-repository" \
+# "values-used-by-different-argo-apps/prod-maven-repos.yaml"
 
-delete_application "prod-maven-repos"
-create_helm_application "prod-maven-repos" \
-"galasa-development/branch-maven-repository" \
-"values-used-by-different-argo-apps/prod-maven-repos.yaml"
+delete_application "main-bld"
+create_application "main-bld" "galasa-development/galasabld" 
+
+delete_application "main-inttests"
+create_application "main-inttests" "galasa-development/inttests" 
+
+delete_application "main-simplatform"
+create_application "main-simplatform" "galasa-development/simplatform"
 
 
