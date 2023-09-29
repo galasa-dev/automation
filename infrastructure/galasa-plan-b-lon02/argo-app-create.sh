@@ -78,11 +78,9 @@ function create_application {
 function create_helm_application {
     app_name=$1
     repo_path=$2
-    values_file=$3
+    values_file_relative_to_helm_chart=$3
 
     h2 "Creating argocd application ${app_name} from a helm chart"
-
-    values_file_path="${base_git_repo_path}/${values_file}"
 
     info "Using values file at ${values_file_path}"
 
@@ -92,32 +90,42 @@ function create_helm_application {
     --revision HEAD \
     --dest-server https://kubernetes.default.svc \
     --dest-namespace galasa-development \
-    --project default \
-    --values ${values_file_path}"
+    --project default"
 
     info "Command to run is $cmd"
-
     $cmd
-
     rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to create application ${app_name}. rc=${rc}" ; exit 1 ; fi
+
+    cmd="argocd app set ${app_name} --values ${values_file_relative_to_helm_chart}"
+    info "Command to run is $cmd"
+    $cmd
+    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to set values into application ${app_name}. rc=${rc}" ; exit 1 ; fi
 }
 
 function delete_application {
     app_name=$1
     h2 "Deleting application ${app_name}"
     argocd app delete ${app_name} --cascade --yes
-    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to delete application ${app_name}. rc=${rc}" ; exit 1 ; fi
+    rc=$? ; if [[ "${rc}" != "0" ]]; 
+        then error "Failed to delete application ${app_name}. rc=${rc}. Continuing anyway..." 
+    else
+        success "Application ${app_name} deleted."
+    fi
 }
 
 # delete_application "codecov-maven-repos"
 
-create_helm_application "codecov-maven-repos" \
-"galasa-development/branch-maven-repository" \
-"galasa-development/branch-maven-repository/values-used-by-different-argo-apps/codecov-maven-repos.yaml"
+# create_helm_application "codecov-maven-repos" \
+# "galasa-development/branch-maven-repository" \
+# "values-used-by-different-argo-apps/codecov-maven-repos.yaml"
 
 # create_application "github-copyright" "galasa-development/github-copyright"
 # create_application "github-webhook_receiver" "galasa-development/github-copyright"
-# create_helm_application "integration-maven-repos" "galasa-development/branch-maven-repository"
+
+delete_application "integration-maven-repos"
+create_helm_application "integration-maven-repos" \
+"galasa-development/branch-maven-repository" \
+"values-used-by-different-argo-apps/integration-maven-repos.yaml"
 
 
 
