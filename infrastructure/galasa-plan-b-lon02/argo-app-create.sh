@@ -122,12 +122,20 @@ function delete_application {
 # create_application "github-copyright" "galasa-development/github-copyright"
 # create_application "github-webhook_receiver" "galasa-development/github-copyright"
 
-delete_application "integration-maven-repos"
-create_helm_application "integration-maven-repos" \
+# delete_application "integration-maven-repos"
+# create_helm_application "integration-maven-repos" \
+# "galasa-development/branch-maven-repository" \
+# "values-used-by-different-argo-apps/integration-maven-repos.yaml"
+
+# delete_application "main-maven-repos"
+# create_helm_application "main-maven-repos" \
+# "galasa-development/branch-maven-repository" \
+# "values-used-by-different-argo-apps/main-maven-repos.yaml"
+
+
+delete_application "prod-maven-repos"
+create_helm_application "prod-maven-repos" \
 "galasa-development/branch-maven-repository" \
-"values-used-by-different-argo-apps/integration-maven-repos.yaml"
-
-
-
+"values-used-by-different-argo-apps/prod-maven-repos.yaml"
 
 
