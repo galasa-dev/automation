@@ -146,19 +146,17 @@ function delete_application {
 # "galasa-development/branch-maven-repository" \
 # "values-used-by-different-argo-apps/main-maven-repos.yaml"
 
-
-
 # delete_application "main-bld"
 # create_application "main-bld" "galasa-development/galasabld" 
 
 # delete_application "main-inttests"
 # create_application "main-inttests" "galasa-development/inttests" 
 
-delete_application "main-simplatform"
-create_helm_application "main-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/main-simplatform-values.yaml"
+# delete_application "main-simplatform"
+# create_helm_application "main-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/main-simplatform-values.yaml"
 
-delete_application "prod-simplatform"
-create_helm_application "prod-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/prod-simplatform-values.yaml"
+# delete_application "prod-simplatform"
+# create_helm_application "prod-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/prod-simplatform-values.yaml"
 
 # delete_application "prod-maven-repos"
 # create_helm_application "prod-maven-repos" \
