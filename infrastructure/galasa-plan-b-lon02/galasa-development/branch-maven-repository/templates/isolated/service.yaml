@@ -1,0 +1,20 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+{{ if .Values.isolated.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: isolated-{{ .Values.isolated.branch }}
+  name: isolated-{{ .Values.isolated.branch }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: isolated-{{ .Values.isolated.branch }}
+{{ end }}
