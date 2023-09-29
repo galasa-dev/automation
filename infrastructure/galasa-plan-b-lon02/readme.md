@@ -12,3 +12,8 @@ This cluster has the following applications set up:
 
 - Argocd has a dex server built-in.
 - There is no secrets service on this account. It's on the CIO account, and we use the same secrets manager service.
+
+# Create argocd applications
+Create applications in argocd using the `argo-app-create.sh` script.
+
+> Read + Change it before you run it.
