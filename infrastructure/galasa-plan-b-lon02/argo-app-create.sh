@@ -125,55 +125,48 @@ function delete_application {
     fi
 }
 
-delete_application "github-copyright"
-delete_application "codecov-maven-repos"
-delete_application "main-cli"
-delete_application "github-webhook-receiver"
-delete_application "main-maven-repos"
-delete_application "integration-maven-repos"
-delete_application "main-bld"
-delete_application "main-inttests"
-delete_application "main-simplatform"
-delete_application "prod-simplatform"
-delete_application "prod-maven-repos"
-delete_application "galasa-development-namespace"
+# delete_application "github-copyright"
+# delete_application "codecov-maven-repos"
+# delete_application "main-cli"
+# delete_application "github-webhook-receiver"
+# delete_application "main-maven-repos"
+# delete_application "integration-maven-repos"
+# delete_application "main-bld"
+# delete_application "main-inttests"
+# delete_application "main-simplatform"
+# delete_application "prod-simplatform"
+# delete_application "prod-maven-repos"
+# delete_application "galasa-development-namespace"
+
+
 
 create_application "galasa-development-namespace" "galasa-development"
 
-
 create_application "main-cli" "galasa-development/cli" 
-
 
 create_helm_application "codecov-maven-repos" \
 "galasa-development/branch-maven-repository" \
 "values-used-by-different-argo-apps/codecov-maven-repos.yaml"
 
-
 create_application "github-copyright" "galasa-development/github-copyright"
 
-
 create_application "github-webhook-receiver" "galasa-development/github-webhook-receiver"
-
 
 create_helm_application "integration-maven-repos" \
 "galasa-development/branch-maven-repository" \
 "values-used-by-different-argo-apps/integration-maven-repos.yaml"
 
-
 create_helm_application "main-maven-repos" \
 "galasa-development/branch-maven-repository" \
 "values-used-by-different-argo-apps/main-maven-repos.yaml"
 
-
 create_application "main-bld" "galasa-development/galasabld" 
-
 
 create_application "main-inttests" "galasa-development/inttests" 
 
 create_helm_application "main-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/main-simplatform-values.yaml"
 
 create_helm_application "prod-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/prod-simplatform-values.yaml"
-
 
 create_helm_application "prod-maven-repos" \
 "galasa-development/branch-maven-repository" \
