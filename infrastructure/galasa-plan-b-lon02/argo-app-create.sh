@@ -63,7 +63,8 @@ base_git_repo_path="infrastructure/${cluster_name}"
 
 function create_application {
     app_name=$1
-    repo_path=$2
+    repo_name=$2
+    repo_path=$3
 
     h2 "Creating argocd application ${app_name}"
 
@@ -140,34 +141,54 @@ function delete_application {
 
 
 
-create_application "galasa-development-namespace" "galasa-development"
+# create_application "galasa-development-namespace" \
+#     https://github.com/galasa-dev/automation.git \
+#     "galasa-development"
 
-create_application "main-cli" "galasa-development/cli" 
+# create_application "main-cli" \
+#     https://github.com/galasa-dev/automation.git \
+#     "galasa-development/cli" 
 
-create_helm_application "codecov-maven-repos" \
-"galasa-development/branch-maven-repository" \
-"values-used-by-different-argo-apps/codecov-maven-repos.yaml"
+# create_helm_application "codecov-maven-repos" \
+#     "galasa-development/branch-maven-repository" \
+#     "values-used-by-different-argo-apps/codecov-maven-repos.yaml"
 
-create_application "github-copyright" "galasa-development/github-copyright"
+# create_application "github-copyright" \
+#     https://github.com/galasa-dev/automation.git \
+#     "galasa-development/github-copyright"
 
-create_application "github-webhook-receiver" "galasa-development/github-webhook-receiver"
+# create_application "github-webhook-receiver" \
+#     https://github.com/galasa-dev/automation.git \
+#     "galasa-development/github-webhook-receiver"
 
-create_helm_application "integration-maven-repos" \
-"galasa-development/branch-maven-repository" \
-"values-used-by-different-argo-apps/integration-maven-repos.yaml"
+# create_helm_application "integration-maven-repos" \
+#     "galasa-development/branch-maven-repository" \
+#     "values-used-by-different-argo-apps/integration-maven-repos.yaml"
 
-create_helm_application "main-maven-repos" \
-"galasa-development/branch-maven-repository" \
-"values-used-by-different-argo-apps/main-maven-repos.yaml"
+# create_helm_application "main-maven-repos" \
+#     "galasa-development/branch-maven-repository" \
+#     "values-used-by-different-argo-apps/main-maven-repos.yaml"
 
-create_application "main-bld" "galasa-development/galasabld" 
+# create_application "main-bld" \
+#     https://github.com/galasa-dev/automation.git \
+#     "galasa-development/galasabld" 
 
-create_application "main-inttests" "galasa-development/inttests" 
+# create_application "main-inttests" \
+#     https://github.com/galasa-dev/automation.git \
+#     "galasa-development/inttests" 
 
-create_helm_application "main-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/main-simplatform-values.yaml"
+# create_helm_application "main-simplatform" \
+#     "galasa-development/simplatform" \
+#     "values-used-by-different-argo-apps/main-simplatform-values.yaml"
 
-create_helm_application "prod-simplatform" "galasa-development/simplatform" "values-used-by-different-argo-apps/prod-simplatform-values.yaml"
+# create_helm_application "prod-simplatform" \
+#     "galasa-development/simplatform" \
+#     "values-used-by-different-argo-apps/prod-simplatform-values.yaml"
 
-create_helm_application "prod-maven-repos" \
-"galasa-development/branch-maven-repository" \
-"values-used-by-different-argo-apps/prod-maven-repos.yaml"
+# create_helm_application "prod-maven-repos" \
+#     "galasa-development/branch-maven-repository" \
+#     "values-used-by-different-argo-apps/prod-maven-repos.yaml"
+
+create_application "galasa-ibmcloud" \
+    https://github.com/galasa-dev/argocd-ibmcloud.git \
+    "argocd-ibmcloud"
