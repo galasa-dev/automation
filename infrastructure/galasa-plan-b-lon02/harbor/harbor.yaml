@@ -9,6 +9,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: harbor-core
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -30,6 +31,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: "harbor-database"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -44,6 +46,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: "harbor-jobservice"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -59,6 +62,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: "harbor-registry"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -74,6 +78,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: "harbor-registry-htpasswd"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -88,6 +93,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: "harbor-registryctl"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -101,6 +107,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: harbor-trivy
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -116,6 +123,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: harbor-core
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -138,7 +146,7 @@ data:
   POSTGRESQL_SSLMODE: "disable"
   POSTGRESQL_MAX_IDLE_CONNS: "100"
   POSTGRESQL_MAX_OPEN_CONNS: "900"
-  EXT_ENDPOINT: "https://harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+  EXT_ENDPOINT: "https://harbor.galasa.dev"
   CORE_URL: "http://harbor-core:80"
   JOBSERVICE_URL: "http://harbor-jobservice"
   REGISTRY_URL: "http://harbor-registry:5000"
@@ -169,6 +177,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "harbor-jobservice-env"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -189,6 +198,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "harbor-jobservice"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -229,6 +239,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "harbor-portal"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -272,6 +283,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "harbor-registry"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -337,6 +349,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "harbor-registryctl"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -349,6 +362,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: harbor-jobservice-scandata
+  namespace: harbor
   annotations:
     helm.sh/resource-policy: keep
   labels:
@@ -370,6 +384,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: harbor-jobservice
+  namespace: harbor
   annotations:
     helm.sh/resource-policy: keep
   labels:
@@ -391,6 +406,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: harbor-registry
+  namespace: harbor
   annotations:
     helm.sh/resource-policy: keep
   labels:
@@ -412,6 +428,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: harbor-core
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -432,6 +449,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "harbor-database"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -450,6 +468,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "harbor-jobservice"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -470,6 +489,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "harbor-portal"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -489,6 +509,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: harbor-redis
+  # namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -507,6 +528,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "harbor-registry"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -529,6 +551,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "harbor-trivy"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -549,6 +572,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: harbor-core
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -661,6 +685,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "harbor-jobservice"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -755,6 +780,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "harbor-portal"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -817,6 +843,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "harbor-registry"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -957,6 +984,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "harbor-database"
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -1054,6 +1082,7 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: "database-data"
+      namespace: harbor
       labels:
         heritage: Helm
         release: harbor
@@ -1072,6 +1101,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: harbor-redis
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -1123,6 +1153,7 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
+      namespace: harbor
       labels:
         heritage: Helm
         release: harbor
@@ -1141,6 +1172,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: harbor-trivy
+  namespace: harbor
   labels:
     heritage: Helm
     release: harbor
@@ -1289,63 +1321,3 @@ spec:
       resources:
         requests:
           storage: "1Gi"
----
-# Source: harbor/templates/ingress/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: "harbor-ingress"
-  annotations:
-    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
-    nginx.ingress.kubernetes.io/proxy-body-size: 500m
-spec:
-  tls:
-  - secretName: galasa-wildcard-cert
-    hosts:
-    - harbor.galasa.dev
-  rules:
-  - http:
-      paths:
-      - path: /api/
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: harbor-core
-            port:
-              number: 80
-      - path: /service/
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: harbor-core
-            port:
-              number: 80
-      - path: /v2/
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: harbor-core
-            port:
-              number: 80
-      - path: /chartrepo/
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: harbor-core
-            port:
-              number: 80
-      - path: /c/
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: harbor-core
-            port:
-              number: 80
-      - path: /
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: harbor-portal
-            port:
-              number: 80
-    host: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud

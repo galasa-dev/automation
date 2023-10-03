@@ -27,7 +27,7 @@ kubectl describe ExternalSecrets -n harbor
 ```
 kubectl apply -f infrastructure/galasa-plan-b-lon02/harbor/harbor.yaml -n harbor 
 
-kubectl rollout restart -n argocd deployments harbor-core harbor-jobservice harbor-portal harbor-registry
+kubectl rollout restart -n harbor deployments harbor-core harbor-jobservice harbor-portal harbor-registry
 ```
 
 ## Secrets Supplied/Used
