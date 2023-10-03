@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: restapidoc-stable
+  namespace: galasa-production
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: restapidoc-stable
