@@ -24,3 +24,10 @@ spec:
     command:
     - make
     - all
+    volumeMounts: 
+    - name: githubapp-copyright-unit-test-key
+      mountPath: /key
+  volumes:
+    - name: githubapp-copyright-unit-test-key
+      secret:
+        secretName: githubapp-copyright-unit-test-key
