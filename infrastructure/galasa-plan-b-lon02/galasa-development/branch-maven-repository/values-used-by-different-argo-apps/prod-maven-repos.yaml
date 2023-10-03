@@ -10,47 +10,47 @@ namespace: galasa-development
 managers:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-managers
+  imageName: harbor.galasa.dev/galasadev/galasa-managers
   imageTag: main
 extensions:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-extensions
+  imageName: harbor.galasa.dev/galasadev/galasa-extensions
   imageTag: main
 codecov:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-codecoverage
+  imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
   imageTag: main      
 framework:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-framework
+  imageName: harbor.galasa.dev/galasadev/galasa-framework
   imageTag: main 
 obr:
   deploy: true
   branch: prod
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-obr
+  imageName: harbor.galasa.dev/galasadev/galasa-obr
   imageTag: prod
 maven:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-maven
+  imageName: harbor.galasa.dev/galasadev/galasa-maven
   imageTag: main
 gradle:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-gradle
+  imageName: harbor.galasa.dev/galasadev/galasa-gradle
   imageTag: main
 eclipse:
   deploy: true
   branch: prod
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-eclipse
+  imageName: harbor.galasa.dev/galasadev/galasa-eclipse
   imageTag: prod
 p2:
   deploy: true
   branch: prod
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-p2
+  imageName: harbor.galasa.dev/galasadev/galasa-p2
   imageTag: prod  
 isolated:
   deploy: true
@@ -60,17 +60,17 @@ isolated:
 javadoc:
   deploy: true
   branch: prod
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-javadoc-maven-repo
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
   imageTag: prod
 javadocsite:
   deploy: true
   branch: prod
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-javadoc-site
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
   imageTag: prod  
 restApiDocSite:
   deploy: true
   branch: prod
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-restapidoc-site
+  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
   imageTag: prod 
 mvp:
   deploy: true
@@ -80,5 +80,5 @@ mvp:
 wrapping:
   deploy: false
   branch: main
-  imageName: harbor.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud/galasadev/galasa-wrapping
+  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
   imageTag: main

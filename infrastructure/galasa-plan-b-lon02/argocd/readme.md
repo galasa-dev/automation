@@ -1,4 +1,12 @@
+## Warning !
 
+Note : Only apply these yamls once ! Argocd edits them on the fly.
+
+- Apply argocd only once
+- Then you can deploy argocd-cm
+- Then all of the secrets files
+
+If you need to refresh the secret files, you have to delete them first. 
 
 ## Useful commands 
 
