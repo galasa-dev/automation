@@ -129,7 +129,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghreceiver:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
@@ -264,7 +264,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/swagger:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
