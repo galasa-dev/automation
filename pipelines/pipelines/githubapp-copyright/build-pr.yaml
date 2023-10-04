@@ -106,19 +106,6 @@ spec:
 #
   finally:
 
-  - name: ls
-    taskRef: 
-      name: script
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/githubapp-copyright/build
-    - name: script
-      value:  
-        ls
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
   - name: git-status
     when:
       - input: "$(tasks.git-verify.status)"
