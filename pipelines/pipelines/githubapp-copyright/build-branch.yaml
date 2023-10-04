@@ -1,0 +1,75 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-githubapp-copyright
+  namespace: galasa-build
+spec:
+
+  workspaces:
+  - name: git-workspace
+# 
+# 
+#
+  tasks:
+# 
+# 
+# 
+  - name: clone-githubapp-copyright
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/githubapp-copyright
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/githubapp-copyright
+    workspaces:
+     - name: output
+       workspace: git-workspace 
+#
+#
+#
+  - name: githubapp-copyright-make
+    taskRef: 
+      name: make
+    runAfter: 
+    - clone-githubapp-copyright
+    params:
+    - name: directory
+      value: $(context.pipelineRun.name)/githubapp-copyright
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+#
+  - name: docker-build-githubapp-copyright
+    taskRef:
+      name: docker-build
+    runAfter:
+    - githubapp-copyright-make
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/githubapp-copyright
+    - name: dockerfilePath
+      value: githubapp-copyright/Dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-copyright:latest
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace

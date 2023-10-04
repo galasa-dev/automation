@@ -17,6 +17,36 @@ spec:
   - name: directory
     type: string  
   steps:
+  - name: list-main-dir-contents
+    workingDir: /workspace/git/$(params.directory)
+    image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
+    command:
+    - ls
+  - name: list-key-dir-contents
+    workingDir: /workspace/git/$(params.directory)/key
+    image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
+    command:
+    - ls
+  - name: list-build-dir-contents-1
+    workingDir: /workspace/git/$(params.directory)/build
+    image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
+    command:
+    - ls
+  - name: copy-key
+    workingDir: /workspace/git/$(params.directory)
+    image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
+    command:
+    - cp /workspace/git/$(params.directory)/key/* /workspace/git/$(params.directory)/build
+  - name: list-build-dir-contents-2
+    workingDir: /workspace/git/$(params.directory)/build
+    image: docker.io/library/busybox:latest
+    imagePullPolicy: Always
+    command:
+    - ls
   - name: make
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/golang:latest
@@ -26,8 +56,13 @@ spec:
     - all
     volumeMounts: 
     - name: githubapp-copyright-unit-test-key
-      mountPath: /key
+      mountPath: /workspace/git/$(params.directory)/key
+      # mountPath: /workspace/git/$(params.directory)/build
+    - name: build-directory 
+      mountPath: /workspace/git/$(params.directory)/build
   volumes:
     - name: githubapp-copyright-unit-test-key
       secret:
         secretName: githubapp-copyright-unit-test-key
+    - name: build-directory
+      emptyDir: {}
