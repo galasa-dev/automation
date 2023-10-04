@@ -40,7 +40,7 @@ spec:
     image: docker.io/library/busybox:latest
     imagePullPolicy: Always
     command:
-    - cp /workspace/git/$(params.directory)/key/* /workspace/git/$(params.directory)/build
+    - cp /workspace/git/$(params.directory)/key/key.pem /workspace/git/$(params.directory)/build
   - name: list-build-dir-contents-2
     workingDir: /workspace/git/$(params.directory)/build
     image: docker.io/library/busybox:latest
