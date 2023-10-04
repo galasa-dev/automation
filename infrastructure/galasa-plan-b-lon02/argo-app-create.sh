@@ -139,7 +139,8 @@ function delete_application {
 # delete_application "prod-maven-repos"
 # delete_application "galasa-development-namespace"
 
-
+# delete_application "galasa-production"
+# delete_application "galasa-production-namespace"
 
 # create_application "galasa-development-namespace" \
 #     https://github.com/galasa-dev/automation.git \
@@ -189,6 +190,11 @@ function delete_application {
 #     "galasa-development/branch-maven-repository" \
 #     "values-used-by-different-argo-apps/prod-maven-repos.yaml"
 
-create_application "galasa-ibmcloud" \
+create_application "galasa-production-namespace" \
     https://github.com/galasa-dev/argocd-ibmcloud.git \
-    "argocd-ibmcloud"
+    "galasa-production"
+
+create_application "galasa-production" \
+    https://github.com/galasa-dev/argocd-ibmcloud.git \
+    "galasa-production/galasa-production"
+
