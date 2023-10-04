@@ -191,10 +191,10 @@ function delete_application {
 #     "values-used-by-different-argo-apps/prod-maven-repos.yaml"
 
 create_application "galasa-production-namespace" \
-    https://github.com/galasa-dev/argocd-ibmcloud.git \
+    https://github.com/galasa-dev/automation.git \
     "galasa-production"
 
 create_application "galasa-production" \
-    https://github.com/galasa-dev/argocd-ibmcloud.git \
+    https://github.com/galasa-dev/automation.git \
     "galasa-production/galasa-production"
 
