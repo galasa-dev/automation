@@ -40,7 +40,9 @@ spec:
     image: docker.io/library/busybox:latest
     imagePullPolicy: Always
     command:
-    - cp /workspace/git/$(params.directory)/key/key.pem /workspace/git/$(params.directory)/build
+    - cp
+    - /workspace/git/$(params.directory)/key/key.pem
+    - /workspace/git/$(params.directory)/build
   - name: list-build-dir-contents-2
     workingDir: /workspace/git/$(params.directory)/build
     image: docker.io/library/busybox:latest
@@ -55,9 +57,12 @@ spec:
     - make
     - all
     volumeMounts: 
+    # Where we are getting the key.pem from a secret
+    # It will be copied into a different directory as volumeMounts from secrets are read only
     - name: githubapp-copyright-unit-test-key
       mountPath: /workspace/git/$(params.directory)/key
-      # mountPath: /workspace/git/$(params.directory)/build
+    # Where the key.pem will be copied to, emptyDirs are read and write
+    # Needs to be read and write as the Makefile will be making changes in here
     - name: build-directory 
       mountPath: /workspace/git/$(params.directory)/build
   volumes:
