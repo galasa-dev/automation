@@ -15,14 +15,10 @@ spec:
   - hosts:
     - p2.galasa.dev
     - p2snapshot.galasa.dev
-    - jenkins.galasa.dev
-    - sonarqube.galasa.dev
     - resources.galasa.dev
     - javadoc.galasa.dev
     - javadoc-snapshot.galasa.dev
     - rest.galasa.dev
-    - nexus.galasa.dev
-    - docker.galasa.dev
     - development.galasa.dev
     secretName: galasa-wildcard-cert
   rules:
@@ -46,26 +42,8 @@ spec:
               number: 80
         path: /
         pathType: ImplementationSpecific
-  - host: jenkins.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: jenkins
-            port:
-              number: 8080
-        path: /
-        pathType: ImplementationSpecific
-  - host: sonarqube.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: sonarqube
-            port:
-              number: 9000
-        path: /
-        pathType: ImplementationSpecific
+
+
   - host: javadoc.galasa.dev
     http:
       paths:
@@ -106,26 +84,7 @@ spec:
               number: 80
         path: /
         pathType: ImplementationSpecific
-  - host: nexus.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: nexus
-            port:
-              number: 8081
-        path: /
-        pathType: ImplementationSpecific
-  - host: docker.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: nexus
-            port:
-              number: 5000
-        path: /
-        pathType: ImplementationSpecific
+
   - host: development.galasa.dev
     http:
       paths:
@@ -136,31 +95,4 @@ spec:
               number: 3000
         path: /githubapp/copyright/event_handler
         pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: main-obr
-            port:
-              number: 80
-        path: /main/maven/obr/
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: main-p2
-            port:
-              number: 80
-        path: /main/p2/
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: main-isolated
-            port:
-              number: 80
-        path: /main/maven/isolated/
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: main-mvp
-            port:
-              number: 80
-        path: /main/maven/mvp/
-        pathType: ImplementationSpecific
+      
