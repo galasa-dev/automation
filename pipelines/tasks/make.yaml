@@ -17,12 +17,14 @@ spec:
   - name: directory
     type: string  
   steps:
+  # Check the /build and /key directories are made by the volumeMounts below - WORKS
   - name: list-main-dir-contents
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/busybox:latest
     imagePullPolicy: Always
     command:
     - ls
+  # Check the key.pem is inside /key - DOES NOT WORK
   - name: list-key-dir-contents
     workingDir: /workspace/git/$(params.directory)/key
     image: docker.io/library/busybox:latest
@@ -35,6 +37,7 @@ spec:
     imagePullPolicy: Always
     command:
     - ls
+  # Copy key.pem from /key which is read only to /build which the Makefile needs - DOES NOT WORK AS key.pem IS NOT IN /key
   - name: copy-key
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/busybox:latest
