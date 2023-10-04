@@ -28,6 +28,7 @@ spec:
             - containerPort: 3000
           volumeMounts:
             - mountPath: /galasa
+              subPath: key.pem 
               name: key
               readOnly: true
       volumes:
