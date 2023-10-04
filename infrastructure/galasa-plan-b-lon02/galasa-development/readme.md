@@ -25,7 +25,7 @@ The `secret-argocd.yaml` file contains a reference to a secret `planb-argocd-cli
 Look up the value of that secret and put it into the `ARGOCD_CLI_TOKEN` environment variable.
 ```
 
-export ARGOCD_SERVER="argocd.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud"
+export ARGOCD_SERVER="argocd.galasa.dev"
 
 argocd login $ARGOCD_SERVER --auth-token $ARGOCD_CLI_TOKEN --grpc-web
 
