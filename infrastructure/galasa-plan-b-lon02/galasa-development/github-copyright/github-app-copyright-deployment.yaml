@@ -23,6 +23,7 @@ spec:
         - command:
             - copyright
           image: 'harbor.galasa.dev/galasadev/galasa-copyright:latest'
+          imagePullPolicy: Always
           name: copyright
           ports:
             - containerPort: 3000
