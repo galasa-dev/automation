@@ -23,14 +23,20 @@ spec:
         - command:
             - copyright
           image: 'harbor.galasa.dev/galasadev/galasa-copyright:latest'
+          imagePullPolicy: Always
           name: copyright
           ports:
             - containerPort: 3000
           volumeMounts:
             - mountPath: /galasa
+              subPath: key.pem 
               name: key
               readOnly: true
       volumes:
         - name: key
           secret:
             secretName: github-copyright-app-key
+            items:
+              - key: key.pem
+                path: key.pem
+            defaultMode: 440
