@@ -17,41 +17,6 @@ spec:
   - name: directory
     type: string  
   steps:
-  # Check the /build and /key directories are made by the volumeMounts below - WORKS
-  - name: list-main-dir-contents
-    workingDir: /workspace/git/$(params.directory)
-    image: docker.io/library/busybox:latest
-    imagePullPolicy: Always
-    command:
-    - ls
-  # Check the key.pem is inside /key - DOES NOT WORK
-  - name: list-key-dir-contents
-    workingDir: /workspace/git/$(params.directory)/key
-    image: docker.io/library/busybox:latest
-    imagePullPolicy: Always
-    command:
-    - ls
-  - name: list-build-dir-contents-1
-    workingDir: /workspace/git/$(params.directory)/build
-    image: docker.io/library/busybox:latest
-    imagePullPolicy: Always
-    command:
-    - ls
-  # Copy key.pem from /key which is read only to /build which the Makefile needs - DOES NOT WORK AS key.pem IS NOT IN /key
-  - name: copy-key
-    workingDir: /workspace/git/$(params.directory)
-    image: docker.io/library/busybox:latest
-    imagePullPolicy: Always
-    command:
-    - cp
-    - /workspace/git/$(params.directory)/key/key.pem
-    - /workspace/git/$(params.directory)/build
-  - name: list-build-dir-contents-2
-    workingDir: /workspace/git/$(params.directory)/build
-    image: docker.io/library/busybox:latest
-    imagePullPolicy: Always
-    command:
-    - ls
   - name: make
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/golang:latest
@@ -60,17 +25,9 @@ spec:
     - make
     - all
     volumeMounts: 
-    # Where we are getting the key.pem from a secret
-    # It will be copied into a different directory as volumeMounts from secrets are read only
     - name: githubapp-copyright-unit-test-key
-      mountPath: /workspace/git/$(params.directory)/key
-    # Where the key.pem will be copied to, emptyDirs are read and write
-    # Needs to be read and write as the Makefile will be making changes in here
-    - name: build-directory 
-      mountPath: /workspace/git/$(params.directory)/build
+      mountPath: /key
   volumes:
     - name: githubapp-copyright-unit-test-key
       secret:
         secretName: githubapp-copyright-unit-test-key
-    - name: build-directory
-      emptyDir: {}
