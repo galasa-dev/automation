@@ -25,10 +25,11 @@ spec:
           image: 'harbor.galasa.dev/galasadev/galasa-copyright:latest'
           imagePullPolicy: Always
           name: copyright
+          args: ["/secrets/key.pem"]
           ports:
             - containerPort: 3000
           volumeMounts:
-            - mountPath: /galasa
+            - mountPath: /secrets
               subPath: key.pem 
               name: key
               readOnly: true
