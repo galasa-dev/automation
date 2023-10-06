@@ -31,6 +31,7 @@ spec:
     type: string
   workspaces:
   - name: git-workspace
+  - name: keys-workspace
 # 
 # 
 #
@@ -65,23 +66,44 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
-#
-#
-#
+
+  #
+  # Copy a unit test secret into the git workspace.
+  #
+  - name: copy-unit-test-secret
+    taskRef: 
+      name: script
+    runAfter:
+    - clone-githubapp-copyright
+    params:
+      script: |
+        cp //git-workspace/$(context.pipelineRun.name)/githubapp-copyright/key.pem
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+    - name: keys-workspace
+      secret:
+        secretName: githubapp-copyright-unit-test-keys
+
+  #
+  # Build the program with the makefile.
+  #
   - name: githubapp-copyright-make
     taskRef: 
-      name: make
+      name: make-with-params
     runAfter: 
-    - clone-githubapp-copyright
+    - copy-unit-test-secret
     params:
     - name: directory
       value: $(context.pipelineRun.name)/githubapp-copyright
+    - params: ["all" , "GITHUB_AUTH_KEY=/git-workspace/$(context.pipelineRun.name)/githubapp-copyright/key.pem"]
     workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-#
+    - name: git-workspace
+      workspace: git-workspace
+
+  # 
+  # 
+  #
   - name: docker-build-githubapp-copyright
     taskRef:
       name: docker-build
