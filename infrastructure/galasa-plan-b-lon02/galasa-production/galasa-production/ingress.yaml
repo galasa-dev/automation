@@ -96,3 +96,15 @@ spec:
         path: /githubapp/copyright/event_handler
         pathType: ImplementationSpecific
       
+
+  # Nexus is used in the isolated build.
+  - host: nexus.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: nexus
+            port:
+              number: 8081
+        path: /
+        pathType: ImplementationSpecific
