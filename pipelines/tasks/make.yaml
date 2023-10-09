@@ -18,7 +18,8 @@ spec:
     type: string  
   - name: params
     type: string[]
-    default: ["all"]
+    default: 
+    - all
   steps:
   - name: make
     workingDir: /workspace/git/$(params.directory)
