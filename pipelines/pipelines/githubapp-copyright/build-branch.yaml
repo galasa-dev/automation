@@ -17,9 +17,10 @@ spec:
 # 
 #
   tasks:
-# 
-# 
-# 
+
+  # 
+  # Clone the github depo.
+  # 
   - name: clone-githubapp-copyright
     taskRef: 
       name: git-clone
@@ -37,9 +38,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace 
-#
-#
-#
+
+  #
+  # Build the copyright checker source code.
+  #
   - name: githubapp-copyright-make
     taskRef: 
       name: make
@@ -51,9 +53,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-#
+
+  # 
+  # Assemble into a container image.
+  #
   - name: docker-build-githubapp-copyright
     taskRef:
       name: docker-build
@@ -73,3 +76,45 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  # 
+  # Assemble into a container image.
+  #
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build-githubapp-copyright
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appnameCli)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - cli-$(params.imageTag)
+
+  #----------------------------------------------------------------
+  - name: wait-cli-binary
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-cli-binary
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appnameCli)
+      - --resource
+      - apps:Deployment:githubappcopyright
+      - --health    
+     
