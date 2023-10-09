@@ -93,12 +93,12 @@ spec:
       - app 
       - actions 
       - run 
-      - $(params.appnameCli)
+      - github-copyright
       - restart 
       - --kind 
       - Deployment
       - --resource-name
-      - cli-$(params.imageTag)
+      - githubappcopyright
 
   #----------------------------------------------------------------
   - name: wait-cli-binary
@@ -113,7 +113,7 @@ spec:
       value: 
       - app 
       - wait
-      - $(params.appnameCli)
+      - github-copyright
       - --resource
       - apps:Deployment:githubappcopyright
       - --health    
