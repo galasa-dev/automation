@@ -68,24 +68,6 @@ spec:
        workspace: git-workspace 
 
   #
-  # Copy a unit test secret into the git workspace.
-  #
-  - name: copy-unit-test-secret
-    taskRef: 
-      name: script
-    runAfter:
-    - clone-githubapp-copyright
-    params:
-      script: |
-        cp //git-workspace/$(context.pipelineRun.name)/githubapp-copyright/key.pem
-    workspaces:
-    - name: git-workspace
-      workspace: git-workspace
-    - name: keys-workspace
-      secret:
-        secretName: githubapp-copyright-unit-test-keys
-
-  #
   # Build the program with the makefile.
   #
   - name: githubapp-copyright-make
