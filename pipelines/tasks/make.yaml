@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: make
+  name: make-with-params
   namespace: galasa-build
 spec:
   workspaces:
@@ -16,18 +16,12 @@ spec:
   params:
   - name: directory
     type: string  
+  - name: params
+    type: string[]
+    default: ["all"]
   steps:
   - name: make
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/golang:latest
     imagePullPolicy: Always
-    command:
-    - make
-    - all
-    volumeMounts: 
-    - name: githubapp-copyright-unit-test-key
-      mountPath: /key
-  volumes:
-    - name: githubapp-copyright-unit-test-key
-      secret:
-        secretName: githubapp-copyright-unit-test-key
+    command: ["make" , "$( params.params[*] )"]
