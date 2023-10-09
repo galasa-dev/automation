@@ -90,19 +90,18 @@ spec:
   #
   - name: githubapp-copyright-make
     taskRef: 
-      name: make-with-params
+      name: make
     runAfter: 
-    - copy-unit-test-secret
+    - clone-githubapp-copyright
     params:
     - name: directory
       value: $(context.pipelineRun.name)/githubapp-copyright
-    - params: ["all" , "GITHUB_AUTH_KEY=/git-workspace/$(context.pipelineRun.name)/githubapp-copyright/key.pem"]
     workspaces:
-    - name: git-workspace
-      workspace: git-workspace
+     - name: git-workspace
+       workspace: git-workspace
 
   # 
-  # 
+  # Assemble the container image.
   #
   - name: docker-build-githubapp-copyright
     taskRef:
