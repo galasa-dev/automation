@@ -31,7 +31,7 @@ spec:
     type: string
   workspaces:
   - name: git-workspace
-  - name: keys-workspace
+
 # 
 # 
 #
