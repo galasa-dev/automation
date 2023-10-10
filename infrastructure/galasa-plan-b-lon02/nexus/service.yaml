@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus
+  namespace: nexus
+  labels:
+    app: nexus
+spec:
+  ports:
+  - port: 8081
+    name: http
+  - port: 5000
+    name: docker
+  selector:
+    app: nexus
