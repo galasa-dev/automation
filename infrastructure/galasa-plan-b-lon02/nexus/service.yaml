@@ -6,10 +6,14 @@ metadata:
   labels:
     app: nexus
 spec:
+  type: ClusterIP
   ports:
   - port: 8081
     name: http
+    targetPort: 8081
   - port: 5000
     name: docker
+    targetPort: 5000
   selector:
     app: nexus
+  
