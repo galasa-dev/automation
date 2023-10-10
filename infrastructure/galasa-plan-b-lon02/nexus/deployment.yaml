@@ -27,7 +27,7 @@ spec:
           mountPath: /nexus-data
       containers:
       - name: nexus
-        image: sonatype/nexus3:3.23.0
+        image: sonatype/nexus3:3.29.0
 #        imagePullPolicy: Always
         env:
         - name: NEXUS_CONTEXT
