@@ -54,7 +54,7 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # argocd login --core
 # Check it works.
 # argocd app list
-
+# Or argocd login argocd.galasa.dev --sso  
 
 cluster_name=$(basename ${BASEDIR})
 info "Creating applications in cluster ${cluster_name}"
