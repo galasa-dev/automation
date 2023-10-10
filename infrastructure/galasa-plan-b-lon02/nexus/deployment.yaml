@@ -29,9 +29,6 @@ spec:
       - name: nexus
         image: sonatype/nexus3:3.29.0
 #        imagePullPolicy: Always
-        env:
-        - name: NEXUS_CONTEXT
-          value: nexus
         ports:
         - containerPort: 8081
           name: http
