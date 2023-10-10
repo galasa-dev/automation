@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus
+  namespace: nexus
+  labels:
+    app: nexus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      name: nexus
+      labels:
+        app: nexus
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+      initContainers:
+      - name: init-data
+        image: busybox:1.28
+        command: ['sh', '-c', 'chown 200 /nexus-data']
+        volumeMounts:
+        - name: datadir
+          mountPath: /nexus-data
+      containers:
+      - name: nexus
+        image: sonatype/nexus3:3.23.0
+#        imagePullPolicy: Always
+        env:
+        - name: NEXUS_CONTEXT
+          value: nexus
+        ports:
+        - containerPort: 8081
+          name: http
+        - containerPort: 5000
+          name: docker
+        volumeMounts:
+        - name: datadir
+          mountPath: /nexus-data
+        resources:
+          requests:
+            cpu: "2"
+      volumes:
+      - name: datadir
+        persistentVolumeClaim:
+          claimName: nexus-pvc
