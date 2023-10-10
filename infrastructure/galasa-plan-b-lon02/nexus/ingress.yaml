@@ -10,11 +10,12 @@ metadata:
   namespace: nexus
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   tls:
   - hosts:
-    - docker.galasa.dev
     - nexus-planb.galasa.dev
+    - docker.galasa.dev
     secretName: galasa-wildcard-cert
   rules:
   - host: nexus-planb.galasa.dev
