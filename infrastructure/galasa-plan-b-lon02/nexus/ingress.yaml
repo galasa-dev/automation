@@ -14,11 +14,11 @@ metadata:
 spec:
   tls:
   - hosts:
-    - nexus-planb.galasa.dev
+    - nexus.galasa.dev
     - docker.galasa.dev
     secretName: galasa-wildcard-cert
   rules:
-  - host: nexus-planb.galasa.dev
+  - host: nexus.galasa.dev
     http:
       paths:
       - backend:
