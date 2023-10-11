@@ -39,7 +39,7 @@ spec:
           mountPath: /nexus-data
         resources:
           requests:
-            cpu: "2"
+            cpu: "4"
       volumes:
       - name: datadir
         persistentVolumeClaim:
