@@ -26,6 +26,6 @@ spec:
           service:
             name: githubappcopyright
             port:
-              number: 80
+              number: 443
         path: /
         pathType: Prefix
