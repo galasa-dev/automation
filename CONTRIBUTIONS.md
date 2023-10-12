@@ -36,4 +36,4 @@ By making a contribution to this project, I certify that:
    maintained indefinitely and may be redistributed consistent with
    this project or the open source license(s) involved.
 
-For practical advice on how to contribute, please read [this](./docs/how-to-contribute.md)
+For practical advice on how to contribute, please read [this](https://github.com/galasa-dev/automation/blob/main/docs/how-to-contribute.md)
