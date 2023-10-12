@@ -30,8 +30,8 @@ spec:
             - containerPort: 3000
           volumeMounts:
             - mountPath: /secrets
-              subPath: key.pem 
               name: secrets-volume
+              readOnly: true
       volumes:
         - name: secrets-volume
           secret:
