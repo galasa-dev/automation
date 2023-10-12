@@ -27,5 +27,5 @@ spec:
             name: githubappcopyright
             port:
               number: 443
-        path: /
+        path: /githubapp/copyright/event_handler
         pathType: Prefix
