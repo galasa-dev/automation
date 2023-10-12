@@ -25,7 +25,7 @@ spec:
           image: 'harbor.galasa.dev/galasadev/galasa-copyright:latest'
           imagePullPolicy: Always
           name: copyright
-          args: ["/secrets/key.pem"]
+          args: ["--githubAuthKeyFile","/secrets/key.pem","--debug"]
           ports:
             - containerPort: 3000
           volumeMounts:
