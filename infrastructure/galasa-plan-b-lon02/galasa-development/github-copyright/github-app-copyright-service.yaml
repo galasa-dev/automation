@@ -11,7 +11,7 @@ metadata:
   namespace: galasa-development
 spec:
   ports:
-    - port: 3000
+    - port: 80
       protocol: TCP
   selector:
     app: githubappcopyright
