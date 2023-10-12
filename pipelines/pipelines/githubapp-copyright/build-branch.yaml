@@ -101,11 +101,11 @@ spec:
       - githubappcopyright
 
   #----------------------------------------------------------------
-  - name: wait-cli-binary
+  - name: wait-for-recycle-to-complete
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-cli-binary
+    - recycle-deployment
     params:
     - name: server
       value: argocd.galasa.dev
