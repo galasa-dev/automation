@@ -39,4 +39,4 @@ spec:
             items:
               - key: key.pem
                 path: key.pem
-            defaultMode: 3000
+            defaultMode: 444
