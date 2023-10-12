@@ -31,13 +31,12 @@ spec:
           volumeMounts:
             - mountPath: /secrets
               subPath: key.pem 
-              name: key
-              readOnly: true
+              name: secrets-volume
       volumes:
-        - name: key
+        - name: secrets-volume
           secret:
             secretName: github-copyright-app-key
             items:
               - key: key.pem
                 path: key.pem
-            defaultMode: 440
+            defaultMode: 444
