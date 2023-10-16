@@ -6,12 +6,7 @@
 ## Introduction
 With many repos making up the Galasa project and many different types of artifacts being produced, the build and release of Galasa has become a little complicated. These instructions detail the process of building, testing and releasing a version of Galasa and related components.
 
-Galasa has been broken up into multiple components, and these components are only released if the component has changed. These components (and related repos) are:-
-
-1. Galasa (wrapping, gradle, maven, framework, extensions, managers, obr, eclipse, isolated)
-2. CLI (cli)
-
-The Galasa component is always released, but the others are only cloned, built, tested and released if there are changes.
+Galasa consists of code stored in multiple repositories: wrapping, gradle, maven, framework, extensions, managers, obr, cli, eclipse and isolated.
 
 
 ## PRE-RELEASE PROCESS
