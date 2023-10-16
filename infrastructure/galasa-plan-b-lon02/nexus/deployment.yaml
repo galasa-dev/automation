@@ -27,7 +27,7 @@ spec:
           mountPath: /nexus-data
       containers:
       - name: nexus
-        image: sonatype/nexus3:3.29.0
+        image: sonatype/nexus3:3.61.0
 #        imagePullPolicy: Always
         ports:
         - containerPort: 8081
@@ -39,7 +39,9 @@ spec:
           mountPath: /nexus-data
         resources:
           requests:
-            cpu: "4"
+            cpu: "2"
+          limits:
+            cpu: "2"
       volumes:
       - name: datadir
         persistentVolumeClaim:
