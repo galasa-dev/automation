@@ -187,7 +187,7 @@ EOF
         exit 1
     fi
 
-    success "All branches in github called ${release_type} are now delcreated. Yay!"
+    success "All branches in github called ${release_type} are now created. Yay!"
 }
 
 
