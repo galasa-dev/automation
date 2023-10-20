@@ -27,7 +27,15 @@ These are manual steps to bump the version of Galasa to the next version.
 
     As above, make sure the main build this starts has finished before moving on
 
-4. Upgrade Eclipse
+4. Upgrade CLI
+
+    a. Change the VERSION file
+    b. Change the following line in build.gradle
+    ```
+    def galasaFrameworkVersion = '0.30.0'
+    ```
+
+5. Upgrade Eclipse
     These changes need to be done manually.
     For example: Look at this PR and do the same changes to the new version number... https://github.com/galasa-dev/eclipse/pull/50
 
@@ -50,7 +58,8 @@ These are manual steps to bump the version of Galasa to the next version.
 
     q. As above, make sure the main build this starts has finished before moving on
 
-5. Upgrade Isolated
+
+6. Upgrade Isolated
 
     a. full/pomDocs.xml
     b. full/pomJavaDoc.xml
@@ -63,10 +72,3 @@ These are manual steps to bump the version of Galasa to the next version.
 
     g. Open PR for these changes and merge into main
 
-6. Upgrade CLI
-
-    a. Change the VERSION file
-    b. Change the following line in build.gradle
-    ```
-    def galasaFrameworkVersion = '0.30.0'
-    ```
