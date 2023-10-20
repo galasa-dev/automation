@@ -143,9 +143,9 @@ spec:
   - name: distBranch
     value: release
   - name: version
-    value: ${version}
+    value: "${version}"
   - name: bootVersion
-    value: ${boot_version}
+    value: "${boot_version}"
 #
 #
 #
