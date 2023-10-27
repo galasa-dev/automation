@@ -7,6 +7,7 @@
 1.4 You will see it has a `username` and `password` field, which you need to use next...
 
 2. Logon to https://marketplace.eclipse.org/ using the credentials.
+2.1 Note: The login panel may ask for an email address, but it still accepts a userid...
 3. Locate the Galasa plugin https://marketplace.eclipse.org/content/galasa/edit and edit.
 4. Update the Solution Version and Save and Save.
-5. Check the released supported eclipse versions, removing any versions that we know are unsupported.
+5. Check the released supported eclipse versions, removing any versions that we know are unsupported. Save.
