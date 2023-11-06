@@ -39,10 +39,12 @@ var client = http.Client{
 	Timeout: time.Second * 30,
 }
 
-/**
+/*
+*
 This poll logic needs to is given a webhook id, then search all deliveries from the webhook cross referencing a mounted mapper config
 
 Arguments required:
+
 	String Github Org - which org we are watching
 	String Github Token - access token
 	String Hook ID - mostly to save api calls
@@ -66,8 +68,8 @@ func getEventList() []string {
 
 	page := 1
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries?per_page=50", *orgName, *hookId), nil)
-	link := resp.Header["Link"][0]
-	segments := strings.Split(strings.TrimSpace(link), ";")
+	// link := resp.Header["Link"][0]
+	// segments := strings.Split(strings.TrimSpace(link), ";")
 
 	// If latestId not set, we assume this is startup and to only act on anything new past this point. Mark the newest as latestId event though no action.
 	if latestDeliveryId == "" {
@@ -83,7 +85,6 @@ func getEventList() []string {
 	upToDate := false
 	// Look at the last 250 Events max
 	for page < 5 {
-		nextPage := strings.Trim(segments[0], "<>")
 
 		parseDeliveries(resp.Body, &deliveries)
 
@@ -100,6 +101,15 @@ func getEventList() []string {
 		if upToDate {
 			break
 		}
+
+		// The Link header will only be present if there were more than 50 deliveries in the list so more than one page
+		link := resp.Header["Link"]
+		if len(link) == 0 {
+			break
+		}
+
+		segments := strings.Split(strings.TrimSpace(link[0]), ";")
+		nextPage := strings.Trim(segments[0], "<>")
 
 		resp = githubGet(nextPage, nil)
 		page++
