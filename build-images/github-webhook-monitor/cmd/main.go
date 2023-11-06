@@ -68,8 +68,6 @@ func getEventList() []string {
 
 	page := 1
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries?per_page=50", *orgName, *hookId), nil)
-	// link := resp.Header["Link"][0]
-	// segments := strings.Split(strings.TrimSpace(link), ";")
 
 	// If latestId not set, we assume this is startup and to only act on anything new past this point. Mark the newest as latestId event though no action.
 	if latestDeliveryId == "" {
