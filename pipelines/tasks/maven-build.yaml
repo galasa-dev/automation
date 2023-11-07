@@ -30,6 +30,20 @@ spec:
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
     imagePullPolicy: Always
+    # To authenticate to GitHub Packages during a Maven build
+    env:
+    - name: GITHUB_TOKEN_READ_PACKAGES_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: github-token-read-packages
+          key: username
+          optional: false
+    - name: GITHUB_TOKEN_READ_PACKAGES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: github-token-read-packages
+          key: password
+          optional: false
     command:
       - mvn
     args:
