@@ -82,7 +82,7 @@ Once an approver has approved, you can move on.
    rm maven-metadata.xml.sha1
    ```
 5. Go to Vault and find the sonatype-creds secret, to use the username and password in the next step.
-6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the Nexus staging repository:
+6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the staging repository:
 
    ```
    galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>
@@ -90,10 +90,10 @@ Once an approver has approved, you can move on.
 
 7. `exit` the image.
 <!-- End of temporary steps -->
-8. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
-9. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
-11. run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
-14. run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
+1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
+2. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
+3.  run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
+4.  run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
 
 
 ### Update reference sites
