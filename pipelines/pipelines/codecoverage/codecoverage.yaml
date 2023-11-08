@@ -220,6 +220,7 @@ spec:
         - java.jacoco.code.coverage=true
         - --override
         - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs
+        # nexus is gone, need to replace code coverage location
         - --override
         - java.jacoco.save.credentials=JACOCO
         - --override
@@ -266,7 +267,8 @@ spec:
         - --output
         - target/inttests
         - --execs
-        - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs  
+        - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs 
+        # nexus is gone, need to replace code coverage location 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
