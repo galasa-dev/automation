@@ -197,7 +197,3 @@ function delete_application {
 # create_application "galasa-production" \
 #     https://github.com/galasa-dev/automation.git \
 #     "galasa-production/galasa-production"
-
-create_application "nexus" \
-    https://github.com/galasa-dev/automation.git \
-    "nexus"
