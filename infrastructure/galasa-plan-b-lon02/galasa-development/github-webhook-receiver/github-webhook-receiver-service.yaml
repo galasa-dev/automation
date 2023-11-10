@@ -10,7 +10,7 @@ metadata:
   labels:
     app: github-webhook-receiver
   name: github-webhook-receiver
-  namespace: galasa-pipelines
+  namespace: galasa-development
 spec:
   ports:
     - port: 80
