@@ -101,7 +101,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-
   #---------------------------------------------------------------------
   # Github pull request status publisher tool
   #---------------------------------------------------------------------
@@ -145,7 +144,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
 
   #---------------------------------------------------------------------
   # Github activity monitor
@@ -312,7 +310,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
 
   #---------------------------------------------------------------------
   # Kubectl tool
