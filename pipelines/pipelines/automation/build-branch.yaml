@@ -451,3 +451,23 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+
+  - name: build-unzip-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/unzip-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/unzip:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
