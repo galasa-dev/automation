@@ -18,13 +18,13 @@ spec:
     type: string
   - name: command
     type: array
-  - name: imageTag
+  - name: galasabldImageTag
     type: string
     default: main
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/galasadev/galasabld:$(params.imageTag)
+    image: harbor.galasa.dev/galasadev/galasabld:$(params.galasabldImageTag)
     imagePullPolicy: Always
     command:
     - galasabld
