@@ -396,7 +396,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/cli/
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
     - name: noPush
       value: ""
     - name: dockerfilePath
