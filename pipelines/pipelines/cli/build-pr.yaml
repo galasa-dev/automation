@@ -362,7 +362,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: docker.io/library/openjdk:11
+      value: harbor.galasa.dev/common/openjdk11-ibm:main 
     - name: command
       value: 
         - ./test-galasactl-ecosystem.sh
