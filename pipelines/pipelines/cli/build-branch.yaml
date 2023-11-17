@@ -159,7 +159,7 @@ spec:
   # So remove it. It gets re-generated when we compile.
   - name: clear-mod
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-api
     params:
@@ -179,7 +179,7 @@ spec:
   # So remove it. It gets re-generated when we compile.
   - name: clear-sum
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - clear-mod
     params:
@@ -270,7 +270,7 @@ spec:
 # 
 # 
 # 
-  - name: test-galasactl-local-maven-linux-amd64
+  - name: test-galasactl-local-maven-linux-x86-64
     taskRef: 
       name: general-command
     runAfter:
@@ -291,11 +291,11 @@ spec:
 # 
 # 
 # 
-  - name: test-galasactl-local-gradle-linux-amd64
+  - name: test-galasactl-local-gradle-linux-x86-64
     taskRef: 
       name: general-command
     runAfter:
-      - test-galasactl-local-maven-linux-amd64
+      - test-galasactl-local-maven-linux-x86-64
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -316,11 +316,13 @@ spec:
 # 
 # 
 # 
+
+#----------------------------------------------------------------
   - name: chmod-ecosystem-script
     taskRef: 
       name: general-command
     runAfter:
-      - test-galasactl-local-gradle-linux-amd64
+      - test-galasactl-local-gradle-linux-x86-64
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -334,10 +336,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
-  - name: test-galasactl-ecosystem-linux-amd64
+
+#----------------------------------------------------------------
+  - name: test-galasactl-ecosystem-linux-x86-64
     taskRef: 
       name: general-command
     runAfter:
@@ -351,7 +352,7 @@ spec:
       value: 
         - ./test-galasactl-ecosystem.sh
         - --bootstrap
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - http://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -364,7 +365,7 @@ spec:
     taskRef: 
       name: docker-build
     runAfter:
-    - test-galasactl-ecosystem-linux-amd64
+    - test-galasactl-ecosystem-linux-x86-64
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -378,7 +379,7 @@ spec:
       value: automation/dockerfiles/cli/cli-dockerfile
     - name: buildArgs
       value:
-        - "--build-arg=platform=linux-amd64"
+        - "--build-arg=platform=linux-x86_64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -515,19 +516,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  #----------------------------------------------------------------
-  # And finally... whether the above work or not, this gets called.
-  #----------------------------------------------------------------
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

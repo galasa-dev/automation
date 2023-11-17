@@ -1,0 +1,84 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+
+namespace: galasa-development
+
+managers:
+  deploy: false
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-managers
+  imageTag: codecov
+extensions:
+  deploy: false
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-extensions
+  imageTag: codecov
+codecov:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
+  imageTag: codecov      
+framework:
+  deploy: false
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-framework
+  imageTag: codecov 
+obr:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-obr
+  imageTag: codecov
+maven:
+  deploy: false
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-maven
+  imageTag: codecov
+gradle:
+  deploy: false
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-gradle
+  imageTag: codecov
+eclipse:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-eclipse
+  imageTag: codecov
+p2:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-p2
+  imageTag: codecov  
+isolated:
+  deploy: true
+  branch: codecov
+  imageName: icr.io/galasadev/galasa-isolated-zip
+  imageTag: codecov
+javadoc:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
+  imageTag: codecov
+javadocsite:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
+  imageTag: codecov  
+restApiDocSite:
+  deploy: true
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
+  imageTag: codecov 
+mvp:
+  deploy: true
+  branch: codecov
+  imageName: icr.io/galasadev/galasa-mvp-zip
+  imageTag: codecov
+wrapping:
+  deploy: false
+  branch: codecov
+  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
+  imageTag: codecov

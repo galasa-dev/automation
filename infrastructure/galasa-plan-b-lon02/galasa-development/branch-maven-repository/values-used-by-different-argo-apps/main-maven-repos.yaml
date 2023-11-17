@@ -1,0 +1,99 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+
+namespace: galasa-development
+
+managers:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-managers
+  imageTag: main
+extensions:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-extensions
+  imageTag: main
+codecov:
+  deploy: false
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
+  imageTag: main      
+framework:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-framework
+  imageTag: main 
+obr:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-obr
+  imageTag: main
+maven:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-maven
+  imageTag: main
+gradle:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-gradle
+  imageTag: main
+eclipse:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-eclipse
+  imageTag: main
+p2:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-p2
+  imageTag: main  
+isolated:
+  deploy: true
+  branch: main
+  imageName: icr.io/galasadev/galasa-isolated-zip
+  imageTag: main
+javadoc:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
+  imageTag: main
+javadocsite:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
+  imageTag: main  
+restApiDocSite:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
+  imageTag: main 
+mvp:
+  deploy: true
+  branch: main
+  imageName: icr.io/galasadev/galasa-mvp-zip
+  imageTag: main
+wrapping:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
+  imageTag: main
+cli:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/cli
+  imageTag: main
+simplatform:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/simplatform
+  imageTag: main
+inttests:
+  deploy: true
+  branch: main
+  imageName: harbor.galasa.dev/galasadev/inttests
+  imageTag: main

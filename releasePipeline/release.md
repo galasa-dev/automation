@@ -24,15 +24,16 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`release`' option.  
 4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`release`' option. 
 
-5. Run [20-build-all-code..sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
-6. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). 
-All the tests must pass before moving on.
+5. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
+6. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
 
-For the ones which fail, run them individually :
-  a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
-  b. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
-  c. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
-  d. Repeat as required.
+   a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
+
+   b. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml to supply the correct version and argocd-synced/pipelines/regression-reruns.yaml. Add the tests that failed as shown in the example, to run them again.
+
+   c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
+
+   d. Repeat as required.
 
 
 ### Test the Eclipse plug-in and Simbank tests manually
@@ -41,7 +42,7 @@ For the ones which fail, run them individually :
 2. Follow the [instructions](https://galasa.dev/docs/getting-started/simbank) provided to explore Simbank and run the supplied Simbank tests. Complete both sections 'Creating an example Galasa project using Maven' and 'Creating an example Galasa project using Gradle'. You will need to update your Galasa preferences (Eclipse > Settings > Galasa) and set the Remote Maven URI to https://development.galasa.dev/release/maven-repo/obr so Galasa can access the code to be released.
 
 
-### Obtain release approval
+### Obtain release approval (if release Distribution for Galasa)
 
 1. Ask the Team and Product managers for release approval by:
    1. Finding the GitHub issue related to the release you are working on in the GHE repository cics/cics-ts-tracking.
@@ -70,10 +71,18 @@ Once an approver has approved, you can move on.
    docker run -it --entrypoint /bin/sh harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
    ```
 
-3. When inside the image, run `cd htdocs/dev/galasa`
-4. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them, `rm maven-metadata.xml` etc.
-5. Go to Vault and find the maven-creds secret, to use the username and password in the next step.
-6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the Nexus staging repository:
+3. When inside the image, run:
+   ```
+   cd htdocs/dev/galasa
+   ```
+4. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them:
+   ```
+   rm maven-metadata.xml
+   rm maven-metadata.xml.md5
+   rm maven-metadata.xml.sha1
+   ```
+5. Go to Vault and find the sonatype-creds secret, to use the username and password in the next step.
+6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the staging repository:
 
    ```
    galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>
@@ -81,10 +90,10 @@ Once an approver has approved, you can move on.
 
 7. `exit` the image.
 <!-- End of temporary steps -->
-8. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
-9. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
-11. run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
-14. run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
+1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
+2. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
+3.  run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
+4.  run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
 
 
 ### Update reference sites

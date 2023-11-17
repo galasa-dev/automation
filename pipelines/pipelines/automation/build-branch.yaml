@@ -101,7 +101,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-
   #---------------------------------------------------------------------
   # Github pull request status publisher tool
   #---------------------------------------------------------------------
@@ -145,7 +144,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
 
   #---------------------------------------------------------------------
   # Github activity monitor
@@ -313,7 +311,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-
   #---------------------------------------------------------------------
   # Kubectl tool
   #---------------------------------------------------------------------
@@ -455,15 +452,22 @@ spec:
      - name: git-workspace
        workspace: git-workspace 
 
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
+  - name: build-unzip-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/unzip-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/unzip:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
