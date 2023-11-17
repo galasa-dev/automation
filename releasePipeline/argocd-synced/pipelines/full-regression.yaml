@@ -47,7 +47,7 @@ spec:
         - compilation
         - --trace
         - --bootstrap
-        - http://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
         - --throttle
         - '30'
         - --poll

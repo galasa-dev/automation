@@ -352,7 +352,7 @@ spec:
       value: 
         - ./test-galasactl-ecosystem.sh
         - --bootstrap
-        - http://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
     workspaces:
      - name: git-workspace
        workspace: git-workspace
