@@ -287,7 +287,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/kubectl-dockerfile
     - name: imageName
@@ -309,7 +309,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/argocd-dockerfile
     - name: imageName
@@ -332,7 +332,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/gitcli-dockerfile
     - name: imageName
@@ -354,7 +354,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/tkn-dockerfile
     - name: imageName
@@ -376,7 +376,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/openapi-dockerfile
     - name: imageName
@@ -398,7 +398,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/swagger-dockerfile
     - name: imageName
@@ -420,7 +420,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/unzip-dockerfile
     - name: imageName
@@ -442,7 +442,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/openjdk11-ibm-dockerfile
     - name: imageName
