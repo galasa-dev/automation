@@ -471,3 +471,27 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+
+  #---------------------------------------------------------------------
+  # open jdk 11 image with the IBM certs installed in the trust store and JRE
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image
+  - name: build-openjdk11-ibm-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/openjdk11-ibm-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/openjdk11-ibm:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
