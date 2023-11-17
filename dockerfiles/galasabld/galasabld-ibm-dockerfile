@@ -4,7 +4,7 @@ FROM ${dockerRepository}/galasadev/galasabld:${branch}
 
 USER root
 
-COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
-COPY ibminter.pem /etc/ssl/certs/ibminter.pem
+COPY ../certs/ibmroot.pem  /etc/ssl/certs/ibmroot.pem
+COPY ../certs/ibminter.pem /etc/ssl/certs/ibminter.pem
 RUN  cat /etc/ssl/certs/ibmroot.pem >> /etc/ssl/certs/ca-certificates.crt
 RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
