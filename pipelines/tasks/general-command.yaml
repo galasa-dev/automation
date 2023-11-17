@@ -22,7 +22,7 @@ spec:
     type: string  
     default: docker.io/library/busybox:latest
   steps:
-  - name: command
+  - name: run-command
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
     imagePullPolicy: Always
