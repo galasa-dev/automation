@@ -1310,4 +1310,38 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace   
+       workspace: git-workspace
+
+  - name: trigger-build-distribution-for-galasa
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main", "release"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment-mvp
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - build-distribution-for-galasa
+      - -n
+      - jcarino
+      # - galasa-build
+      - --prefix-name 
+      - trigger-build-distribution-for-galasa
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - jade-sa
+      # - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
