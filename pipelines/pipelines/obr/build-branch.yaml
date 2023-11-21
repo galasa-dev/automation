@@ -563,7 +563,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/obr/javadocs
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: ""
     - name: dockerfilePath
