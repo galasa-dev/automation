@@ -347,12 +347,12 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: docker.io/library/openjdk:11
+      value: harbor.galasa.dev/common/openjdk11-ibm:main 
     - name: command
       value: 
         - ./test-galasactl-ecosystem.sh
         - --bootstrap
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -396,7 +396,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/cli/
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
     - name: noPush
       value: ""
     - name: dockerfilePath
@@ -421,7 +421,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-cli-binary-downloadables:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/cli/
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: ""
     - name: dockerfilePath
