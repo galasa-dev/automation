@@ -199,7 +199,7 @@ spec:
         - --trace
     #
         - --bootstrap
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
         - --throttle
         - '5'
         # - --throttlefile
