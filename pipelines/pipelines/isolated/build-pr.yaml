@@ -572,13 +572,16 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/isolated/full
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
       value: icr.io/galasadev/galasa-isolated:$(params.headSha)
     - name: noPush
       value: "--no-push"
+    - name: buildArgs
+      value:
+        - "--build-arg=directory=isolated/full"
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
@@ -592,7 +595,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/isolated/full
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
@@ -603,6 +606,7 @@ spec:
       value:
         - "--tarPath"
         - "/workspace/git/$(context.pipelineRun.name)/isolated/full/target/isolated/isolated.tar"
+        - "--build-arg=directory=isolated/full"
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
@@ -1069,13 +1073,16 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/isolated/mvp
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
       value: icr.io/galasadev/galasa-mvp:$(params.headSha)
     - name: noPush
       value: "--no-push"
+    - name: buildArgs
+      value:
+        - "--build-arg=directory=isolated/mvp"
     workspaces:
       - name: git-workspace
         workspace: git-workspace  
@@ -1089,7 +1096,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/isolated/mvp
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
@@ -1100,6 +1107,9 @@ spec:
       value:
         - "--tarPath"
         - "/workspace/git/$(context.pipelineRun.name)/isolated/mvp/target/isolated/isolated.tar"
+    - name: buildArgs
+      value:
+        - "--build-arg=directory=isolated/mvp"
     workspaces:
       - name: git-workspace
         workspace: git-workspace       
