@@ -421,7 +421,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-cli-binary-downloadables:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/cli/
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: ""
     - name: dockerfilePath
