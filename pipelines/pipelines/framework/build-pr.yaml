@@ -201,7 +201,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)/framework
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: ""
     - name: dockerfilePath

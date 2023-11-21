@@ -1,9 +1,6 @@
 FROM docker.io/library/httpd:2.4
 
-ARG branch
-
 RUN rm -v /usr/local/apache2/htdocs/*
+COPY automation/dockerfiles/httpdconf/httpd.conf /usr/local/apache2/conf/httpd.conf
 
-COPY httpd.conf /usr/local/apache2/conf/httpd.conf
-
-COPY target/site/apidocs/ /usr/local/apache2/htdocs/
+COPY obr/javadocs/target/site/apidocs/ /usr/local/apache2/htdocs/
