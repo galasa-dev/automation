@@ -93,7 +93,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/buildutils
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-binary-dockerfile
     - name: imageName
@@ -165,7 +165,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/buildutils
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-ibm-dockerfile
     - name: imageName

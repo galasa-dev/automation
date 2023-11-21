@@ -101,7 +101,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-
   #---------------------------------------------------------------------
   # Github pull request status publisher tool
   #---------------------------------------------------------------------
@@ -145,7 +144,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
 
   #---------------------------------------------------------------------
   # Github activity monitor
@@ -313,7 +311,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-
   #---------------------------------------------------------------------
   # Kubectl tool
   #---------------------------------------------------------------------
@@ -327,7 +324,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/kubectl-dockerfile
     - name: imageName
@@ -351,7 +348,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/argocd-dockerfile
     - name: imageName
@@ -376,7 +373,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/gitcli-dockerfile
     - name: imageName
@@ -400,7 +397,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/tkn-dockerfile
     - name: imageName
@@ -424,7 +421,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/openapi-dockerfile
     - name: imageName
@@ -444,7 +441,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/swagger-dockerfile
     - name: imageName
@@ -454,3 +451,47 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+
+  - name: build-unzip-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/unzip-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/unzip:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+
+  #---------------------------------------------------------------------
+  # open jdk 11 image with the IBM certs installed in the trust store and JRE
+  #---------------------------------------------------------------------
+  # Package the tool into a docker image
+  - name: build-openjdk11-ibm-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/openjdk11-ibm-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/openjdk11-ibm:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
