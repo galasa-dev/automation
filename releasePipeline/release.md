@@ -81,7 +81,7 @@ Once an approver has approved, you can move on.
    rm maven-metadata.xml.md5
    rm maven-metadata.xml.sha1
    ```
-5. Go to Vault and find the sonatype-creds secret, to use the username and password in the next step.
+5. Go to the IBM Cloud Secrets Manager and find the sonatype-credentials secret, to use the username and password in the next step.
 6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the staging repository:
 
    ```
