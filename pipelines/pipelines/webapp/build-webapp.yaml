@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: branch-webapp
+  name: build-webapp
   namespace: galasa-build
 spec:
   params:
@@ -81,7 +81,21 @@ spec:
       value: $(params.toBranch)
     workspaces:
      - name: git-workspace
-       workspace: git-workspace     
+       workspace: git-workspace   
+#
+# 
+# 
+  - name: maven-gpg
+    taskRef:
+      name: maven-gpg
+    runAfter:
+    - check-branch
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
 # 
 # 
 # 
@@ -89,7 +103,7 @@ spec:
     taskRef:
       name: maven-build
     runAfter:
-    - clone-simplatform
+    - maven-gpg
     params:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
