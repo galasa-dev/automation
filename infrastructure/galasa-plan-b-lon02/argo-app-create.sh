@@ -138,6 +138,10 @@ function delete_application {
 # delete_application "prod-simplatform"
 # delete_application "prod-maven-repos"
 # delete_application "galasa-development-namespace"
+delete_application "galasa-ecosystem1"
+create_application "galasa-ecosystem1" \
+    https://github.com/galasa-dev/automation.git \
+    "ecosystem1"
 
 # delete_application "galasa-production"
 # delete_application "galasa-production-namespace"
