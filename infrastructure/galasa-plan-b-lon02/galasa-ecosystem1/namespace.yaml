@@ -6,4 +6,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ecosystem1
+  name: galasa-ecosystem1
