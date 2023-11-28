@@ -1,10 +1,7 @@
-#
-# Copyright contributors to the Galasa project 
-# 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress
+  name: ingress-new
   namespace: galasa-prod
 spec:
   ingressClassName: nginx
@@ -26,3 +23,6 @@ spec:
             name: testcatalog
             port:
               number: 8080
+  tls:
+  - hosts:
+    - '*.cicsk8s.hursley.ibm.com'
