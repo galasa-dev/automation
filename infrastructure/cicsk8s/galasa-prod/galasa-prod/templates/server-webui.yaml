@@ -29,7 +29,6 @@ spec:
       - name: webui
         image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-webui-amd64:prod
         # Need to push webui image to new Harbor
-        # image: harbor.galasa.dev/galasadev/galasa-webui-amd64:prod
         imagePullPolicy: Always
         ports:
         - containerPort: 80
