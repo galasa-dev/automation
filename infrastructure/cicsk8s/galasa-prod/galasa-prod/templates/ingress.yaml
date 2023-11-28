@@ -9,30 +9,9 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: "galasa-cicsk8s.hursley.ibm.com"
+  - host: "galasa-galasa-prod.cicsk8s.hursley.ibm.com"
     http:
       paths:
-      # - pathType: Prefix
-      #   path: "/ExampleAppClientV855"
-      #   backend:
-      #     service:
-      #       name: catext-cicswebui
-      #       port:
-      #         number: 9080
-      # - pathType: Prefix
-      #   path: "/ExampleAppApi"
-      #   backend:
-      #     service:
-      #       name: catext-api
-      #       port:
-      #         number: 9080
-      # - pathType: Prefix
-      #   path: "/ExampleApp"
-      #   backend:
-      #     service:
-      #       name: catext-frontend
-      #       port:
-      #         number: 80
       - pathType: Prefix
         path: "/"
         backend:
