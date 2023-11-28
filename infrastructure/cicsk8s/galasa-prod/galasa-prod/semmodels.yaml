@@ -1,0 +1,52 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: semmodels
+  namespace: galasa-prod
+  labels:
+    app: semmodels
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: semmodels
+  template:
+    metadata:
+      name: semmodels
+      labels:
+        app: semmodels
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        applevel: critical
+      containers:
+      - name: semmodels
+        # We haven't yet pushed galasa-semmodels to the new Harbor
+        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-semmodels:prod
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: semmodels
+  namespace: galasa-prod
+spec:
+  type: ClusterIP
+  ports:
+  - name: semmodels
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: semmodels
