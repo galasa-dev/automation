@@ -8,4 +8,4 @@ metadata:
   namespace: galasa-prod
 data:
   apibase.js: |+
-    var galasaBootstrap = 'http://galasa-cicsk8s.hursley.ibm.com/bootstrap' 
+    var galasaBootstrap = 'http://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap' 
