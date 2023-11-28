@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -22,6 +25,9 @@ spec:
     default: prod-maven-repos
   workspaces:
   - name: git-workspace
+#
+#
+#
   tasks:
   - name: clone-automation
     taskRef: 
@@ -40,6 +46,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: snapshot-obr
     taskRef:
       name: docker-build
@@ -64,7 +73,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
+#
+#
+#
   - name: recycle-obr
     taskRef:
       name: argocd-cli
@@ -84,6 +95,9 @@ spec:
       - Deployment
       - --resource-name
       - obr-$(params.imageTag)
+#
+#
+#
   - name: wait-obr
     taskRef:
       name: argocd-cli
@@ -100,38 +114,41 @@ spec:
       - --resource
       - apps:Deployment:obr-$(params.imageTag)
       - --health     
-
-
-  - name: snapshot-mvp
-    taskRef:
-      name: docker-build
-    runAfter:
-    - wait-obr   
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/repo-dockerfile
-    - name: imageName
-      value: icr.io/galasadev/galasa-mvp-zip:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=icr.io"         
-        - "--build-arg=image=galasa-mvp-zip"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
-
+#
+#
+#
+  # - name: snapshot-mvp
+  #   taskRef:
+  #     name: docker-build
+  #   runAfter:
+  #   - wait-obr   
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name) 
+  #   - name: context
+  #     value: $(context.pipelineRun.name) 
+  #   - name: dockerfilePath
+  #     value: automation/dockerfiles/snapshots/repo-dockerfile
+  #   - name: imageName
+  #     value: icr.io/galasadev/galasa-mvp-zip:$(params.toBranch)
+  #   - name: noPush
+  #     value: ""
+  #   - name: buildArgs
+  #     value:
+  #       - "--build-arg=dockerRepository=icr.io"         
+  #       - "--build-arg=image=galasa-mvp-zip"   
+  #       - "--build-arg=oldBranch=$(params.fromBranch)"   
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace  
+#
+#
+#
   - name: recycle-mvp
     taskRef:
       name: argocd-cli
     runAfter:
-    - snapshot-mvp
+    - wait-obr
     params:
     - name: server
       value: argocd.galasa.dev
@@ -146,6 +163,9 @@ spec:
       - Deployment
       - --resource-name
       - mvp-$(params.imageTag)
+#
+#
+#
   - name: wait-mvp
     taskRef:
       name: argocd-cli
@@ -162,38 +182,41 @@ spec:
       - --resource
       - apps:Deployment:mvp-$(params.imageTag)
       - --health      
-
-
-  - name: snapshot-isolated
-    taskRef:
-      name: docker-build
-    runAfter:
-    - wait-mvp  
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/repo-dockerfile
-    - name: imageName
-      value: icr.io/galasadev/galasa-isolated-zip:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=icr.io"         
-        - "--build-arg=image=galasa-isolated-zip"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
-
+#
+#
+#
+  # - name: snapshot-isolated
+  #   taskRef:
+  #     name: docker-build
+  #   runAfter:
+  #   - wait-mvp  
+  #   params:
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name) 
+  #   - name: context
+  #     value: $(context.pipelineRun.name) 
+  #   - name: dockerfilePath
+  #     value: automation/dockerfiles/snapshots/repo-dockerfile
+  #   - name: imageName
+  #     value: icr.io/galasadev/galasa-isolated-zip:$(params.toBranch)
+  #   - name: noPush
+  #     value: ""
+  #   - name: buildArgs
+  #     value:
+  #       - "--build-arg=dockerRepository=icr.io"         
+  #       - "--build-arg=image=galasa-isolated-zip"   
+  #       - "--build-arg=oldBranch=$(params.fromBranch)"   
+  #   workspaces:
+  #    - name: git-workspace
+  #      workspace: git-workspace  
+#
+#
+#
   - name: recycle-isolated
     taskRef:
       name: argocd-cli
     runAfter:
-    - snapshot-isolated
+    - wait-mvp
     params:
     - name: server
       value: argocd.galasa.dev
@@ -208,6 +231,9 @@ spec:
       - Deployment
       - --resource-name
       - isolated-$(params.imageTag)
+#
+#
+#
   - name: wait-isolated
     taskRef:
       name: argocd-cli
@@ -224,7 +250,9 @@ spec:
       - --resource
       - apps:Deployment:isolated-$(params.imageTag)
       - --health        
-
+#
+#
+#
   - name: snapshot-javadoc
     taskRef:
       name: docker-build
@@ -249,7 +277,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
-
+#
+#
+#
   - name: recycle-javadoc
     taskRef:
       name: argocd-cli
@@ -269,6 +299,9 @@ spec:
       - Deployment
       - --resource-name
       - javadoc-$(params.imageTag)
+#
+#
+#
   - name: wait-javadoc
     taskRef:
       name: argocd-cli
@@ -285,7 +318,9 @@ spec:
       - --resource
       - apps:Deployment:javadoc-$(params.imageTag)
       - --health         
-
+#
+#
+#
   - name: snapshot-eclipse
     taskRef:
       name: docker-build
@@ -310,7 +345,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
+#
+#
+#
   - name: recycle-eclipse
     taskRef:
       name: argocd-cli
@@ -330,6 +367,9 @@ spec:
       - Deployment
       - --resource-name
       - eclipse-$(params.imageTag)
+#
+#
+#
   - name: wait-eclipse
     taskRef:
       name: argocd-cli
@@ -346,7 +386,9 @@ spec:
       - --resource
       - apps:Deployment:eclipse-$(params.imageTag)
       - --health      
-
+#
+#
+#
   - name: snapshot-p2
     taskRef:
       name: docker-build
@@ -371,7 +413,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
-
+#
+#
+#
   - name: recycle-p2
     taskRef:
       name: argocd-cli
@@ -391,6 +435,9 @@ spec:
       - Deployment
       - --resource-name
       - p2-$(params.imageTag)
+#
+#
+#
   - name: wait-p2
     taskRef:
       name: argocd-cli
@@ -407,7 +454,9 @@ spec:
       - --resource
       - apps:Deployment:p2-$(params.imageTag)
       - --health         
-
+#
+#
+#
   - name: snapshot-javadoc-site
     taskRef:
       name: docker-build
@@ -432,7 +481,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-
+#
+#
+#
   - name: recycle-javadoc-site
     taskRef:
       name: argocd-cli
@@ -452,6 +503,9 @@ spec:
       - Deployment
       - --resource-name
       - javadocsite-$(params.imageTag)
+#
+#
+#
   - name: wait-javadoc-site
     taskRef:
       name: argocd-cli
@@ -468,8 +522,77 @@ spec:
       - --resource
       - apps:Deployment:javadocsite-$(params.imageTag)
       - --health         
-
-
+#
+#
+#
+  - name: snapshot-restapidoc-site
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/repo-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.toBranch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=image=galasa-restapidoc-site"
+        - "--build-arg=oldBranch=$(params.fromBranch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: recycle-restapidoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-restapidoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - actions
+      - run
+      - $(params.appname)
+      - restart
+      - --kind
+      - Deployment
+      - --resource-name
+      - restapidocsite-$(params.imageTag)
+#
+#
+#
+  - name: wait-restapidoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-restapidoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:restapidocsite-$(params.imageTag)
+      - --health
+#
+#
+#
   - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
@@ -494,7 +617,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
-
+#
+#
+#
   - name: snapshot-ibm-boot-embedded
     taskRef:
       name: docker-build
@@ -550,5 +675,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-       
-               

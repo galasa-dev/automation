@@ -1,0 +1,72 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: full-regression
+  namespace: galasa-build
+spec:
+#
+#
+#
+  params:
+  - name: distBranch
+    type: string
+  - name: version
+    type: string
+  - name: bootVersion
+    type: string
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: regression-run
+    taskRef: 
+      name: galasactl
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - runs
+        - submit
+        - --stream
+        - inttests
+        - --package
+        - local
+        - --package
+        - kubernetes
+        - --package
+        - compilation
+        - --trace
+        - --bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+        - --throttle
+        - '30'
+        - --poll
+        - '10'
+        - --progress
+        - '1'
+        - --reportyaml
+        - tests.yaml
+        - --override
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/$(params.distBranch)/maven-repo/obr
+        - --override
+        - galasaecosystem.isolated.mvp.zip=https://development.galasa.dev/$(params.distBranch)/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/$(params.version)/galasa-isolated-mvp-$(params.version).zip
+        - --override
+        - galasaecosystem.isolated.full.zip=https://development.galasa.dev/$(params.distBranch)/maven-repo/isolated/dev/galasa/galasa-isolated/$(params.version)/galasa-isolated-$(params.version).zip
+        - --override
+        - galasaecosystem.docker.version=$(params.distBranch)
+        - --override
+        - galasaecosystem.runtime.version=$(params.version)
+        - --override
+        - galasaecosystem.galasaboot.version=$(params.bootVersion)
+        - --log # Otherwise there is no output
+        - "-"

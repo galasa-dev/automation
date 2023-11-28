@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -12,6 +15,12 @@ spec:
     type: array   
   - name: server
     type: string    
+  - name: authSecretName
+    type: string
+    default: argocd-token
+  - name: authSecretKey
+    type: string
+    default: argocd-token
   steps:
   - name: argocd-cli
     image: harbor.galasa.dev/common/argocd-cli:main
@@ -20,8 +29,8 @@ spec:
     - name: ARGOCD_AUTH_TOKEN
       valueFrom:
         secretKeyRef:
-          name: argocd-token
-          key: argocd-token
+          name: $(params.authSecretName)
+          key: $(params.authSecretKey)
           optional: false
     args:
     - $(params.command)

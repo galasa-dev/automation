@@ -1,3 +1,8 @@
+/*
+ * Copyright contributors to the Galasa project
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package main
 
 import (
@@ -21,6 +26,21 @@ var client = http.Client{
 	Timeout: 30 * time.Second,
 }
 
+// This program is called either because:
+//   - Some pull request has been opened/re-opened/synchronized.
+//     (in which case the userId passed is the person who did the push/open/re-open)
+//   - Some pull request has been reviewed, and the comment "Approved for building"
+//     has been submitted as a review comment.
+//     (in which case the userId passed is the person who did the review)
+//
+// Objectives:
+//
+//		Look at the pull request being built and check the userID passed is a member of
+//		an approved group within the github organisation.
+//
+//	 If the PR and userid passes the checks, then the PR is told that a build is
+//	 now in-progress. If the checks fail, then a suitable comment will be appended
+//	 to the PR such as "Build not run, please request an admin to approve"
 func main() {
 	token = os.Getenv("GITHUBTOKEN")
 	userId := flag.Int("userid", -1, "The UserId of PR opener")

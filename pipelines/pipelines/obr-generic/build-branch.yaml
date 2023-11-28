@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -290,7 +293,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/runtime/ibmBootEmbedded
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
     - name: dockerfilePath
       value: automation/dockerfiles/runtime/ibmBootEmbedded/ibmBootEmbedded-dockerfile
     - name: imageName
@@ -308,12 +311,9 @@ spec:
 # 
 # 
 # 
-  # Trigger Isolated when doing a Main Build
-  - name: trigger-isolated
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
+
+  # Trigger CLI 
+  - name: trigger-cli
     taskRef:
       name: tkn-cli
     runAfter:
@@ -325,50 +325,11 @@ spec:
       value: 
       - pipeline
       - start
-      - branch-isolated
+      - branch-cli
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-isolated-main
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
-# 
-# 
-# 
-  # Trigger Eclipse when doing a Complete Build/Branch Build 
-  - name: trigger-eclipse
-    when:
-      - input: "$(params.toBranch)"
-        operator: notin
-        values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - branch-docker-build-ibm-embedded
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - branch-eclipse
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-eclipse-$(params.toBranch)
-      - --param
-      - fromObrBranch=$(params.toBranch)
-      - --param
-      - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - trigger-cli-$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
       - --param
@@ -378,7 +339,11 @@ spec:
       - --param
       - imageTag=$(params.imageTag)
       - --param
-      - appname=$(params.appname)
+      - appnameCli=$(params.toBranch)-cli
+      - --param
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - appnameMavenRepos=$(params.appname)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
@@ -388,15 +353,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

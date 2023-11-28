@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -29,9 +32,12 @@ spec:
   - name: jacocoEnabled
     type: string
     default: "true"
-  - name: isRelease
+  # isMainOrRelease accepts a true or false value which is passed to the Gradle build script as a build argument later.
+  # When set to true, Gradle will complete signing tasks like signing artifacts with a GPG key.
+  # Should be set to true for Main or Release builds. Set to false if doing a branch build.
+  - name: isMainOrRelease
     type: string
-    default: "false"
+    default: "true"
   workspaces:
   - name: git-workspace
 # 
@@ -126,11 +132,12 @@ spec:
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/managers/repo"
         - "-PjacocoEnabled=$(params.jacocoEnabled)"
-        - "-PisRelease=$(params.isRelease)"
+        - "-PisMainOrRelease=$(params.isMainOrRelease)"
     - name: command
       value: 
         - check
         - publish
+        - "--info"
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
@@ -245,15 +252,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -13,6 +16,9 @@ spec:
   params:
   - name: context
     type: string  
+  - name: settingsDirectory
+    type: string
+    default: /workspace/git/gpg
   steps:
   - name: gpgdirectory
     workingDir: /workspace/git/$(params.context)
@@ -20,7 +26,15 @@ spec:
     imagePullPolicy: Always
     command:
     - mkdir
-    - /workspace/git/gpg
+    - $(params.settingsDirectory)
+  - name: change-dir-permissions
+    workingDir: /workspace/git/$(params.context)
+    image: harbor.galasa.dev/common/gpg:latest
+    imagePullPolicy: Always
+    command:
+    - chmod
+    - '700'
+    - $(params.settingsDirectory)
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gpg:main
@@ -28,7 +42,7 @@ spec:
     command:
     - gpg
     - --homedir
-    - /workspace/git/gpg
+    - $(params.settingsDirectory)
     - --pinentry-mode
     - loopback
     - --passphrase-file
@@ -45,7 +59,7 @@ spec:
     command:
     - cp
     - /root/mavengpg/settings.xml
-    - /workspace/git/gpg/settings.xml
+    - $(params.settingsDirectory)/settings.xml
     volumeMounts:
     - name: mavengpg
-      mountPath: /root/mavengpg 
+      mountPath: /root/mavengpg

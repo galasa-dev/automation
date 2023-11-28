@@ -1,0 +1,98 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: community-ingress-resource
+  namespace: galasa-production
+  annotations:
+    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+spec:
+  tls:
+  - hosts:
+    - p2.galasa.dev
+    - p2snapshot.galasa.dev
+    - resources.galasa.dev
+    - javadoc.galasa.dev
+    - javadoc-snapshot.galasa.dev
+    - rest.galasa.dev
+    - development.galasa.dev
+    secretName: galasa-wildcard-cert
+  rules:
+  - host: p2.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: p2stable
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: p2snapshot.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: p2-snapshot
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+
+
+  - host: javadoc.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: javadoc-stable
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: javadoc-snapshot.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: javadoc-snapshot
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: resources.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: resources
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: rest.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: restapidoc-stable
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+
+  - host: development.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: githubappcopyright
+            port:
+              number: 3000
+        path: /githubapp/copyright/event_handler
+        pathType: ImplementationSpecific
+

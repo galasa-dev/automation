@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -26,9 +29,11 @@ spec:
   - name: jacocoEnabled
     type: string
     default: "true"
-  - name: isRelease
+  # isMainOrRelease accepts a true or false value which is passed to any Gradle build script as a build argument later.
+  # Not used in this pipeline as is a Maven build but needs passing through to the next build for the Gradle repository.
+  - name: isMainOrRelease
     type: string
-    default: "false"
+    default: "true"
   workspaces:
   - name: git-workspace
 # 
@@ -140,7 +145,7 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
         - "-Dgalasa.jacocoEnabled=$(params.jacocoEnabled)"
-        - "-Dgalasa.isRelease=$(params.isRelease)"
+        - "-Dgalasa.isRelease=$(params.isMainOrRelease)"
     - name: command
       value: 
         - deploy
@@ -251,7 +256,7 @@ spec:
       - --param
       - jacocoEnabled=$(params.jacocoEnabled)
       - --param
-      - isRelease=$(params.isRelease)
+      - isMainOrRelease=$(params.isMainOrRelease)
       - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
@@ -262,15 +267,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

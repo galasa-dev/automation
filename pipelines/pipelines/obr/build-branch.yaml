@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -239,7 +242,7 @@ spec:
 #
   - name: list-bom
     taskRef: 
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-bom
     params:
@@ -311,7 +314,7 @@ spec:
 #
   - name: list-obr
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-obr
     params:
@@ -506,7 +509,7 @@ spec:
 #
   - name: cat-javadoc-pom
     taskRef:
-      name: unix-command   
+      name: general-command
     runAfter:
     - generate-javadoc
     params:
@@ -524,7 +527,7 @@ spec:
 #
   - name: maven-build-javadoc
     taskRef: 
-      name: maven-build-java18
+      name: maven-build
     runAfter: 
     - cat-javadoc-pom
     params:
@@ -541,6 +544,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
+    - name: image
+      value: docker.io/library/maven:3.8.7-openjdk-18
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -558,7 +563,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.imageTag)
     - name: context
-      value: $(context.pipelineRun.name)/obr/javadocs
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: ""
     - name: dockerfilePath
@@ -717,15 +722,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # finally:
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

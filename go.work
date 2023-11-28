@@ -1,0 +1,9 @@
+go 1.19
+
+use (
+	./build-images/github-status
+	./build-images/github-verify
+	./build-images/github-webhook-monitor
+	./build-images/github-webhook-receiver
+	./offline-tools/copyrighter
+)

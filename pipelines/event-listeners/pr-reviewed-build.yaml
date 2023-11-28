@@ -1,3 +1,9 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
@@ -38,10 +44,14 @@ spec:
           value: $(body.pull_request.issue_url)
         - name: git-head-ref
           value: $(body.pull_request.head.ref)
+        - name: git-head-sha
+          value: $(body.pull_request.head.sha)
         - name: git-base-ref
           value: $(body.pull_request.base.ref)
         - name: git-pr-number
           value: $(body.pull_request.number)
+        # The userid passed is the id of the person who just submitted a review using 
+        # the approval/comment/request-changes github dialog
         - name: git-userid
           value: $(body.review.user.id)
         - name: git-action
@@ -55,6 +65,7 @@ spec:
             - name: git-issue-url
             - name: git-pr-number
             - name: git-head-ref
+            - name: git-head-sha
             - name: git-base-ref
             - name: git-userid
             - name: git-action
@@ -67,6 +78,23 @@ spec:
                 pipelineRef:
                   name: pr-$(tt.params.git-repository-name)
                 serviceAccountName: galasa-build-bot
+                podTemplate:
+                  volumes:
+                  - name: gradle-properties
+                    secret:
+                      secretName: gradle-properties
+                  - name: gpg-key
+                    secret:
+                      secretName: gpg-key
+                  - name: mavengpg
+                    secret:
+                      secretName: mavengpg
+                  - name: githubcreds
+                    secret:
+                      secretName: github-token
+                  - name: harborcreds
+                    secret:
+                      secretName: harbor-creds-yaml
                 workspaces:
                 - name: git-workspace
                   volumeClaimTemplate:
@@ -80,6 +108,8 @@ spec:
                 params:
                   - name: headRef
                     value: $(tt.params.git-head-ref)
+                  - name: headSha
+                    value: $(tt.params.git-head-sha)
                   - name: baseRef
                     value: $(tt.params.git-base-ref) 
                   - name: prUrl

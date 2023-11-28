@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -28,6 +31,9 @@ spec:
     type: string
   - name: action
     type: string
+#
+#
+#
   tasks:
   - name: git-verify
     taskRef:
@@ -39,77 +45,84 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
-  - name: install-ecosystem
+#
+#
+#
+  - name: clone-helm
     taskRef:
-      name: argocd-cli
+      name: git-clone
     runAfter:
     - git-verify
     params:
-    - name: server
-      value: argocd.galasa.dev
+    - name: url
+      value: https://github.com/galasa-dev/helm
+    - name: revision
+      value: $(params.baseRef)
+    - name: refspec
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/helm
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: install-ecosystem
+    taskRef:
+      name: general-command
+    runAfter:
+    - git-verify
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/helm/charts
+    - name: image
+      value: docker.io/alpine/helm:3.12.1
     - name: command
       value:
-      - app
-      - create
+      - helm
+      - install
       - pr-$(params.headRef)
-      - --project
-      - default
-      - --repo
-      - https://github.com/galasa-dev/helm
-      - --revision
-      - $(params.headRef)
-      - --dest-server
-      - https://kubernetes.default.svc
-      - --dest-namespace
-      - galasa-development
-      - --path
-      - charts/ecosystem
-      - --helm-set
-      - externalHostname=c1.eu-gb.containers.cloud.ibm.com
-      - --helm-set
-      - galasaRegistry=harbor.galasa.dev/galasadev
-      - --helm-set
+      - ./ecosystem
+      - --namespace
+      - galasa-build
+      - --set
+      - externalHostname=cicsk8sm.hursley.ibm.com
+      - --set
       - galasaVersion=main
-      - --upsert
-  - name: sync-app
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - install-ecosystem
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value:
-      - app
-      - sync
-      - pr-$(params.headRef)
-  - name: wait-app
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - sync-app
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value:
-      - app
-      - wait
-      - pr-$(params.headRef)
-      - --health  
+      - --set
+      - galasaRegistry=harbor.galasa.dev/galasadev
+      - --set
+      - dex.config.issuer=http://cicsk8sm.hursley.ibm.com/dex
+      - --wait
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   finally:
-  - name: cleanup-app
+  - name: uninstall-ecosystem
     taskRef:
-      name: argocd-cli
+      name: general-command
     params:
-    - name: server
-      value: argocd.galasa.dev
+    - name: context
+      value: $(context.pipelineRun.name)/helm
+    - name: image
+      value: docker.io/alpine/helm:3.12.1
     - name: command
       value:
-      - app
-      - delete
+      - helm
+      - uninstall
       - pr-$(params.headRef)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   - name: git-status
     when:
       - input: "$(tasks.git-verify.status)"

@@ -1,5 +1,10 @@
 #! /usr/bin/env bash
 
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 #-----------------------------------------------------------------------------------------
 # Objective: Run regression tests from a given branch in a given repo.
 #-----------------------------------------------------------------------------------------

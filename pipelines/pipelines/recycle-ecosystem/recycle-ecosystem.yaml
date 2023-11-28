@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -32,6 +35,21 @@ spec:
         - rollout
         - restart
         - deployment/api
+  - name: wait-api
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-api
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/api
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -39,7 +57,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -48,6 +66,21 @@ spec:
         - rollout
         - restart
         - deployment/testcatalog
+  - name: wait-testcatalog
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-testcatalog
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/testcatalog
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -55,7 +88,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -64,6 +97,21 @@ spec:
         - rollout
         - restart
         - deployment/engine-controller
+  - name: wait-engine-controller
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-engine-controller
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/engine-controller
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -71,7 +119,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -80,6 +128,21 @@ spec:
         - rollout
         - restart
         - deployment/resource-monitor
+  - name: wait-resource-monitor
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-resource-monitor
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/resource-monitor
+        - -w
+        - --timeout=3m
 #
 #
 #
@@ -87,7 +150,7 @@ spec:
     taskRef:
       name: kubectl
     runAfter:
-    - recycle-api
+    - wait-api
     params:
     - name: command
       value: 
@@ -96,3 +159,18 @@ spec:
         - rollout
         - restart
         - deployment/metrics
+  - name: wait-metrics
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-metrics
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/metrics
+        - -w
+        - --timeout=3m
