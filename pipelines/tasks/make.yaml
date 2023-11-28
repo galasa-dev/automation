@@ -1,10 +1,13 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: make
+  name: make-with-params
   namespace: galasa-build
 spec:
   workspaces:
@@ -13,11 +16,13 @@ spec:
   params:
   - name: directory
     type: string  
+  - name: params
+    type: array
+    default: 
+    - all
   steps:
   - name: make
     workingDir: /workspace/git/$(params.directory)
     image: docker.io/library/golang:latest
     imagePullPolicy: Always
-    command:
-    - make
-    - all  
+    command: ["make" , "$( params.params[*])" ]

@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -9,6 +12,8 @@ metadata:
 secrets:
 - name: harbor-creds
 - name: icr-api-key
+- name: planb-harbor-creds
+- name: github-enterprise-credentials
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -24,6 +29,12 @@ rules:
     verbs: ["create", "get", "watch", "list"]
   - apiGroups: ["tekton.dev"]
     resources: ["pipelines"]
+    verbs: ["delete", "get", "watch", "list"]
+  - apiGroups: ["tekton.dev"]
+    resources: ["taskruns"]
+    verbs: ["delete", "get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["pods"]
     verbs: ["delete", "get", "watch", "list"]
 ---
 kind: RoleBinding

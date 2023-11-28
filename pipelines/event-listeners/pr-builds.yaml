@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
@@ -41,6 +44,8 @@ spec:
           value: $(body.pull_request.base.ref)
         - name: git-pr-number
           value: $(body.number)
+        # The userid passed is the id of the person who just committed, which caused the PR sync.
+        # OR the person who just opened/re-opened the PR
         - name: git-userid
           value: $(body.pull_request.user.id)
         - name: git-action

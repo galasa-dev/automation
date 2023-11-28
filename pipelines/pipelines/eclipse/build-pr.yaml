@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -111,13 +114,15 @@ spec:
       value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent
     - name: settingsLocation
       value: /workspace/git/gpg/settings.xml  
+    - name: image
+      value: docker.io/library/maven:3.8.5-openjdk-17
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/eclipse/repo"
         - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
-        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/photon"
+        - "-Dgalasa.eclipse.repo=http://download.eclipse.org/releases/2022-09"
         - "-Dgalasa.runtime.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.simplatform.repo=https://development.galasa.dev/main/maven-repo/simplatform"
     - name: command
@@ -161,7 +166,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/dev.galasa.eclipse.site
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
@@ -190,14 +195,3 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

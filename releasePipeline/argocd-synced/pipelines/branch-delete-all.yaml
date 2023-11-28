@@ -1,0 +1,700 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-delete-all
+  namespace: galasa-build
+spec:
+  params:
+  - name: distBranch
+    type: string
+#
+#
+#
+  tasks:
+#
+#######  Automation
+#
+  - name: delete-branch-automation
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - automation
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml        
+#
+#######  Wrapping
+#
+  - name: delete-branch-wrapping
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - wrapping
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-wrapping
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-wrapping
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml        
+#
+#######  Gradle
+#
+  - name: delete-branch-gradle
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - gradle
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-gradle
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-gradle
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Maven
+#
+  - name: delete-branch-maven
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - maven
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-maven
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-maven
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Framework
+#
+  - name: delete-branch-framework
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - framework
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-framework
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-framework
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Extensions
+#
+  - name: delete-branch-extensions
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - extensions
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-extensions
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-extensions
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Managers
+#
+  - name: delete-branch-managers
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - managers
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-managers
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-managers
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Obr
+#
+  - name: delete-branch-obr
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - obr
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-obr
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-obr
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-obr-generic
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-obr-generic
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-boot
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-boot-embedded-amd64
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-boot-ibm
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-ibm-boot-embedded-amd64
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-javadoc-maven-repo
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-javadoc-maven-repo
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-javadoc-site
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-javadoc-site
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Eclipse
+#
+  - name: delete-branch-eclipse
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - eclipse
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-eclipse
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-eclipse
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#   
+  - name: delete-image-p2
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-p2
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Isolated
+#
+  - name: delete-branch-isolated
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - isolated
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  # - name: delete-image-isolated
+  #   taskRef:
+  #     name: galasabld
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: command
+  #     value:
+  #       - harbor
+  #       - deleteimage
+  #       - --harbor
+  #       - harbor.galasa.dev
+  #       - --project
+  #       - galasadev
+  #       - --repository
+  #       - galasa-isolated
+  #       - --tag
+  #       - $(params.distBranch)
+  #       - --credentials
+  #       - /harborcreds/harborcreds.yaml
+#
+#
+  # - name: delete-image-mvp
+  #   taskRef:
+  #     name: galasabld
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: command
+  #     value:
+  #       - harbor
+  #       - deleteimage
+  #       - --harbor
+  #       - harbor.galasa.dev
+  #       - --project
+  #       - galasadev
+  #       - --repository
+  #       - galasa-mvp
+  #       - --tag
+  #       - $(params.distBranch)
+  #       - --credentials
+  #       - /harborcreds/harborcreds.yaml
+#
+#
+#
+#######  CLI
+#
+  - name: delete-branch-cli
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - cli
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
+#
+#
+#
+  - name: delete-image-cli-amd64
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-cli-amd64
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-cli-ibm-amd64
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-cli-ibm-amd64
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#
+#
+  - name: delete-image-cli-binary
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - harbor
+        - deleteimage
+        - --harbor
+        - https://harbor.galasa.dev
+        - --project
+        - galasadev
+        - --repository
+        - galasa-cli-binary-downloadables
+        - --tag
+        - $(params.distBranch)
+        - --credentials
+        - /harborcreds/harborcreds.yaml
+#
+#######  Resources
+#
+  # - name: delete-image-resources
+  #   taskRef:
+  #     name: galasabld
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: command
+  #     value:
+  #       - harbor
+  #       - deleteimage
+  #       - --harbor
+  #       - harbor.galasa.dev
+  #       - --project
+  #       - galasadev
+  #       - --repository
+  #       - galasa-resources
+  #       - --tag
+  #       - $(params.distBranch)
+  #       - --credentials
+  #       - /harborcreds/harborcreds.yaml

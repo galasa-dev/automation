@@ -3,27 +3,34 @@
 This repository is the single location for all the automation and CI/CD that occurs in Galasa. 
 
 Find out more about:
-1. [Build-images](#build-images) - custom images required for the build process
-1. [Dockerfiles](#dockerfiles) - the organised Dockerfiles for all the images built for galasa
-1. [Infrastructure](#infrastructure) - the Galasa infrastructure as code, including the Kubernetes set-up
-1. [Pipelines](#pipelines) - the components used in our Tekton build pipelines, such as Pipelines and Tasks
+1. [build-images](#build-images): Custom images required for the build process
+1. [dockerfiles](#dockerfiles): The organised Dockerfiles for all the images built for Galasa
+1. [docs](#docs): Documentation pages and images
+1. [infrastructure](#infrastructure): The Galasa infrastructure as code, including the Kubernetes set-up
+1. [offline-tools](#offline-tools): Source code for the copyright checker tool
+1. [pipelines](#pipelines): The CustomResourceDefinitions used in our Tekton build pipelines, ClusterRoles, EventListeners, Pipelines, Roles, ServiceAccounts and Tasks
+1. [releasePipeline](#releasePipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
 
 
 # Build-images
 
 This directory holds the Go code for custom build images.
 
-github-status:
+## github-status:
 
 This image provides the status of a pull request build - whether it passed or failed - and updates the pull request on GitHub with this status.
 
-github-verify:
+## github-verify:
 
 This image is used to verify that a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build.
 
-github-monitor:
+## github-webhook-monitor:
 
 This image is used to monitor the galasa-dev organisation-wide webhook for any new deliveries, every 2 minutes. It will then trigger the appropriate EventListener for each delivery to then trigger the corresponding build pipeline.
+
+## github-webhook-receiver: 
+
+This image is used to receive requests from the webhook and responds with a 200 response to avoid the appearance of unsuccessful deliveries.
 
 
 # Dockerfiles
@@ -32,17 +39,27 @@ This directory is the single location for all Dockerfiles needed to build the im
 
 | Category | Dockerfiles |
 |----------|-------------|
-| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _common_ directory) | argocd, gitcli, gpg, kubectl, tkn | 
-| Go programs | ghstatus, ghverify, github-monitor |
-| Base image (All other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
-| Galasa core repositories | wrapping, gradle, maven, framework, extensions, managers, obr |
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, github-monitor, github-receiver, gpg, kubectl, openapi, openjdk11-ibm, swagger, tkn, unzip | 
+| Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
+| Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
+| Maven repositories for the built Galasa core components | wrapping, gradle, maven, framework, extensions, managers, obr, cli-binary, eclipse, isolated |
+| Maven repositories for other components | galasabld-binary, javadoc-maven-repo |
 | Galasa runtime images | obrGeneric, bootEmbedded, ibmBootEmbedded | 
-| Galasa Eclipse plug-in | eclipse, eclipse-p2 |
-| Galasa Isolated build | isolated, isolatedZip |
+| Galasa CLI | cli, cli-ibm |
+| Galasa Eclipse plug-in | eclipse-p2 |
+| Galasa Isolated build | isolatedZip |
 | Galasa Integrated tests | inttests |
-| Galasa CLI tools | galasabld, galasactl | 
-| Galasa Javadoc | javadoc-maven-repo, javadoc-site |
-| Galasa Simplatform | simplatform, simplatform-amd64, simbank webapp |
+| Galasa build utilities | galasabld, galasabld-ibm, galasabld-obr | 
+| Galasa Javadoc and REST API doc | javadoc-maven-repo, javadoc-site, restapidoc-site |
+| Galasa Simplatform | simplatform, simplatform-amd64, webapp |
+| Galasa Resources site | resources |
+
+
+# Docs
+
+This directory contains images for the documentation and instructions for:
+* How to contribute to the project
+* How to authenticate a Pull Request to build
 
 
 # Infrastructure
@@ -51,19 +68,23 @@ Galasa's infrastructure is currently spread across two Kubernetes clusters - an 
 
 cicsk8s:
 * All Tekton build pipelines are run on the internal cluster.
-* The Argo CD instance which controls all resources for the pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
+* The ArgoCD instance which controls all resources for the pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
 
-ibmcloud-galasadev-cluster: 
+galasa-plan-b-lon02: 
 * All Deployments, Services and Ingresses which make up our Maven artifact repositories are hosted on the external cluster.
-* The [Argo CD](argocd.galasa.dev) instance which controls the above resources is hosted on the external cluster.
+* The [ArgoCD](argocd.galasa.dev) instance which controls the above resources is hosted on the external cluster.
 * Our image registry [Harbor](harbor.galasa.dev) is hosted on the external cluster.
 
 
 # Pipelines
 
+## Cluster Roles
+
+A ClusterRole recycle-ecosystem has been created to recycle the Deployments in the galasa-prod ecosystem.
+
 ## Event Listeners
 
-A webhook is set up for the galasa-dev organisation on GitHub. Every 2-minutes, the github-monitor checks for new events and triggers one of the three EventListeners where necessary.
+A webhook is set up for the galasa-dev organisation on GitHub. Every 2-minutes, the github-monitor checks for new events delivered to the webhook and triggers one of the three EventListeners where necessary.
 
 _Currently, payload validation has been turned off with an annotation in the metadata for these EventListeners. This is because the github-monitor currently cannot validate the payloads from GitHub. This will be turned on in the future once the github-monitor can validate payloads from GitHub._
 
@@ -84,13 +105,13 @@ This EventListener is triggered via webhook when code is pushed into the main br
 
 ## Pipelines
 
-Galasa's architecture means that components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping.
+Galasa's architecture means that the core components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping.
 
 In the pipelines, you will see that during some of the Maven or Gradle builds, the Maven source is pointed at the Maven artifact repository of the previous component. So, Framework's Gradle build has the build argument _-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven_ so it can use artifacts from Maven's build.
 
 You will also notice that the Dockerfiles for some components are FROM the previous component.
 
-![](./docs-images/repo-links.png)
+![](./docs/repo-links.png)
 
 _For more information about the Tasks used in the Pipelines, see the **Tasks** section of this README._
 
@@ -126,10 +147,10 @@ To build changes across multiple GitHub repositories at the same time, the chang
 
 This example is for a branch build for branch iss001 that contains changes to Framework and Managers (Framework is the first pipeline).
 
-1. Before starting a branch build, you must set up an app on [Argo CD](argocd.galasa.dev) to control your Deployments.
-![](./docs-images/create-argocd-app.png)
+1. Before starting a branch build, you must set up an app on [ArgoCD](argocd.galasa.dev) to control your Deployments.
+![](./docs/create-argocd-app.png)
 2. As Framework is the first pipeline in the chain that has changes to be built, you must set up Deployments for Framework and all other repos that come after it, so Framework, Extensions, Managers and OBR. You do this by overriding the values from values.yaml to _REPO_.deploy = true, _REPO_.branch = _BRANCH_ and _REPO_.imageTag = _BRANCH_.
-![](./docs-images/edit-values.png)
+![](./docs/edit-values.png)
 3. The app and all of its resources will show as 'Unhealthy' at first, as the Docker images tagged with your branch name do not exist yet, as they have not been built.
 4. Manually start the first pipeline by executing a tkn command, passing in parameters. This command must be ran inside the automation directory, as it references the podTemplate and volumeClaimTemplate for the workspace. If you don't want to run this command inside the automation directory, change the paths to the templates. For our example, running inside the automation directory this would be the command:
 ```
@@ -139,9 +160,11 @@ tkn pipeline start branch-framework -n galasa-build \
 --pod-template pipelines/templates/pod-template.yaml --serviceaccount galasa-build-bot \ 
 --param fromBranch=main \
 --param toBranch=iss001 \
+--param revision=iss001 \
 --param refspec=refs/heads/iss001:refs/heads/iss001 \
 --param imageTag=iss001 \
---param appname=iss001-maven-repo
+--param appname=iss001-maven-repo \ 
+--param jacocoEnabled=false
 ```
 5. The first pipeline should start, and then will trigger the following pipeline in the chain by running a similar tkn command in a task at the end of the pipeline.
 6. After the OBR pipeline has successfully ran, go to your app on Argo CD and 'Sync' your resources.
@@ -192,6 +215,11 @@ The Docker image conatining the galasactl CLI binaries is pushed [here](https://
 The CLI binaries are downloadable from [here](https://development.galasa.dev/main/binary/cli).
 
 
+**Codecoverage**
+
+_More documentation to be written._ 
+
+
 **Eclipse**
 
 These pipelines build the [Galasa Eclipse plug-in](https://github.com/galasa-dev/eclipse).
@@ -237,6 +265,16 @@ The Docker image for the Framework Maven repo is [here](https://harbor.galasa.de
 The Framework Maven repository is [here](https://development.galasa.dev/main/maven-repo/framework).
 
 
+**Galasa UI**
+
+_More documentation to be written._ 
+
+
+**GitHub copyright**
+
+_More documentation to be written._ 
+
+
 **Gradle**
 
 These pipelines build the [Galasa Gradle plug-in](https://github.com/galasa-dev/gradle)
@@ -254,7 +292,7 @@ The Gradle Maven repository is [here](https://development.galasa.dev/main/maven-
 
 **Helm**
 
-These pipelines test the Helm chart to install a Galasa ecosystem.
+These pipelines test the [Helm chart](https://github.com/galasa-dev/helm) to install a Galasa ecosystem.
 
 pr-helm:
 The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin. It then attempts to install an ecosystem using the Helm chart by creating an ArgoCD app, syncs the app and waits for confirmation of app health. It then cleans up the app if successful and returns the status of the pipeline to the PR.
@@ -412,6 +450,15 @@ snapshot-integration:
 This pipeline snapshots all of the main images and promotes them to integration.
 
 
+## Roles
+
+A Role to recycle deployments on the cluster.
+
+
+## Service Accounts
+
+Definitions for the ServiceAccounts used during pipelines.
+
 
 ## Tasks
 
@@ -420,33 +467,36 @@ This pipeline snapshots all of the main images and promotes them to integration.
 This task uses the Argo CD CLI to interact with resources that are managed by Argo CD, including resources for our Maven repositories. 
 
 Parameters:
-* server: The argocd server to perform the command on.
 * command: An array of each part of the argocd command to execute.
+* server: The argocd server to perform the command on.
+* authSecretName: The secret name to use to authenticate to the server.
+* authSecretKey: The secret key to use to authenticate to the server.
 
 This task uses the custom [argocd-cli image](https://harbor.galasa.dev/harbor/projects/5/repositories/argocd-cli/artifacts-tab). 
 
 
-### copy
-
-This task performs a simple copy from one location to another.
-
-Parameters:
-* context: The directory to perform the command in
-* source: The from location.
-* destination: The to location.
-
-This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
-
-
-### galasabld
+### galasabld-command
 
 This task uses the galasabld CLI to perform galasabld commands, such as galasabld template.
 
 Parameters:
 * context: The directory to perform the command in.
 * command: An array of all of the parts of the command.
+* galasabldImageTag: The image tag to use, defaults to main.
 
 This task uses the custom [galasabld image](https://harbor.galasa.dev/harbor/projects/5/repositories/galasabld/artifacts-tab).
+
+
+### galasactl-command
+
+This task uses the galasactl CLI to perform galasactl commands, such as galasactl runs submit.
+
+Parameters:
+* context: The directory to perform the command in.
+* command: An array of all of the parts of the command.
+* galasactlImageTag: The image tag to use, defaults to main.
+
+This task uses the custom [galasactl image](https://harbor.galasa.dev/harbor/projects/2/repositories/galasa-cli-ibm-amd64/artifacts-tab).
 
 
 ### get-commit
@@ -456,6 +506,17 @@ This task gets the latest git commit hash from the provided repository, and stor
 Parameters:
 * pipelineRunName: The name of the currently running PipelineRun, from the PipelineRun context, to find the working directory.
 * repo: The name of the GitHub repository.
+
+This task uses the custom [gitcli image](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab).
+
+
+### git-checkout
+
+This task switches to the correct git branch for a branch-level build as the pipeline always clones the main branch.
+
+Parameters:
+* context: The directory to perform the command in.
+* branch: The name of branch to switch to.
 
 This task uses the custom [gitcli image](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab).
 
@@ -476,8 +537,6 @@ _All uses of this task have been commented out as the pipelines use a volumeClai
 
 This task clones a GitHub repository from the provided URL into the workspace.
 
-_More documentation to be written._ 
-
 
 ### git-status
 
@@ -488,6 +547,7 @@ Parameters:
 * prUrl: The URL of the pull request on GitHub.
 * statusesUrl: The URL to return the status of the build to the pull request via a POST request.
 * issueUrl: The URL to return comments to the pull request via a POST request.
+* pipelineRunName: The PipelineRun name triggered by the PR.
 
 This task uses the custom [ghstatus image](https://harbor.galasa.dev/harbor/projects/5/repositories/ghstatus/artifacts-tab).
 
@@ -533,12 +593,24 @@ This task uses the offical [Gradle image](https://hub.docker.com/_/gradle) from 
 This task allows you to build and push Docker images within a Kubernetes cluster or container. This is needed as Docker virtualisation cannot be performed inside a containerised environment.
 
 Parameters:
-* dockerfilePath: The path to the Dockerfile needed for the build.
+* pipelineRunName: The PipelineRun name to use for the working directory.
 * imageName: The name to give the image after it is built, including the tag.
+* context: The Docker build context
 * noPush: Allows you to choose whether you want to push the image built to the given destination (dockerRegistry/imageName).
+* dockerfilePath: The path to the Dockerfile needed for the build.
 * buildArgs: An array used to pass any build arguments needed into the Dockerfile.
 
 The task uses [kaniko-executor image](https://console.cloud.google.com/gcr/images/kaniko-project/GLOBAL/executor@sha256:23ae6ccaba2b0f599966dbc5ecf38aa4404f4cd799add224167eaf285696551a/details?tag=latest), from gcr.io (Google Container Registry).
+
+
+### kubectl 
+
+This task allows you to execute kubectl commands on the cluster the pipeline runs on.
+
+Parameters: 
+* command: An array of the parts of the command.
+
+The task uses the [kubectl image](https://harbor.galasa.dev/harbor/projects/3/repositories/kubectl/artifacts-tab).
 
 
 ### make
@@ -547,6 +619,7 @@ This task is used to perform the shell command 'make all' to execute a Makefile.
 
 Parameters:
 * directory: The directory to perform the command in.
+* params: An array of commands, defaults to all.
 
 This task uses the official [GoLang image](https://hub.docker.com/_/golang).
 
@@ -560,8 +633,9 @@ Parameters:
 * settingsLocation: The location of the settings.xml produced by the maven-gpg task. This will normally be /workspace/git/PIPELINE_RUN_NAME/REPO/gpg/settings.xml. For the OBR builds, as two Maven builds occur in two different contexts, to avoid doing maven-gpg twice, the settingsLocation is set.
 * buildArgs: An array used for any additional arguments to pass to Maven.
 * command: An array of commands to use in the build such as 'deploy' or 'install'.
+* image: The Maven image to use for the task, defaults to Maven version 3.8.6 with the Open JDK 11.
 
-This task uses the offical [Maven image](https://hub.docker.com/_/maven) from DockerHub.
+This task uses the offical [Maven 3.8.6 with Open JDK 11 image](https://hub.docker.com/_/maven) from DockerHub unless overridden.
 
 
 ### maven-gpg
@@ -573,20 +647,10 @@ The Maven build uses the Maven GPG Plugin to sign all of the built artifacts usi
 1. In the last step, the settings.xml from the mavengpg secret that has been populated with the galasa.passphrase is copied and put in the directory made in the first step.
 
 Parameters:
-* context: The location to store the settings.xml for use by a Maven build.
+* context: The directory to execute the command in.
+* settingsDirectory: The location of the settings.xml to use in the subsequent Maven build, defaults to /workspace/git/gpg if not overriden.
 
 This task uses the custom [gpg image](https://harbor.galasa.dev/harbor/projects/5/repositories/gpg/artifacts-tab). This task also uses the offical [busybox image](https://hub.docker.com/_/busybox) from DockerHub to perform Unix commands.
-
-
-### recycle-deployment
-
-This task uses the kubectl CLI to recycle deployments on the cluster. 
-
-Parameters:
-* namespace: The name of the Kubernetes Namespace.
-* deployment: The name of the Kubernetes Deployment.
-
-This task uses the custom [kubectl image](https://harbor.galasa.dev/harbor/projects/5/repositories/kubectl/artifacts-tab).
 
 
 ### script
@@ -600,6 +664,7 @@ Parameters:
 
 This task, by default, uses the latest [busybox image](https://hub.docker.com/_/busybox). Unless, an image is passed as a paramter.
 
+
 ### tkn-cli
 
 This task is used the Tekton CLI to communicate with Tekton.
@@ -611,15 +676,9 @@ Parameters:
 This task uses the custom [tkn image](https://harbor.galasa.dev/harbor/projects/5/repositories/tkn/artifacts-tab).
 
 
-### unix-command
+## Templates
 
-This task is used to perform Unix commands. 
-
-Parameters:
-* context: The directory to perform the command in.
-* command: An array with the parts of the command to perform.
-
-This task uses the latest [busybox image](https://hub.docker.com/_/busybox).
+This directory contains template files for a Pod and Workspace that must be passed into the tkn CLI to kick off a pipeline manually, as described below.
 
 
 ## How to manually trigger a pipeline
@@ -644,3 +703,11 @@ ie: If the main builds fail and you want to re-start a build.
 This can be the case if we get environmental failures, for examople when argocd fails to 
 re-deploy one of the docker images from the build.
 
+## How are the IBM build machines protected from malicious code in a fork-pull-request ?
+There are built-in protections to prevent malicious code being executed as part of a build process
+on the IBM build hardware. The mechanism is described [here](./docs/pull-request-build-authentication.md).
+
+
+# Release Pipeline
+
+This directory contains all scripts and pipelines and the specific instructions needed to complete a release of the open source Galasa project. See the [README](./releasePipeline/README.md) for more details.

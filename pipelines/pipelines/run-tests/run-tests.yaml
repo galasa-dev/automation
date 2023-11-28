@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -41,7 +44,7 @@ spec:
         - runs 
         - prepare 
         - --bootstrap 
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap 
         - --stream 
         - inttests 
         - --portfolio 
@@ -66,7 +69,7 @@ spec:
         - runs 
         - submit 
         - --bootstrap 
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap 
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap 
         - --portfolio 
         - /workspace/git/$(context.pipelineRun.name)/test.yaml 
         - --throttle 
@@ -76,7 +79,7 @@ spec:
         - --progress 
         - '1' 
         - --override 
-        - galasaecosystem.runtime.repository=http://galasadev-cicsk8s.hursley.ibm.com/integration/maven/obr 
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/integration/maven-repo/obr/
         - --override 
         - galasaecosystem.docker.version=integration 
         - --reportyaml 
@@ -117,4 +120,4 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace

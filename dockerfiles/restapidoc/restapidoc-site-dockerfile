@@ -1,0 +1,7 @@
+FROM docker.io/library/httpd:2.4
+
+RUN rm -v /usr/local/apache2/htdocs/*
+
+COPY automation/dockerfiles/httpdconf/httpd.conf /usr/local/apache2/conf/httpd.conf
+
+COPY framework/docs/generated/galasaapi/ /usr/local/apache2/htdocs/

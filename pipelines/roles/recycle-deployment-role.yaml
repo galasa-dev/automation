@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 
 # This is currently not being used, but it might be in future if we have a task
 # that uses the same rules so keep 

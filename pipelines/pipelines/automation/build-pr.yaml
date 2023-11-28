@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -31,6 +34,9 @@ spec:
   - name: action
     type: string
   tasks:
+# 
+# 
+# 
   - name: git-verify
     taskRef:
       name: git-verify
@@ -41,6 +47,9 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+# 
+# 
+# 
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -59,7 +68,10 @@ spec:
       value: $(context.pipelineRun.name)/automation
     workspaces:
      - name: output
-       workspace: git-workspace 
+       workspace: git-workspace
+# 
+# 
+# 
   - name: get-commit
     taskRef:
       name: get-commit
@@ -73,6 +85,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: go-build-ghverify
     taskRef:
       name: go-build
@@ -90,6 +105,112 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
+  - name: build-ghverify-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghverify
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-verify
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/ghverify-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghverify:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: go-build-ghstatus
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-status
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghstatus
+      - cmd/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: build-ghstatus-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghstatus
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-status
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/ghstatus-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghstatus:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: go-build-ghmonitor
+    taskRef:
+      name: go-build
+    runAfter:
+      - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-monitor
+    - name: goArgs
+      value:
+      - build
+      - -o
+      - bin/ghmonitor
+      - cmd/main.go  
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: build-ghmonitor-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - go-build-ghmonitor
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/build-images/github-webhook-monitor
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/github-monitor-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/ghmonitor:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
 
   # A tool which is called by the webhook, responds OK, and 
   # tells a pull request that a build is 'pending...'
@@ -110,7 +231,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+# 
+# 
+# 
   - name: build-ghreceiver-image
     taskRef:
       name: docker-build
@@ -126,30 +249,13 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/common/ghreceiver:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-   
-   
-  
-  - name: go-build-ghstatus
-    taskRef:
-      name: go-build
-    runAfter:
-      - clone-automation
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation/build-images/github-status
-    - name: goArgs
-      value:
-      - build
-      - -o
-      - bin/ghstatus
-      - cmd/main.go  
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
+# 
+# 
+# 
   - name: build-gpg-image
     taskRef:
       name: docker-build
@@ -159,7 +265,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/gpg-dockerfile
     - name: imageName
@@ -169,6 +275,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: build-kubectl-image
     taskRef:
       name: docker-build
@@ -178,7 +287,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/kubectl-dockerfile
     - name: imageName
@@ -188,6 +297,31 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
+  - name: build-argocdcli-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/argocd-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/argocd-cli:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
   - name: build-gitcli-image
     taskRef:
       name: docker-build
@@ -198,7 +332,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/gitcli-dockerfile
     - name: imageName
@@ -208,6 +342,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+# 
+# 
+# 
   - name: build-tkn-image
     taskRef:
       name: docker-build
@@ -217,7 +354,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/tkn-dockerfile
     - name: imageName
@@ -226,7 +363,10 @@ spec:
       value: --no-push
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace
+# 
+# 
+# 
   - name: build-openapi-image
     taskRef:
       name: docker-build
@@ -236,7 +376,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/common
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
     - name: dockerfilePath
       value: automation/dockerfiles/common/openapi-dockerfile
     - name: imageName
@@ -245,7 +385,76 @@ spec:
       value: --no-push
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: build-swagger-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/swagger-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/swagger:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: build-unzip-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/unzip-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/unzip:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: build-openjdk11-ibm-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/openjdk11-ibm-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/openjdk11-ibm:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
   finally:
   - name: git-status
     when:
@@ -265,14 +474,3 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

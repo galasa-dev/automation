@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -110,7 +113,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application
     - name: settingsLocation
-      value: /workspace/git/gpg/settings.xml
+      value: /workspace/git/$(context.pipelineRun.name)/simplatform/settings.xml
     - name: buildArgs
       value:
         - "-Dgalasa.source.repo=https://development.galasa.dev/$(params.fromBranch)/maven-repo/obr"
@@ -273,14 +276,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

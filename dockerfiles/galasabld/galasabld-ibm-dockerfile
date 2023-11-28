@@ -1,6 +1,3 @@
-#
-# Copyright contributors to the Galasa project 
-#
 ARG dockerRepository
 ARG branch
 FROM ${dockerRepository}/galasadev/galasabld:${branch}
