@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -15,13 +18,13 @@ spec:
     type: string
   - name: command
     type: array
-  - name: tag
+  - name: galasactlImageTag
     type: string
     default: main
   steps:
   - name: galasactl
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.tag)
+    image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.galasactlImageTag)
     imagePullPolicy: Always
     command:
     - galasactl

@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -191,7 +194,7 @@ spec:
        workspace: git-workspace 
   - name: list-bom
     taskRef: 
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-bom
     params:
@@ -213,7 +216,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/galasa-bom
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
@@ -255,7 +258,7 @@ spec:
        workspace: git-workspace
   - name: list-obr
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-obr
     params:
@@ -277,7 +280,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/obr/dev.galasa.uber.obr
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/gpg/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
@@ -344,14 +347,14 @@ spec:
        workspace: git-workspace
   - name: maven-build-javadoc
     taskRef: 
-      name: maven-build-java18
+      name: maven-build
     runAfter: 
     - generate-javadoc
     params:
     - name: context
       value: $(context.pipelineRun.name)/obr/javadocs
     - name: settingsLocation
-      value: /workspace/git/$(context.pipelineRun.name)/obr/settings.xml
+      value: /workspace/git/gpg/settings.xml
     - name: command
       value: 
         - deploy
@@ -362,6 +365,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
+    - name: image
+      value: docker.io/library/maven:3.8.7-openjdk-18
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -376,7 +381,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-javadoc-site:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)/obr/javadocs
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: ""
     - name: dockerfilePath
@@ -426,14 +431,3 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

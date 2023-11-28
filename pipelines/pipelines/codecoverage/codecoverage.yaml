@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -141,7 +144,7 @@ spec:
 
   - name: cat-template
     taskRef:
-      name: unix-command   
+      name: general-command
     runAfter:
     - generate-pom-sources
     params:
@@ -196,7 +199,7 @@ spec:
         - --trace
     #
         - --bootstrap
-        - http://galasa-cicsk8s.hursley.ibm.com/bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
         - --throttle
         - '5'
         # - --throttlefile
@@ -217,6 +220,7 @@ spec:
         - java.jacoco.code.coverage=true
         - --override
         - java.jacoco.save.location=https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs
+        # nexus is gone, need to replace code coverage location
         - --override
         - java.jacoco.save.credentials=JACOCO
         - --override
@@ -233,7 +237,7 @@ spec:
 
   - name: cat-results
     taskRef:
-      name: unix-command   
+      name: general-command 
     runAfter:
     - run-tests
     params:
@@ -263,14 +267,15 @@ spec:
         - --output
         - target/inttests
         - --execs
-        - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs  
+        - https://nexus.galasa.dev/repository/jacoco/$(params.branch)/execs 
+        # nexus is gone, need to replace code coverage location 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
 
   - name: ls-execs
     taskRef:
-      name: unix-command   
+      name: general-command
     runAfter:
     - fetch-execs
     params:
@@ -410,4 +415,4 @@ spec:
       - $(params.appname)
       - --resource
       - apps:Deployment:codecov-$(params.imageTag)
-      - --health    
+      - --health

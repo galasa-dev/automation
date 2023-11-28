@@ -6,120 +6,15 @@
 ## Introduction
 With many repos making up the Galasa project and many different types of artifacts being produced, the build and release of Galasa has become a little complicated. These instructions detail the process of building, testing and releasing a version of Galasa and related components.
 
-Galasa has been broken up into multiple components, and these components are only released if the component has changed. These components (and related repos) are:-
-
-1. Galasa (wrapping, gradle, maven, framework, extensions, managers, obr, eclipse, isolated)
-1. CLI (cli)
-
-The Galasa component is always released, but the others are only cloned, built, tested and released if there are changes.
-
-
-## Set up
-
-1. Clone the 'automation' repository, main branch. All the yaml and scripts you will be using can be found in the releasePipeline folder.
-1. Log into ArgoCD `argocd login --sso argocd.galasa.dev`
-1. Log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
-1. Ensure you have the latest galasabld program from https://development.galasa.dev/prod/binary/bld/ and it is on the path.
-1. jq needs to be installed.
-1. watch needs to be installed.
-6. IBM Cloud CLI needs to be installed and logged in:
-```
-ibmcloud login --sso
-ibmcloud cr region-set global
-```
-
-For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-build pr logs -f --last to watch it's progress. Only move onto the next command once the previous is completed successfully.
+Galasa consists of code stored in multiple repositories: wrapping, gradle, maven, framework, extensions, managers, obr, cli, eclipse and isolated.
 
 
 ## PRE-RELEASE PROCESS
-It may be beneficial to complete a pre-release before starting a vx.xx.x release of Galasa. This is to ensure the main Galasa component builds successfully and to iron out any problems before the actual release, as there will be a freeze on delivering code during this time. 
 
-**Do not check in any changes you make to files during this work item unless you are correcting a mistake - back out everything at the end**
-
-1. Ensure you have complered Steps 1, 2 and 3 of the 'Set up' section of this README
-1. Complete Steps 1, 3 and 4 of the 'Create branch and ArgoCD applications' section in the release process
-   - Before doing Step 1, in 02-create-argocd-apps.sh, do a find and replace on the word 'release' and change to 'prerelease'. 
-   - In Step 4, **ensure that the following parameters are set**: distBranch=prerelease, fromBranch=main
-1. Complete Step 1 of 'Build the components' **ensuring that the following parameters are set**: toBranch=prerelease, revision=prerelease, refspec=refs/heads/prerelease:refs/heads/prerelease, imageTag=prerelease, appname=prerelease-maven-repos, jacocoEnabled=false, isRelease=true
-1. Go to a maven artifact from each repository and check that the .asc files are present, which means the artifact has been signed. For example, https://development.galasa.dev/prerelease/maven-repo/wrapping/dev/galasa/com.auth0.jwt/<VERSION> should contain a file called com.auth0.jwt-<VERSION>.jar.asc.
-1. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
-
+Follow the instructions in [prerelease.md](prerelease.md)
 
 ## RELEASE PROCESS
 
-### Create branch and ArgoCD applications
+Follow the instructions in [release.md](./release.md)
 
-1. 02-create-argocd-apps.sh - Create the Deployments and Tekton resources in Kubernetes.
-1. 03-create-argocd-cli-app.sh - **Only if CLI being released** - Create the Deployments and Tekton resources in Kubernetes.
-1. Ensure Kubernetes context is set to the internal cicsk8s cluster.
-1. Run `kubectl -n galasa-build create -f 10-clone-galasa.yaml` - Clone all the repos' main branches to release branches.
-1. Run `kubectl -n galasa-build create -f 11-clone-cli.yaml` - **Only if CLI being released** - Clone the repo's main branch to release branch.
 
-### Build the components
-
-1. Run `kubectl -n galasa-build create -f 20-build-galasa.yaml` - Build the Galasa main component. **After each repo's build, go to its maven repository and check that the artifacts have been signed, there should be .asc files present**
-1. Run `kubectl -n galasa-build create -f 21-build-cli.yaml` - **Only if CLI being released** - Build the CLI.
-
-### Regression test
-
-1. Amend 28-regression-test-galasa.yaml - Set the correct version for this release, and the bootVersion for galasa-boot (check [here](https://development.galasa.dev/main/maven-repo/obr/dev/galasa/galasa-boot/) for current galasa-boot version)
-1. Run `kubectl -n galasa-build create -f 28-regression-test-galasa.yaml` - Test Galasa.
-1. If there are any failures from the regression testing - Amend 29-regression-reruns.yaml and pipelines/regression-reruns.yaml. Add the tests that failed, to run them again.
-1. Run `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
-1. Repeat as required.
-1. Manually install and test the SimBank example in Eclipse.
-
-All the tests must pass before moving on.
-
-### Obtain release approval
-
-1. Ask the Team and Product managers for release approval.
-
-### Deployment
-
-<!-- Commenting out the steps below for now as they do not work. An item is open to fix this. Temporary steps to work around this below: -->
-<!-- 1. Amend 30-deploy-maven-galasa.yaml and amend the version parameter to the release.
-1. Run `kubectl -n galasa-build create -f 30-deploy-maven-galasa.yaml` - Deploy the maven artifacts to OSS Sonatype. -->
-1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor.
-1. Exec into the image so you can run commands from inside it, by running `docker run -it --entrypoint /bin/sh harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release`
-1. When inside the image, run `cd htdocs/dev/galasa`
-1. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them, `rm maven-metadata.xml` etc.
-1. Go to Vault and find the maven-creds secret, to use the username and password in the next step.
-1. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the Nexus staging repository:
-`galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>`
-1. `exit` the image.
-<!-- End of temporary steps -->
-1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document.
-1. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata.
-1. Wait until Maven Central is updated.
-1. Amend 33-resources-image.yaml - Set the version.
-1. Run `kubectl -n galasa-build create -f 33-resources-image.yaml` - Build the resources-image.
-1. Amend 34-deploy-docker-galasa.sh - Set the version.
-1. 34-deploy-docker-galasa.sh - Deploy the Container images to ICR.
-1. Amend 35-deploy-docker-cli.sh - **Only if CLI being released** - Set the version.
-1. 35-deploy-docker-cli.sh- **Only if CLI being released** - Deploy the CLI images to ICR.
-
-### Update reference sites
-
-1. 40-argocd-ibmcloud.md - Follow the instructions to update the IBM Cloud Galasa external sites.
-1. 41-eclipse-marketplace.md - Follow the instructions to update the Eclipse Marketplace to advertise the latest Eclipse plugin.
-
-### Tag release and deploy CLI
-
-1. Amend 50-tag-galasa.yaml - Update the tag name, must be prefixed with lowercase v.
-1. Run `kubectl -n galasa-build create -f 50-tag-galasa.yaml` - Tag the release on ALL repos.
-1. 52-deploy-cli-release.md - **Only if CLI being released** - Follow instructions to deploy the CLI to the repo release.
-
-### Clean up
-
-<!-- 1. Run `kubectl -n galasa-build create -f 90-delete-all-branches.yaml` - Delete the release branch in ALL repos. -->
-<!-- Temporary steps until we can automate deleting the 'release' images: -->
-1. Go through the images in [Harbor](harbor.galasa.dev) and delete all images tagged 'release' that were built as part of this release (tick box next to image tagged 'release' and select Actions then Delete)
-1. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image)
-<!-- End of temporary steps-->
-1. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
-
-### Bump to new version
-
-1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-1. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties: https://github.ibm.com/CICS/cicsts-galasa-config/blob/main/CPS.properties. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.

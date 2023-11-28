@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -28,7 +31,13 @@ spec:
     type: string
   - name: action
     type: string
+#
+#
+#
   tasks:
+#
+#
+#
   - name: git-verify
     taskRef:
       name: git-verify
@@ -39,6 +48,9 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+#
+#
+#
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -58,6 +70,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: clone-framework
     taskRef: 
       name: git-clone
@@ -77,6 +92,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,7 +108,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+#
+#
+#
   - name: gradle-build-framework
     taskRef:
       name: gradle-build
@@ -111,6 +131,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+#
+#
+#
   - name: docker-build-framework
     taskRef:
       name: docker-build
@@ -135,6 +158,60 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+#
+#
+#
+  - name: generate-api-docs
+    taskRef:
+      name: general-command
+    runAfter:
+    - clone-framework
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: image
+      value: harbor.galasa.dev/common/swagger:main
+    - name: command
+      value:
+        - java
+        - -jar
+        - /opt/swagger/swagger-codegen-cli.jar
+        - generate
+        - -i
+        - /workspace/git/$(context.pipelineRun.name)/framework/openapi.yaml
+        - -l
+        - html2
+        - -o
+        - docs/generated/galasaapi
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: docker-build-restapidoc-site
+    taskRef:
+      name: docker-build
+    runAfter:
+    - generate-api-docs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.headSha)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   finally:
   - name: git-status
     when:
@@ -154,14 +231,3 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

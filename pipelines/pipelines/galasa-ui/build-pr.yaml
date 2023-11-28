@@ -1,0 +1,202 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pr-webui
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+#----------------------------------------------------------------
+  tasks:
+  - name: git-verify
+    taskRef:
+      name: git-verify
+    params:
+    - name: userId
+      value: $(params.userId)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: action
+      value: $(params.action)
+
+#----------------------------------------------------------------
+# Clone the webui repository
+  - name: clone-webui
+    taskRef:
+      name: git-clone
+    runAfter:
+    - git-verify
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/webui
+    - name: revision
+      value: $(params.baseRef)
+    - name: refspec
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
+    - name: depth
+      value: "50"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/webui
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Install the webui's dependencies
+  - name: npm-install-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - clone-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - install
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Generate gRPC types for the webui
+  - name: generate-grpc-types
+    taskRef:
+      name: general-command
+    runAfter:
+    - npm-install-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - ./node_modules/.bin/proto-loader-gen-types
+        - src/utils/grpc/dex.proto
+        - -O
+        - src/generated/grpc
+        - --grpcLib=@grpc/grpc-js
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Run the webui's unit tests
+  - name: npm-test-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - generate-grpc-types
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - test
+        - --
+        - --watchAll=false
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Build the webui
+  - name: npm-build-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - npm-test-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - run
+        - build
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Build Docker image and push to harbor
+  - name: docker-build-webui
+    taskRef:
+      name: docker-build
+    runAfter:
+    - npm-build-webui
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-ui:$(params.headSha)
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: noPush
+      value: "--no-push"
+    - name: dockerfilePath
+      value: webui/galasa-ui/Dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# And finally... whether the above works or not, update the status
+# of the Tekton check in the pull request to either passed/failed.
+  finally:
+  - name: git-status
+    when:
+      - input: "$(tasks.git-verify.status)"
+        operator: in
+        values: ["Succeeded"]
+    taskRef:
+      name: git-status
+    params:
+    - name: status
+      value: $(tasks.status)
+    - name: prUrl
+      value: $(params.prUrl)
+    - name: statusesUrl
+      value: $(params.statusesUrl)
+    - name: issueUrl
+      value: $(params.issueUrl)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)

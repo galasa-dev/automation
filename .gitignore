@@ -1,1 +1,7 @@
 .vscode/
+
+# Don't check-in any metadata files the MAC creates using the file explorer.
+**/.DS_Store
+
+temp
+

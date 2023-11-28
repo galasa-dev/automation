@@ -1,0 +1,169 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-webui
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: toBranch
+    type: string
+    default: main
+  - name: imageTag
+    type: string
+    default: main
+
+#----------------------------------------------------------------
+# Clone the webui repository
+  tasks:
+  - name: clone-webui
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/webui
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/webui
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Switch to the given branch if it exists
+  - name: check-branch
+    taskRef:
+      name: git-check-branch
+    runAfter:
+    - clone-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Install the webui's dependencies
+  - name: npm-install-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - check-branch
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - install
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Generate gRPC types for the webui
+  - name: generate-grpc-types
+    taskRef:
+      name: general-command
+    runAfter:
+    - npm-install-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - ./node_modules/.bin/proto-loader-gen-types
+        - src/utils/grpc/dex.proto
+        - -O
+        - src/generated/grpc
+        - --grpcLib=@grpc/grpc-js
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Run the webui's unit tests
+  - name: npm-test-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - generate-grpc-types
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - test
+        - --
+        - --watchAll=false
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Build the webui
+  - name: npm-build-webui
+    taskRef:
+      name: general-command
+    runAfter:
+    - npm-test-webui
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: image
+      value: docker.io/library/node:18.16.0-alpine3.18
+    - name: command
+      value:
+        - npm
+        - run
+        - build
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+# Build docker image and push to harbor
+  - name: docker-build-webui
+    taskRef:
+      name: docker-build
+    runAfter:
+    - npm-build-webui
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-ui:$(params.imageTag)
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: webui/galasa-ui/Dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace

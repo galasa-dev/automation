@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -522,6 +525,77 @@ spec:
 # 
 # 
 # 
+# 
+# 
+# 
+  - name: snapshot-restapidoc-site
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/repo-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=image=galasa-restapidoc-site"
+        - "--build-arg=oldBranch=$(params.fromBranch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: recycle-restapidoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-restapidoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - actions
+      - run
+      - $(params.appname)
+      - restart
+      - --kind
+      - Deployment
+      - --resource-name
+      - restapidocsite-$(params.imageTag)
+#
+#
+#
+  - name: wait-restapidoc-site
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-restapidoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:restapidocsite-$(params.imageTag)
+      - --health
+#
+#
+#
   - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
@@ -585,6 +659,7 @@ spec:
     - wait-isolated
     - wait-javadoc
     - wait-javadoc-site
+    - wait-restapidoc-site
     - wait-eclipse
     - wait-p2
     - snapshot-boot-embedded
@@ -615,8 +690,4 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace          
-
-    
-       
-               
+       workspace: git-workspace

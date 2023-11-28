@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -162,6 +165,7 @@ spec:
         - -o
         - pkg/galasaapi
         - --additional-properties=packageName=galasaapi
+        - --global-property=apiTests=false
     workspaces:
      - name: git-workspace
        workspace: git-workspace         
@@ -171,7 +175,7 @@ spec:
   # So remove it. It gets re-generated when we compile.
   - name: clear-mod
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - generate-api
     params:
@@ -191,7 +195,7 @@ spec:
   # So remove it. It gets re-generated when we compile.
   - name: clear-sum
     taskRef:
-      name: unix-command
+      name: general-command
     runAfter:
     - clear-mod
     params:
@@ -255,15 +259,128 @@ spec:
       value: $(context.pipelineRun.name)/cli
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace 
 
+  #----------------------------------------------------------------
+  # START OF TESTS
+  #----------------------------------------------------------------
+
+  - name: chmod-local-script
+    taskRef: 
+      name: general-command
+    runAfter:
+      - galasactl-make
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: docker.io/library/bash:3.2.57
+    - name: command
+      value: 
+        - chmod
+        - +x
+        - test-galasactl-local.sh
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: test-galasactl-local-maven-linux-x86-64
+    taskRef: 
+      name: general-command
+    runAfter:
+      - chmod-local-script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: docker.io/library/maven:3.8.6-openjdk-11
+    - name: command
+      value: 
+        - ./test-galasactl-local.sh
+        - --buildTool
+        - maven
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: test-galasactl-local-gradle-linux-x86-64
+    taskRef: 
+      name: general-command
+    runAfter:
+      - test-galasactl-local-maven-linux-x86-64
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: docker.io/library/gradle:6.8.2-jdk11 
+    - name: command
+      value: 
+        - ./test-galasactl-local.sh
+        - --buildTool
+        - gradle
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+# TO-DO Add tests for the other binaries, darwin etc
+# 
+# 
+# 
+#----------------------------------------------------------------
+  - name: chmod-ecosystem-script
+    taskRef: 
+      name: general-command
+    runAfter:
+      - test-galasactl-local-gradle-linux-x86-64
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: docker.io/library/bash:3.2.57
+    - name: command
+      value: 
+        - chmod
+        - +x
+        - test-galasactl-ecosystem.sh
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
+  - name: test-galasactl-ecosystem-linux-x86-64
+    taskRef: 
+      name: general-command
+    runAfter:
+      - chmod-ecosystem-script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: harbor.galasa.dev/common/openjdk11-ibm:main 
+    - name: command
+      value: 
+        - ./test-galasactl-ecosystem.sh
+        - --bootstrap
+        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  #----------------------------------------------------------------
+  # END OF TESTS
   #----------------------------------------------------------------
   # Build a docker image with the command installed into it.
   - name: docker-build-cli
     taskRef: 
       name: docker-build
     runAfter:
-    - galasactl-make
+    - test-galasactl-ecosystem-linux-x86-64
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -277,7 +394,7 @@ spec:
       value: automation/dockerfiles/cli/cli-dockerfile
     - name: buildArgs
       value:
-        - "--build-arg=platform=linux-amd64"
+        - "--build-arg=platform=linux-x86_64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -294,7 +411,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)/cli/
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
@@ -320,7 +437,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-cli-binary-downloadables:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)/cli/
+      value: $(context.pipelineRun.name)
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
@@ -356,15 +473,4 @@ spec:
     - name: issueUrl
       value: $(params.issueUrl)
     - name: pipelineRunName
-      value: $(context.pipelineRun.name)     
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace
+      value: $(context.pipelineRun.name)

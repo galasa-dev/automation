@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
-# 
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -29,6 +32,8 @@ spec:
   - name: action
     type: string
   tasks:
+
+
   - name: git-verify
     taskRef:
       name: git-verify
@@ -39,6 +44,8 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
+
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -58,6 +65,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+
   - name: clone-managers
     taskRef: 
       name: git-clone
@@ -77,6 +86,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+
   - name: get-commit
     taskRef:
       name: get-commit
@@ -90,6 +101,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: gradle-build-managers
     taskRef:
       name: gradle-build
@@ -107,9 +120,12 @@ spec:
       value: 
         - check
         - publish
+        - "--info"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: docker-build-managers
     taskRef:
       name: docker-build
@@ -134,6 +150,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+       
   finally:
   - name: git-status
     when:
@@ -153,14 +171,3 @@ spec:
       value: $(params.issueUrl)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
-
-  # Commenting out for now, until we decide whether to stay with VolumeClaimTemplate per PRun or go back to PVC
-  # - name: git-clean
-  #   taskRef: 
-  #     name: git-clean
-  #   params:
-  #   - name: subdirectory
-  #     value: $(context.pipelineRun.name)
-  #   workspaces:
-  #    - name: git-workspace
-  #      workspace: git-workspace

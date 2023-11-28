@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -19,8 +22,9 @@ spec:
     type: string  
     default: docker.io/library/busybox:latest
   steps:
-  - name: command
+  - name: run-command
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
+    imagePullPolicy: Always
     command:
       - $(params.command[*])

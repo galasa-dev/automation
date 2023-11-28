@@ -2,8 +2,6 @@ ARG dockerRepository
 ARG tag
 ARG jdkImage
 
-#FROM ${dockerRepository}/galasadev/galasa-obr-generic:${tag}
-
 FROM ${jdkImage}
 
 RUN touch /var/run/docker.sock && \
@@ -19,7 +17,6 @@ WORKDIR /galasa
 
 USER galasa
 
-#COPY --from=0 /galasa/* /galasa/
 COPY target/* /galasa/
 
 

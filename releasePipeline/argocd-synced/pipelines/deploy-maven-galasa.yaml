@@ -1,0 +1,33 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: deploy-maven-galasa
+  namespace: galasa-build
+spec:
+  params:
+  - name: version
+    type: string
+  - name: repository
+    type: string
+    default: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: deploy-maven
+    taskRef: 
+      name: deploy-maven-galasa
+    params:
+    - name: version
+      value: $(params.version)
+    - name: repository
+      value: $(params.repository)
