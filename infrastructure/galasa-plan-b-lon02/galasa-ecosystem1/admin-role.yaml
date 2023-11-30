@@ -71,7 +71,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: galasa-admin
+  name: galasa-ecosystem-admin
 subjects:
 - kind: ServiceAccount
   name: galasa-ecosystem1-admin
