@@ -61,3 +61,17 @@ rules:
   - "externalsecrets"
   verbs:
   - "*"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: galasa-ecosystem-admin
+  namespace: galasa-ecosystem1
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: galasa-admin
+subjects:
+- kind: ServiceAccount
+  name: galasa-ecosystem1-admin
