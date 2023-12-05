@@ -195,7 +195,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/eclipse/galasa-eclipse-parent/dev.galasa.eclipse.site
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
     - name: imageName
