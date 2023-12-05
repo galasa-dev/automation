@@ -1339,17 +1339,15 @@ spec:
       - start
       - build-distribution-for-galasa
       - -n
-      - jcarino
-      # - galasa-build
+      - galasa-build
       - --prefix-name 
-      - trigger-build-distribution-for-galasa
+      - trigger-build-distribution-for-galasa-
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
       - ./pipelines/templates/pod-template.yaml
       - --serviceaccount
-      - jade-sa
-      # - galasa-build-bot
+      - galasa-build-bot
     workspaces:
      - name: git-workspace
        workspace: git-workspace
