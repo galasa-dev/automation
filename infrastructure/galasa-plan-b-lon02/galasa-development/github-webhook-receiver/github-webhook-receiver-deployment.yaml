@@ -8,7 +8,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: github-webhook-receiver
-  namespace: galasa-pipelines
+  namespace: galasa-development
 spec:
   revisionHistoryLimit: 1
   replicas: 1
@@ -31,11 +31,6 @@ spec:
               secretKeyRef:
                 name: github-token
                 key: token
-          # - name: GITHUBUSERNAME
-          #   valueFrom:
-          #     secretKeyRef:
-          #       name: github-token
-          #       key: username
           args: ["--port", "80"]
           ports:
             - containerPort: 80

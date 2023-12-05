@@ -3,14 +3,15 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: tekton-build-workspace-pvc
-  namespace: galasa-pipelines
+  name: pvc-testcatalog
+  namespace: galasa-prod
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
+      storage: 1Gi
