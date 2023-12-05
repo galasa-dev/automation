@@ -549,25 +549,11 @@ spec:
 # 
 # 
 # 
-  - name: copy-text-files
-    taskRef:
-      name: script
-    runAfter:
-    - maven-build-galasactl
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/isolated/full
-    - name: script
-      value: cp -vr resources/* target/isolated/     
-    workspaces:
-      - name: git-workspace
-        workspace: git-workspace             
-
   - name: docker-build-isolated
     taskRef:
       name: docker-build
     runAfter:
-    - copy-text-files
+    - maven-build-galasactl
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -1050,25 +1036,11 @@ spec:
 # 
 # 
 # 
-  - name: copy-text-files-mvp
-    taskRef:
-      name: script
-    runAfter:
-    - maven-build-galasactl-mvp
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/isolated/mvp
-    - name: script
-      value: cp -vr resources/* target/isolated/     
-    workspaces:
-      - name: git-workspace
-        workspace: git-workspace             
-
   - name: docker-build-mvp
     taskRef:
       name: docker-build
     runAfter:
-    - copy-text-files-mvp
+    - maven-build-galasactl-mvp
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
