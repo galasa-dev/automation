@@ -1,0 +1,114 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testcatalog
+  namespace: galasa-prod
+  labels:
+    app: testcatalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testcatalog
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      name: testcatalog
+      labels:
+        app: testcatalog
+    spec:
+      serviceAccountName: galasa-controller
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        applevel: critical
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: applevel
+                operator: In
+                values:
+                - critical
+      initContainers:
+      - name: init-chown-data
+        image: docker.io/busybox:1.32.0
+        imagePullPolicy: IfNotPresent
+        command: ["chown", "-R", "1000", "/data"]
+        volumeMounts:
+        - name: data
+          mountPath: /data
+          subPath: ""
+      containers:
+      - name: resource-monitor
+        image: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:prod
+        imagePullPolicy: Always
+        command: ["java"]
+        args: 
+        - -jar
+        - boot.jar
+        - --obr
+        - file:galasa.obr
+        - --trace
+        - --api
+        - --bundle 
+        - dev.galasa.framework.api.health
+        - --bundle 
+        - dev.galasa.framework.api.testcatalog
+        - --bootstrap
+        - $(BOOTSTRAP_URI)
+        env:
+        - name: BOOTSTRAP_URI
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: bootstrap
+        ports:
+        - containerPort: 8080
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        volumeMounts:
+        - name: testcatalog
+          mountPath: /galasa/load/dev.galasa.testcatalog.cfg
+          subPath: dev.galasa.testcatalog.cfg
+        - name: data
+          mountPath: /galasa/testcatalog    
+      volumes:
+      - name: testcatalog
+        configMap:
+          name: testcatalog-file
+      - name: data
+        persistentVolumeClaim:
+          claimName: pvc-testcatalog
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: testcatalog
+  namespace: galasa-prod
+  labels:
+    app: testcatalog
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: testcatalog

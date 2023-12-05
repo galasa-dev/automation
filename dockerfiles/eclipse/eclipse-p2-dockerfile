@@ -1,5 +1,6 @@
 FROM docker.io/library/httpd:2.4
 
 RUN rm -v /usr/local/apache2/htdocs/*
-COPY httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY target/repository/ /usr/local/apache2/htdocs/
+COPY automation/dockerfiles/httpdconf/httpd.conf /usr/local/apache2/conf/httpd.conf
+
+COPY eclipse/galasa-eclipse-parent/dev.galasa.eclipse.site/target/repository/ /usr/local/apache2/htdocs/

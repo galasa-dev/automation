@@ -1,0 +1,104 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ras
+  namespace: galasa-prod
+  labels:
+    name: ras
+spec:
+  serviceName: ras
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ras
+  template:
+    metadata:
+      name: ras
+      labels:
+        app: ras
+    spec:
+      containers:
+      - name: couchdb
+        image: couchdb:2.3.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5984
+          name: couchdbport
+        - containerPort: 4369
+          name: erlangbport
+        - containerPort: 9100
+        env:
+#        - name: COUCHDB_USER
+#          value: "admin"
+#        - name: COUCHDB_PASSWORD
+#          value: "galasa"
+#        - name: NODE_NETBIOS_NAME
+#          valueFrom:
+#            fieldRef:
+#              fieldPath: metadata.name
+#        - name: NODENAME
+#          value: $(NODE_NETBIOS_NAME).ras
+#        - name: COUCHDB_SECRET
+#          value: "galasacluster"
+#        - name: ERL_FLAGS
+#          value: '-setcookie "galasacookiemonster"'
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5984
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        volumeMounts:
+        - mountPath: /opt/couchdb/data
+          name: data-disk
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        longhorn: "true"
+        applevel: critical
+      volumes:
+      - name: data-disk
+        persistentVolumeClaim:
+          claimName: claim-couchdb
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ras
+              topologyKey: kubernetes.io/hostname
+  volumeClaimTemplates:
+  - metadata:
+      name: data-disk
+    spec:
+      accessModes:
+        - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: 100Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ras
+  namespace: galasa-prod
+  labels:
+    app: ras
+spec:
+  ports:
+  - port: 5984
+    name: couchdbport
+  - port: 4369
+    name: erlangport
+  selector:
+    app: ras
