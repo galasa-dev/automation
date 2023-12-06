@@ -1,6 +1,6 @@
 ARG dockerRepository
 ARG branch
-FROM ${dockerRepository}/galasadev/galasabld:${branch}
+FROM ${dockerRepository}/galasadev/galasabld-amd64:${branch}
 
 USER root
 
