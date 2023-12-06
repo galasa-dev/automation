@@ -131,7 +131,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -158,7 +158,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-ibm:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
