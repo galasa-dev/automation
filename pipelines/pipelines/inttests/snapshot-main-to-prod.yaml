@@ -115,3 +115,17 @@ spec:
       - --resource
       - apps:Deployment:inttests-$(params.imageTag)
       - --health
+
+  # finally:
+  # - name: report-failed-build
+  #   when:
+  #     - input: "$(tasks.status)"
+  #       operator: in
+  #       values: ["Failed"]
+  #   taskRef:
+  #     name: slack-post
+  #   params:
+  #   - name: repo
+  #     value: "inttests"
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name)
