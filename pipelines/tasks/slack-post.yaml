@@ -11,7 +11,7 @@ metadata:
   namespace: galasa-build
 spec:
   params:
-  - name: repo
+  - name: pipelineName
     type: string   
   - name: pipelineRunName
     type: string    
@@ -29,8 +29,8 @@ spec:
     args:
     - slackpost
     - builds
-    - --repo 
-    - $(params.repo)
+    - --pipeline 
+    - $(params.pipelineName)
     - --prun
     - $(params.pipelineRunName)
     - --hook
