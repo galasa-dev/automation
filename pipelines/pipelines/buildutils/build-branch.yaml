@@ -144,7 +144,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -169,7 +169,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-ibm-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-ibm:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -214,3 +214,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: repo
+      value: "buildutils"
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
