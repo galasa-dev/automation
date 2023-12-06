@@ -184,7 +184,7 @@ spec:
     taskRef:
       name: slack-post
     params:
-    - name: repo
-      value: "recycle-ecosystem"
+    - name: pipelineName
+      value: $(context.pipeline.name)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
