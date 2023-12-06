@@ -125,7 +125,7 @@ spec:
   #   taskRef:
   #     name: slack-post
   #   params:
-  #   - name: repo
-  #     value: "inttests"
+  #   - name: pipelineName
+  #     value: $(context.pipeline.name)
   #   - name: pipelineRunName
   #     value: $(context.pipelineRun.name)
