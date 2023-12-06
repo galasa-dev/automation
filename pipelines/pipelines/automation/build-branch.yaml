@@ -239,54 +239,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace  
-# 
-# 
-#  Kick the argocd application to refresh, causing a re-deployment
-#
-# 
-#
-  - name: recycle-webhook-receiver-deployment
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - build-ghreceiver-image
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - github-webhook-receiver
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - github-webhook-receiver
-# 
-# 
-# Wait for the redeployment to complete.
-# 
-# 
-  - name: wait-webhook-receiver-deployment
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-webhook-receiver-deployment
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - github-webhook-receiver 
-      - --resource
-      - apps:Deployment:github-webhook-receiver
-      - --health
-
-
   #---------------------------------------------------------------------
   # GPG signing tool
   #---------------------------------------------------------------------
@@ -496,16 +448,16 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-  # finally:
-  # - name: report-failed-build
-  #   when:
-  #     - input: "$(tasks.status)"
-  #       operator: in
-  #       values: ["Failed"]
-  #   taskRef:
-  #     name: slack-post
-  #   params:
-  #   - name: repo
-  #     value: "automation"
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
