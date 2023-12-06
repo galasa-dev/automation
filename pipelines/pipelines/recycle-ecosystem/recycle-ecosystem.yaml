@@ -174,3 +174,17 @@ spec:
         - deployment/metrics
         - -w
         - --timeout=3m
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: repo
+      value: "recycle-ecosystem"
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
