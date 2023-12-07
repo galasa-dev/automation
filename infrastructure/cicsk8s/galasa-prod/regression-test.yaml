@@ -23,6 +23,7 @@ spec:
           - args:
             - $(HOOK)
             command:
+            - galasabld
             - slackpost
             - tests
             - --path
@@ -34,8 +35,7 @@ spec:
                 secretKeyRef:
                   key: webhook
                   name: slack-webhook
-            # image: harbor.galasa.dev/galasadev/galasa-bld-ibm-amd64:stable
-            image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:main
+            image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:stable
             imagePullPolicy: Always
             name: submit-report
             resources: {}
