@@ -105,7 +105,7 @@ spec:
     - name: command
       value:
         - ./node_modules/.bin/proto-loader-gen-types
-        - src/utils/grpc/dex.proto
+        - public/dex.proto
         - -O
         - src/generated/grpc
         - --grpcLib=@grpc/grpc-js
