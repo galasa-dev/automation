@@ -1,0 +1,141 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: branch-helm
+  namespace: galasa-build
+spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: ecosystemNamespace
+    type: string
+    default: galasa-ecosystem1
+  workspaces:
+  - name: git-workspace
+#
+#
+#
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: clone-helm
+    taskRef:
+      name: git-clone
+    runAfter:
+    - clone-automation
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/helm
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/helm
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: check-branch
+    taskRef:
+      name: git-check-branch
+    runAfter:
+    - clone-helm
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/helm
+    - name: branch
+      value: $(params.branch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+  - name: uninstall-ecosystem
+    taskRef:
+      name: helm
+    runAfter:
+    - check-branch
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/helm
+    - name: command
+      value:
+      - uninstall
+      - $(params.branch)-ecosystem
+      - --ignore-not-found
+      - --namespace=$(params.ecosystemNamespace)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: install-ecosystem
+    taskRef:
+      name: helm
+    runAfter:
+    - uninstall-ecosystem
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+      - install
+      - $(params.branch)-ecosystem
+      - ./helm/charts/ecosystem
+      - --namespace=$(params.ecosystemNamespace)
+      - --values
+      - ./automation/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml
+      - --wait
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: test-ecosystem
+    taskRef:
+      name: helm
+    runAfter:
+    - install-ecosystem
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/helm
+    - name: command
+      value:
+      - test
+      - $(params.branch)-ecosystem
+      - --namespace=$(params.ecosystemNamespace)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
