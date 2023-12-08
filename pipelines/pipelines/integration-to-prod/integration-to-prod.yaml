@@ -682,7 +682,7 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
-    - snapshot-ibm-boot-embedded
+    - recycle-ecosystem
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
