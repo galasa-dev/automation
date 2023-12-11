@@ -27,6 +27,7 @@ spec:
     image: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.galasabldImageTag)
     imagePullPolicy: Always
     command:
+    - galasabld
     - $(params.command[*])
     volumeMounts:
     - name: githubcreds
