@@ -1314,6 +1314,7 @@ spec:
       - galasa-build
       - --prefix-name 
       - trigger-snapshot-main-to-prod-
+      - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
