@@ -7,13 +7,13 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: integration-to-prod
+  name: snapshot-main-to-prod
   namespace: galasa-build
 spec:
   params:
   - name: fromBranch
     type: string
-    default: integration
+    default: main
   - name: toBranch
     type: string
     default: prod
@@ -45,75 +45,7 @@ spec:
       value: $(context.pipelineRun.name)/automation
     workspaces:
      - name: output
-       workspace: git-workspace
-#
-#
-#
-  - name: snapshot-obr
-    taskRef:
-      name: docker-build
-    runAfter:
-    - clone-automation  
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/repo-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-obr"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace     
-#
-#
-#
-  - name: recycle-obr
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - snapshot-obr
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - obr-$(params.imageTag)
-#
-#
-#
-  - name: wait-obr
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-obr
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appname)
-      - --resource
-      - apps:Deployment:obr-$(params.imageTag)
-      - --health     
+       workspace: git-workspace  
 #
 #
 #
@@ -135,53 +67,53 @@ spec:
   #     value: ""
   #   - name: buildArgs
   #     value:
-  #       - "--build-arg=dockerRepository=icr.io"         
-  #       - "--build-arg=image=galasa-mvp-zip"   
-  #       - "--build-arg=oldBranch=$(params.fromBranch)"   
+  #       - "--build-arg=dockerRepository=icr.io"
+  #       - "--build-arg=image=galasa-mvp-zip"
+  #       - "--build-arg=oldBranch=$(params.fromBranch)"
   #   workspaces:
   #    - name: git-workspace
   #      workspace: git-workspace  
 #
 #
 #
-  - name: recycle-mvp
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - wait-obr
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - mvp-$(params.imageTag)
+  # - name: recycle-mvp
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - wait-obr
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - actions 
+  #     - run 
+  #     - $(params.appname)
+  #     - restart 
+  #     - --kind 
+  #     - Deployment
+  #     - --resource-name
+  #     - mvp-$(params.imageTag)
 #
 #
 #
-  - name: wait-mvp
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-mvp
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appname)
-      - --resource
-      - apps:Deployment:mvp-$(params.imageTag)
-      - --health      
+  # - name: wait-mvp
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - recycle-mvp
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - wait
+  #     - $(params.appname)
+  #     - --resource
+  #     - apps:Deployment:mvp-$(params.imageTag)
+  #     - --health      
 #
 #
 #
@@ -212,44 +144,44 @@ spec:
 #
 #
 #
-  - name: recycle-isolated
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - wait-mvp
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - isolated-$(params.imageTag)
+  # - name: recycle-isolated
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - wait-mvp
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - actions 
+  #     - run 
+  #     - $(params.appname)
+  #     - restart 
+  #     - --kind 
+  #     - Deployment
+  #     - --resource-name
+  #     - isolated-$(params.imageTag)
 #
 #
 #
-  - name: wait-isolated
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-isolated
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appname)
-      - --resource
-      - apps:Deployment:isolated-$(params.imageTag)
-      - --health        
+  # - name: wait-isolated
+  #   taskRef:
+  #     name: argocd-cli
+  #   runAfter:
+  #   - recycle-isolated
+  #   params:
+  #   - name: server
+  #     value: argocd.galasa.dev
+  #   - name: command
+  #     value: 
+  #     - app 
+  #     - wait
+  #     - $(params.appname)
+  #     - --resource
+  #     - apps:Deployment:isolated-$(params.imageTag)
+  #     - --health        
 #
 #
 #
@@ -257,7 +189,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-isolated  
+    - clone-automation 
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -325,7 +257,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-javadoc  
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -393,7 +325,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-eclipse  
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -461,7 +393,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - wait-p2  
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -593,118 +525,6 @@ spec:
 #
 #
 #
-  - name: snapshot-boot-embedded
-    taskRef:
-      name: docker-build
-    runAfter:
-    - wait-javadoc-site  
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/generic-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-boot-embedded-amd64"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace       
-#
-#
-#
-  - name: snapshot-ibm-boot-embedded
-    taskRef:
-      name: docker-build
-    runAfter:
-    - snapshot-boot-embedded  
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
-    - name: context
-      value: $(context.pipelineRun.name) 
-    - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/generic-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:$(params.toBranch)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-ibm-boot-embedded-amd64"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace  
-
-#
-# Recycle the Ecosystem
-# 
-  - name: recycle-ecosystem
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - snapshot-ibm-boot-embedded
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - recycle-ecosystem
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - recycle-ecosystem
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-#
-#
-# 
-  - name: trigger-helm
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - recycle-ecosystem
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - branch-helm
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-helm
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
 
   finally:
   - name: report-failed-build

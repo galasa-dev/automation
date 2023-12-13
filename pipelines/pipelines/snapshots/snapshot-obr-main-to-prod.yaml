@@ -7,11 +7,9 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: snapshot-simplatform
+  name: snapshot-obr-main-to-prod
   namespace: galasa-build
 spec:
-  workspaces:
-  - name: git-workspace
   params:
   - name: fromBranch
     type: string
@@ -24,14 +22,13 @@ spec:
     default: prod
   - name: appname
     type: string
-    default: prod-simplatform
+    default: prod-maven-repos
+  workspaces:
+  - name: git-workspace
 #
 #
 #
   tasks:
-#
-#
-#
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -43,7 +40,7 @@ spec:
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
-      value: "1"
+      value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/automation
     workspaces:
@@ -52,38 +49,38 @@ spec:
 #
 #
 #
-  - name: snapshot-simplatform
+  - name: snapshot-obr
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation
+    - clone-automation  
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
-    - name: context 
+    - name: context
       value: $(context.pipelineRun.name) 
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/repo-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-simplatform:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-simplatform"   
-        - "--build-arg=oldBranch=$(params.fromBranch)" 
+        - "--build-arg=image=galasa-obr"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
+       workspace: git-workspace     
 #
 #
 #
-  - name: recycle-simplatform
+  - name: recycle-obr
     taskRef:
       name: argocd-cli
     runAfter:
-    - snapshot-simplatform
+    - snapshot-obr
     params:
     - name: server
       value: argocd.galasa.dev
@@ -97,13 +94,15 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - simplatform-$(params.imageTag)
-
-  - name: wait-simplatform
+      - obr-$(params.imageTag)
+#
+#
+#
+  - name: wait-obr
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-simplatform
+    - recycle-obr
     params:
     - name: server
       value: argocd.galasa.dev
@@ -113,12 +112,12 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:simplatform-$(params.imageTag)
-      - --health 
-#
-#
-#
-  - name: snapshot-simplatform-app
+      - apps:Deployment:obr-$(params.imageTag)
+      - --health
+# 
+# 
+# 
+  - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
     runAfter:
@@ -131,31 +130,53 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:$(params.toBranch)
+      value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-simplatform-amd64"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"  
+        - "--build-arg=image=galasa-boot-embedded-amd64"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
+       workspace: git-workspace       
+#
+#
+#
+  - name: snapshot-ibm-boot-embedded
+    taskRef:
+      name: docker-build
+    runAfter:
+    - snapshot-boot-embedded
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/generic-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:$(params.toBranch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasa-ibm-boot-embedded-amd64"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+
 # 
+# Recycle the galasa-prod Ecosystem which uses the 'prod' images
 # 
-# 
-  # Trigger Eclipse to do a Main Build with new Simplatform prod changes
-  - name: trigger-eclipse
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["prod"]
+  - name: recycle-ecosystem
     taskRef:
       name: tkn-cli
     runAfter:
-    - wait-simplatform
-    - snapshot-simplatform-app
+    - snapshot-ibm-boot-embedded
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
@@ -163,11 +184,11 @@ spec:
       value: 
       - pipeline
       - start
-      - branch-eclipse
+      - recycle-ecosystem
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-eclipse-main
+      - recycle-ecosystem
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
@@ -178,6 +199,39 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+      
+# Trigger CLI
+  - name: trigger-cli
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - snapshot-ibm-boot-embedded
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-cli
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-cli-$(params.toBranch)
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace    
 
   finally:
   - name: report-failed-build
