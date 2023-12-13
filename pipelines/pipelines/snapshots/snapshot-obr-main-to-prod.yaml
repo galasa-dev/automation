@@ -172,7 +172,7 @@ spec:
 # 
 # Recycle the galasa-prod Ecosystem which uses the 'prod' images
 # 
-  - name: recycle-ecosystem
+  - name: trigger-recycle-ecosystem
     taskRef:
       name: tkn-cli
     runAfter:
