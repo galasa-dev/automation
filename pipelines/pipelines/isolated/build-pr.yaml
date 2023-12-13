@@ -42,6 +42,7 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -250,7 +251,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-isolated1
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -285,7 +291,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-isolated2
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -319,7 +330,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-isolated3
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -354,7 +370,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-isolated4
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -388,7 +409,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-isolated5
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -422,7 +448,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-isolated6
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -456,7 +487,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-javadoc
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -495,7 +531,12 @@ spec:
     taskRef:
       name: script
     runAfter:
-      - maven-build-docs  
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated  
     params:  
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
@@ -553,6 +594,14 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
+    - maven-build-isolated1
+    - maven-build-isolated2
+    - maven-build-isolated3
+    - maven-build-isolated4
+    - maven-build-isolated5
+    - maven-build-isolated6
+    - maven-build-javadoc
+    - maven-build-docs
     - maven-build-galasactl
     params:
     - name: pipelineRunName
@@ -701,7 +750,7 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - generate-pom-mvp
+    - generate-pom-mvp
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -736,7 +785,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-mvp1
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -771,7 +825,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-mvp2
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -805,7 +864,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-mvp3
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -840,7 +904,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-mvp4
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -874,7 +943,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-mvp5
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -908,7 +982,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-mvp6
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -942,7 +1021,12 @@ spec:
     taskRef: 
       name: maven-build
     runAfter:
-      - maven-build-javadoc-mvp
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:   
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -973,8 +1057,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace      
-
-
 # 
 # 
 # 
@@ -982,7 +1064,12 @@ spec:
     taskRef:
       name: script
     runAfter:
-    - maven-build-docs-mvp
+    - clone-automation
+    - clone-obr
+    - clone-framework
+    - clone-extensions
+    - clone-managers
+    - clone-isolated
     params:  
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
@@ -1040,6 +1127,14 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
+    - maven-build-mvp1
+    - maven-build-mvp2
+    - maven-build-mvp3
+    - maven-build-mvp4
+    - maven-build-mvp5
+    - maven-build-mvp6
+    - maven-build-javadoc-mvp
+    - maven-build-docs-mvp
     - maven-build-galasactl-mvp
     params:
     - name: pipelineRunName
