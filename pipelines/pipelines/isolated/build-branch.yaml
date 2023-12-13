@@ -1388,7 +1388,7 @@ spec:
 #
 #
 # Snapshot from Main to Prod the remaining Galasa components (Javadoc, Restapidoc, etc)...
-  - name: trigger-snapshot-main-to-prod
+  - name: trigger-snapshot-all-main-to-prod
     when:
       - input: "$(params.toBranch)"
         operator: in
@@ -1405,11 +1405,11 @@ spec:
       value: 
       - pipeline
       - start
-      - snapshot-main-to-prod
+      - snapshot-all-main-to-prod
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-snapshot-main-to-prod-
+      - trigger-snapshot-all-main-to-prod-
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
