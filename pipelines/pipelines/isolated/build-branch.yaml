@@ -1253,46 +1253,14 @@ spec:
       - --resource
       - apps:Deployment:mvp-$(params.imageTag) 
       - --health   
-
-
-  - name: trigger-snapshot-integration
+#
+#
+# Snapshot from Main to Prod the remaining Galasa components (Javadoc, Restapidoc, etc)...
+  - name: trigger-main-to-prod
     when:
       - input: "$(params.toBranch)"
         operator: in
         values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - wait-deployment-mvp
-    - wait-deployment
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - snapshot-integration
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-snapshot-integration
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
-  - name: trigger-build-distribution-for-galasa
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main", "release"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -1310,6 +1278,40 @@ spec:
       - galasa-build
       - --prefix-name 
       - trigger-build-distribution-for-galasa-
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: trigger-build-distribution-for-galasa
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main", "release"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment-mvp
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - main-to-prod
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-snapshot-main-to-prod-
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
