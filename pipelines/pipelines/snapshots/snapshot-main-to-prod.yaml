@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: main-to-prod
+  name: snapshot-main-to-prod
   namespace: galasa-build
 spec:
   params:

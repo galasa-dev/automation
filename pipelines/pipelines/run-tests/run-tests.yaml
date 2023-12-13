@@ -95,7 +95,7 @@ spec:
        workspace: git-workspace       
 
 # Snapshot the Main OBR to Prod now we have confirmed no environmental problems introduced
-  - name: trigger-obr-main-to-prod
+  - name: trigger-snapshot-obr-main-to-prod
     taskRef:
       name: tkn-cli
     runAfter:
@@ -107,11 +107,11 @@ spec:
       value: 
       - pipeline
       - start
-      - obr-main-to-prod
+      - snapshot-obr-main-to-prod
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-obr-main-to-prod
+      - trigger-snapshot-obr-main-to-prod
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
