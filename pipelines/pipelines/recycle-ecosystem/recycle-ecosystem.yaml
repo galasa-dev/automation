@@ -24,6 +24,26 @@ spec:
 #
 #
 #
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
   - name: recycle-api
     taskRef:
       name: kubectl
@@ -174,6 +194,49 @@ spec:
         - deployment/metrics
         - -w
         - --timeout=3m
+#
+# Trigger CLI
+#
+  - name: trigger-cli
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-metrics
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-cli
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-cli-$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appnameCli=$(params.toBranch)-cli
+      - --param
+      - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - appnameMavenRepos=$(params.appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
 
   finally:
   - name: report-failed-build

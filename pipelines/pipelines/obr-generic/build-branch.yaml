@@ -308,12 +308,10 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+#
+# Recycle the Ecosystem
 # 
-# 
-# 
-
-  # Trigger CLI 
-  - name: trigger-cli
+  - name: recycle-ecosystem
     taskRef:
       name: tkn-cli
     runAfter:
@@ -325,25 +323,12 @@ spec:
       value: 
       - pipeline
       - start
-      - branch-cli
+      - recycle-ecosystem
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-cli-$(params.toBranch)
-      - --param
-      - toBranch=$(params.toBranch)
-      - --param
-      - revision=$(params.revision)
-      - --param
-      - refspec=$(params.refspec)
-      - --param
-      - imageTag=$(params.imageTag)
-      - --param
-      - appnameCli=$(params.toBranch)-cli
-      - --param
-      - fromSimplatformBranch=$(params.fromSimplatformBranch)
-      - --param
-      - appnameMavenRepos=$(params.appname)
+      - recycle-ecosystem
+      - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
@@ -352,7 +337,40 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace      
+       workspace: git-workspace
+#
+#
+# 
+  - name: trigger-helm
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - recycle-ecosystem
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-helm
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-helm
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+# 
 
   finally:
   - name: report-failed-build
