@@ -205,7 +205,7 @@ spec:
     when:
       - input: "$(params.toBranch)"
         operator: in
-        values: ["main"]
+        values: ["prod"]
     taskRef:
       name: tkn-cli
     runAfter:
