@@ -357,6 +357,7 @@ spec:
       - galasa-build
       - --prefix-name 
       - trigger-run-tests
+      - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
