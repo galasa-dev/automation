@@ -13,6 +13,9 @@ spec:
   workspaces:
   - name: git-workspace
   params:
+  - name: bootstrapUrl
+    type: string
+    default: https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
   tasks:
   - name: clone-automation
     taskRef: 
@@ -44,15 +47,21 @@ spec:
         - runs 
         - prepare 
         - --bootstrap 
-        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap 
+        - $(params.bootstrapUrl) 
         - --stream 
         - inttests 
         - --portfolio 
         - test.yaml 
         - --test 
         - local.CoreLocalJava11Ubuntu
+        - --override 
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/main/maven-repo/obr/
+        - --override 
+        - galasaecosystem.docker.version=main
         - --log
         - '-'
+    - name: galasactlImageTag
+      value: stable
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -69,7 +78,7 @@ spec:
         - runs 
         - submit 
         - --bootstrap 
-        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap 
+        - $(params.bootstrapUrl) 
         - --portfolio 
         - /workspace/git/$(context.pipelineRun.name)/test.yaml 
         - --throttle 
@@ -90,6 +99,8 @@ spec:
         - junit.xml
         - --log
         - '-'
+    - name: galasactlImageTag
+      value: stable
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
