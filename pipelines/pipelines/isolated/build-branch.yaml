@@ -1255,12 +1255,13 @@ spec:
       - --health   
 #
 #
-# Snapshot from Main to Prod the remaining Galasa components (Javadoc, Restapidoc, etc)...
-  - name: trigger-main-to-prod
+# 
+# Build DfG with MVP updates...
+  - name: trigger-build-distribution-for-galasa
     when:
       - input: "$(params.toBranch)"
         operator: in
-        values: ["main"]
+        values: ["main, release"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -1290,11 +1291,12 @@ spec:
 #
 #
 #
-  - name: trigger-build-distribution-for-galasa
+# Snapshot from Main to Prod the remaining Galasa components (Javadoc, Restapidoc, etc)...
+  - name: trigger-snapshot-main-to-prod
     when:
       - input: "$(params.toBranch)"
         operator: in
-        values: ["main", "release"]
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -1307,7 +1309,7 @@ spec:
       value: 
       - pipeline
       - start
-      - main-to-prod
+      - snapshot-main-to-prod
       - -n
       - galasa-build
       - --prefix-name 

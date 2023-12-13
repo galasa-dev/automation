@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: obr-main-to-prod
+  name: snapshot-obr-main-to-prod
   namespace: galasa-build
 spec:
   params:
