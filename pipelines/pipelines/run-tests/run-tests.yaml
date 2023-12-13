@@ -79,9 +79,9 @@ spec:
         - --progress 
         - '1' 
         - --override 
-        - galasaecosystem.runtime.repository=https://development.galasa.dev/integration/maven-repo/obr/
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/main/maven-repo/obr/
         - --override 
-        - galasaecosystem.docker.version=integration 
+        - galasaecosystem.docker.version=main
         - --reportyaml 
         - tests.yaml 
         - --reportjson 
@@ -94,7 +94,8 @@ spec:
      - name: git-workspace
        workspace: git-workspace       
 
-  - name: trigger-integration-to-prod
+# Snapshot the Main OBR to Prod now we have confirmed no environmental problems introduced
+  - name: trigger-obr-main-to-prod
     taskRef:
       name: tkn-cli
     runAfter:
@@ -106,11 +107,11 @@ spec:
       value: 
       - pipeline
       - start
-      - integration-to-prod
+      - obr-main-to-prod
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-integration-to-prod
+      - trigger-obr-main-to-prod
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
