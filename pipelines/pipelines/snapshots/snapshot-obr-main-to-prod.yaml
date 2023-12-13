@@ -200,7 +200,7 @@ spec:
      - name: git-workspace
        workspace: git-workspace
       
-# Trigger CLI
+# Trigger CLI rebuild after OBR code is promoted to production...
   - name: trigger-cli
     when:
       - input: "$(params.toBranch)"
@@ -221,7 +221,7 @@ spec:
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-cli-$(params.toBranch)
+      - trigger-cli-main
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
