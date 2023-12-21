@@ -4,4 +4,4 @@ FROM ${dockerRepository}/galasadev/galasa-maven:${tag}
 
 COPY repo/ /usr/local/apache2/htdocs/
 COPY framework.githash /usr/local/apache2/htdocs/framework.githash
-COPY openapi.yaml /usr/local/apache2/htdocs/openapi.yaml
+COPY galasa-parent/dev.galasa.framework.api.openapi/src/main/resources/openapi.yaml /usr/local/apache2/htdocs/openapi.yaml

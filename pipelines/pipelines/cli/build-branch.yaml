@@ -57,25 +57,6 @@ spec:
        workspace: git-workspace
 
   #----------------------------------------------------------------
-  - name: clone-framework
-    taskRef: 
-      name: git-clone
-    params:
-    - name: url
-      value: https://github.com/galasa-dev/framework
-    - name: revision
-      value: $(params.revision)
-    - name: refspec
-      value: $(params.refspec)
-    - name: depth
-      value: "99999999"
-    - name: subdirectory
-      value: $(context.pipelineRun.name)/framework
-    workspaces:
-     - name: output
-       workspace: git-workspace 
-
-  #----------------------------------------------------------------
   # Clone the CLI repo
   - name: clone-cli
     taskRef: 
@@ -128,7 +109,6 @@ spec:
       name: general-command
     runAfter:
     - clone-automation
-    - clone-framework
     - clone-cli
     - gather-dependencies
     params:
@@ -143,7 +123,7 @@ spec:
         - /opt/openapi/openapi-generator-cli.jar
         - generate
         - -i
-        - /workspace/git/$(context.pipelineRun.name)/framework/openapi.yaml
+        - /workspace/git/$(context.pipelineRun.name)/cli/build/dependencies/openapi.yaml
         - -g
         - go 
         - -o
