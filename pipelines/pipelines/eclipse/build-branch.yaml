@@ -292,6 +292,10 @@ spec:
 # 
   # Trigger Isolated
   - name: trigger-isolated
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -335,3 +339,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)

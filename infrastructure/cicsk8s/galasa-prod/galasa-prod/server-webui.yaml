@@ -1,0 +1,63 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webui
+  namespace: galasa-prod
+  labels:
+    app: webui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webui
+  template:
+    metadata:
+      name: webui
+      labels:
+        app: webui
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        applevel: critical
+      containers:
+      - name: webui
+        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-webui-amd64:prod
+        # Need to push webui image to new Harbor
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: server-base
+          mountPath: /usr/local/apache2/htdocs/assets/apibase.js
+          subPath: apibase.js
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 60
+          periodSeconds: 60
+      volumes:
+      - name: server-base
+        configMap:
+          name: webapi-base
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webui
+  namespace: galasa-prod
+  labels:
+    app: webui
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: webui

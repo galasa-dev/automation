@@ -1,0 +1,168 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+#
+# The external host name the Kubernetes NodePorts can be accessed on, can be an IP address if you are not using ingresses
+#
+# If you wish to access your Galasa Ecosystem through ingresses (see the `ingress` value below),
+# this is the host name that will be used and it must not be an IP address
+#
+externalHostname: "galasa-ecosystem1.galasa.dev"
+#
+# The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
+# all the components are running the same version and a controlled upgrade can be performed
+#
+galasaVersion: "main"
+#
+#
+# The container registry the Galasa images can be found in
+#
+galasaRegistry: "harbor.galasa.dev/galasadev"
+#
+#
+# The pull policy to be used for the Galasa images, only useful for Galasa development purposes
+#
+pullPolicy: "Always"
+#
+#
+# The architecture the pods will be run on, at the moment, only adm64 is supported
+#
+architecture: amd64
+#
+#
+# Any nodeselectors you wish to use to restrict the nodes the pods will run on
+#
+nodeSelectors: {}
+#
+#
+# The storage class to be used for persistent volumes
+#
+storageClass: ""
+#
+#
+# The size of the persistent volumes for the data stores
+#
+etcdDiskSize: "1Gi"
+couchdbDiskSize: "10Gi"
+catalogDiskSize: "1Gi"
+#
+#
+# The image names and versions for the non-Galasa images
+#
+etcdImage: "quay.io/coreos/etcd:v3.2.25"
+couchdbImage: "couchdb:2.3.1"
+dexImage: "ghcr.io/dexidp/dex:v2.32.0"
+kubectlImage: "bitnami/kubectl:1.28"
+#
+#
+# Values to enable and configure the use of ingress
+# Note: The externalHostname value must be a valid DNS name for ingress to be used.
+#
+ingress:
+  # Enables/disables the use of ingress
+  enabled: true
+
+  # The IngressClass to use for ingresses
+  ingressClassName: "public-iks-k8s-nginx"
+
+  # Values to configure the use of TLS in ingresses. For example:
+  # tls:
+  #   - hosts:
+  #     - "*.example.com"
+  #     secretName: mysecret
+  tls:
+    - hosts:
+      - "galasa-ecosystem1.galasa.dev"
+      secretName: galasa-wildcard-cert
+  
+  # The name of the Secret containing root and intermediate CA certificates in a single .pem file
+  caCertSecretName: ""
+
+  # Annotations to be added to ingresses. For example:
+  # annotations:
+  #   nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  annotations: {}
+#
+#
+# Values to configure the ecosystem's use of Dex
+#
+dex:
+  # `configSecret` contains values as to whether a new Kubernetes Secret containing the Dex configuration
+  # should be created, or if an existing Secret containing should be used.
+  configSecret:
+    # Enables the creation of a Kubernetes Secret using the values provided in `config` if set to true.
+    # If set to false, you must provide a value for `secretName` that corresponds to an existing Secret.
+    create: true
+
+    # The name of the Kubernetes Secret containing the Dex configuration to mount within the Dex deployment.
+    # `secretName` must point to a Secret containing a "config.yaml" key and a valid Dex configuration in YAML format.
+    # If `secretName` is provided and `create` is set to true, then the given name will be ignored and a new Secret
+    # named "<release-name>-dex-config" will be created.
+    secretName: ""
+
+  # `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps.
+  # If you would like to mount an additional environment variable from a Secret or ConfigMap, provide the name of the
+  # resource in the `envFrom` list. For example:
+  # envFrom:
+  #   - secretRef:
+  #       name: github-oauth-app-secret
+  #   - configMapRef:
+  #       name: my-env-configmap
+  envFrom:
+    - secretRef:
+        name: galasa-ecosystem1-github-oauth-app-for-dex
+    - secretRef:
+        name: galasa-ecosystem1-dex-webui-client
+
+  # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
+  # 30000 to 32767 range if they are left blank).
+  nodePorts:
+    grpc: 32000
+    http: # blank - dynamically assigned
+
+  # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
+  # By default, etcd is used as the storage option for the Galasa Ecosystem.
+  config:
+    issuer: "https://galasa-ecosystem1.galasa.dev/dex"
+
+    # Enable Dex's gRPC API for clients to interact with.
+    grpc:
+      # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
+      addr: "galasa-ecosystem1.galasa.dev:32000"
+      reflection: true
+
+    connectors:
+    - type: github
+      id: github
+      name: GitHub
+      config:
+        clientID: $githubOAuthAppClientId
+        clientSecret: $githubOAuthAppClientSecret
+        redirectURI: https://galasa-ecosystem1.galasa.dev/dex/callback
+        orgs:
+        - name: galasa-dev
+          teams:
+          - galasa-ecosystem1-users
+
+    # OAuth 2.0 configuration values
+    oauth2:
+      skipApprovalScreen: true
+
+    # A list of known clients that authenticate with Dex
+    staticClients:
+    - id: galasa-webui
+      redirectURIs:
+      - 'https://galasa-ecosystem1.galasa.dev/auth/callback'
+      name: 'Galasa Ecosystem Web UI'
+      # Use the webui client secret drawn from the secret mounted in envFrom
+      secretEnv: webuiClientSecret
+
+    # Token expiry configuration
+    expiry:
+      idTokens: 24h
+      refreshTokens:
+        validIfNotUsedFor: 8760h # 1 year

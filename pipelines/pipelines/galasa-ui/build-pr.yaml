@@ -49,12 +49,34 @@ spec:
       value: $(params.action)
 
 #----------------------------------------------------------------
+# Clone the automation repository
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    runAfter:
+    - git-verify
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+#----------------------------------------------------------------
 # Clone the webui repository
   - name: clone-webui
     taskRef:
       name: git-clone
     runAfter:
-    - git-verify
+    - clone-automation
     params:
     - name: url
       value: https://github.com/galasa-dev/webui
@@ -74,14 +96,12 @@ spec:
 # Install the webui's dependencies
   - name: npm-install-webui
     taskRef:
-      name: general-command
+      name: nodejs
     runAfter:
     - clone-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
-    - name: image
-      value: docker.io/library/node:18.16.0-alpine3.18
     - name: command
       value:
         - npm
@@ -94,18 +114,16 @@ spec:
 # Generate gRPC types for the webui
   - name: generate-grpc-types
     taskRef:
-      name: general-command
+      name: nodejs
     runAfter:
     - npm-install-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
-    - name: image
-      value: docker.io/library/node:18.16.0-alpine3.18
     - name: command
       value:
         - ./node_modules/.bin/proto-loader-gen-types
-        - src/utils/grpc/dex.proto
+        - public/dex.proto
         - -O
         - src/generated/grpc
         - --grpcLib=@grpc/grpc-js
@@ -117,14 +135,12 @@ spec:
 # Run the webui's unit tests
   - name: npm-test-webui
     taskRef:
-      name: general-command
+      name: nodejs
     runAfter:
     - generate-grpc-types
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
-    - name: image
-      value: docker.io/library/node:18.16.0-alpine3.18
     - name: command
       value:
         - npm
@@ -139,14 +155,12 @@ spec:
 # Build the webui
   - name: npm-build-webui
     taskRef:
-      name: general-command
+      name: nodejs
     runAfter:
     - npm-test-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
-    - name: image
-      value: docker.io/library/node:18.16.0-alpine3.18
     - name: command
       value:
         - npm
@@ -173,7 +187,7 @@ spec:
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
-      value: webui/galasa-ui/Dockerfile
+      value: automation/dockerfiles/webui/webui-dockerfile
     workspaces:
      - name: git-workspace
        workspace: git-workspace
