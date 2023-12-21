@@ -159,7 +159,7 @@ spec:
         - /opt/openapi/openapi-generator-cli.jar
         - generate
         - -i
-        - /workspace/git/$(context.pipelineRun.name)/framework/openapi.yaml
+        - /workspace/git/$(context.pipelineRun.name)/cli/build/dependencies/openapi.yaml
         - -g
         - go 
         - -o
