@@ -1,0 +1,185 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: buildutils-snapshot-main-to-prod
+  namespace: galasa-build
+spec:
+  params:
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
+    type: string
+    default: prod
+  - name: imageTag
+    type: string
+    default: prod
+  - name: appname
+    type: string
+    default: prod-bld
+  workspaces:
+  - name: git-workspace
+# 
+# 
+#
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+# 
+# 
+#
+  - name: snapshot-galasabld-binaries
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation  
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/repo-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasabld-binary-downloadables"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
+        - "--build-arg=branch=$(params.toBranch)"   
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
+# 
+# 
+#
+  - name: recycle-galasabld-binaries
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - snapshot-galasabld-binaries
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - bld-$(params.imageTag)
+# 
+# 
+#
+  - name: wait-galasabld-binaries
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-galasabld-binaries
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:bld-$(params.imageTag)
+      - --health 
+# 
+# 
+# 
+  - name: snapshot-galasabld-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation  
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/generic-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasabld"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"     
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: snapshot-galasabld-ibm-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation  
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name) 
+    - name: context
+      value: $(context.pipelineRun.name) 
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/generic-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"         
+        - "--build-arg=image=galasabld-ibm"   
+        - "--build-arg=oldBranch=$(params.fromBranch)" 
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  # finally:
+  # - name: report-failed-build
+  #   when:
+  #     - input: "$(tasks.status)"
+  #       operator: in
+  #       values: ["Failed"]
+  #   taskRef:
+  #     name: slack-post
+  #   params:
+  #   - name: pipelineName
+  #     value: $(context.pipeline.name)
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name)

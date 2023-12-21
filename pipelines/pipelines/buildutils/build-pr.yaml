@@ -91,7 +91,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-  - name: build-galasabld-image
+  - name: build-galasabld-executable
     taskRef:
       name: docker-build
     runAfter:
@@ -105,7 +105,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.headSha)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -114,6 +114,29 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+  - name: build-galasabld-ibm-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - build-galasabld-executable
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
+    - name: dockerfilePath
+      value: automation/dockerfiles/galasabld/galasabld-ibm-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:$(params.headSha)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=branch=$(params.headSha)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
   finally:
   - name: git-status
     when:

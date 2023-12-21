@@ -186,7 +186,7 @@ spec:
         - /opt/swagger/swagger-codegen-cli.jar
         - generate
         - -i
-        - /workspace/git/$(context.pipelineRun.name)/framework/openapi.yaml
+        - /workspace/git/$(context.pipelineRun.name)/framework/galasa-parent/dev.galasa.framework.api.openapi/src/main/resources/openapi.yaml
         - -l
         - html2
         - -o
@@ -345,3 +345,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)

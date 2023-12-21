@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: buildutils-snapshot-main-to-prod
+  name: snapshot-obr-main-to-prod
   namespace: galasa-build
 spec:
   params:
@@ -22,11 +22,11 @@ spec:
     default: prod
   - name: appname
     type: string
-    default: prod-bld
+    default: prod-maven-repos
   workspaces:
   - name: git-workspace
-# 
-# 
+#
+#
 #
   tasks:
   - name: clone-automation
@@ -46,10 +46,10 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
 #
-  - name: snapshot-galasabld-binaries
+#
+#
+  - name: snapshot-obr
     taskRef:
       name: docker-build
     runAfter:
@@ -62,26 +62,25 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/repo-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-obr:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasabld-binary-downloadables"   
+        - "--build-arg=image=galasa-obr"   
         - "--build-arg=oldBranch=$(params.fromBranch)"   
-        - "--build-arg=branch=$(params.toBranch)"   
     workspaces:
      - name: git-workspace
        workspace: git-workspace     
-# 
-# 
 #
-  - name: recycle-galasabld-binaries
+#
+#
+  - name: recycle-obr
     taskRef:
       name: argocd-cli
     runAfter:
-    - snapshot-galasabld-binaries
+    - snapshot-obr
     params:
     - name: server
       value: argocd.galasa.dev
@@ -95,15 +94,15 @@ spec:
       - --kind 
       - Deployment
       - --resource-name
-      - bld-$(params.imageTag)
-# 
-# 
+      - obr-$(params.imageTag)
 #
-  - name: wait-galasabld-binaries
+#
+#
+  - name: wait-obr
     taskRef:
       name: argocd-cli
     runAfter:
-    - recycle-galasabld-binaries
+    - recycle-obr
     params:
     - name: server
       value: argocd.galasa.dev
@@ -113,16 +112,16 @@ spec:
       - wait
       - $(params.appname)
       - --resource
-      - apps:Deployment:bld-$(params.imageTag)
-      - --health 
+      - apps:Deployment:obr-$(params.imageTag)
+      - --health
 # 
 # 
 # 
-  - name: snapshot-galasabld-executable
+  - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation  
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -131,25 +130,25 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasabld"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"     
+        - "--build-arg=image=galasa-boot-embedded-amd64"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: snapshot-galasabld-ibm-executable
+       workspace: git-workspace       
+#
+#
+#
+  - name: snapshot-ibm-boot-embedded
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation  
+    - snapshot-boot-embedded
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name) 
@@ -158,14 +157,92 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-ibm:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:$(params.toBranch)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasabld-ibm"   
-        - "--build-arg=oldBranch=$(params.fromBranch)" 
+        - "--build-arg=image=galasa-ibm-boot-embedded-amd64"   
+        - "--build-arg=oldBranch=$(params.fromBranch)"   
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace  
+
+# 
+# Recycle the galasa-prod Ecosystem which uses the 'prod' images
+# 
+  - name: trigger-recycle-ecosystem
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - snapshot-ibm-boot-embedded
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - recycle-ecosystem
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - recycle-ecosystem
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+      
+# Trigger CLI rebuild after OBR code is promoted to production...
+  - name: trigger-cli
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["prod"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - snapshot-ibm-boot-embedded
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-cli
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-cli-main
+      - --use-param-defaults
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace    
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
