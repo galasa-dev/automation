@@ -141,7 +141,7 @@ function delete_application {
 delete_application "galasa-ecosystem1"
 create_application "galasa-ecosystem1" \
     https://github.com/galasa-dev/automation.git \
-    "ecosystem1"
+    "galasa-ecosystem1"
 
 # delete_application "galasa-production"
 # delete_application "galasa-production-namespace"
