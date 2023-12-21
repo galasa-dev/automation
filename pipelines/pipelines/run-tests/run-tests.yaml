@@ -13,6 +13,9 @@ spec:
   workspaces:
   - name: git-workspace
   params:
+  - name: bootstrapUrl
+    type: string
+    default: https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
   tasks:
   - name: clone-automation
     taskRef: 
@@ -44,15 +47,21 @@ spec:
         - runs 
         - prepare 
         - --bootstrap 
-        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap 
+        - $(params.bootstrapUrl) 
         - --stream 
         - inttests 
         - --portfolio 
         - test.yaml 
         - --test 
         - local.CoreLocalJava11Ubuntu
+        - --override 
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/main/maven-repo/obr/
+        - --override 
+        - galasaecosystem.docker.version=main
         - --log
         - '-'
+    - name: galasactlImageTag
+      value: stable
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
@@ -69,7 +78,7 @@ spec:
         - runs 
         - submit 
         - --bootstrap 
-        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap 
+        - $(params.bootstrapUrl) 
         - --portfolio 
         - /workspace/git/$(context.pipelineRun.name)/test.yaml 
         - --throttle 
@@ -79,9 +88,9 @@ spec:
         - --progress 
         - '1' 
         - --override 
-        - galasaecosystem.runtime.repository=https://development.galasa.dev/integration/maven-repo/obr/
+        - galasaecosystem.runtime.repository=https://development.galasa.dev/main/maven-repo/obr/
         - --override 
-        - galasaecosystem.docker.version=integration 
+        - galasaecosystem.docker.version=main
         - --reportyaml 
         - tests.yaml 
         - --reportjson 
@@ -90,11 +99,14 @@ spec:
         - junit.xml
         - --log
         - '-'
+    - name: galasactlImageTag
+      value: stable
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
 
-  - name: trigger-integration-to-prod
+# Snapshot the Main OBR to Prod now we have confirmed no environmental problems introduced
+  - name: trigger-snapshot-obr-main-to-prod
     taskRef:
       name: tkn-cli
     runAfter:
@@ -106,11 +118,11 @@ spec:
       value: 
       - pipeline
       - start
-      - integration-to-prod
+      - snapshot-obr-main-to-prod
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-integration-to-prod
+      - trigger-snapshot-obr-main-to-prod
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
@@ -121,3 +133,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)

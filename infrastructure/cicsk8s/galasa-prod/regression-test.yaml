@@ -1,0 +1,139 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: regression-test-new
+  namespace: galasa-prod
+spec:
+  schedule: 0 6 * * *
+  successfulJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+          - args:
+            - $(HOOK)
+            command:
+            - galasabld
+            - slackpost
+            - tests
+            - --path
+            - /galasa/test.json
+            - --hook
+            env:
+            - name: HOOK
+              valueFrom:
+                secretKeyRef:
+                  key: webhook
+                  name: slack-webhook
+            image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:stable
+            imagePullPolicy: Always
+            name: submit-report
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+          dnsPolicy: ClusterFirst
+          initContainers:
+          - command:
+            - chmod
+            - -R
+            - "777"
+            - /galasa
+            image: busybox
+            imagePullPolicy: Always
+            name: permissions
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+          - command:
+            - rm
+            - -rf
+            - /galasa/*
+            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            imagePullPolicy: Always
+            name: clean
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+          - command:
+            - galasactl
+            - runs
+            - prepare
+            - --bootstrap
+            - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+            - --stream
+            - inttests
+            - --portfolio
+            - /galasa/tests.yaml
+            - --package
+            - local
+            - --package
+            - kubernetes
+            - --package
+            - compilation
+            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            imagePullPolicy: IfNotPresent
+            name: run-prepare
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+          - command:
+            - galasactl
+            - runs
+            - submit
+            - --bootstrap
+            - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+            - --portfolio
+            - /galasa/tests.yaml
+            - --throttle
+            - "30"
+            - --throttlefile
+            - throttle
+            - --poll
+            - "10"
+            - --progress
+            - "1"
+            - --trace
+            - --reportjson
+            - /galasa/test.json
+            - --noexitcodeontestfailures
+            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            imagePullPolicy: IfNotPresent
+            name: run-submit
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+          nodeSelector:
+            kubernetes.io/arch: amd64
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - emptyDir: {}
+            name: static-files
+  suspend: false

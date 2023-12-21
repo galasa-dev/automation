@@ -684,6 +684,10 @@ spec:
 #
 # Trigger obr-generic
   - name: trigger-obr-generic
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -700,19 +704,7 @@ spec:
       - galasa-build
       - --prefix-name 
       - trigger-obr-generic-$(params.toBranch)
-      - --param
-      - fromBranch=$(params.toBranch)
-      - --param
-      - toBranch=$(params.toBranch)
-      - --param
-      - revision=$(params.revision)
-      - --param
-      - refspec=$(params.refspec)
-      - --param
-      - imageTag=$(params.imageTag)
-      - --param
-      - appname=$(params.appname)
-      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
+      - --use-param-defaults # This forces Tekton to use the default params
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
@@ -722,3 +714,17 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace    
+
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
