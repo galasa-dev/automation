@@ -103,9 +103,9 @@ function set_kubernetes_context {
 
 
 
-function build_all_code {
+function build_wrapping_to_obrgeneric {
 
-    yaml_file="build_code.yaml"
+    yaml_file="build_wrapping_to_obrgeneric.yaml"
 
     rm -f temp/${yaml_file}
     cat << EOF > temp/${yaml_file}
@@ -116,7 +116,7 @@ function build_all_code {
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: complete-build-
+  generateName: complete-build-part1-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
@@ -136,12 +136,12 @@ spec:
     value: "false"
     
     # true if the branch is 'main' or 'release' or 'prerelease'
-    # No idea what it controlls ?
+    # This parameter is used by pom.xmls and build.gradles to complete GPG signing of the artefacts only if true
   - name: isMainOrRelease
     value: "true"
 # 
 # 
-# Start the Complete Build at the Wrapping pipeline
+# Start Part 1 of the Complete Build at the Wrapping pipeline
 # 
 # 
   pipelineRef:
@@ -182,10 +182,10 @@ EOF
 
     output=$(kubectl -n galasa-build create -f temp/${yaml_file})
     # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    # pipelinerun.tekton.dev/complete-build-part1-8cbj8 created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to create the branches. rc=$?"
+        error "Failed to start the complete build pipeline. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
@@ -194,12 +194,12 @@ EOF
     pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
 
 
-    success "Branch builds kicked off."
+    success "Build for Wrapping kicked off - this should trigger a chain of builds up to and including OBR Generic. (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic)"
     bold "Now use the tekton dashboard to monitor it to see that they all work."
-    note "If the 'isolated' build completes OK, then we know they all worked."
+    note "If the 'OBR Generic' build completes OK, then we know that part 1 of the complete build worked."
 }
 
 
 ask_user_for_release_type
 set_kubernetes_context
-build_all_code
+build_wrapping_to_obrgeneric

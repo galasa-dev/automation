@@ -684,10 +684,6 @@ spec:
 #
 # Trigger obr-generic
   - name: trigger-obr-generic
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -704,7 +700,18 @@ spec:
       - galasa-build
       - --prefix-name 
       - trigger-obr-generic-$(params.toBranch)
-      - --use-param-defaults # This forces Tekton to use the default params
+      - --param
+      - fromBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template

@@ -292,10 +292,6 @@ spec:
 # 
   # Trigger Isolated
   - name: trigger-isolated
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
