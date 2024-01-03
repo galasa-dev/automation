@@ -14,9 +14,6 @@ spec:
   - name: fromBranch
     type: string
     default: main
-  - name: fromSimplatformBranch
-    type: string
-    default: prod
   - name: toBranch
     type: string
     default: main
@@ -312,6 +309,10 @@ spec:
 # 
 # 
   - name: trigger-helm
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -341,6 +342,10 @@ spec:
 
 # Run a Core test against the Main OBR 
   - name: trigger-run-tests
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
