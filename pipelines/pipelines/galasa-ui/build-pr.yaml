@@ -51,7 +51,7 @@ spec:
 #----------------------------------------------------------------
 # Clone the automation repository
   - name: clone-automation
-    taskRef: 
+    taskRef:
       name: git-clone
     runAfter:
     - git-verify
@@ -110,23 +110,87 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-#----------------------------------------------------------------
-# Generate gRPC types for the webui
-  - name: generate-grpc-types
+  #----------------------------------------------------------------
+  # Call gradle to pull-down dependencies we need and put them in
+  # the correct places.
+  - name: gather-dependencies
     taskRef:
-      name: nodejs
+      name: gradle-build
     runAfter:
     - npm-install-webui
     params:
+    # The context indicates which folder the build.gradle is in.
     - name: context
-      value: $(context.pipelineRun.name)/webui/galasa-ui
+      value: $(context.pipelineRun.name)/webui
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/webui/repo"
     - name: command
       value:
-        - ./node_modules/.bin/proto-loader-gen-types
-        - public/dex.proto
-        - -O
-        - src/generated/grpc
-        - --grpcLib=@grpc/grpc-js
+        - downloadDependencies
+        - --info
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+
+  #----------------------------------------------------------------
+  # Generate TypeScript client code from the openapi.yaml so the webui can
+  # talk to the API server.
+  - name: generate-api
+    taskRef:
+      name: general-command
+    runAfter:
+    - gather-dependencies
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui
+    - name: image
+      value: harbor.galasa.dev/common/openapi:main
+    - name: command
+      value:
+        - java
+        - -jar
+        - /opt/openapi/openapi-generator-cli.jar
+        - generate
+        - -i
+        - /workspace/git/$(context.pipelineRun.name)/webui/build/dependencies/openapi.yaml
+        - -g
+        - typescript
+        - -o
+        - galasa-ui/src/app/generated/galasaapi
+        - --additional-properties=packageName=galasaapi
+        - --global-property=apiTests=false
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  #----------------------------------------------------------------
+  # The generated TypeScript client code contains some compilation and build errors, which need fixing:
+  # 1. PromiseAPI.ts returns a constant named "result", which conflicts with the "result" field in a test run,
+  #    so rename the constant to something else.
+  # 2. index.ts runs into "Type error: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'",
+  #    so apply the suggested fix to the offending exports.
+  - name: fix-openapi-client
+    taskRef:
+      name: script
+    runAfter:
+    - generate-api
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui
+    - name: script
+      value:
+        mkdir -p temp &&
+        promiseApiFile="galasa-ui/src/generated/galasaapi/PromiseAPI.ts" &&
+        cat ${promiseApiFile} | sed "s/const result =/const apiResult =/g" > temp/PromiseAPI-temp.ts &&
+        cat temp/PromiseAPI-temp.ts | sed "s/return result\.toPromise/return apiResult\.toPromise/g" > temp/PromiseAPI.ts &&
+        cp temp/PromiseAPI.ts ${promiseApiFile} &&
+        indexFile="galasa-ui/src/generated/galasaapi/index.ts" &&
+        cat ${indexFile} | sed "s/export { Configuration/export { type Configuration/1" > temp/index-temp.ts &&
+        cat temp/index-temp.ts | sed "s/export { PromiseMiddleware/export { type PromiseMiddleware/1" > temp/index.ts &&
+        cp temp/index.ts ${indexFile}
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -137,7 +201,7 @@ spec:
     taskRef:
       name: nodejs
     runAfter:
-    - generate-grpc-types
+    - fix-openapi-client
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui

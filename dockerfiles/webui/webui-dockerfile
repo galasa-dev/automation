@@ -14,7 +14,6 @@ RUN chown -R node:node /galasa
 # See https://nextjs.org/docs/app/api-reference/next-config-js/output for information.
 COPY --chown=node:node .next/standalone ./
 COPY --chown=node:node .next/static ./.next/static
-COPY --chown=node:node ./public ./public
 
 # Never run anything in a docker container as the root user if you can help it.
 # Node images provide a non-root "node" user and group, so use that.
