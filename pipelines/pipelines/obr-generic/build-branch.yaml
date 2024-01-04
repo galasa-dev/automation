@@ -14,9 +14,6 @@ spec:
   - name: fromBranch
     type: string
     default: main
-  - name: fromSimplatformBranch
-    type: string
-    default: prod
   - name: toBranch
     type: string
     default: main
@@ -311,7 +308,12 @@ spec:
 # 
 # 
 # 
+# Trigger rebuild of the ecosystem1 using the Helm chart if doing a 'main' build...
   - name: trigger-helm
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -339,8 +341,12 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-# Run a Core test against the Main OBR 
+# Run a Core test against the Main OBR if doing a 'main' build...
   - name: trigger-run-tests
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["main"]
     taskRef:
       name: tkn-cli
     runAfter:
@@ -366,7 +372,53 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace   
+       workspace: git-workspace  
+
+# Trigger CLI build if doing a 'prerelease' or a 'release'...
+  - name: trigger-cli
+    when:
+      - input: "$(params.toBranch)"
+        operator: in
+        values: ["prerelease", "release"]
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - branch-docker-build-ibm-embedded
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-cli
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-cli-$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appnameCli=$(params.toBranch)-cli
+      - --param
+      - fromSimplatformBranch=prod
+      - --param
+      - appnameMavenRepos=$(params.appname)
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace     
 
   finally:
   - name: report-failed-build

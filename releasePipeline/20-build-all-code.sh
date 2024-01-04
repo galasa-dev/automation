@@ -136,7 +136,7 @@ spec:
     value: "false"
     
     # true if the branch is 'main' or 'release' or 'prerelease'
-    # No idea what it controlls ?
+    # This parameter is used by pom.xmls and build.gradles to complete GPG signing of the artefacts only if true
   - name: isMainOrRelease
     value: "true"
 # 
@@ -182,10 +182,10 @@ EOF
 
     output=$(kubectl -n galasa-build create -f temp/${yaml_file})
     # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    # pipelinerun.tekton.dev/complete-build-part1-8cbj8 created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to create the branches. rc=$?"
+        error "Failed to start the complete build pipeline. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
@@ -194,9 +194,9 @@ EOF
     pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
 
 
-    success "Branch builds kicked off."
+    success "Branch build for Wrapping kicked off - this should trigger the full chain of builds up to and including Isolated (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic > CLI > Eclipse > Isolated)."
     bold "Now use the tekton dashboard to monitor it to see that they all work."
-    note "If the 'isolated' build completes OK, then we know they all worked."
+    note "If the 'Isolated' build completes OK, then we know that the complete build worked."
 }
 
 
