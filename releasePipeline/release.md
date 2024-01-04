@@ -24,9 +24,8 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`release`' option.  
 4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`release`' option. 
 
-5. Run [20-build-all-code-part1.sh](./20-build-all-code-part1.sh). When prompted, choose the '`release`' option.
-6. Run [21-build-all-code-part2.sh](./21-build-all-code-part2.sh). When prompted, choose the '`release`' option.
-7. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
+5. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
+6. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
 
    a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
 

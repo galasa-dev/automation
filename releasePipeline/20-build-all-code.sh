@@ -103,9 +103,9 @@ function set_kubernetes_context {
 
 
 
-function build_wrapping_to_obrgeneric {
+function build_all_code {
 
-    yaml_file="build_wrapping_to_obrgeneric.yaml"
+    yaml_file="build_code.yaml"
 
     rm -f temp/${yaml_file}
     cat << EOF > temp/${yaml_file}
@@ -116,7 +116,7 @@ function build_wrapping_to_obrgeneric {
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: complete-build-part1-
+  generateName: complete-build-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
@@ -141,7 +141,7 @@ spec:
     value: "true"
 # 
 # 
-# Start Part 1 of the Complete Build at the Wrapping pipeline
+# Start the Complete Build at the Wrapping pipeline
 # 
 # 
   pipelineRef:
@@ -194,12 +194,12 @@ EOF
     pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
 
 
-    success "Build for Wrapping kicked off - this should trigger a chain of builds up to and including OBR Generic. (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic)"
+    success "Branch build for Wrapping kicked off - this should trigger the full chain of builds up to and including Isolated (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic > CLI > Eclipse > Isolated)."
     bold "Now use the tekton dashboard to monitor it to see that they all work."
-    note "If the 'OBR Generic' build completes OK, then we know that part 1 of the complete build worked."
+    note "If the 'Isolated' build completes OK, then we know that the complete build worked."
 }
 
 
 ask_user_for_release_type
 set_kubernetes_context
-build_wrapping_to_obrgeneric
+build_all_code
