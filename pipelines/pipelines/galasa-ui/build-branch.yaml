@@ -82,32 +82,15 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-#----------------------------------------------------------------
-# Install the webui's dependencies
-  - name: npm-install-webui
-    taskRef:
-      name: nodejs
-    runAfter:
-    - check-branch
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/webui/galasa-ui
-    - name: command
-      value:
-        - npm
-        - install
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
   #----------------------------------------------------------------
-  # Call gradle to pull-down dependencies we need and put them in
-  # the correct places.
-  - name: gather-dependencies
+  # Call gradle to pull-down dependencies we need and put them in the correct places,
+  # before generating the TypeScript client code from the openapi.yaml so the webui can
+  # talk to the API server.
+  - name: generate-api
     taskRef:
       name: gradle-build
     runAfter:
-    - npm-install-webui
+    - check-branch
     params:
     # The context indicates which folder the build.gradle is in.
     - name: context
@@ -119,42 +102,11 @@ spec:
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/webui/repo"
     - name: command
       value:
-        - downloadDependencies
+        - generateTypeScriptClient
         - --info
     workspaces:
     - name: git-workspace
       workspace: git-workspace
-
-  #----------------------------------------------------------------
-  # Generate TypeScript client code from the openapi.yaml so the webui can
-  # talk to the API server.
-  - name: generate-api
-    taskRef:
-      name: general-command
-    runAfter:
-    - gather-dependencies
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/webui
-    - name: image
-      value: harbor.galasa.dev/common/openapi:main
-    - name: command
-      value:
-        - java
-        - -jar
-        - /opt/openapi/openapi-generator-cli.jar
-        - generate
-        - -i
-        - /workspace/git/$(context.pipelineRun.name)/webui/build/dependencies/openapi.yaml
-        - -g
-        - typescript
-        - -o
-        - galasa-ui/src/app/generated/galasaapi
-        - --additional-properties=packageName=galasaapi
-        - --global-property=apiTests=false
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
 
   #----------------------------------------------------------------
   # The generated TypeScript client code contains some compilation and build errors, which need fixing:
@@ -186,12 +138,30 @@ spec:
        workspace: git-workspace
 
 #----------------------------------------------------------------
+# Install the webui's dependencies
+  - name: npm-install-webui
+    taskRef:
+      name: nodejs
+    runAfter:
+    - fix-openapi-client
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/webui/galasa-ui
+    - name: command
+      value:
+        - npm
+        - install
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+#----------------------------------------------------------------
 # Run the webui's unit tests
   - name: npm-test-webui
     taskRef:
       name: nodejs
     runAfter:
-    - fix-openapi-client
+    - npm-install-webui
     params:
     - name: context
       value: $(context.pipelineRun.name)/webui/galasa-ui
