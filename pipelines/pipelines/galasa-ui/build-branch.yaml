@@ -97,13 +97,10 @@ spec:
       value: $(context.pipelineRun.name)/webui
     - name: buildArgs
       value:
-        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven"
-        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
-        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/webui/repo"
+        - "-PsourceMaven=https://development.galasa.dev/$(params.toBranch)/maven-repo/framework"
     - name: command
       value:
         - generateTypeScriptClient
-        - --info
     workspaces:
     - name: git-workspace
       workspace: git-workspace
@@ -125,7 +122,7 @@ spec:
     - name: script
       value:
         mkdir -p temp &&
-        promiseApiFile="galasa-ui/src/generated/galasaapi/PromiseAPI.ts" &&
+        promiseApiFile="galasa-ui/src/generated/galasaapi/types/PromiseAPI.ts" &&
         cat ${promiseApiFile} | sed "s/const result =/const apiResult =/g" > temp/PromiseAPI-temp.ts &&
         cat temp/PromiseAPI-temp.ts | sed "s/return result\.toPromise/return apiResult\.toPromise/g" > temp/PromiseAPI.ts &&
         cp temp/PromiseAPI.ts ${promiseApiFile} &&
