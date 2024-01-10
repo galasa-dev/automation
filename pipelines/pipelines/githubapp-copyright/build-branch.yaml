@@ -19,7 +19,7 @@ spec:
   tasks:
 
   # 
-  # Clone the github depo.
+  # Clone the github repo.
   # 
   - name: clone-githubapp-copyright
     taskRef: 
@@ -131,3 +131,7 @@ spec:
       value: $(context.pipeline.name)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
+    - name: branchFlag
+      value: ""
+    - name: branch
+      value: ""
