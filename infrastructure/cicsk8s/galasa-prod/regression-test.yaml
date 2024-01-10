@@ -10,70 +10,47 @@ metadata:
   name: regression-test-new
   namespace: galasa-prod
 spec:
-  schedule: 0 6 * * *
+  schedule: 0 6 * * * # Daily at 06:00
   successfulJobsHistoryLimit: 1
-  concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       backoffLimit: 0
       template:
         spec:
-          containers:
-          - args:
-            - $(HOOK)
-            command:
-            - galasabld
-            - slackpost
-            - tests
-            - --path
-            - /galasa/test.json
-            - --hook
-            env:
-            - name: HOOK
-              valueFrom:
-                secretKeyRef:
-                  key: webhook
-                  name: slack-webhook
-            image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:stable
-            imagePullPolicy: Always
-            name: submit-report
-            resources: {}
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: File
-            volumeMounts:
-            - mountPath: /galasa
-              name: static-files
-          dnsPolicy: ClusterFirst
           initContainers:
-          - command:
+          - name: permissions
+            command:
             - chmod
             - -R
             - "777"
             - /galasa
             image: busybox
             imagePullPolicy: Always
-            name: permissions
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
             - mountPath: /galasa
               name: static-files
-          - command:
+
+          - name: clean
+            command:
             - rm
             - -rf
             - /galasa/*
             image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
             imagePullPolicy: Always
-            name: clean
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
             - mountPath: /galasa
               name: static-files
-          - command:
+
+          - name: run-prepare
+            command:
             - galasactl
             - runs
             - prepare
@@ -89,16 +66,19 @@ spec:
             - kubernetes
             - --package
             - compilation
+            - --log
+            - '-'
             image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
             imagePullPolicy: IfNotPresent
-            name: run-prepare
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
             - mountPath: /galasa
               name: static-files
-          - command:
+
+          - name: run-submit
+            command:
             - galasactl
             - runs
             - submit
@@ -118,22 +98,52 @@ spec:
             - --reportjson
             - /galasa/test.json
             - --noexitcodeontestfailures
+            - --log
+            - '-'
             image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
             imagePullPolicy: IfNotPresent
-            name: run-submit
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
             - mountPath: /galasa
               name: static-files
+
+          containers:
+          - name: submit-report
+            command:
+            - galasabld
+            - slackpost
+            - tests
+            - --path
+            - /galasa/test.json
+            - --hook
+            args:
+            - $(HOOK)
+            env:
+            - name: HOOK
+              valueFrom:
+                secretKeyRef:
+                  key: webhook
+                  name: slack-webhook
+            image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:stable
+            imagePullPolicy: Always
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+
+          dnsPolicy: ClusterFirst
           nodeSelector:
             kubernetes.io/arch: amd64
           restartPolicy: Never
           schedulerName: default-scheduler
-          securityContext: {}
+          securityContext: {}      
           terminationGracePeriodSeconds: 30
           volumes:
           - emptyDir: {}
             name: static-files
+
   suspend: false
