@@ -273,3 +273,5 @@ spec:
       value: $(context.pipeline.name)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
+    - name: branch
+      value: $(params.toBranch)
