@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: pr-wrapping
@@ -43,7 +43,7 @@ spec:
     - name: action
       value: $(params.action)
   - name: clone-automation
-    taskRef: 
+    taskRef:
       name: git-clone
     runAfter:
       - git-verify
@@ -62,7 +62,7 @@ spec:
      - name: output
        workspace: git-workspace
   - name: clone-wrapping
-    taskRef: 
+    taskRef:
       name: git-clone
     runAfter:
       - git-verify
@@ -97,7 +97,7 @@ spec:
     taskRef:
       name: maven-gpg
     runAfter:
-    - clone-wrapping 
+    - clone-wrapping
     params:
     - name: context
       value: $(context.pipelineRun.name)/wrapping
@@ -121,7 +121,7 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/wrapping/repo"
     - name: command
-      value: 
+      value:
         - deploy
     workspaces:
      - name: git-workspace

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: branch-gradle
@@ -40,12 +40,12 @@ spec:
     default: "true"
   workspaces:
   - name: git-workspace
-# 
-# 
-# 
+#
+#
+#
   tasks:
   - name: clone-automation
-    taskRef: 
+    taskRef:
       name: git-clone
     params:
     - name: url
@@ -61,11 +61,11 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
-# 
+#
+#
+#
   - name: clone-gradle
-    taskRef: 
+    taskRef:
       name: git-clone
     params:
     - name: url
@@ -81,20 +81,20 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-# 
-# 
-# 
+#
+#
+#
   - name: check-branch
     # Have to remove this when clause for now, as get-commit and the build task should runAfter this
     # but if this doesn't execute, the pipeline will stop. Need to improve in future.
-    # when: 
+    # when:
     #   - input: "$(params.toBranch)"
     #     operator: notin
     #     values: ["main"]
-    taskRef: 
+    taskRef:
       name: git-check-branch
     runAfter:
-    - clone-gradle  
+    - clone-gradle
     params:
     - name: context
       value: $(context.pipelineRun.name)/gradle
@@ -103,9 +103,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+#
+#
+#
   - name: get-commit
     taskRef:
       name: get-commit
@@ -119,13 +119,13 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+#
+#
+#
   - name: branch-gradle-build-gradle
     taskRef:
       name: gradle-build
-    runAfter: 
+    runAfter:
       - check-branch
     params:
     - name: context
@@ -138,15 +138,15 @@ spec:
         - "-PjacocoEnabled=$(params.jacocoEnabled)"
         - "-PisMainOrRelease=$(params.isMainOrRelease)"
     - name: command
-      value: 
+      value:
         - check
         - publish
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+#
+#
+#
   - name: branch-docker-build-gradle
     taskRef:
       name: docker-build
@@ -171,9 +171,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# 
+#
+#
+#
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -183,19 +183,19 @@ spec:
     - name: server
       value: argocd.galasa.dev
     - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
+      value:
+      - app
+      - actions
+      - run
       - $(params.appname)
       - restart
-      - --kind 
+      - --kind
       - Deployment
       - --resource-name
       - gradle-$(params.imageTag)
-# 
-# 
-# 
+#
+#
+#
   - name: wait-deployment
     taskRef:
       name: argocd-cli
@@ -205,16 +205,16 @@ spec:
     - name: server
       value: argocd.galasa.dev
     - name: command
-      value: 
-      - app 
+      value:
+      - app
       - wait
       - $(params.appname)
       - --resource
       - apps:Deployment:gradle-$(params.imageTag)
       - --health
-# 
-# 
-# 
+#
+#
+#
   # Trigger the next Pipeline (branch-maven)
   - name: trigger-maven
     taskRef:
@@ -225,13 +225,13 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation
     - name: command
-      value: 
+      value:
       - pipeline
       - start
       - branch-maven
       - -n
       - galasa-build
-      - --prefix-name 
+      - --prefix-name
       - trigger-maven-$(params.toBranch)
       - --param
       - fromBranch=$(params.toBranch)
