@@ -246,3 +246,7 @@ spec:
       value: $(context.pipeline.name)
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
+    - name: branchFlag
+      value: ""
+    - name: branch
+      value: ""
