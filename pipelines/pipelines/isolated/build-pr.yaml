@@ -1174,8 +1174,6 @@ spec:
       value:
         - "--tarPath"
         - "/workspace/git/$(context.pipelineRun.name)/isolated/mvp/target/isolated/isolated.tar"
-    - name: buildArgs
-      value:
         - "--build-arg=directory=isolated/mvp"
     workspaces:
       - name: git-workspace
