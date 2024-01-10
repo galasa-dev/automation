@@ -15,11 +15,11 @@ spec:
     type: string   
   - name: pipelineRunName
     type: string 
-  # - name: branchFlag
-  #   type: string
-  #   default: --branch
-  # - name: branch
-  #   type: string
+  - name: branchFlag
+    type: string
+    default: --branch
+  - name: branch
+    type: string
   steps:
   - name: make-slack-post
     image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:main
@@ -38,7 +38,7 @@ spec:
     - $(params.pipelineName)
     - --prun
     - $(params.pipelineRunName)
-    # - $(params.branchFlag) 
-    # - $(params.branch)
+    - $(params.branchFlag) 
+    - $(params.branch)
     - --hook
     - $(HOOK)
