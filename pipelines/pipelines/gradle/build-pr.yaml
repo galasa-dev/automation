@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: pr-gradle
@@ -43,7 +43,7 @@ spec:
     - name: action
       value: $(params.action)
   - name: clone-automation
-    taskRef: 
+    taskRef:
       name: git-clone
     runAfter:
       - git-verify
@@ -62,7 +62,7 @@ spec:
      - name: output
        workspace: git-workspace
   - name: clone-gradle
-    taskRef: 
+    taskRef:
       name: git-clone
     runAfter:
       - git-verify
@@ -96,7 +96,7 @@ spec:
   - name: gradle-build-gradle
     taskRef:
       name: gradle-build
-    runAfter: 
+    runAfter:
       - clone-gradle
     params:
     - name: context
@@ -107,7 +107,7 @@ spec:
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/gradle/repo"
     - name: command
-      value: 
+      value:
         - check
         - publish
     workspaces:
