@@ -121,19 +121,12 @@ dex:
   # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
   # 30000 to 32767 range if they are left blank).
   nodePorts:
-    grpc: 32000
     http: # blank - dynamically assigned
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
     issuer: "https://galasa-ecosystem1.galasa.dev/dex"
-
-    # Enable Dex's gRPC API for clients to interact with.
-    grpc:
-      # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
-      addr: "galasa-ecosystem1.galasa.dev:32000"
-      reflection: true
 
     connectors:
     - type: github
