@@ -149,7 +149,7 @@ dex:
     staticClients:
     - id: galasa-webui
       redirectURIs:
-      - 'https://galasa-ecosystem1.galasa.dev/auth/callback'
+      - 'https://galasa-ecosystem1.galasa.dev/api/auth/callback'
       name: 'Galasa Ecosystem Web UI'
       # Use the webui client secret drawn from the secret mounted in envFrom
       secretEnv: webuiClientSecret
@@ -158,4 +158,5 @@ dex:
     expiry:
       idTokens: 24h
       refreshTokens:
+        reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
