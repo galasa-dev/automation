@@ -11,7 +11,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -53,18 +52,59 @@ Arguments required:
 Poll frequency can be controlled from K8s Cron job of how often this is run. Also allows for simple manual trigger
 */
 func main() {
+
 	parseArgsAndConfigs()
 
-	//Returns a list with the oldest relevant event first
-	orderedEventList := getEventList()
+	runGitHubMonitorInstance()
+	//push error all the way to the topbytes//exit the pod
+	//kube keeps restarting when we exits
 
-	// Submits the events to any relevant webhook defined
-	submitEvents(orderedEventList)
 }
 
-func getEventList() []string {
+const (
+	SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS = 60
+)
+
+func runGitHubMonitorInstance() {
+	var err error
+	for {
+		err = getAndSubmitEvents()
+		if err == nil {
+			// wait for more events to arrive at github... then check again.
+			log.Printf("runGitHubMonitorInstance - Going to sleep.")
+			time.Sleep(SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS * time.Second)
+			log.Printf("runGitHubMonitorInstance - Just woke up.")
+		} else {
+			log.Printf("runGitHubMonitorInstance FAIL - Error: %v", err)
+			break
+		}
+	}
+
+	// If there has been an error, exit with an exit code of 1.
+	var exitCode = 0
+	if err != nil {
+		exitCode = 1
+	}
+
+	os.Exit(exitCode)
+}
+
+func getAndSubmitEvents() error {
+	var err error
+	var orderedEventList []string
+
+	orderedEventList, err = getEventList()
+	if err == nil {
+		err = submitEvents(orderedEventList)
+	}
+
+	return err
+}
+
+func getEventList() ([]string, error) {
 	var deliveries []jsontypes.Delivery
 	var eventQueue []string
+	var err error
 
 	page := 1
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries?per_page=50", *orgName, *hookId), nil)
@@ -73,73 +113,77 @@ func getEventList() []string {
 	if latestDeliveryId == "" {
 		f, err := os.Create(latestIdPath)
 		if err != nil {
-			log.Printf("Failed to create Id file: %s", err)
+			log.Printf("Failed to create Id file: %v", err)
 		}
 		parseDeliveries(resp.Body, &deliveries)
 		f.WriteString(strconv.Itoa(deliveries[0].Id))
-		os.Exit(0)
-	}
+	} else {
 
-	upToDate := false
-	// Look at the last 250 Events max
-	for page < 5 {
+		upToDate := false
+		// Look at the last 250 Events max
+		for page < 5 {
 
-		parseDeliveries(resp.Body, &deliveries)
+			parseDeliveries(resp.Body, &deliveries)
 
-		// Loop through current page entries
-		for _, val := range deliveries {
-			id := fmt.Sprintf("%v", val.Id)
-			if id == latestDeliveryId {
-				upToDate = true
-				break
-			} else {
-				eventQueue = append(eventQueue, id)
+			// Loop through current page entries
+			for _, val := range deliveries {
+				id := fmt.Sprintf("%v", val.Id)
+				if id == latestDeliveryId {
+					upToDate = true
+					break
+				} else {
+					eventQueue = append(eventQueue, id)
+				}
 			}
-		}
-		if upToDate {
-			break
+			if upToDate {
+				break
+			}
+
+			// The Link header will only be present if there were more than 50 deliveries in the list so more than one page
+			link := resp.Header["Link"]
+			if len(link) == 0 {
+				break
+			}
+
+			segments := strings.Split(strings.TrimSpace(link[0]), ";")
+			nextPage := strings.Trim(segments[0], "<>")
+
+			resp = githubGet(nextPage, nil)
+			page++
 		}
 
-		// The Link header will only be present if there were more than 50 deliveries in the list so more than one page
-		link := resp.Header["Link"]
-		if len(link) == 0 {
-			break
+		if len(eventQueue) == 0 {
+			log.Printf("Nothing to do")
+			return eventQueue, err
 		}
 
-		segments := strings.Split(strings.TrimSpace(link[0]), ";")
-		nextPage := strings.Trim(segments[0], "<>")
-
-		resp = githubGet(nextPage, nil)
-		page++
+		for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
+			eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
+		}
 	}
 
-	if len(eventQueue) == 0 {
-		log.Printf("Nothing to do")
-		return eventQueue
-	}
-
-	for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
-		eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
-	}
-
-	return eventQueue
+	return eventQueue, err
 }
 
-func submitEvents(events []string) {
+func submitEvents(events []string) error {
+	var err error
 	log.Printf("%v found\n %v", len(events), events)
 
 	// Now need to submit all events to event listener
 	for _, id := range events {
 		log.Printf("Inspecting event: %s", id)
-		hookRequest, err := buildHookRequest(id)
+		var hookRequest *http.Request
+		hookRequest, err = buildHookRequest(id)
 		if err != nil {
-			log.Fatal(err)
+			break
 		}
 
 		if hookRequest != nil {
-			resp, err := client.Do(hookRequest)
+			var resp *http.Response
+			resp, err = client.Do(hookRequest)
 			if err != nil {
 				log.Printf("WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
+				break
 			} else {
 				log.Printf("URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
 			}
@@ -148,43 +192,48 @@ func submitEvents(events []string) {
 		// We update the bookmark without ensuring 202 to prevent a backlog of missed events.
 		updateBookmark(id)
 	}
+
+	return err
 }
 
 // Does a look up with the Github API to find the hook requests and payloads. Then creates new http request from output
 func buildHookRequest(id string) (*http.Request, error) {
 	var request jsontypes.WebhookRequest
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal("Failed retrieving webhook request body.", err)
-	}
-
-	json.Unmarshal(b, &request)
-
-	if eventType, ok := triggerMap.Events[request.Event]; ok {
-		url := eventType.EventListener
-		payload, _ := json.Marshal(request.Request.Payload)
-		webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
-		if err != nil {
-			return nil, err
-		}
-
-		// Add headers
-		for k, v := range request.Request.Headers {
-			webhookRequest.Header.Add(k, v)
-		}
-
-		return webhookRequest, nil
+		log.Printf("Failed retrieving webhook request body. %v\n", err)
 	} else {
-		log.Printf("No action required for type: %s\n", request.Event)
+
+		err = json.Unmarshal(b, &request)
+		if err == nil {
+
+			if eventType, ok := triggerMap.Events[request.Event]; ok {
+				url := eventType.EventListener
+				payload, _ := json.Marshal(request.Request.Payload)
+				webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
+				if err != nil {
+					return nil, err
+				}
+
+				// Add headers
+				for k, v := range request.Request.Headers {
+					webhookRequest.Header.Add(k, v)
+				}
+
+				return webhookRequest, nil
+			} else {
+				log.Printf("No action required for type: %s\n", request.Event)
+			}
+		}
 	}
 
-	return nil, nil
+	return nil, err
 }
 
 // Extracts Delivery Json from body.
 func parseDeliveries(body io.ReadCloser, v interface{}) {
-	b, err := ioutil.ReadAll(body)
+	b, err := io.ReadAll(body)
 	if err != nil {
 		log.Fatal("Failed to parse response body into interface", err)
 	}
@@ -248,13 +297,13 @@ func parseArgsAndConfigs() {
 	}
 
 	//Read trigger configs
-	b, err := ioutil.ReadFile(*triggerMapPath)
+	b, err := os.ReadFile(*triggerMapPath)
 	if err != nil {
 		log.Fatal("Failed to open trigger mappings\n", err)
 	}
 	yaml.Unmarshal(b, &triggerMap)
 
-	b, err = ioutil.ReadFile(latestIdPath)
+	b, err = os.ReadFile(latestIdPath)
 	if err != nil {
 		log.Println("Failed to find latestId file")
 		return
