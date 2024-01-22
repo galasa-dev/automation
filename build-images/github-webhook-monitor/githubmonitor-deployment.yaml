@@ -1,0 +1,53 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-monitor
+  namespace: galasa-build
+  labels:
+    app: resource-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-monitor
+  template:
+    metadata:
+      name: resource-monitor
+      labels:
+        app: resource-monitor
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        applevel: critical
+      containers:
+      - name: resource-monitor
+        image: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:prod
+        imagePullPolicy: Always
+        command: ["java"]
+        args: 
+        - -galasa-dev
+        - hook
+        - -trigger-map
+        env:
+        - name: GITHUBTOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: bootstrap
+        ports:
+        - containerPort: 9010
+          name: metrics
+        - containerPort: 9011
+          name: health
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9011
+          initialDelaySeconds: 60
+          periodSeconds: 60
