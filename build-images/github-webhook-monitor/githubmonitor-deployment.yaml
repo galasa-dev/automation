@@ -7,47 +7,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: github-monitor
+  name: github-event-monitor
   namespace: galasa-build
-  labels:
-    app: resource-monitor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: resource-monitor
+      app: github-monitor
   template:
     metadata:
-      name: resource-monitor
+      name: github-monitor
       labels:
-        app: resource-monitor
+        app: github-monitor
     spec:
       nodeSelector:
-        kubernetes.io/arch: arm64
-        applevel: critical
+        kubernetes.io/arch: amd64
       containers:
-      - name: resource-monitor
-        image: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:prod
+      - name: ghmonitor
+        image: harbor.galasa.dev/common/ghmonitor:main
         imagePullPolicy: Always
-        command: ["java"]
-        args: 
-        - -galasa-dev
-        - hook
-        - -trigger-map
+        command: ["github-monitor"]
+        args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/tmp/config.yaml"]
         env:
-        - name: GITHUBTOKEN
-          valueFrom:
-            configMapKeyRef:
-              name: config
-              key: bootstrap
-        ports:
-        - containerPort: 9010
-          name: metrics
-        - containerPort: 9011
-          name: health
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 9011
-          initialDelaySeconds: 60
-          periodSeconds: 60
+          - name: GITHUBTOKEN
+            valueFrom:
+              secretKeyRef:
+                name: webhook-monitor
+                key: token
+                optional: false
+        volumeMounts:
+          - mountPath: /tmp
+            name: trigger-map
+          - mountPath: /mnt
+            name: latest-id
