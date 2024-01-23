@@ -4,11 +4,6 @@ ARG platform
 
 FROM ${dockerRepository}/galasadev/galasa-boot-embedded-${platform}:${tag}
 
-COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
-COPY ibminter.pem /etc/ssl/certs/ibminter.pem
-RUN  cat /etc/ssl/certs/ibmroot.pem >> /etc/ssl/certs/ca-certificates.crt
-RUN  cat /etc/ssl/certs/ibminter.pem >> /etc/ssl/certs/ca-certificates.crt
-
 USER root
 
 COPY carootcert.der $JAVA_HOME/lib/security
