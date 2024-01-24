@@ -7,7 +7,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: github-event-monitor
+  name: github-monitor
   namespace: galasa-build
 spec:
   replicas: 1
@@ -24,10 +24,10 @@ spec:
         kubernetes.io/arch: amd64
       containers:
       - name: ghmonitor
-        image: harbor.galasa.dev/common/ghmonitor:main
+        image: harbor.galasa.dev/common/ghmonitor:test
         imagePullPolicy: Always
         command: ["github-monitor"]
-        args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/tmp/config.yaml"]
+        args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/config.yaml"]
         env:
           - name: GITHUBTOKEN
             valueFrom:
@@ -40,3 +40,11 @@ spec:
             name: trigger-map
           - mountPath: /mnt
             name: latest-id
+      volumes:
+        - name: trigger-map
+          configMap:
+            name: githubmonitor-configmap
+            defaultMode: 438
+        - name: latest-id
+          persistentVolumeClaim:
+            claimName: latest-id
