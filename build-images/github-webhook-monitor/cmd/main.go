@@ -31,7 +31,7 @@ var hookId *string
 
 var latestDeliveryId string
 
-const latestIdPath = "/mnt/latestId"
+const latestIdPath = "/mnt/latestId.txt"
 
 var client = http.Client{
 
@@ -56,8 +56,6 @@ func main() {
 	parseArgsAndConfigs()
 
 	runGitHubMonitorInstance()
-	//push error all the way to the topbytes//exit the pod
-	//kube keeps restarting when we exits
 
 }
 
@@ -93,7 +91,11 @@ func getAndSubmitEvents() error {
 	var err error
 	var orderedEventList []string
 
+	log.Println("getAndSubmitEvents - Getting events....")
+
 	orderedEventList, err = getEventList()
+
+	log.Printf("getAndSubmitEvents - ordered event list: %v", orderedEventList)
 	if err == nil {
 		err = submitEvents(orderedEventList)
 	}
@@ -111,14 +113,15 @@ func getEventList() ([]string, error) {
 
 	// If latestId not set, we assume this is startup and to only act on anything new past this point. Mark the newest as latestId event though no action.
 	if latestDeliveryId == "" {
+		log.Println("getEventList - LatestDeliveryId is empty")
 		f, err := os.Create(latestIdPath)
 		if err != nil {
-			log.Printf("Failed to create Id file: %v", err)
+			log.Printf("getEventList - Failed to create Id file: %v", err)
 		}
 		parseDeliveries(resp.Body, &deliveries)
 		f.WriteString(strconv.Itoa(deliveries[0].Id))
 	} else {
-
+		log.Println("getEventList - LatestDeliveryId is NOT empty")
 		upToDate := false
 		// Look at the last 250 Events max
 		for page < 5 {
@@ -167,11 +170,11 @@ func getEventList() ([]string, error) {
 
 func submitEvents(events []string) error {
 	var err error
-	log.Printf("%v found\n %v", len(events), events)
+	log.Printf("submitEvents - %v events found\n %v", len(events), events)
 
 	// Now need to submit all events to event listener
 	for _, id := range events {
-		log.Printf("Inspecting event: %s", id)
+		log.Printf("submitEvents - Inspecting event: %s", id)
 		var hookRequest *http.Request
 		hookRequest, err = buildHookRequest(id)
 		if err != nil {
@@ -182,10 +185,10 @@ func submitEvents(events []string) error {
 			var resp *http.Response
 			resp, err = client.Do(hookRequest)
 			if err != nil {
-				log.Printf("WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
+				log.Printf("submitEvents - WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
 				break
 			} else {
-				log.Printf("URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
+				log.Printf("submitEvents - URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
 			}
 		}
 
@@ -202,7 +205,7 @@ func buildHookRequest(id string) (*http.Request, error) {
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Failed retrieving webhook request body. %v\n", err)
+		log.Printf("buildHookRequest - Failed retrieving webhook request body. %v\n", err)
 	} else {
 
 		err = json.Unmarshal(b, &request)
@@ -223,7 +226,7 @@ func buildHookRequest(id string) (*http.Request, error) {
 
 				return webhookRequest, nil
 			} else {
-				log.Printf("No action required for type: %s\n", request.Event)
+				log.Printf("buildHookRequest - No action required for type: %s\n", request.Event)
 			}
 		}
 	}
@@ -235,11 +238,12 @@ func buildHookRequest(id string) (*http.Request, error) {
 func parseDeliveries(body io.ReadCloser, v interface{}) {
 	b, err := io.ReadAll(body)
 	if err != nil {
-		log.Fatal("Failed to parse response body into interface", err)
+		log.Fatal("parseDeliveries - Failed to parse response body into interface", err)
 	}
+
 	err = json.Unmarshal(b, &v)
 	if err != nil {
-		log.Fatal("Failed to unmarshal delivery response", err)
+		log.Fatalf("parseDeliveries - Failed to unmarshal delivery response. Error: %v", err)
 	}
 }
 
@@ -255,12 +259,14 @@ func githubGet(url string, headers map[string]string) *http.Response {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Failed to execute GET request to %s", url), err)
+		log.Fatal(fmt.Sprintf("githubGet - Failed to execute GET request to %s", url), err)
 	}
 
 	// Do a basic OK check
 	if resp.StatusCode != http.StatusOK {
-		log.Fatal(fmt.Sprintf("Status: %s from %s", resp.Status, url))
+		b, _ := io.ReadAll(resp.Body)
+		log.Printf("githubGet - HTTP resp body: %s", string(b))
+		log.Fatalf(fmt.Sprintf("githubGet - HTTP response status: %s from %s", resp.Status, url))
 	}
 
 	return resp
@@ -268,9 +274,10 @@ func githubGet(url string, headers map[string]string) *http.Response {
 
 // Write to file in truncate mode to record last actioned ID.
 func updateBookmark(id string) {
+	log.Printf("updateBookmark - updating event id to %s", id)
 	f, err := os.OpenFile(latestIdPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("updateBookmark - Error opening file: %v", err)
 	}
 	f.WriteString(id)
 	f.Close()
@@ -278,6 +285,9 @@ func updateBookmark(id string) {
 
 // Parse all runtime arguments and environment variables.
 func parseArgsAndConfigs() {
+
+	log.Printf("parseArgsAndConfigs - command args - %v\n", os.Args)
+
 	// Set with K8s secret mount
 	token = os.Getenv("GITHUBTOKEN")
 
@@ -290,24 +300,24 @@ func parseArgsAndConfigs() {
 
 	flag.Parse()
 	if *hookId == "" {
-		log.Fatal("An webhook id must be passed. Please use the -hook flag.")
+		log.Fatal("parseArgsAndConfigs - An webhook id must be passed. Please use the -hook flag.")
 	}
 	if *orgName == "" {
-		log.Fatal("An github organisation must be passed. Please use the -org flag.")
+		log.Fatal("parseArgsAndConfigs - An github organisation must be passed. Please use the -org flag.")
 	}
 
 	//Read trigger configs
 	b, err := os.ReadFile(*triggerMapPath)
 	if err != nil {
-		log.Fatal("Failed to open trigger mappings\n", err)
+		log.Fatal("parseArgsAndConfigs - Failed to open trigger mappings\n", err)
 	}
 	yaml.Unmarshal(b, &triggerMap)
 
 	b, err = os.ReadFile(latestIdPath)
 	if err != nil {
-		log.Println("Failed to find latestId file")
+		log.Printf("parseArgsAndConfigs - Failed to find latestId file. Error: %v", err.Error())
 		return
 	}
 	latestDeliveryId = string(b)
-	log.Printf("LatestID is %s", latestDeliveryId)
+	log.Printf("parseArgsAndConfigs - LatestID is %s", latestDeliveryId)
 }
