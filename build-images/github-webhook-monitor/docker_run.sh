@@ -10,7 +10,7 @@ ORG_NAME="galasa-dev"
 HOOK_ID="386623630"
 
 docker run \
-    -v $(pwd)/config.yaml:/config.yaml \
+    -v $(pwd)/config.yaml:/tmp/config.yaml \
     -v $(pwd)/latestId:/mnt/latestId \
     -e GITHUBTOKEN=${GITHUBTOKEN} \
-    ghmonitor:test -org=${ORG_NAME} -hook=${HOOK_ID} -trigger-map=/config.yaml
+    harbor.galasa.dev/common/ghmonitor:test -org=${ORG_NAME} -hook=${HOOK_ID} -trigger-map=/tmp/config.yaml
