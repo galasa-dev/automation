@@ -319,5 +319,5 @@ func parseArgsAndConfigs() {
 		return
 	}
 	latestDeliveryId = string(b)
-	log.Printf("parseArgsAndConfigs - LatestID is %s", latestDeliveryId)
+	log.Printf("parseArgsAndConfigs - LatestID recovered from bookmark file is %s", latestDeliveryId)
 }
