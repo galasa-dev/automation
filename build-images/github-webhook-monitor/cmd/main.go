@@ -31,7 +31,7 @@ var hookId *string
 
 var latestDeliveryId string
 
-const latestIdPath = "/mnt/latestId.txt"
+const latestIdPath = "/mnt/latestId"
 
 var client = http.Client{
 
@@ -121,7 +121,7 @@ func getEventList() ([]string, error) {
 		parseDeliveries(resp.Body, &deliveries)
 		f.WriteString(strconv.Itoa(deliveries[0].Id))
 	} else {
-		log.Println("getEventList - LatestDeliveryId is NOT empty")
+		log.Printf("getEventList - LatestDeliveryId is %v", latestDeliveryId)
 		upToDate := false
 		// Look at the last 250 Events max
 		for page < 5 {
@@ -132,6 +132,7 @@ func getEventList() ([]string, error) {
 			for _, val := range deliveries {
 				id := fmt.Sprintf("%v", val.Id)
 				if id == latestDeliveryId {
+					log.Printf("id: %v == latestDeliveryId: %v", id, latestDeliveryId)
 					upToDate = true
 					break
 				} else {
@@ -280,6 +281,13 @@ func updateBookmark(id string) {
 		log.Fatalf("updateBookmark - Error opening file: %v", err)
 	}
 	f.WriteString(id)
+	//read file content
+	data := make([]byte, 100)
+	count, err := f.Read(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("bookmark file Latest Id - %v", string(data[:count]))
 	f.Close()
 }
 
