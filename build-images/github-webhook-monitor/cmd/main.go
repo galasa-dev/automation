@@ -32,7 +32,7 @@ var hookId *string
 var latestDeliveryId string
 
 const (
-	latestIdPath                            = "/mnt/latestId/latestId.txt"
+	latestIdPath                            = "/mnt/latestId"
 	SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS = 120
 )
 
