@@ -26,8 +26,8 @@ spec:
       - name: ghmonitor
         image: harbor.galasa.dev/common/ghmonitor:test
         imagePullPolicy: Always
-        command: ["github-monitor"]
-        args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/config.yaml"]
+        command: ["/go/bin/ghmonitor"]
+        args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/tmp/config.yaml"]
         env:
           - name: GITHUBTOKEN
             valueFrom:
