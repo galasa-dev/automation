@@ -31,10 +31,12 @@ var hookId *string
 
 var latestDeliveryId string
 
-const latestIdPath = "/mnt/latestId"
+const (
+	latestIdPath                            = "/mnt/latestId/latestId.txt"
+	SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS = 120
+)
 
 var client = http.Client{
-
 	Timeout: time.Second * 30,
 }
 
@@ -52,30 +54,27 @@ Arguments required:
 Poll frequency can be controlled from K8s Cron job of how often this is run. Also allows for simple manual trigger
 */
 func main() {
-
-	parseArgsAndConfigs()
-
-	runGitHubMonitorInstance()
-
-}
-
-const (
-	SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS = 60
-)
-
-func runGitHubMonitorInstance() {
 	var err error
+
 	for {
-		err = getAndSubmitEvents()
+		err = parseArgsAndConfigs()
 		if err == nil {
-			// wait for more events to arrive at github... then check again.
-			log.Printf("runGitHubMonitorInstance - Going to sleep.")
-			time.Sleep(SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS * time.Second)
-			log.Printf("runGitHubMonitorInstance - Just woke up.")
+			err = getAndSubmitEvents()
+			if err == nil {
+				// wait for more events to arrive at github... then check again.
+				log.Printf("main - Going to sleep.")
+				time.Sleep(SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS * time.Second)
+				log.Printf("main - Just woke up.")
+			} else {
+				log.Printf("main FAIL - Error when getting and submitting events: %v", err)
+				break
+			}
+
 		} else {
-			log.Printf("runGitHubMonitorInstance FAIL - Error: %v", err)
+			log.Printf("main FAIL - Error when parsing args and configs: %v", err)
 			break
 		}
+
 	}
 
 	// If there has been an error, exit with an exit code of 1.
@@ -116,8 +115,9 @@ func getEventList() ([]string, error) {
 		log.Println("getEventList - LatestDeliveryId is empty")
 		f, err := os.Create(latestIdPath)
 		if err != nil {
-			log.Printf("getEventList - Failed to create Id file: %v", err)
+			log.Printf("getEventList - Failed to create LatestDeliveryId file: %v", err)
 		}
+		log.Println("getEventList - LatestDeliveryId file has been created")
 		parseDeliveries(resp.Body, &deliveries)
 		f.WriteString(strconv.Itoa(deliveries[0].Id))
 	} else {
@@ -132,10 +132,10 @@ func getEventList() ([]string, error) {
 			for _, val := range deliveries {
 				id := fmt.Sprintf("%v", val.Id)
 				if id == latestDeliveryId {
-					log.Printf("id: %v == latestDeliveryId: %v", id, latestDeliveryId)
 					upToDate = true
 					break
 				} else {
+					log.Printf("getEventList - appending event %s to event list...", id)
 					eventQueue = append(eventQueue, id)
 				}
 			}
@@ -157,7 +157,7 @@ func getEventList() ([]string, error) {
 		}
 
 		if len(eventQueue) == 0 {
-			log.Printf("Nothing to do")
+			log.Printf("getEventList - No events to submit")
 			return eventQueue, err
 		}
 
@@ -179,6 +179,7 @@ func submitEvents(events []string) error {
 		var hookRequest *http.Request
 		hookRequest, err = buildHookRequest(id)
 		if err != nil {
+			log.Printf("submitEvents - Error when building hook request: %v", err)
 			break
 		}
 
@@ -282,30 +283,28 @@ func updateBookmark(id string) {
 	}
 
 	f.WriteString(id)
-	//read file content
-	data := make([]byte, 100)
-	count, err := f.Read(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("bookmark file Latest Id - %v", string(data[:count]))
 	f.Close()
 }
 
 // Parse all runtime arguments and environment variables.
-func parseArgsAndConfigs() {
-
+func parseArgsAndConfigs() error {
 	log.Printf("parseArgsAndConfigs - command args - %v\n", os.Args)
 
 	// Set with K8s secret mount
 	token = os.Getenv("GITHUBTOKEN")
 
 	// E.g. -org=galasa-dev
-	orgName = flag.String("org", "", "Name of github Organisation we are monitoring")
+	if flag.Lookup("org") == nil {
+		orgName = flag.String("org", "", "Name of github Organisation we are monitoring")
+	}
 	// E.g. -trigger-map=/home/user/map
-	triggerMapPath = flag.String("trigger-map", "", "Yaml config map for routing triggers to event listeners")
+	if flag.Lookup("trigger-map") == nil {
+		triggerMapPath = flag.String("trigger-map", "", "Yaml config map for routing triggers to event listeners")
+	}
 	// E.g. -hook=000000
-	hookId = flag.String("hook", "", "Id for Webhook to watch")
+	if flag.Lookup("hook") == nil {
+		hookId = flag.String("hook", "", "Id for Webhook to watch")
+	}
 
 	flag.Parse()
 	if *hookId == "" {
@@ -320,13 +319,17 @@ func parseArgsAndConfigs() {
 	if err != nil {
 		log.Fatal("parseArgsAndConfigs - Failed to open trigger mappings\n", err)
 	}
-	yaml.Unmarshal(b, &triggerMap)
 
-	b, err = os.ReadFile(latestIdPath)
-	if err != nil {
-		log.Printf("parseArgsAndConfigs - Failed to find latestId file. Error: %v", err.Error())
-		return
+	err = yaml.Unmarshal(b, &triggerMap)
+	if err == nil {
+		b, err = os.ReadFile(latestIdPath)
+		if err != nil {
+			log.Printf("parseArgsAndConfigs - Failed to find latestId file. Error: %v", err.Error())
+			return nil
+		}
+		latestDeliveryId = string(b)
+		log.Printf("parseArgsAndConfigs - LatestID recovered from bookmark file is %s", latestDeliveryId)
 	}
-	latestDeliveryId = string(b)
-	log.Printf("parseArgsAndConfigs - LatestID recovered from bookmark file is %s", latestDeliveryId)
+
+	return err
 }
