@@ -6,4 +6,5 @@
    - restapidoc-stable.yaml
    - p2stable.yaml
    - resources.yaml
-3. Let ArgoCD sync the `galasa-production` application in argocd.galasa.dev.
+3. Create a new branch with the changes and raise a PR to merge into the `main` branch.
+4. Let ArgoCD sync the `galasa-production` application in argocd.galasa.dev.
