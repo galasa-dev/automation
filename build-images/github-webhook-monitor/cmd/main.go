@@ -280,6 +280,7 @@ func updateBookmark(id string) {
 	if err != nil {
 		log.Fatalf("updateBookmark - Error opening file: %v", err)
 	}
+
 	f.WriteString(id)
 	//read file content
 	data := make([]byte, 100)
