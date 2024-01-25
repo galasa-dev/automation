@@ -104,7 +104,9 @@ function set_kubernetes_context {
 function create_resources_image {
 
     h1 "Creating the resources image..."
-
+    if [ -d "${BASEDIR}/temp" ] ; then
+        mkdir ${BASEDIR}/temp
+    fi
     cd ${WORKSPACE_DIR}/temp
     yaml_file=${WORKSPACE_DIR}/temp/build-resources-images.yaml
     cat << EOF > $yaml_file

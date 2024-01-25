@@ -92,6 +92,9 @@ function calculate_galasactl_executable {
 
 function download_galasactl {
     h1 "Downloading galasactl..."
+    if [ -d "${BASEDIR}/temp" ] ; then
+        mkdir ${BASEDIR}/temp
+    fi
     cd ${BASEDIR}/temp
 
     url="https://development.galasa.dev/main/binary/cli/${galasactl_full_name}"
