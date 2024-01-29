@@ -69,7 +69,6 @@ func main() {
 				log.Printf("main FAIL - Error when getting and submitting events: %v", err)
 				break
 			}
-
 		} else {
 			log.Printf("main FAIL - Error when parsing args and configs: %v", err)
 			break
@@ -90,7 +89,7 @@ func getAndSubmitEvents() error {
 	var err error
 	var orderedEventList []string
 
-	log.Println("getAndSubmitEvents - Getting events....")
+	log.Println("getAndSubmitEvents - Getting event list....")
 
 	orderedEventList, err = getEventList()
 
@@ -106,6 +105,7 @@ func getEventList() ([]string, error) {
 	var deliveries []jsontypes.Delivery
 	var eventQueue []string
 	var err error
+	var f *os.File
 
 	page := 1
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries?per_page=50", *orgName, *hookId), nil)
@@ -113,13 +113,14 @@ func getEventList() ([]string, error) {
 	// If latestId not set, we assume this is startup and to only act on anything new past this point. Mark the newest as latestId event though no action.
 	if latestDeliveryId == "" {
 		log.Println("getEventList - LatestDeliveryId is empty")
-		f, err := os.Create(latestIdPath)
+		f, err = os.Create(latestIdPath)
 		if err != nil {
 			log.Printf("getEventList - Failed to create LatestDeliveryId file: %v", err)
+		} else {
+			log.Println("getEventList - LatestDeliveryId file has been created")
+			parseDeliveries(resp.Body, &deliveries)
+			f.WriteString(strconv.Itoa(deliveries[0].Id))
 		}
-		log.Println("getEventList - LatestDeliveryId file has been created")
-		parseDeliveries(resp.Body, &deliveries)
-		f.WriteString(strconv.Itoa(deliveries[0].Id))
 	} else {
 		log.Printf("getEventList - LatestDeliveryId is %v", latestDeliveryId)
 		upToDate := false
