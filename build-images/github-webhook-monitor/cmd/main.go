@@ -11,7 +11,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -155,7 +154,7 @@ func submitEvents(events []string) {
 func buildHookRequest(id string) (*http.Request, error) {
 	var request jsontypes.WebhookRequest
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal("Failed retrieving webhook request body.", err)
 	}
@@ -185,7 +184,7 @@ func buildHookRequest(id string) (*http.Request, error) {
 
 // Extracts Delivery Json from body.
 func parseDeliveries(body io.ReadCloser, v interface{}) {
-	b, err := ioutil.ReadAll(body)
+	b, err := io.ReadAll(body)
 	if err != nil {
 		log.Fatal("Failed to parse response body into interface", err)
 	}
@@ -249,13 +248,13 @@ func parseArgsAndConfigs() {
 	}
 
 	//Read trigger configs
-	b, err := ioutil.ReadFile(*triggerMapPath)
+	b, err := os.ReadFile(*triggerMapPath)
 	if err != nil {
 		log.Fatal("Failed to open trigger mappings\n", err)
 	}
 	yaml.Unmarshal(b, &triggerMap)
 
-	b, err = ioutil.ReadFile(latestIdPath)
+	b, err = os.ReadFile(latestIdPath)
 	if err != nil {
 		log.Println("Failed to find latestId file")
 		return
