@@ -53,7 +53,7 @@ Arguments required:
 Poll frequency can be controlled from K8s Cron job of how often this is run. Also allows for simple manual trigger
 */
 func main() {
-	log.Println("Main - entered...")
+	log.Println("Main - entered.")
 	parseArgsAndConfigs()
 
 	//Returns a list with the oldest relevant event first
