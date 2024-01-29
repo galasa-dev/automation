@@ -68,7 +68,15 @@ function login_to_harbour(){
         exit 1
     fi
 
-    echo ${HARBOR_CLI_SECRET} | docker login harbor.galasa.dev -u "${HARBOR_USERNAME}" --password-stdin
+    echo "${HARBOR_CLI_SECRET}" | docker login harbor.galasa.dev -u "${HARBOR_USERNAME}" --password-stdin
+
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then 
+        error "Failed to login to Harbor"
+        exit 1
+    fi
+
+    success "Logged in to Harbor successfully"
 }
 
 function build_and_tag_docker_image(){
