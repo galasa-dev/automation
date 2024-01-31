@@ -24,10 +24,23 @@ spec:
 #
 #
   - name: deploy-maven
-    taskRef: 
-      name: deploy-maven-galasa
+    taskRef:
+      name: galasabld
     params:
-    - name: version
-      value: $(params.version)
-    - name: repository
-      value: $(params.repository)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - wrapping
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /creds/githubcreds.yaml
