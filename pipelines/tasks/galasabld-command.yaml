@@ -34,3 +34,9 @@ spec:
       mountPath: /creds
     - name: harborcreds
       mountPath: /harborcreds
+    - name: sonatypecreds
+      mountPath: /sonatypecreds
+  volumes:
+  - name: sonatypecreds
+    secret:
+       secretName: sonatype-creds-yaml
