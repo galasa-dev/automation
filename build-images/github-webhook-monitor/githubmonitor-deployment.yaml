@@ -1,0 +1,50 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-monitor
+  namespace: galasa-build
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: github-monitor
+  template:
+    metadata:
+      name: github-monitor
+      labels:
+        app: github-monitor
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+      - name: ghmonitor
+        image: harbor.galasa.dev/common/ghmonitor:test
+        imagePullPolicy: Always
+        command: ["/go/bin/ghmonitor"]
+        args: ["-org=galasa-dev","-hook=386623630","-trigger-map=/tmp/config.yaml"]
+        env:
+          - name: GITHUBTOKEN
+            valueFrom:
+              secretKeyRef:
+                name: webhook-monitor
+                key: token
+                optional: false
+        volumeMounts:
+          - mountPath: /tmp
+            name: trigger-map
+          - mountPath: /mnt
+            name: latest-id
+      volumes:
+        - name: trigger-map
+          configMap:
+            name: githubmonitor-configmap
+            defaultMode: 438
+        - name: latest-id
+          persistentVolumeClaim:
+            claimName: latest-id
