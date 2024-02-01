@@ -34,9 +34,9 @@ spec:
       mountPath: /creds
     - name: harborcreds
       mountPath: /harborcreds
-    - name: sonatypecreds
-      mountPath: /sonatypecreds
+    - name: mavencreds
+      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
   volumes:
-  - name: sonatypecreds
-    secret:
-       secretName: sonatype-creds-yaml
+    - name: mavencreds
+      secret:
+        secretName: maven-creds

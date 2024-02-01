@@ -31,16 +31,16 @@ spec:
       value: $(context.pipelineRun.name)
     - name: command
       value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - wrapping
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
+      - galasabld
+      - maven
+      - deploy
+      - --repository
+      - $(params.repository)
+      - --local
+      - /usr/local/apache2/htdocs
+      - --group
+      - dev.galasa
+      - --version
+      - $(params.version)
+      - --credentials
+      - /workspace/git/$(context.pipelineRun.name)/creds/mavencreds.yaml
