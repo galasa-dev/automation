@@ -31,7 +31,6 @@ spec:
       value: $(context.pipelineRun.name)
     - name: command
       value:
-      - galasabld
       - maven
       - deploy
       - --repository
