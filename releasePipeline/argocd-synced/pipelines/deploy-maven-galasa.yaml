@@ -25,7 +25,7 @@ spec:
 #
   - name: deploy-maven
     taskRef:
-      name: galasabld
+      name: galasabld-copy
     params:
     - name: context
       value: $(context.pipelineRun.name)
