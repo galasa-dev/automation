@@ -42,4 +42,4 @@ spec:
       - --version
       - $(params.version)
       - --credentials
-      - /workspace/git/$(context.pipelineRun.name)/creds/mavencreds.yaml
+      - /mavencreds/mavencreds.yaml

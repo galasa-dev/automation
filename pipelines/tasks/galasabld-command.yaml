@@ -35,8 +35,4 @@ spec:
     - name: harborcreds
       mountPath: /harborcreds
     - name: mavencreds
-      mountPath: /workspace/git/$(context.pipelineRun.name)/creds
-  volumes:
-    - name: mavencreds
-      secret:
-        secretName: maven-creds
+      mountPath: /mavencreds
