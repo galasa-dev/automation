@@ -1,4 +1,4 @@
-FROM docker.io/library/openjdk:11
+FROM harbor.galasa.dev/docker_proxy_cache/library/openjdk:11
 
 RUN mkdir /opt/swagger
 RUN curl -L https://repo1.maven.org/maven2/io/swagger/codegen/v3/swagger-codegen-cli/3.0.41/swagger-codegen-cli-3.0.41.jar -o /opt/swagger/swagger-codegen-cli.jar
