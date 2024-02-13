@@ -9909,7 +9909,7 @@ spec:
         - ""
         - --appendonly
         - "no"
-        image: harbor.galasa.dev/docker_proxy_cache/library/redis:7.0.4-alpine
+        image: redis:7.0.4-alpine
         imagePullPolicy: Always
         name: redis
         ports:
