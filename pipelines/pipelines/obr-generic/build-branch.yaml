@@ -274,7 +274,7 @@ spec:
       value:
         - "--build-arg=tag=$(params.fromBranch)"
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=jdkImage=docker.io/library/openjdk:11"
+        - "--build-arg=jdkImage=harbor.galasa.dev/docker_proxy_cache/library/openjdk:11"
     workspaces:
      - name: git-workspace
        workspace: git-workspace

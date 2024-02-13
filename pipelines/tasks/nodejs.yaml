@@ -21,7 +21,7 @@ spec:
   steps:
   - name: nodejs
     workingDir: /workspace/git/$(params.context)
-    image: docker.io/library/node:20.10.0-alpine
+    image: harbor.galasa.dev/docker_proxy_cache/library/node:20.10.0-alpine
     imagePullPolicy: Always
     command:
       - $(params.command[*])

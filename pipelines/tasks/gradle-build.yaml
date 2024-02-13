@@ -23,7 +23,7 @@ spec:
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
-    image: docker.io/library/gradle:6.8.2-jdk11 
+    image: harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11 
     imagePullPolicy: Always
     command:
     - gradle

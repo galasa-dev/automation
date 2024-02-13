@@ -366,7 +366,7 @@ spec:
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/obr/javadocs/docker/repo"
         - "-Dmaven.javadoc.failOnError=false"
     - name: image
-      value: docker.io/library/maven:3.8.7-openjdk-18
+      value: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.7-openjdk-18
     workspaces:
      - name: git-workspace
        workspace: git-workspace

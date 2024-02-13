@@ -196,7 +196,7 @@ spec:
       value: ""
     # - name: buildArgs
     #   value:
-    #     - "--build-arg=dockerRepository=docker.io"
+    #     - "--build-arg=dockerRepository=harbor.galasa.dev/docker_proxy_cache"
     #     - "--build-arg=jdkImage=/library/openjdk:11-jdk"
     workspaces:
       - name: git-workspace
