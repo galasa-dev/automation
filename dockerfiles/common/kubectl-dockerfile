@@ -1,4 +1,4 @@
-FROM alpine:3.18.4
+FROM harbor.galasa.dev/docker_proxy_cache/alpine:3.18.4
 
 RUN apk add curl
 
