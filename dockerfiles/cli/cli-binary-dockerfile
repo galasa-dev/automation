@@ -1,4 +1,4 @@
-FROM docker.io/library/httpd:2.4
+FROM harbor.galasa.dev/docker_proxy_cache/library/httpd:2.4
 
 RUN rm -v /usr/local/apache2/htdocs/*
 COPY automation/dockerfiles/httpdconf/base-httpd.conf /usr/local/apache2/conf/httpd.conf
