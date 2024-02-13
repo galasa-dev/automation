@@ -16,6 +16,6 @@ spec:
   steps:
   - name: kubectl
     image: harbor.galasa.dev/common/kubectl:main
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     args:
     - $(params.command)

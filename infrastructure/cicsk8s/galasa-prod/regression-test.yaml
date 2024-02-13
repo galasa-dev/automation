@@ -7,7 +7,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: regression-test-new
+  name: regression-test
   namespace: galasa-prod
 spec:
   schedule: 0 6 * * * # Daily at 06:00
@@ -26,8 +26,8 @@ spec:
             - -R
             - "777"
             - /galasa
-            image: busybox
-            imagePullPolicy: Always
+            image: harbor.galasa.dev/docker_proxy_cache/library/busybox:latest
+            imagePullPolicy: IfNotPresent
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File

@@ -32,7 +32,7 @@ spec:
   - name: docker-build
     workingDir: /workspace/git/$(params.pipelineRunName)
     image: gcr.io/kaniko-project/executor:v1.6.0
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     env:
     - name: DOCKER_CONFIG
       value: /root/.docker

@@ -24,7 +24,7 @@ spec:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11 
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command:
     - gradle
     args:

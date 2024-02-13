@@ -22,7 +22,7 @@ spec:
   - name: get-commit
     workingDir: /workspace/git/$(params.pipelineRunName)/$(params.repo)
     image: harbor.galasa.dev/common/gitcli:main
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     script: |
       #!/bin/sh
       set +e

@@ -25,7 +25,7 @@ spec:
   - name: script
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     script: |
       #!/bin/sh
       set +e

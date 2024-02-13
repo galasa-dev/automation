@@ -25,6 +25,6 @@ spec:
   - name: run-command
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command:
       - $(params.command[*])

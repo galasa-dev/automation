@@ -23,14 +23,14 @@ spec:
   - name: gpgdirectory
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/docker_proxy_cache/library/busybox:latest
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command:
     - mkdir
     - $(params.settingsDirectory)
   - name: change-dir-permissions
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/gpg:latest
-    imagePullPolicy: Always
+    image: harbor.galasa.dev/common/gpg:main
+    imagePullPolicy: IfNotPresent
     command:
     - chmod
     - '700'
@@ -38,7 +38,7 @@ spec:
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gpg:main
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command:
     - gpg
     - --homedir
@@ -55,7 +55,7 @@ spec:
   - name: copy-settings
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/docker_proxy_cache/library/busybox:latest
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command:
     - cp
     - /root/mavengpg/settings.xml
