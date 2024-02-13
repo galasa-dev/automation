@@ -23,6 +23,6 @@ spec:
   steps:
   - name: make
     workingDir: /workspace/git/$(params.directory)
-    image: docker.io/library/golang:latest
+    image: harbor.galasa.dev/docker_proxy_cache/library/golang:latest
     imagePullPolicy: Always
     command: ["make" , "$( params.params[*])" ]

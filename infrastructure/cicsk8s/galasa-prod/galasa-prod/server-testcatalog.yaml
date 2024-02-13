@@ -43,7 +43,7 @@ spec:
                 - critical
       initContainers:
       - name: init-chown-data
-        image: docker.io/busybox:1.32.0
+        image: harbor.galasa.dev/docker_proxy_cache/busybox:1.32.0
         imagePullPolicy: IfNotPresent
         command: ["chown", "-R", "1000", "/data"]
         volumeMounts:
