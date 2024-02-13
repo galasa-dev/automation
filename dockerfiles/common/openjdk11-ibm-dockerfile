@@ -1,4 +1,4 @@
-FROM docker.io/library/openjdk:11
+FROM harbor.galasa.dev/docker_proxy_cache/library/openjdk:11
 
 COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
 COPY ibminter.pem /etc/ssl/certs/ibminter.pem
