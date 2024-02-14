@@ -251,7 +251,7 @@ spec:
   # gather code coverage stats.
   - name: galasactl-make
     taskRef:
-      name: make
+      name: make-with-params
     runAfter:
     - get-commit
     params:

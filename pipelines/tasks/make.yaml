@@ -16,13 +16,15 @@ spec:
   params:
   - name: directory
     type: string  
-  - name: params
+  - name: command
     type: array
     default: 
     - all
   steps:
   - name: make
     workingDir: /workspace/git/$(params.directory)
-    image: harbor.galasa.dev/docker_proxy_cache/library/golang:latest
+    image: harbor.galasa.dev/docker_proxy_cache/library/golang:1.20.1
     imagePullPolicy: IfNotPresent
-    command: ["make" , "$( params.params[*])" ]
+    command: 
+      - make
+      - $(params.command[*])

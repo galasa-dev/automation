@@ -22,7 +22,7 @@ spec:
   steps:
   - name: gpgdirectory
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/docker_proxy_cache/library/busybox:latest
+    image: harbor.galasa.dev/docker_proxy_cache/library/busybox:1.36.1
     imagePullPolicy: IfNotPresent
     command:
     - mkdir
@@ -54,7 +54,7 @@ spec:
       mountPath: /root/mavengpg
   - name: copy-settings
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/docker_proxy_cache/library/busybox:latest
+    image: harbor.galasa.dev/docker_proxy_cache/library/busybox:1.36.1
     imagePullPolicy: IfNotPresent
     command:
     - cp

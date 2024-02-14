@@ -20,7 +20,7 @@ spec:
     type: array
   - name: image
     type: string  
-    default: harbor.galasa.dev/docker_proxy_cache/library/busybox:latest
+    default: harbor.galasa.dev/docker_proxy_cache/library/busybox:1.36.1
   steps:
   - name: run-command
     workingDir: /workspace/git/$(params.context)
