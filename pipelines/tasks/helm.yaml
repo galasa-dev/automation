@@ -21,8 +21,8 @@ spec:
   steps:
   - name: helm
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/docker_proxy_cache/library/alpine/helm:3.13.2
-    imagePullPolicy: Always
+    image: harbor.galasa.dev/docker_proxy_cache/alpine/helm:3.13.2
+    imagePullPolicy: IfNotPresent
     command:
       - helm
     args:

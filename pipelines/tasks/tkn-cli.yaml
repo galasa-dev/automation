@@ -22,7 +22,7 @@ spec:
   - name: tkn-cli
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/tkn:main
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     command:
       - tkn
       - $(params.command[*])

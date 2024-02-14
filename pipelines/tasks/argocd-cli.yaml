@@ -24,7 +24,7 @@ spec:
   steps:
   - name: argocd-cli
     image: harbor.galasa.dev/common/argocd-cli:main
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     env:
     - name: ARGOCD_AUTH_TOKEN
       valueFrom:
