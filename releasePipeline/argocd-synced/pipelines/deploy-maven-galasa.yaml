@@ -8,7 +8,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: deploy-maven-galasa
-  namespace: galasa-build-copy
+  namespace: galasa-build
 spec:
   params:
   - name: version
@@ -25,9 +25,21 @@ spec:
 #
   - name: deploy-maven
     taskRef: 
-      name: deploy-maven-galasa
+      name: galasabld-copy
     params:
-    - name: version
-      value: $(params.version)
-    - name: repository
-      value: $(params.repository)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+      - maven
+      - deploy
+      - --repository
+      - $(params.repository)
+      - --local
+      - /usr/local/apache2/htdocs
+      - --group
+      - dev.galasa
+      - --version
+      - $(params.version)
+      - --credentials
+      - /mavencreds/mavencreds.yaml

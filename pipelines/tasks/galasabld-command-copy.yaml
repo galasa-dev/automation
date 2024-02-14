@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: galasabld
+  name: galasabld-copy
   namespace: galasa-build
 spec:
   workspaces:
@@ -24,7 +24,7 @@ spec:
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.galasabldImageTag)
+    image: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
     imagePullPolicy: Always
     command:
     - galasabld
