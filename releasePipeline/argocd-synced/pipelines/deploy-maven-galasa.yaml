@@ -8,7 +8,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: deploy-maven-galasa
-  namespace: galasa-build
+  namespace: galasa-build-copy
 spec:
   params:
   - name: version
