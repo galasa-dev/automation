@@ -71,7 +71,7 @@ spec:
 #
   - name: make
     taskRef:
-      name: make
+      name: make-with-params
     runAfter:
       - clone-buildutils  
     params:

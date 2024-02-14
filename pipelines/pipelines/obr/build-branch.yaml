@@ -388,7 +388,7 @@ spec:
         operator: in
         values: ["release"]
     taskRef:
-      name: make
+      name: make-with-params
     runAfter:
       - clone-buildutils
       - branch-docker-build-obr  

@@ -29,7 +29,7 @@ spec:
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
     image: $(params.image)
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     # To authenticate to GitHub Packages during a Maven build
     env:
     - name: GITHUB_TOKEN_READ_PACKAGES_USERNAME

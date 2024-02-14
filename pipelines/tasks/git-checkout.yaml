@@ -22,7 +22,7 @@ spec:
   - name: run-script
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/common/gitcli:main
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     env:
     - name: GITHUBTOKEN
       valueFrom:
