@@ -84,10 +84,20 @@ function ask_user_for_release_type {
                 break
                 ;;
             *)
-            echo "Unrecognised input.";;
+            echo "Unrecognised input."
+            exit 1
+            ;;
         esac
     done
     echo "Chosen type of release process: ${release_type}"
+}
+
+function ask_user_for_release_version {
+    h1 "Please type the version of this release..."
+
+    read -p "Please enter the version number: " version
+
+    echo "You are doing a release for version ${version}"
 }
 
 
@@ -130,7 +140,7 @@ metadata:
 spec:
   params:
   - name: version
-    value: "x.xx.x"
+    value: "{$version}"
   - name: image
     value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:"{$release_type}"
   pipelineRef:
@@ -193,5 +203,6 @@ EOF
 }
 
 ask_user_for_release_type
+ask_user_for_release_version
 set_kubernetes_context
 deploy_maven_artifacts
