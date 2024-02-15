@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Deletes all the release-type branches in each github repo
+# Objectives: Deploys maven artifacts using galasabld
 #
 # Environment variable over-rides:
 # 
@@ -117,7 +117,7 @@ function set_kubernetes_context {
 
 function deploy_maven_artifacts {
 
-    h1 "Deploying all artifacts in github called ${release_type}"
+    h1 "Deploying all Galasa artifacts at version ${version}"
 
     branch_name="${release_type}"
 
@@ -199,7 +199,7 @@ EOF
         exit 1
     fi
 
-    success "All maven artifacts in github called ${release_type} are now deployed. Yay!"
+    success "All maven artifacts for the current release are now deployed. Yay!"
 }
 
 ask_user_for_release_type
