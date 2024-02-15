@@ -105,14 +105,14 @@ function set_kubernetes_context {
 
 
 
-function delete_branches {
+function deploy_maven_artifacts {
 
-    h1 "Deleting all branches in github called ${release_type}"
+    h1 "Deploying all artifacts in github called ${release_type}"
 
     branch_name="${release_type}"
 
-    rm -f temp/delete_branches.yaml
-    cat << EOF > temp/delete_branches.yaml
+    rm -f temp/deploy-maven-galasa.yaml
+    cat << EOF > temp/deploy-maven-galasa.yaml
 
 #
 # Copyright contributors to the Galasa project
@@ -123,13 +123,18 @@ function delete_branches {
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: delete-branches-galasa-
+  generateName: deploy-maven-galasa-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
 spec:
+  params:
+  - name: version
+    value: "x.xx.x"
+  - name: image
+    value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:"{$release_type}"
   pipelineRef:
-    name: branch-delete-all
+    name: deploy-maven-galasa
   podTemplate:
     volumes:
     - name: githubcreds
@@ -138,18 +143,18 @@ spec:
     - name: harborcreds
       secret:
         secretName: harbor-creds-yaml
-  params:
-  - name: distBranch
-    value: "${branch_name}"
+    - name: mavencreds
+      secret:
+        secretName: maven-creds
 
 EOF
 
-    output=$(kubectl -n galasa-build create -f temp/delete_branches.yaml)
+    output=$(kubectl -n galasa-build create -f temp/deploy-maven-galasa.yaml)
     # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    # pipelinerun.tekton.dev/deploy-maven-galasa-jzcvf created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to delete the branches. rc=$?"
+        error "Failed to deploy maven artifacts. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
@@ -184,9 +189,9 @@ EOF
         exit 1
     fi
 
-    success "All branches in github called ${release_type} are now deleted. Yay!"
+    success "All maven artifacts in github called ${release_type} are now deployed. Yay!"
 }
 
 ask_user_for_release_type
 set_kubernetes_context
-delete_branches
+deploy_maven_artifacts

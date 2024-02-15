@@ -21,10 +21,13 @@ spec:
   - name: galasabldImageTag
     type: string
     default: main
+  - name: image
+    type: string
+    defualt: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.galasabldImageTag)
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.galasabldImageTag)
+    image: $(params.image)
     imagePullPolicy: Always
     command:
     - galasabld
