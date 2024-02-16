@@ -23,11 +23,11 @@ spec:
     default: main
   - name: image
     type: string
-    defualt: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.galasabldImageTag)
+    defualt: harbor.galasa.dev/galasadev/galasabld-amd64
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)
-    image: $(params.image)
+    image: $(params.image):$(params.galasabldImageTag)
     imagePullPolicy: Always
     command:
     - galasabld
@@ -37,3 +37,5 @@ spec:
       mountPath: /creds
     - name: harborcreds
       mountPath: /harborcreds
+    - name: mavencreds
+      mountPath: /mavencreds
