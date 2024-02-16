@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Build all the code in github release/prerelease branches.
+# Objectives: Deploys maven artifacts to OSS Sonatype
 #
 # Environment variable over-rides:
 # 
@@ -84,83 +84,69 @@ function ask_user_for_release_type {
                 break
                 ;;
             *)
-            echo "Unrecognised input.";;
+            echo "Unrecognised input."
+            exit 1
+            ;;
         esac
     done
     echo "Chosen type of release process: ${release_type}"
 }
 
+function ask_user_for_release_version {
+    h1 "Please type the version of this release..."
+
+    read -p "Please enter the version number: " version
+
+    echo "You are doing a release for version ${version}"
+}
+
 
 function set_kubernetes_context {
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
-    kubectl config set-context cicsk8s --namespace=galasa-build
+    namespace="galasa-build"
+    h1 "Setting the kubernetes context to be cicsk8s, using namespace ${namespace}"
+    kubectl config set-context cicsk8s --namespace=${namespace}
     rc=$?
     if [[ "${rc}" != "0" ]]; then 
         error "Failed. rc=${rc}"
         exit 1
     fi
+    success "Kubernetes context set to cicsk8s using namespace ${namespace}"
 }
 
 
 
-function build_all_code {
+function deploy_maven_artifacts {
 
-    yaml_file="build_code.yaml"
+    h1 "Deploying all Galasa artifacts at version ${version}"
 
-    rm -f temp/${yaml_file}
-    cat << EOF > temp/${yaml_file}
+    branch_name="${release_type}"
+
+    rm -f temp/deploy-maven-galasa.yaml
+    cat << EOF > temp/deploy-maven-galasa.yaml
 
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: complete-build-
+  generateName: deploy-maven-galasa-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
 spec:
   params:
-  - name: toBranch
-    value: ${release_type}
-  - name: revision
-    value: ${release_type}
-  - name: refspec
-    value: refs/heads/${release_type}:refs/heads/${release_type}
-  - name: imageTag
-    value: ${release_type}
-  - name: appname
-    value: ${release_type}-maven-repos
-  - name: jacocoEnabled
-    value: "false"
-    
-    # true if the branch is 'main' or 'release' or 'prerelease'
-    # This parameter is used by pom.xmls and build.gradles to complete GPG signing of the artefacts only if true
-  - name: isMainOrRelease
-    value: "true"
-# 
-# 
-# Start the Complete Build at the Wrapping pipeline
-# 
-# 
+  - name: version
+    value: "{$version}"
+  - name: image
+    value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:"{$release_type}"
   pipelineRef:
-    name: branch-wrapping
-  serviceAccountName: galasa-build-bot
-# 
-# 
-# 
+    name: deploy-maven-galasa
   podTemplate:
     volumes:
-    - name: gradle-properties
-      secret:
-        secretName: gradle-properties
-    - name: gpg-key
-      secret:
-        secretName: gpg-key
-    - name: mavengpg
-      secret:
-        secretName: mavengpg
     - name: githubcreds
       secret:
         secretName: github-token
@@ -170,25 +156,15 @@ spec:
     - name: mavencreds
       secret:
         secretName: maven-creds
-  workspaces:
-  - name: git-workspace
-    volumeClaimTemplate:
-      spec:
-        storageClassName: longhorn-temp
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 20Gi
 
 EOF
 
-    output=$(kubectl -n galasa-build create -f temp/${yaml_file})
+    output=$(kubectl -n galasa-build create -f temp/deploy-maven-galasa.yaml)
     # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/complete-build-part1-8cbj8 created
+    # pipelinerun.tekton.dev/deploy-maven-galasa-jzcvf created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to start the complete build pipeline. rc=$?"
+        error "Failed to deploy maven artifacts. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
@@ -196,13 +172,37 @@ EOF
 
     pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
 
+    MAX_WAIT_ITERATIONS=30
+    COUNTER=0
+    while [  $COUNTER -lt $MAX_WAIT_ITERATIONS ]; do
+        info "Sleeping, waiting for pipeline run ${pipeline_run_name} to succeed.." 
+        # Sleep for a second.
+        sleep 10
+        let COUNTER=COUNTER+1 
 
-    success "Branch build for Wrapping kicked off - this should trigger the full chain of builds up to and including Isolated (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic > CLI > Eclipse > Isolated)."
-    bold "Now use the tekton dashboard to monitor it to see that they all work."
-    note "If the 'Isolated' build completes OK, then we know that the complete build worked."
+        # Find the status of the pipeline run...
+        status=$(kubectl get $pipeline_run_name | tail -1 | xargs | cut -f2 -d' ')
+        if [[ "${status}" == "True" ]]; then
+            info "Pipeline run completed OK."
+            break
+        fi
+
+        if [[ "${status}" == "False" ]]; then
+            error "Pipeline run $pipeline_run_name failed."
+            exit 1
+            break
+        fi
+    done
+    
+    if [ ${COUNTER} -ge $MAX_WAIT_ITERATIONS ]; then 
+        error "Timed out waiting for pipeline run ${pipeline_run_name} to complete."
+        exit 1
+    fi
+
+    success "All maven artifacts have been successfully deployed. Yay!"
 }
 
-
 ask_user_for_release_type
+ask_user_for_release_version
 set_kubernetes_context
-build_all_code
+deploy_maven_artifacts

@@ -115,8 +115,11 @@ function delete_branches {
     cat << EOF > temp/delete_branches.yaml
 
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
@@ -135,6 +138,9 @@ spec:
     - name: harborcreds
       secret:
         secretName: harbor-creds-yaml
+    - name: mavencreds
+        secret:
+            secretName: maven-creds
   params:
   - name: distBranch
     value: "${branch_name}"

@@ -25,9 +25,21 @@ spec:
 #
   - name: deploy-maven
     taskRef: 
-      name: deploy-maven-galasa
+      name: galasabld
     params:
-    - name: version
-      value: $(params.version)
-    - name: repository
-      value: $(params.repository)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+      - maven
+      - deploy
+      - --repository
+      - $(params.repository)
+      - --local
+      - /usr/local/apache2/htdocs
+      - --group
+      - dev.galasa
+      - --version
+      - $(params.version)
+      - --credentials
+      - /mavencreds/mavencreds.yaml

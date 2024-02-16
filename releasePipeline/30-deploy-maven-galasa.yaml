@@ -17,3 +17,14 @@ spec:
     value: "x.xx.x"
   pipelineRef:
     name: deploy-maven-galasa
+  podTemplate:
+    volumes:
+    - name: githubcreds
+      secret:
+        secretName: github-token
+    - name: harborcreds
+      secret:
+        secretName: harbor-creds-yaml
+    - name: mavencreds
+      secret:
+        secretName: maven-creds

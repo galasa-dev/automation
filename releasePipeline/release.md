@@ -56,10 +56,10 @@ Once an approver has approved, you can move on.
 
 ### Deployment
 
-<!-- Commenting out the steps below for now as they do not work. An item is open to fix this. Temporary steps to work around this below: -->
-<!-- 1. Amend 30-deploy-maven-galasa.yaml and amend the version parameter to the release.
-1. Run `kubectl -n galasa-build create -f 30-deploy-maven-galasa.yaml` - Deploy the maven artifacts to OSS Sonatype. -->
-1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor using:
+1. Run the 30-deploy-maven-galasa.sh script - Deploys the maven artifacts to OSS Sonatype.
+
+<!-- Temporary steps if there are issues with the 30-deploy-maven-galasa.sh script: -->
+<!--  1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor using:
 
    ```
    docker pull harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:release
@@ -88,7 +88,7 @@ Once an approver has approved, you can move on.
    galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>
    ```
 
-7. `exit` the image.
+7. `exit` the image. -->
 <!-- End of temporary steps -->
 1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
 2. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
