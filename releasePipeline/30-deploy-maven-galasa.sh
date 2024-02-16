@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Deploys maven artifacts using galasabld
+# Objectives: Deploys maven artifacts to OSS Sonatype
 #
 # Environment variable over-rides:
 # 
