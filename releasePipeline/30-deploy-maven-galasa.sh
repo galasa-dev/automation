@@ -199,7 +199,7 @@ EOF
         exit 1
     fi
 
-    success "All maven artifacts for the current release are now deployed. Yay!"
+    success "All maven artifacts have been successfully deployed. Yay!"
 }
 
 ask_user_for_release_type
