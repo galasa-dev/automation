@@ -13,4 +13,4 @@ docker run \
     -v $(pwd)/config.yaml:/tmp/config.yaml \
     -v $(pwd)/latestId:/mnt/latestId \
     -e GITHUBTOKEN=${GITHUBTOKEN} \
-    harbor.galasa.dev/common/ghmonitor:test -org=${ORG_NAME} -hook=${HOOK_ID} -trigger-map=/tmp/config.yaml
+    harbor.galasa.dev/common/ghmonitor:main -org=${ORG_NAME} -hook=${HOOK_ID} -trigger-map=/tmp/config.yaml

@@ -269,7 +269,13 @@ func githubGet(url string, headers map[string]string) *http.Response {
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
 		log.Printf("githubGet - HTTP resp body: %s", string(b))
-		log.Fatalf(fmt.Sprintf("githubGet - HTTP response status: %s from %s", resp.Status, url))
+		
+		//if we get 404 just log an skip
+		if resp.StatusCode == http.StatusNotFound {
+			log.Printf("githubGet - HTTP resp code 404 from %s", url)
+		} else {
+			log.Fatalf(fmt.Sprintf("githubGet - HTTP response status: %s from %s", resp.Status, url))
+		}
 	}
 
 	return resp
