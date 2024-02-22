@@ -159,11 +159,10 @@ func getEventList() ([]string, error) {
 
 		if len(eventQueue) == 0 {
 			log.Printf("getEventList - No events to submit")
-			return eventQueue, err
-		}
-
-		for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
-			eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
+		} else {
+			for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
+				eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
+			}
 		}
 	}
 
