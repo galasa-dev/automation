@@ -34,6 +34,7 @@ var latestDeliveryId string
 const (
 	latestIdPath                            = "/mnt/latestId"
 	SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS = 120
+	EVENT_ID_NOT_FOUND_ERROR_MSG            = "HTTP Status Code 404 - Event Not Found"
 )
 
 var client = http.Client{
@@ -180,8 +181,14 @@ func submitEvents(events []string) error {
 		var hookRequest *http.Request
 		hookRequest, err = buildHookRequest(id)
 		if err != nil {
-			log.Printf("submitEvents - Error when building hook request: %v", err)
-			break
+			//skip events that return status 404 (not found)
+			if err.Error() == EVENT_ID_NOT_FOUND_ERROR_MSG {
+				log.Printf("submitEvents - skipping event %s", id)
+				continue
+			} else {
+				log.Printf("submitEvents - Error when building hook request: %v", err)
+				break
+			}
 		}
 
 		if hookRequest != nil {
@@ -210,26 +217,30 @@ func buildHookRequest(id string) (*http.Request, error) {
 	if err != nil {
 		log.Printf("buildHookRequest - Failed retrieving webhook request body. %v\n", err)
 	} else {
+		if resp.StatusCode == http.StatusNotFound {
+			log.Printf("buildHookRequest - unable to unmarshal into json request struct because event %s has response code of 404", id)
+			err = fmt.Errorf(EVENT_ID_NOT_FOUND_ERROR_MSG)
+		} else {
+			err = json.Unmarshal(b, &request)
+			if err == nil {
 
-		err = json.Unmarshal(b, &request)
-		if err == nil {
+				if eventType, ok := triggerMap.Events[request.Event]; ok {
+					url := eventType.EventListener
+					payload, _ := json.Marshal(request.Request.Payload)
+					webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
+					if err != nil {
+						return nil, err
+					}
 
-			if eventType, ok := triggerMap.Events[request.Event]; ok {
-				url := eventType.EventListener
-				payload, _ := json.Marshal(request.Request.Payload)
-				webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
-				if err != nil {
-					return nil, err
+					// Add headers
+					for k, v := range request.Request.Headers {
+						webhookRequest.Header.Add(k, v)
+					}
+
+					return webhookRequest, nil
+				} else {
+					log.Printf("buildHookRequest - No action required for type: %s\n", request.Event)
 				}
-
-				// Add headers
-				for k, v := range request.Request.Headers {
-					webhookRequest.Header.Add(k, v)
-				}
-
-				return webhookRequest, nil
-			} else {
-				log.Printf("buildHookRequest - No action required for type: %s\n", request.Event)
 			}
 		}
 	}
@@ -269,8 +280,8 @@ func githubGet(url string, headers map[string]string) *http.Response {
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
 		log.Printf("githubGet - HTTP resp body: %s", string(b))
-		
-		//if we get 404 just log an skip
+
+		//if we get 404 just log and skip
 		if resp.StatusCode == http.StatusNotFound {
 			log.Printf("githubGet - HTTP resp code 404 from %s", url)
 		} else {
