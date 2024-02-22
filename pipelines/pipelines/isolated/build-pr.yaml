@@ -634,7 +634,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: icr.io/galasadev/galasa-distibution:$(params.headSha)
+      value: icr.io/galasadev/galasa-distribution:$(params.headSha)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -741,7 +741,7 @@ spec:
         - pom.template 
         - --output
         - pom.xml 
-        - --isolated 
+        - --mvp 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
