@@ -180,6 +180,8 @@ spec:
 # 
 # 
 # 
+# Generate a pom.xml of all artefacts from the Framework, Extensions, Managers and OBR 
+# that should go into the Isolated zip using `galasabld template` 
   - name: generate-pom-full
     taskRef:
       name: galasabld
@@ -215,7 +217,8 @@ spec:
        workspace: git-workspace 
 # 
 # 
-#       
+#
+# Build the artefacts from the pom.xml that was just generated
   - name: maven-build-isolated1
     taskRef: 
       name: maven-build
@@ -237,8 +240,6 @@ spec:
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -Dgithub.token.read.packages.username=${GITHUB_TOKEN_READ_PACKAGES_USERNAME}
         - -Dgithub.token.read.packages.password=${GITHUB_TOKEN_READ_PACKAGES_PASSWORD}
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -253,6 +254,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the Isolated zip 
   - name: maven-build-isolated2
     taskRef: 
       name: maven-build
@@ -277,8 +279,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -293,6 +293,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the Isolated zip 
   - name: maven-build-isolated3
     taskRef: 
       name: maven-build
@@ -317,8 +318,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -333,6 +332,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the Isolated zip 
   - name: maven-build-isolated4
     taskRef: 
       name: maven-build
@@ -357,8 +357,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -373,6 +371,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the Isolated zip 
   - name: maven-build-isolated5
     taskRef: 
       name: maven-build
@@ -397,8 +396,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -412,7 +409,8 @@ spec:
        workspace: git-workspace         
 # 
 # 
-#    
+#
+# Build set of artefacts for the Isolated zip 
   - name: maven-build-isolated6
     taskRef: 
       name: maven-build
@@ -437,8 +435,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -453,6 +449,8 @@ spec:
 # 
 # 
 # 
+# Build the /javadoc directory of the Isolated zip which contains Javadoc files
+# for Galasa artefacts 
   - name: maven-build-javadoc
     taskRef: 
       name: maven-build
@@ -477,8 +475,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -493,6 +489,8 @@ spec:
 # 
 # 
 # 
+# Build the docs.jar for the Isolated zip which enables running the Galasa
+# website locally on a machine with the zip downloaded
   - name: maven-build-docs
     taskRef: 
       name: maven-build
@@ -519,8 +517,6 @@ spec:
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -Dgithub.token.read.packages.username=${GITHUB_TOKEN_READ_PACKAGES_USERNAME}
         - -Dgithub.token.read.packages.password=${GITHUB_TOKEN_READ_PACKAGES_PASSWORD}
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -535,6 +531,7 @@ spec:
 # 
 # 
 # 
+# Download the galasactl binaries
   - name: download-cli-binaries
     taskRef:
       name: script
@@ -562,7 +559,10 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace      
-
+# 
+# 
+# 
+# Copy the binaries into the /galasactl directory with `maven copy resources`
   - name: maven-build-galasactl
     taskRef: 
       name: maven-build
@@ -582,8 +582,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -597,7 +595,8 @@ spec:
        workspace: git-workspace              
 # 
 # 
-# 
+#
+# Build a Docker image containing the Isolated zip content
   - name: docker-build-isolated
     taskRef:
       name: docker-build
@@ -631,6 +630,7 @@ spec:
 # 
 # 
 # 
+# Build an isolated.tar file that hosts all the artefacts contained in the Isolated zip 
   - name: docker-build-tar-isolated
     taskRef:
       name: docker-build
@@ -644,7 +644,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/isolated/isolated-dockerfile
     - name: imageName
-      value: icr.io/galasadev/galasa-distibution:$(params.imageTag)
+      value: icr.io/galasadev/galasa-distribution:$(params.imageTag)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
@@ -658,6 +658,7 @@ spec:
 # 
 # 
 # 
+# Build all content into the Isolated zip format
   - name: maven-build-isolated-zip
     taskRef: 
       name: maven-build
@@ -679,8 +680,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -695,6 +694,8 @@ spec:
 # 
 # 
 # 
+# Build a Docker image that will be deployed to the development maven registry
+# so the Isolated zip can be downloaded from there
   - name: docker-build-isolated-zip
     taskRef:
       name: docker-build
@@ -721,6 +722,7 @@ spec:
 # 
 # 
 # 
+# Recycle the deployment that hosts the development maven registry for the Isolated zip 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
@@ -764,7 +766,8 @@ spec:
         ############## MVP ###############
 
 
-
+# Generate a pom.xml of all artefacts from the Framework, Extensions, Managers and OBR 
+# that should go into the MVP zip using `galasabld template` 
   - name: generate-pom-mvp
     taskRef:
       name: galasabld
@@ -793,13 +796,14 @@ spec:
         - pom.template 
         - --output
         - pom.xml 
-        - --isolated 
+        - --mvp 
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
 # 
 # 
-#        
+#
+# Build the artefacts from the pom.xml that was just generated
   - name: maven-build-mvp1
     taskRef: 
       name: maven-build
@@ -812,7 +816,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -820,8 +823,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -836,6 +837,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the MVP zip 
   - name: maven-build-mvp2
     taskRef: 
       name: maven-build
@@ -853,7 +855,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -861,8 +862,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -877,6 +876,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the MVP zip 
   - name: maven-build-mvp3
     taskRef: 
       name: maven-build
@@ -894,7 +894,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -902,8 +901,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -918,6 +915,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the MVP zip 
   - name: maven-build-mvp4
     taskRef: 
       name: maven-build
@@ -935,7 +933,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -943,8 +940,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -959,6 +954,7 @@ spec:
 # 
 # 
 # 
+# Build set of artefacts for the MVP zip 
   - name: maven-build-mvp5
     taskRef: 
       name: maven-build
@@ -976,7 +972,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -984,8 +979,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -999,7 +992,8 @@ spec:
        workspace: git-workspace         
 # 
 # 
-#    
+#
+# Build set of artefacts for the MVP zip 
   - name: maven-build-mvp6
     taskRef: 
       name: maven-build
@@ -1017,7 +1011,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -1025,8 +1018,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -1041,6 +1032,8 @@ spec:
 # 
 # 
 # 
+# Build the /javadoc directory of the MVP zip which contains Javadoc files
+# for Galasa artefacts 
   - name: maven-build-javadoc-mvp
     taskRef: 
       name: maven-build
@@ -1058,7 +1051,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -1066,8 +1058,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -1082,6 +1072,8 @@ spec:
 # 
 # 
 # 
+# Build the docs.jar for the MVP zip which enables running the Galasa
+# website locally on a machine with the zip downloaded
   - name: maven-build-docs-mvp
     taskRef: 
       name: maven-build
@@ -1099,7 +1091,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
         - -Dgalasa.simplatform.repo=https://development.galasa.dev/$(params.fromSimplatformBranch)/maven-repo/simplatform
@@ -1109,8 +1100,6 @@ spec:
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -Dgithub.token.read.packages.username=${GITHUB_TOKEN_READ_PACKAGES_USERNAME}
         - -Dgithub.token.read.packages.password=${GITHUB_TOKEN_READ_PACKAGES_PASSWORD}
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -1125,6 +1114,7 @@ spec:
 # 
 # 
 # 
+# Download the galasactl binaries
   - name: download-cli-binaries-mvp
     taskRef:
       name: script
@@ -1152,7 +1142,10 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace      
-
+# 
+# 
+# 
+# Copy the binaries into the /galasactl directory with `maven copy resources`
   - name: maven-build-galasactl-mvp
     taskRef: 
       name: maven-build
@@ -1172,8 +1165,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -1188,6 +1179,7 @@ spec:
 # 
 # 
 # 
+# Build a Docker image containing the MVP zip content
   - name: docker-build-mvp
     taskRef:
       name: docker-build
@@ -1221,6 +1213,7 @@ spec:
 # 
 # 
 # 
+# Build an isolated.tar file that hosts all the artefacts contained in the MVP zip 
   - name: docker-build-tar-mvp
     taskRef:
       name: docker-build
@@ -1248,6 +1241,7 @@ spec:
 # 
 # 
 # 
+# Build all content into the MVP zip format
   - name: maven-build-mvp-zip
     taskRef: 
       name: maven-build
@@ -1260,7 +1254,6 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
     - name: buildArgs
       value:
-        
         - -Dgalasa.target.repo=file:target/isolated/maven
         - -Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/isolated/mvp/repo
         - -Dgalasa.runtime.repo=https://development.galasa.dev/$(params.fromObrBranch)/maven-repo/obr
@@ -1269,8 +1262,6 @@ spec:
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
         - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
-        # - --settings
-        # - /workspace/git/$(context.pipelineRun.name)/isolated/settings.xml
         - -B
         - -e
         - -fae
@@ -1285,6 +1276,8 @@ spec:
 # 
 # 
 # 
+# Build a Docker image that will be deployed to the development maven registry
+# so the MVP zip can be downloaded from there
   - name: docker-build-mvp-zip
     taskRef:
       name: docker-build
@@ -1311,6 +1304,7 @@ spec:
 # 
 # 
 # 
+# Recycle the deployment that hosts the development maven registry for the MVP zip 
   - name: recycle-deployment-mvp
     taskRef:
       name: argocd-cli

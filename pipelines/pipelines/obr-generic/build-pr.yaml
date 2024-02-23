@@ -127,7 +127,7 @@ spec:
     - name: url
       value: https://github.com/galasa-dev/obr
     - name: revision
-      value: $(params.baseRef)
+      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
     - name: refspec
       value: refs/heads/main:refs/heads/main
     - name: depth
