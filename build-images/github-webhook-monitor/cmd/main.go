@@ -34,6 +34,7 @@ var latestDeliveryId string
 const (
 	latestIdPath                            = "/mnt/latestId"
 	SLEEP_TIME_SECONDS_BETWEEN_GITHUB_POLLS = 120
+	ERROR_MSG_EVENT_NOT_FOUND               = "GitHub tried to get more information about the event it previously told us about, but could not find it"
 )
 
 var client = http.Client{
@@ -126,7 +127,6 @@ func getEventList() ([]string, error) {
 		upToDate := false
 		// Look at the last 250 Events max
 		for page < 5 {
-
 			parseDeliveries(resp.Body, &deliveries)
 
 			// Loop through current page entries
@@ -159,11 +159,10 @@ func getEventList() ([]string, error) {
 
 		if len(eventQueue) == 0 {
 			log.Printf("getEventList - No events to submit")
-			return eventQueue, err
-		}
-
-		for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
-			eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
+		} else {
+			for i, j := 0, len(eventQueue)-1; i < j; i, j = i+1, j-1 {
+				eventQueue[i], eventQueue[j] = eventQueue[j], eventQueue[i]
+			}
 		}
 	}
 
@@ -177,11 +176,18 @@ func submitEvents(events []string) error {
 	// Now need to submit all events to event listener
 	for _, id := range events {
 		log.Printf("submitEvents - Inspecting event: %s", id)
+
 		var hookRequest *http.Request
 		hookRequest, err = buildHookRequest(id)
 		if err != nil {
-			log.Printf("submitEvents - Error when building hook request: %v", err)
-			break
+			//skip events that return status 404 (not found)
+			if err.Error() == ERROR_MSG_EVENT_NOT_FOUND {
+				log.Printf("submitEvents - skipping event %s", id)
+				continue
+			} else {
+				log.Printf("submitEvents - Error when building hook request: %v", err)
+				break
+			}
 		}
 
 		if hookRequest != nil {
@@ -205,36 +211,39 @@ func submitEvents(events []string) error {
 // Does a look up with the Github API to find the hook requests and payloads. Then creates new http request from output
 func buildHookRequest(id string) (*http.Request, error) {
 	var request jsontypes.WebhookRequest
+	var webhookRequest *http.Request
+
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("buildHookRequest - Failed retrieving webhook request body. %v\n", err)
 	} else {
-
-		err = json.Unmarshal(b, &request)
-		if err == nil {
-
-			if eventType, ok := triggerMap.Events[request.Event]; ok {
-				url := eventType.EventListener
-				payload, _ := json.Marshal(request.Request.Payload)
-				webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
-				if err != nil {
-					return nil, err
+		if resp.StatusCode == http.StatusNotFound {
+			log.Printf("buildHookRequest - unable to unmarshal into json request struct because event %s has response code of 404", id)
+			err = fmt.Errorf(ERROR_MSG_EVENT_NOT_FOUND)
+		} else {
+			err = json.Unmarshal(b, &request)
+			if err == nil {
+				eventType, ok := triggerMap.Events[request.Event]
+				if ok {
+					url := eventType.EventListener
+					payload, _ := json.Marshal(request.Request.Payload)
+					webhookRequest, err = http.NewRequest("POST", url, bytes.NewReader(payload))
+					if err == nil {
+						// Add headers
+						for k, v := range request.Request.Headers {
+							webhookRequest.Header.Add(k, v)
+						}
+					}
+				} else {
+					log.Printf("buildHookRequest - No action required for type: %s\n", request.Event)
 				}
-
-				// Add headers
-				for k, v := range request.Request.Headers {
-					webhookRequest.Header.Add(k, v)
-				}
-
-				return webhookRequest, nil
-			} else {
-				log.Printf("buildHookRequest - No action required for type: %s\n", request.Event)
 			}
 		}
 	}
 
-	return nil, err
+	return webhookRequest, err
 }
 
 // Extracts Delivery Json from body.
@@ -269,8 +278,8 @@ func githubGet(url string, headers map[string]string) *http.Response {
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
 		log.Printf("githubGet - HTTP resp body: %s", string(b))
-		
-		//if we get 404 just log an skip
+
+		//if we get 404 just log and skip
 		if resp.StatusCode == http.StatusNotFound {
 			log.Printf("githubGet - HTTP resp code 404 from %s", url)
 		} else {
