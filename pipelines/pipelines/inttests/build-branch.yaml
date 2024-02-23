@@ -127,8 +127,8 @@ spec:
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/inttests/repo"
         - "-Dgalasa.bootstrap=https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap"
-        - "-Dgalasa.skip.deploytestcatatlog=true" 
-        - "-Dgalasa.skip.bundletestcatatlog=false"     
+        - "-Dgalasa.skip.deploytestcatalog=true" 
+        - "-Dgalasa.skip.bundletestcatalog=false"     
     - name: command
       value: 
         - deploy 
