@@ -6,4 +6,4 @@ RUN mkdir /opt/wss-unified-agent
 
 RUN touch /opt/wss-unified-agent/wss-unified-agent.config
 
-RUN curl --location --remote-header-name --remote-name https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar -o /opt/wss-unified-agent/wss-unified-agent.jar
+RUN curl -L https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar -o /opt/wss-unified-agent/wss-unified-agent.jar
