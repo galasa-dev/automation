@@ -1,0 +1,3 @@
+FROM alpine:3.18.4
+
+RUN curl --location --remote-header-name --remote-name https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
