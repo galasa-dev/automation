@@ -2,6 +2,8 @@ FROM harbor.galasa.dev/docker_proxy_cache/library/alpine:3.18.4
 
 RUN apk --no-cache add curl
 
-RUN touch wss-unified-agent.config
+RUN mkdir /opt/wss-unified-agent
 
-RUN curl --location --remote-header-name --remote-name https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
+RUN touch /opt/wss-unified-agent/wss-unified-agent.config
+
+RUN curl --location --remote-header-name --remote-name https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar -o /opt/wss-unified-agent/wss-unified-agent.jar
