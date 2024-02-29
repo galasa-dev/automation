@@ -13,8 +13,6 @@ metadata:
 spec:
   tls:
   - hosts:
-    - p2.galasa.dev
-    - p2snapshot.galasa.dev
     - resources.galasa.dev
     - javadoc.galasa.dev
     - javadoc-snapshot.galasa.dev
@@ -22,28 +20,7 @@ spec:
     - development.galasa.dev
     secretName: galasa-wildcard-cert
   rules:
-  - host: p2.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: p2stable
-            port:
-              number: 80
-        path: /
-        pathType: ImplementationSpecific
-  - host: p2snapshot.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: p2-snapshot
-            port:
-              number: 80
-        path: /
-        pathType: ImplementationSpecific
-
-
+ 
   - host: javadoc.galasa.dev
     http:
       paths:
