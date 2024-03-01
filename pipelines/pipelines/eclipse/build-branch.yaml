@@ -162,7 +162,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - branch-docker-build-eclipse
+    - branch-maven-build-eclipse
     params:
     - name: server
       value: argocd.galasa.dev
@@ -204,7 +204,7 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
-    - wait-deployment-p2
+    - wait-deployment
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
