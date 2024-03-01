@@ -249,47 +249,6 @@ spec:
 # 
 # 
 # 
-  - name: recycle-deployment-p2
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - wait-deployment
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appnameMavenRepos)
-      - restart
-      - --kind 
-      - Deployment
-      - --resource-name
-      - p2-$(params.imageTag) 
-# 
-# 
-# 
-  - name: wait-deployment-p2
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - recycle-deployment-p2
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - wait
-      - $(params.appnameMavenRepos)
-      - --resource
-      - apps:Deployment:p2-$(params.imageTag) 
-      - --health    
-# 
-# 
-# 
   # Trigger Isolated
   - name: trigger-isolated
     taskRef:
