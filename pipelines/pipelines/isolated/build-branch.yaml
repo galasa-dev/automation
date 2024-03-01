@@ -22,9 +22,6 @@ spec:
   - name: fromJavadocBranch
     type: string
     default: main
-  - name: fromEclipseBranch
-    type: string
-    default: main
   - name: toBranch
     type: string
     default: main
@@ -237,7 +234,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -Dgithub.token.read.packages.username=${GITHUB_TOKEN_READ_PACKAGES_USERNAME}
         - -Dgithub.token.read.packages.password=${GITHUB_TOKEN_READ_PACKAGES_PASSWORD}
         - -B
@@ -278,7 +274,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -317,7 +312,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -356,7 +350,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -395,7 +388,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -434,7 +426,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -474,7 +465,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -514,7 +504,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -Dgithub.token.read.packages.username=${GITHUB_TOKEN_READ_PACKAGES_USERNAME}
         - -Dgithub.token.read.packages.password=${GITHUB_TOKEN_READ_PACKAGES_PASSWORD}
         - -B
@@ -581,7 +570,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -679,7 +667,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -822,7 +809,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -861,7 +847,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -900,7 +885,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -939,7 +923,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -978,7 +961,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -1017,7 +999,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -1057,7 +1038,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -1097,7 +1077,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -Dgithub.token.read.packages.username=${GITHUB_TOKEN_READ_PACKAGES_USERNAME}
         - -Dgithub.token.read.packages.password=${GITHUB_TOKEN_READ_PACKAGES_PASSWORD}
         - -B
@@ -1164,7 +1143,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
@@ -1261,7 +1239,6 @@ spec:
         - -Dgalasa.javadoc.repo=https://development.galasa.dev/$(params.fromJavadocBranch)/maven-repo/javadoc
         - -Dgalasa.docs.repo=https://maven.pkg.github.com/galasa-dev/galasa.dev
         - -Dgalasa.central.repo=https://repo.maven.apache.org/maven2/
-        - -Dgalasa.eclipse.repo=https://development.galasa.dev/$(params.fromEclipseBranch)/maven-repo/eclipse
         - -B
         - -e
         - -fae
