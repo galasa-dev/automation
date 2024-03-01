@@ -158,56 +158,6 @@ spec:
 # 
 # 
 # 
-  - name: branch-docker-build-eclipse
-    taskRef:
-      name: docker-build
-    runAfter:
-    - get-commit
-    - branch-maven-build-eclipse
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/eclipse
-    - name: dockerfilePath
-      value: automation/dockerfiles/eclipse/eclipse-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-eclipse:$(params.imageTag)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=baseVersion=latest"
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
-    workspaces:
-      - name: git-workspace
-        workspace: git-workspace
-# 
-# 
-# 
-  - name: branch-docker-build-eclipse-p2
-    taskRef:
-      name: docker-build
-    runAfter:
-    - get-commit
-    - branch-maven-build-eclipse
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: dockerfilePath
-      value: automation/dockerfiles/eclipse/eclipse-p2-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-p2:$(params.imageTag)
-    - name: noPush
-      value: ""
-    workspaces:
-      - name: git-workspace
-        workspace: git-workspace  
-# 
-# 
-# 
   - name: recycle-deployment
     taskRef:
       name: argocd-cli
