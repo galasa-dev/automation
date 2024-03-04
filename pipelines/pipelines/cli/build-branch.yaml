@@ -454,12 +454,12 @@ spec:
      
   #----------------------------------------------------------------
 
-  # Trigger Eclipse 
-  - name: trigger-eclipse
+  # Trigger Isolated
+  - name: trigger-isolated
     taskRef:
       name: tkn-cli
     runAfter:
-    - wait-cli-binary
+    - wait-deployment
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
@@ -467,15 +467,17 @@ spec:
       value: 
       - pipeline
       - start
-      - branch-eclipse
+      - branch-isolated
       - -n
       - galasa-build
       - --prefix-name 
-      - trigger-eclipse-$(params.toBranch)
+      - trigger-isolated-$(params.toBranch)
       - --param
-      - fromObrBranch=$(params.toBranch)
+      - fromObrBranch=$(params.fromObrBranch)
       - --param
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
+      - --param
+      - fromJavadocBranch=$(params.toBranch)
       - --param
       - toBranch=$(params.toBranch)
       - --param
@@ -486,7 +488,6 @@ spec:
       - imageTag=$(params.imageTag)
       - --param
       - appnameMavenRepos=$(params.appnameMavenRepos)
-      - --use-param-defaults # This will pick up the default Eclipse version we have set
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
       - --pod-template
