@@ -698,3 +698,29 @@ spec:
   #       - $(params.distBranch)
   #       - --credentials
   #       - /harborcreds/harborcreds.yaml
+# 
+####### Helm
+# 
+# Only delete the branch on the helm repository during a 'release'
+# A 'prerelease' branch isn't created...
+  - name: delete-branch-helm
+    when:
+      - input: "$(params.distBranch)"
+        operator: in
+        values: ["release"]
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - helm
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml

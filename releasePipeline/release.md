@@ -109,6 +109,11 @@ The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to comp
 3. 52-deploy-cli-release.md - Follow instructions to deploy the CLI to the repo release.
 
 
+### Release new version of the Galasa Ecosystem Helm chart
+
+1. Run the `53-release-helm-chart.sh` script - It pushes the latest code at 'release' to the 'released' branch which kicks off a GitHub Actions workflow.
+
+
 ### Bump to new version
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.

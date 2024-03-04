@@ -289,3 +289,34 @@ spec:
         - $(params.force)
         - --credentials
         - /creds/githubcreds.yaml
+# 
+# 
+# 
+# Only create a new branch on the helm repository during a 'release'
+# Ignore for 'prerelease' as releasing helm does not require
+# inspecting any maven artefacts for correct signing etc.
+  - name: clone-branch-helm
+    when:
+      - input: "$(params.distBranch)"
+        operator: in
+        values: ["release"]
+    taskRef: 
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - helm
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /creds/githubcreds.yaml
