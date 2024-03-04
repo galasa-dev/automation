@@ -197,7 +197,7 @@ EOF
     pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
 
 
-    success "Branch build for Wrapping kicked off - this should trigger the full chain of builds up to and including Isolated (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic > CLI > Eclipse > Isolated)."
+    success "Branch build for Wrapping kicked off - this should trigger the full chain of builds up to and including Isolated (Wrapping > Gradle > Maven > Framework > Extensions > OBR > OBR Generic > CLI > Isolated)."
     bold "Now use the tekton dashboard to monitor it to see that they all work."
     note "If the 'Isolated' build completes OK, then we know that the complete build worked."
 }
