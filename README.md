@@ -42,11 +42,10 @@ This directory is the single location for all Dockerfiles needed to build the im
 | Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, github-monitor, github-receiver, gpg, kubectl, openapi, openjdk11-ibm, swagger, tkn, unzip | 
 | Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
-| Maven repositories for the built Galasa core components | wrapping, gradle, maven, framework, extensions, managers, obr, cli-binary, eclipse, isolated |
+| Maven repositories for the built Galasa core components | wrapping, gradle, maven, framework, extensions, managers, obr, cli-binary, isolated |
 | Maven repositories for other components | galasabld-binary, javadoc-maven-repo |
 | Galasa runtime images | obrGeneric, bootEmbedded, ibmBootEmbedded | 
 | Galasa CLI | cli, cli-ibm |
-| Galasa Eclipse plug-in | eclipse-p2 |
 | Galasa Isolated build | isolatedZip |
 | Galasa Integrated tests | inttests |
 | Galasa build utilities | galasabld, galasabld-ibm, galasabld-obr | 
@@ -220,21 +219,6 @@ The CLI binaries are downloadable from [here](https://development.galasa.dev/mai
 _More documentation to be written._ 
 
 
-**Eclipse**
-
-These pipelines build the [Galasa Eclipse plug-in](https://github.com/galasa-dev/eclipse).
-
-pr-eclipse:
-The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The pipeline then clones the Automation repository at the main branch and the Eclipse repository at the PR's branch. It gets the commit sha of the latest commit in the PR. It then sets up the GPG key for Maven to use, then runs a Maven build of the repository. Docker images are then built to host the artefacts in a Maven repository, and to host the Eclipse plug-in. The pipeline then reports on the status of the builds back to the PR.
-
-branch-eclipse:
-The pipeline first clones the Automation and Eclipse repositories at the main branch, then gets the commit sha of the latest commit on the main branch. It then follows the same steps as pr-eclipse, apart from reporting back to a PR. Finally, the deployment which hosts the Maven repository is recycled to update it with the latest artefacts.
-
-The Docker image for the Maven repo for Eclipse is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-eclipse/artifacts-tab) and the image for the Eclipse P2 site is [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-eclipse-p2/artifacts-tab).
-
-The Eclipse Maven repository is [here](https://development.galasa.dev/main/maven-repo/eclipse).
-
-
 **Extensions**
 
 These pipelines build the [Galasa Extensions](https://github.com/galasa-dev/extensions).
@@ -399,12 +383,12 @@ pr-obr-generic:
 The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. It then clones the Automation, Framework, Extensions and Managers repositories at the main branch, and the OBR repository at the PR's branch. galasabld generates a pom for OBR generic and it is built with Maven, then a Docker image built. Property files are then copied to build the the runtimes of Galasa. The status of the pipeline is then returned to the PR. 
 
 branch-obr-generic:
-This pipeline follows the same steps as the pr-obr-generic pipeline other than verifying the author of or returning status back to a PR. It then triggers either the branch-eclipse pipeline or the branch-isolated pipeline depending on whether a Main build or Complete build is occurring.
+This pipeline follows the same steps as the pr-obr-generic pipeline other than verifying the author of or returning status back to a PR. It then triggers either the branch-helm and run-tests pipelines if doing a Main build, or branch-cli if doing a Complete build.
 
 
 **Simplatform**
 
-These pipelines build the Galasa SimBank Eclipse plug-in, Simbank applications (_to-do_) and and set of sample Simbank tests, all stored in the [Simplatform repository](https://github.com/galasa-dev/simplatform).
+These pipelines build the Galasa Simbank applications (_to-do_) and and set of sample Simbank tests, all stored in the [Simplatform repository](https://github.com/galasa-dev/simplatform).
 
 pr-simplatform:
 The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. The Automation repository is cloned at the main branch and the Simplatform repository at the PR's branch. It gets the commit sha of the latest commit in the PR, then sets up the GPG key for Maven to use. Maven builds the Simplatform application and then the Simbank tests. Docker builds the Simplatform artefacts and then an executable Jar for the Simplatform app. The status of the pipeline is then returned to the PR.  

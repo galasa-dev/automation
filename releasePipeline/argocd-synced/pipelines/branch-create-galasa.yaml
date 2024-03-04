@@ -244,30 +244,6 @@ spec:
 #
 #
 #
-  - name: clone-branch-eclipse
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - eclipse
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
   - name: clone-branch-isolated
     taskRef: 
       name: galasabld
