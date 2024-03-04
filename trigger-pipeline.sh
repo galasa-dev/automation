@@ -69,7 +69,6 @@ Options are:
 --managers
 --obr
 --cli
---eclipse
 --wrapping
 --obr-generic
 --simplatform
@@ -116,8 +115,6 @@ while [ "$1" != "" ]; do
         --obr )                 pipeline="obr"
                                 ;;
         --cli )                 pipeline="cli"
-                                ;;
-        --eclipse )             pipeline="eclipse"
                                 ;;
         --wrapping )            pipeline="wrapping"
                                 ;;
