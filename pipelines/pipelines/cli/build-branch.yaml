@@ -473,7 +473,7 @@ spec:
       - --prefix-name 
       - trigger-isolated-$(params.toBranch)
       - --param
-      - fromObrBranch=$(params.fromObrBranch)
+      - fromObrBranch=$(params.toBranch)
       - --param
       - fromSimplatformBranch=$(params.fromSimplatformBranch)
       - --param
