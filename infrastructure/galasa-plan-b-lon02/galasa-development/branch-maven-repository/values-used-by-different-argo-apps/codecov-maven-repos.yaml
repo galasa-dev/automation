@@ -42,16 +42,6 @@ gradle:
   branch: codecov
   imageName: harbor.galasa.dev/galasadev/galasa-gradle
   imageTag: codecov
-eclipse:
-  deploy: true
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-eclipse
-  imageTag: codecov
-p2:
-  deploy: true
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-p2
-  imageTag: codecov  
 isolated:
   deploy: true
   branch: codecov
