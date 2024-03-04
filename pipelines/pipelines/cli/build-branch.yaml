@@ -459,7 +459,7 @@ spec:
     taskRef:
       name: tkn-cli
     runAfter:
-    - wait-deployment
+    - wait-cli-binary
     params:
     - name: context
       value: $(context.pipelineRun.name)/automation
