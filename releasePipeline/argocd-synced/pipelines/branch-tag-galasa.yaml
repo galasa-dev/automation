@@ -198,28 +198,6 @@ spec:
 #
 #
 #
-  - name: tag-branch-eclipse
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - eclipse
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
   - name: tag-branch-isolated
     taskRef:
       name: galasabld
