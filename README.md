@@ -383,7 +383,7 @@ pr-obr-generic:
 The pipeline first verifies that the author of the PR to the repository is either an approved code-committer or code-admin, before attempting to build any code. It then clones the Automation, Framework, Extensions and Managers repositories at the main branch, and the OBR repository at the PR's branch. galasabld generates a pom for OBR generic and it is built with Maven, then a Docker image built. Property files are then copied to build the the runtimes of Galasa. The status of the pipeline is then returned to the PR. 
 
 branch-obr-generic:
-This pipeline follows the same steps as the pr-obr-generic pipeline other than verifying the author of or returning status back to a PR. It then triggers either the branch-isolated pipeline. 
+This pipeline follows the same steps as the pr-obr-generic pipeline other than verifying the author of or returning status back to a PR. It then triggers either the branch-helm and run-tests pipelines if doing a Main build, or branch-cli if doing a Complete build.
 
 
 **Simplatform**
