@@ -36,18 +36,12 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
    d. Repeat as required.
 
 
-### Test the Eclipse plug-in and Simbank tests manually
-
-1. Follow the [instructions](https://galasa.dev/docs/getting-started/installing-online) provided in our documentation to install the Eclipse plug-in, but instead of installing from https://p2.galasa.dev, install the release candidate from https://development.galasa.dev/release/maven-repo/p2/. Ensure you are using a [supporting version of Eclipse](https://galasa.dev/docs/getting-started) and Java 11.
-2. Follow the [instructions](https://galasa.dev/docs/getting-started/simbank) provided to explore Simbank and run the supplied Simbank tests. Complete both sections 'Creating an example Galasa project using Maven' and 'Creating an example Galasa project using Gradle'. You will need to update your Galasa preferences (Eclipse > Settings > Galasa) and set the Remote Maven URI to https://development.galasa.dev/release/maven-repo/obr so Galasa can access the code to be released.
-
-
 ### Obtain release approval (if release Distribution for Galasa)
 
 1. Ask the Team and Product managers for release approval by:
    1. Finding the GitHub issue related to the release you are working on in the GHE repository cics/cics-ts-tracking.
    2. Checking off the tasks that are listed in the issue.
-   3. Commenting, ensuring to tag the approvers (Roger and Simon) with a link to the regression test results for the 'release' branch on the Phoenix dashboard. Explain any failures that are due to external problems if necessary. Confirm manual installation of Eclipse plug-in and Simbank were successful.
+   3. Commenting, ensuring to tag the approvers (Roger and Simon) with a link to the regression test results for the 'release' branch on the Phoenix dashboard. Explain any failures that are due to external problems if necessary.
 
 Have a look at the GHE issues for previous releases for examples on how this has been done before. 
 
@@ -99,7 +93,6 @@ Once an approver has approved, you can move on.
 ### Update reference sites
 
 1. 40-argocd-ibmcloud.md - Follow the instructions to update the IBM Cloud Galasa external sites.
-2. 41-eclipse-marketplace.md - Follow the instructions to update the Eclipse Marketplace to advertise the latest Eclipse plugin.
 
 
 ### Tag release and deploy CLI
