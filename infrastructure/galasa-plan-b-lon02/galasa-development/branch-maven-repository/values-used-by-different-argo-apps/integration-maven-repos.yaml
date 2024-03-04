@@ -42,16 +42,6 @@ gradle:
   branch: integration
   imageName: harbor.galasa.dev/galasadev/galasa-gradle
   imageTag: integration
-eclipse:
-  deploy: true
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-eclipse
-  imageTag: integration
-p2:
-  deploy: true
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-p2
-  imageTag: integration  
 isolated:
   deploy: true
   branch: integration

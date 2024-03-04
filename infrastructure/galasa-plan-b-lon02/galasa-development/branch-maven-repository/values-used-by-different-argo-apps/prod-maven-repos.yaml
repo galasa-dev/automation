@@ -42,16 +42,6 @@ gradle:
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-gradle
   imageTag: main
-eclipse:
-  deploy: true
-  branch: prod
-  imageName: harbor.galasa.dev/galasadev/galasa-eclipse
-  imageTag: prod
-p2:
-  deploy: true
-  branch: prod
-  imageName: harbor.galasa.dev/galasadev/galasa-p2
-  imageTag: prod  
 isolated:
   deploy: true
   branch: prod
