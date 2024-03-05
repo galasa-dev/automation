@@ -635,13 +635,7 @@ spec:
 # 
 ####### Helm
 # 
-# Only delete the branch on the helm repository during a 'release'
-# A 'prerelease' branch isn't created...
   - name: delete-branch-helm
-    when:
-      - input: "$(params.distBranch)"
-        operator: in
-        values: ["release"]
     taskRef:
       name: galasabld
     params:

@@ -268,14 +268,7 @@ spec:
 # 
 # 
 # 
-# Only create a new branch on the helm repository during a 'release'
-# Ignore for 'prerelease' as releasing helm does not require
-# inspecting any maven artefacts for correct signing etc.
   - name: clone-branch-helm
-    when:
-      - input: "$(params.distBranch)"
-        operator: in
-        values: ["release"]
     taskRef: 
       name: galasabld
     params:
