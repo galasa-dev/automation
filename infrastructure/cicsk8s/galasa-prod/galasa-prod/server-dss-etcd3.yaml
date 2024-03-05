@@ -29,7 +29,7 @@ spec:
         applevel: critical
       containers:
       - name: etcd
-        image: harbor.galasa.dev/infrastructure/etcd:v3.2.25
+        image: quay.io/coreos/etcd:v3.2.25
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 2379
