@@ -71,8 +71,29 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 mkdir -p ${WORKSPACE_DIR}/temp
 
 
+function ask_user_for_release_type {
+    PS3="Select the type of release process please: "
+    select lng in release pre-release
+    do
+        case $lng in
+            "release")
+                export release_type="release"
+                break
+                ;;
+            "pre-release")
+                export release_type="prerelease"
+                break
+                ;;
+            *)
+            echo "Unrecognised input.";;
+        esac
+    done
+    echo "Chosen type of release process: ${release_type}"
+}
+
+
 function get_galasa_version_to_be_released {
-    h1 "Working out the version of Galasa to release."
+    h1 "Working out the version of Galasa that is being released."
 
     url="https://development.galasa.dev/main/maven-repo/obr/dev/galasa/dev.galasa.uber.obr/"
     curl $url > temp/galasa-version.txt -s
@@ -85,20 +106,22 @@ function get_galasa_version_to_be_released {
     # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
     galasa_version=$(cat temp/galasa-version.txt | grep "<a href" | head -2 | tail -1 | cut -f2 -d'"' | cut -f1 -d'/')
 
-    success "Galasa version to be released is ${galasa_version}"
+    success "Galasa version being released is ${galasa_version}"
     export galasa_version
 }
 
+
 function clone_helm_repository {
 
-    h1 "Cloning the 'release' branch of the 'helm' repository into the 'temp' directory..."
+    h1 "Cloning the '${release_type}' branch of the 'helm' repository into the 'temp' directory..."
 
     cd ${WORKSPACE_DIR}/temp
-    git clone --branch release git@github.com:galasa-dev/helm.git
+    git clone --branch ${release_type} git@github.com:galasa-dev/helm.git
     
-    success "'release' branch of the 'helm' repository cloned."
+    success "'${release_type}' branch of the 'helm' repository cloned."
 
 }
+
 
 function get_helm_charts {
 
@@ -124,44 +147,6 @@ function get_helm_charts {
 
 }
 
-function release_helm_charts {
-
-    cd ${WORKSPACE_DIR}
-
-    h1 "Releasing the Helm charts by pushing the 'release' branch to 'released' which will trigger the GitHub Actions workflow..."
-
-    # Push the contents of the branch 'release' to 'released'
-    git push origin release:released
-
-    info "Check that a GitHub Actions workflow has been kicked off..."
-
-    workflow_started="false"
-    retries=0
-    max=100
-    target_line=""
-
-    while [[ "${workflow_started}" == "false" ]]; do
-
-        url=https://api.github.com/repos/galasa-dev/helm/actions/runs?status=in_progress
-        curl $url > temp/workflows_in_progress.txt -s
-
-        target_line=$(cat temp/workflows_in_progress.txt | grep "\"total_count\": 1")
-
-        if [[ "$target_line" != "" ]]; then
-            success "Target line is found - the workflow is now running."
-            workflow_started="true"
-        fi    
-        sleep 5
-        ((retries++))
-        if (( $retries > $max )); then 
-            error "Too many retries."
-            exit 1
-        fi
-    done
-
-    success "GitHub Actions workflow for releasing the Helm charts has started."
-
-}
 
 function check_helm_charts_released {
 
@@ -169,7 +154,7 @@ function check_helm_charts_released {
 
     h1 "Checking the Helm charts were released..."
 
-    info "First, waiting for the GitHub Actions workflow to finish..."
+    info "First, checking that the GitHub Actions workflow to release them, is no longer active..."
 
     workflow_finished="false"
     retries=0
@@ -210,16 +195,34 @@ function check_helm_charts_released {
             error "Release $release_tag does not exist in the repository."
             exit 1
         fi
+
+        info "Checking if the "$release_tag" tag was created"
+
+        url="https://api.github.com/repos/galasa-dev/helm/tags"
+        curl $url > temp/helm-tags.txt -s
+
+        target_line=$(cat temp/helm-tags.txt | grep "\"name\": \"${release_tag}\"")
+
+        if [[ "$target_line" != "" ]]; then
+            success "Tag $release_tag exists in the repository."
+        else
+            error "Tag $release_tag does not exist in the repository."
+            exit 1
+        fi
+
     done
 
-    success "All Helm charts released OK."
+    success "All Helm charts released OK. Yay!"
 
 }
 
+ask_user_for_release_type
 get_galasa_version_to_be_released
 
 clone_helm_repository
 get_helm_charts
-
-release_helm_charts
 check_helm_charts_released
+
+if [[ "$release_type" == "prerelease" ]]; then
+    bold "This is a pre-release. We don't actually want to keep the Release/Tags that were just created. Make sure to delete them!"
+fi
