@@ -24,7 +24,12 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 1. Ensure you have completed the [set up](#set-up) before continuing.
 2. Run [02-create-argocd-apps.sh](./02-create-argocd-apps.sh). When prompted, choose the '`release`' option.
 3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`release`' option.  
-4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`release`' option. 
+4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`release`' option. **Note:** Creating this branch in the 'Helm' repository is all that is required to trigger the GitHub Actions workflow that packages and releases a new Tag and Release of the Helm charts. 
+
+
+### Check the Helm charts were released
+
+1. Run [05-helm-charts.sh](./05-helm-charts.sh). When prompted, choose the '`release`' option. This script uses the GitHub API to check that all Helm charts that had changes in this release have a new Release and Tag object on GitHub. 
 
 ### Build and test the Galasa core components
 
