@@ -73,6 +73,7 @@ Options are:
 --obr-generic
 --simplatform
 --isolated
+-p | --pipeline xxx : Set the name of pipeline to run explicitly
 
 Environment variables used:
 None
@@ -102,27 +103,30 @@ pipeline=""
 
 while [ "$1" != "" ]; do
     case $1 in
-        --gradle )              pipeline="gradle"
+        --gradle )              pipeline="branch-gradle"
                                 ;;
-        --maven )               pipeline="maven"
+        --maven )               pipeline="branch-maven"
                                 ;;
-        --framework )           pipeline="framework"
+        --framework )           pipeline="branch-framework"
                                 ;;
-        --extensions )          pipeline="extensions"
+        --extensions )          pipeline="branch-extensions"
                                 ;;
-        --managers )            pipeline="managers"
+        --managers )            pipeline="branch-managers"
                                 ;;
-        --obr )                 pipeline="obr"
+        --obr )                 pipeline="branch-obr"
                                 ;;
-        --cli )                 pipeline="cli"
+        --cli )                 pipeline="branch-cli"
                                 ;;
-        --wrapping )            pipeline="wrapping"
+        --wrapping )            pipeline="branch-wrapping"
                                 ;;
-        --obr-generic )         pipeline="obr-generic"
+        --obr-generic )         pipeline="branch-obr-generic"
                                 ;;
-        --simplatform )         pipeline="simplatform"
+        --simplatform )         pipeline="branch-simplatform"
                                 ;;
-        --isolated )            pipeline="isolated"
+        --isolated )            pipeline="branch-isolated"
+                                ;;
+        -p | --pipeline )       shift
+                                pipeline=$1
                                 ;;
 
         -h | --help )           usage
@@ -145,7 +149,7 @@ fi
 check_tkn_installed
 
 
-tkn pipeline start branch-$pipeline -n galasa-build --prefix-name trigger-$pipeline-main \
+tkn pipeline start $pipeline -n galasa-build --prefix-name trigger-$pipeline-main \
 --workspace name=git-workspace,volumeClaimTemplateFile=pipelines/templates/git-workspace-template.yaml \
 --pod-template pipelines/templates/pod-template.yaml --serviceaccount galasa-build-bot --use-param-defaults
 
