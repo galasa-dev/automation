@@ -580,7 +580,26 @@ spec:
         - validate    
     workspaces:
      - name: git-workspace
-       workspace: git-workspace              
+       workspace: git-workspace 
+#
+#
+#
+  - name: copy-resources-isolated
+    taskRef:
+      name: general-command
+    runAfter:
+      - clone-isolated
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/isolated/full
+    - name: command
+      value:
+        - cp
+        - resources/*
+        - target/isolated/     
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
 # 
 # 
 #
@@ -598,6 +617,7 @@ spec:
     - maven-build-javadoc
     - maven-build-docs
     - maven-build-galasactl
+    - copy-resources-isolated
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -1153,7 +1173,26 @@ spec:
         - validate    
     workspaces:
      - name: git-workspace
-       workspace: git-workspace              
+       workspace: git-workspace    
+#
+#
+#
+  - name: copy-resources-mvp
+    taskRef:
+      name: general-command
+    runAfter:
+      - clone-isolated
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/isolated/mvp
+    - name: command
+      value:
+        - cp
+        - resources/*
+        - target/isolated/     
+    workspaces:
+      - name: git-workspace
+        workspace: git-workspace
 # 
 # 
 # 
@@ -1171,6 +1210,7 @@ spec:
     - maven-build-javadoc-mvp
     - maven-build-docs-mvp
     - maven-build-galasactl-mvp
+    - copy-resources-mvp
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
