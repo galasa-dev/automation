@@ -139,8 +139,8 @@ spec:
       secret:
         secretName: harbor-creds-yaml
     - name: mavencreds
-        secret:
-            secretName: maven-creds
+      secret:
+        secretName: maven-creds
   params:
   - name: distBranch
     value: "${branch_name}"

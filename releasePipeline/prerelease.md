@@ -19,9 +19,13 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`pre-release`' option. 
 This script kicks off a pipeline to delete all branches called `prerelease` in all the github repositories, so we know they are clean.
 4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`pre-release`' option.  This script creates
-a new branch called `prerelease` in every github repo we need to build.
-5. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`pre-release`' option.
-6. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option. 
+a new branch called `prerelease` in every github repo we need to build. **Note:** Creating this branch in the 'Helm' repository is all that is required to trigger the GitHub Actions workflow that packages and releases a new Tag and Release of the Helm charts. As this is a prerelease, they will need to be deleted after.
+5. Run [05-helm-charts.sh](./05-helm-charts.sh). When prompted, choose the '`pre-release`' option. This script uses the GitHub API to check that all Helm charts that had changes in this release have a new Release and Tag object on GitHub. 
+6. Delete all Releases and Tags for the Helm charts that were just created by pushing to the `prerelease` branch.
+    1. Delete all Releases that were created: [Releases](https://github.com/galasa-dev/helm/releases) - Next to a Release, click the Delete icon and 'Delete this release'.
+    2. Delete all Tags that were created: [Tags](https://github.com/galasa-dev/helm/tags) - Next to a Tag, click the three dots, then 'Delete Tag' then 'Delete this Tag'.
+7. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`pre-release`' option.
+8. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option. 
     - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
-7. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+9. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.

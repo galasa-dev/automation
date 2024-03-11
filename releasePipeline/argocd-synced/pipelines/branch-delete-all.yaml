@@ -632,3 +632,23 @@ spec:
   #       - $(params.distBranch)
   #       - --credentials
   #       - /harborcreds/harborcreds.yaml
+# 
+####### Helm
+# 
+  - name: delete-branch-helm
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - helm
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml

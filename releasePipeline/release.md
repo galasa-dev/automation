@@ -19,13 +19,22 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
 ## Release steps
 
+### Set up the ArgoCD apps and GitHub branches for the release
+
 1. Ensure you have completed the [set up](#set-up) before continuing.
 2. Run [02-create-argocd-apps.sh](./02-create-argocd-apps.sh). When prompted, choose the '`release`' option.
 3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`release`' option.  
-4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`release`' option. 
+4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`release`' option. **Note:** Creating this branch in the 'Helm' repository is all that is required to trigger the GitHub Actions workflow that packages and releases a new Tag and Release of the Helm charts. 
 
-5. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
-6. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
+
+### Check the Helm charts were released
+
+1. Run [05-helm-charts.sh](./05-helm-charts.sh). When prompted, choose the '`release`' option. This script uses the GitHub API to check that all Helm charts that had changes in this release have a new Release and Tag object on GitHub. 
+
+### Build and test the Galasa core components
+
+1. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`release`' option.
+2. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
 
    a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
 
@@ -35,8 +44,7 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
    d. Repeat as required.
 
-
-### Obtain release approval (if release Distribution for Galasa)
+### Obtain release approval (if releasing Distribution for Galasa)
 
 1. Ask the Team and Product managers for release approval by:
    1. Finding the GitHub issue related to the release you are working on in the GHE repository cics/cics-ts-tracking.
@@ -47,8 +55,7 @@ Have a look at the GHE issues for previous releases for examples on how this has
 
 Once an approver has approved, you can move on.
 
-
-### Deployment
+### Deploy the Galasa artifacts to Maven Central
 
 1. Run the 30-deploy-maven-galasa.sh script - Deploys the maven artifacts to OSS Sonatype.
 
@@ -84,25 +91,30 @@ Once an approver has approved, you can move on.
 
 7. `exit` the image. -->
 <!-- End of temporary steps -->
-1. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
-2. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
-3.  run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
-4.  run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
+2. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
+3. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
 
+### Deploy resources.galasa.dev 
+1. Run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
 
-### Update reference sites
+### Deploy images to IBM Cloud Container Registry
+1. run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
+
+### Update external sites
 
 1. 40-argocd-ibmcloud.md - Follow the instructions to update the IBM Cloud Galasa external sites.
-
 
 ### Tag release and deploy CLI
 
 1. Run the `50-tag-github-repositories.sh` - It figures out the galasa version, then creates a version tag from all the release branches in all the repositories. So we can later delete the release branches and the tags will still be there.
 The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to complete. Check if finished OK on the tekton dashboard.
-3. 52-deploy-cli-release.md - Follow instructions to deploy the CLI to the repo release.
+2. 52-deploy-cli-release.md - Follow instructions to deploy the CLI to the repo release.
 
+### Release the Helm charts
 
-### Bump to new version
+1. Run the `53-release-helm-chart.sh` script - The script pushes the code in the Helm repository from the 'release' branch that was created at the start of the release, to the 'released' branch. This kicks off a GitHub Actions workflow to release the Helm charts. After the workflow is complete, the script checks that all Helm charts that were updated in the latest version show under the 'Releases' section of the Helm repository.
+
+### Bump to new version for development
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
 2. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties: https://github.ibm.com/CICS/cicsts-galasa-config/blob/main/CPS.properties. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
@@ -112,7 +124,6 @@ docker pull harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release
 docker image tag harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
 docker image push harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
 ```
-
 
 ### Clean up
 
