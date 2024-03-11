@@ -583,17 +583,23 @@ spec:
 #
   - name: copy-resources-isolated
     taskRef:
-      name: general-command
+      name: script
     runAfter:
-      - clone-isolated
+      - maven-build-isolated1
+      - maven-build-isolated2
+      - maven-build-isolated3
+      - maven-build-isolated4
+      - maven-build-isolated5
+      - maven-build-isolated6
+      - maven-build-javadoc
+      - maven-build-docs
+      - maven-build-galasactl
     params:
     - name: context
       value: $(context.pipelineRun.name)/isolated/full
-    - name: command
+    - name: script
       value:
-        - cp
-        - resources/*
-        - target/isolated/     
+        cp -vr resources/* target/isolated/
     workspaces:
       - name: git-workspace
         workspace: git-workspace
@@ -604,15 +610,6 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - maven-build-isolated1
-    - maven-build-isolated2
-    - maven-build-isolated3
-    - maven-build-isolated4
-    - maven-build-isolated5
-    - maven-build-isolated6
-    - maven-build-javadoc
-    - maven-build-docs
-    - maven-build-galasactl
     - copy-resources-isolated
     params:
     - name: pipelineRunName
@@ -1126,17 +1123,23 @@ spec:
 #
   - name: copy-resources-mvp
     taskRef:
-      name: general-command
+      name: script
     runAfter:
-      - clone-isolated
+      - maven-build-mvp1
+      - maven-build-mvp2
+      - maven-build-mvp3
+      - maven-build-mvp4
+      - maven-build-mvp5
+      - maven-build-mvp6
+      - maven-build-javadoc-mvp
+      - maven-build-docs-mvp
+      - maven-build-galasactl-mvp
     params:
     - name: context
       value: $(context.pipelineRun.name)/isolated/mvp
-    - name: command
+    - name: script
       value:
-        - cp
-        - resources/*
-        - target/isolated/     
+        cp -vr resources/* target/isolated/
     workspaces:
       - name: git-workspace
         workspace: git-workspace
@@ -1147,15 +1150,6 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - maven-build-mvp1
-    - maven-build-mvp2
-    - maven-build-mvp3
-    - maven-build-mvp4
-    - maven-build-mvp5
-    - maven-build-mvp6
-    - maven-build-javadoc-mvp
-    - maven-build-docs-mvp
-    - maven-build-galasactl-mvp
     - copy-resources-mvp
     params:
     - name: pipelineRunName
