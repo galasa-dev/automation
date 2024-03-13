@@ -44,7 +44,7 @@ argocd app create ${release_type}-maven-repos \
                   --sync-option Prune=true \
                   --repo https://github.com/galasa-dev/automation \
                   --revision HEAD  \
-                  --path infrastructure/ibmcloud-galasadev-cluster/galasa-development/branch-maven-repository \
+                  --path infrastructure/galasa-plan-b-lon02/galasa-development/branch-maven-repository \
                   --dest-server https://kubernetes.default.svc \
                   --dest-namespace galasa-development \
                   --helm-set wrapping.branch=${release_type} \
@@ -94,7 +94,7 @@ argocd app create ${release_type}-cli \
                   --self-heal \
                   --repo https://github.com/galasa-dev/automation \
                   --revision HEAD  \
-                  --path infrastructure/ibmcloud-galasadev-cluster/galasa-development/cli \
+                  --path infrastructure/galasa-plan-b-lon02/galasa-development/cli \
                   --dest-server https://kubernetes.default.svc \
                   --dest-namespace galasa-development \
                   --helm-set branch=${release_type} \

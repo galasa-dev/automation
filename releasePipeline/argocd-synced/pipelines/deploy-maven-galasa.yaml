@@ -43,3 +43,7 @@ spec:
       - $(params.version)
       - --credentials
       - /mavencreds/mavencreds.yaml
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld
+    - name: galasabldImageTag
+      value: release

@@ -70,27 +70,7 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 
 mkdir -p temp
 
-function ask_user_for_release_type {
-    PS3="Select the type of release process please: "
-    select lng in release pre-release
-    do
-        case $lng in
-            "release")
-                export release_type="release"
-                break
-                ;;
-            "pre-release")
-                export release_type="prerelease"
-                break
-                ;;
-            *)
-            echo "Unrecognised input."
-            exit 1
-            ;;
-        esac
-    done
-    echo "Chosen type of release process: ${release_type}"
-}
+export release_type="release"
 
 function ask_user_for_release_version {
     h1 "Please type the version of this release..."
@@ -140,9 +120,7 @@ metadata:
 spec:
   params:
   - name: version
-    value: "{$version}"
-  - name: image
-    value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld:"{$release_type}"
+    value: "$version"
   pipelineRef:
     name: deploy-maven-galasa
   podTemplate:
@@ -202,7 +180,6 @@ EOF
     success "All maven artifacts have been successfully deployed. Yay!"
 }
 
-ask_user_for_release_type
 ask_user_for_release_version
 set_kubernetes_context
 deploy_maven_artifacts
