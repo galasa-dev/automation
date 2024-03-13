@@ -1,6 +1,4 @@
-FROM harbor.galasa.dev/docker_proxy_cache/library/alpine:3.18.4
-
-RUN apk --no-cache add curl
+FROM harbor.galasa.dev/docker_proxy_cache/library/openjdk:11
 
 RUN mkdir /opt/wss-unified-agent
 
