@@ -110,10 +110,6 @@ Once an approver has approved, you can move on.
 The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to complete. Check if finished OK on the tekton dashboard.
 2. 52-deploy-cli-release.md - Follow instructions to deploy the CLI to the repo release.
 
-### Release the Helm charts
-
-1. Run the `53-release-helm-chart.sh` script - The script pushes the code in the Helm repository from the 'release' branch that was created at the start of the release, to the 'released' branch. This kicks off a GitHub Actions workflow to release the Helm charts. After the workflow is complete, the script checks that all Helm charts that were updated in the latest version show under the 'Releases' section of the Helm repository.
-
 ### Bump to new version for development
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
