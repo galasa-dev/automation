@@ -202,7 +202,8 @@ EOF
     note "If the 'Isolated' build completes OK, then we know that the complete build worked."
 }
 
-
-ask_user_for_release_type
-set_kubernetes_context
-build_all_code
+if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
+  ask_user_for_release_type
+  set_kubernetes_context
+  build_all_code
+fi
