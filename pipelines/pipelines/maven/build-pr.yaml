@@ -32,6 +32,8 @@ spec:
   - name: action
     type: string
   tasks:
+
+
   - name: git-verify
     taskRef:
       name: git-verify
@@ -42,6 +44,8 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+
+
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -61,6 +65,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+
   - name: clone-maven
     taskRef: 
       name: git-clone
@@ -80,6 +86,8 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+
+
   - name: get-commit
     taskRef:
       name: get-commit
@@ -93,6 +101,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: maven-gpg
     taskRef:
       name: maven-gpg
@@ -104,6 +114,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: maven-build-maven
     taskRef:
       name: maven-build
@@ -117,7 +129,7 @@ spec:
     - name: buildArgs
       value:
         - "-Dgpg.skip=true"
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/gradle"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
     - name: command
@@ -126,6 +138,8 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
   - name: docker-build-maven
     taskRef:
       name: docker-build
@@ -150,6 +164,8 @@ spec:
     workspaces:
       - name: git-workspace
         workspace: git-workspace
+
+        
   finally:
   - name: git-status
     when:
