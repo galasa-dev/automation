@@ -141,7 +141,7 @@ spec:
       value: /workspace/git/gpg/settings.xml
     - name: buildArgs
       value: 
-        - "-Dgalasa.source.repo=https://repo.maven.apache.org/maven2/"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/gradle"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/maven/repo"
         - "-Dgalasa.jacocoEnabled=$(params.jacocoEnabled)"
