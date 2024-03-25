@@ -243,40 +243,7 @@ spec:
       - --health
 # 
 # 
-# 
-  # Trigger snapshot-simplatform (main to prod) when doing a Main Build
-  - name: snapshot-simplatform
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - wait-deployment
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - snapshot-simplatform
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - trigger-snapshot-simplatform-
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace      
-
+#
   finally:
   - name: report-failed-build
     when:
