@@ -243,7 +243,6 @@ spec:
       value: $(context.pipelineRun.name)
     - name: script
       value: cp -vr /opt/k8s/bin/kubectl 
-             /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/set-external-env.sh 
              /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties 
              /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/
     - name: image
