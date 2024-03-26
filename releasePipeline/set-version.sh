@@ -114,6 +114,9 @@ function change_ver_of_property_value {
     
     file="cps-properties.yaml"
 
+    #TO DO: CHANGE so version numbers in example '-0.32.0-' can be replaced
+    #also consider how some values which are '/0.32.0/' should not be changed if not required
+    
     #regex pattern to make sure that only version numbers 
     #with a non-whitespace character in front are replaced
     delimited_old_version="\\/${old_version}\\/"
