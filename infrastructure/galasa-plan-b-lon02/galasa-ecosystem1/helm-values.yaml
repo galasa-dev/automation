@@ -62,9 +62,6 @@ kubectlImage: "bitnami/kubectl:1.28"
 # Note: The externalHostname value must be a valid DNS name for ingress to be used.
 #
 ingress:
-  # Enables/disables the use of ingress
-  enabled: true
-
   # The IngressClass to use for ingresses
   ingressClassName: "public-iks-k8s-nginx"
 
@@ -117,11 +114,6 @@ dex:
         name: galasa-ecosystem1-github-oauth-app-for-dex
     - secretRef:
         name: galasa-ecosystem1-dex-webui-client
-
-  # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
-  # 30000 to 32767 range if they are left blank).
-  nodePorts:
-    http: # blank - dynamically assigned
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
