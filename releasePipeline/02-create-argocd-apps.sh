@@ -74,9 +74,6 @@ function create-maven-repos {
                     --helm-set restApiDocSite.branch=${release_type} \
                     --helm-set restApiDocSite.imageTag=${release_type} \
                     --helm-set restApiDocSite.deploy=true \
-                    --helm-set p2.branch=${release_type} \
-                    --helm-set p2.imageTag=${release_type} \
-                    --helm-set p2.deploy=true \
                     --helm-set isolated.branch=${release_type} \
                     --helm-set isolated.imageTag=${release_type} \
                     --helm-set isolated.deploy=true \

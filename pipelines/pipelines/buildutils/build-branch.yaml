@@ -182,39 +182,6 @@ spec:
 # 
 # 
 # 
-  - name: trigger-snapshot-main-to-prod
-    when:
-      - input: "$(params.branch)"
-        operator: in
-        values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - recycle-galasabld-binaries
-    - build-galasabld-ibm-executable
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - buildutils-snapshot-main-to-prod
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - buildutils-snapshot-
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
   finally:
   - name: report-failed-build
     when:

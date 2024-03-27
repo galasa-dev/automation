@@ -98,7 +98,7 @@ spec:
       value: $(context.pipelineRun.name)/inttests/galasa-inttests-parent
     - name: buildArgs
       value:
-        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/managers"
+        - "-PsourceMaven=https://development.galasa.dev/main/maven-repo/obr"
         - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
         - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/inttests/repo"
     - name: command
@@ -123,7 +123,7 @@ spec:
       value: /workspace/git/$(context.pipelineRun.name)/inttests/settings.xml
     - name: buildArgs
       value: 
-        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/managers"
+        - "-Dgalasa.source.repo=https://development.galasa.dev/main/maven-repo/obr"
         - "-Dgalasa.central.repo=https://repo.maven.apache.org/maven2/"
         - "-Dgalasa.release.repo=file:/workspace/git/$(context.pipelineRun.name)/inttests/repo"
         - "-Dgalasa.bootstrap=https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap"
@@ -207,38 +207,6 @@ spec:
 # 
 # 
 # 
-  - name: trigger-snapshot-main-to-prod
-    when:
-      - input: "$(params.branch)"
-        operator: in
-        values: ["main"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - wait-deployment
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value: 
-      - pipeline
-      - start
-      - inttests-snapshot-main-to-prod
-      - -n
-      - galasa-build
-      - --prefix-name 
-      - inttests-snapshot
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
   finally:
   - name: report-failed-build
     when:
