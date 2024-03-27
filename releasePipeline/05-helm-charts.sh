@@ -216,13 +216,40 @@ function check_helm_charts_released {
 
 }
 
-ask_user_for_release_type
-get_galasa_version_to_be_released
+function delete_pre_release_helm_charts {
 
-clone_helm_repository
-get_helm_charts
-check_helm_charts_released
+    # remove release tag for pre-release process
+    for chart in "${charts[@]}"; do
 
-if [[ "$release_type" == "prerelease" ]]; then
-    bold "This is a pre-release. We don't actually want to keep the Release/Tags that were just created. Make sure to delete them!"
-fi
+        release_tag=$chart-$galasa_version
+
+        # get the release and pull out the release url to delete
+        release_json_details="temp/$release_tag.txt"
+        release_url="https://api.github.com/repos/galasa-dev/helm/releases/tags/$release_tag"
+        curl $release_url > $release_json_details -s
+
+        # var=$(sed -ne "s/^\\\$"url" *= *'\([^']*\)'/p" $release_json_details)
+        # success $var
+        # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#get-a-release-by-tag-name
+        # tag_url="https://api.github.com/repos/galasa-dev/helm/tags/$release_tag"
+        # curl -X DELETE $url
+
+    done
+}
+
+var=$(grep -e ' *"url" *: *"(https:\/\/api\.github\.com\/repos\/galasa-dev\/helm\/releases\/.*)",'  temp/ecosystem-0.32.0.txt)
+success $var
+
+# if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
+#     ask_user_for_release_type
+#     get_galasa_version_to_be_released
+#     clone_helm_repository
+#     get_helm_charts
+#     check_helm_charts_released
+
+#     if [[ "$release_type" == "prerelease" ]]; then
+#         delete_pre_release_helm_charts
+#         bold "This is a pre-release. We don't actually want to keep the Release/Tags that were just created. Make sure to delete them!"
+#     fi
+# fi
+

@@ -10,7 +10,8 @@
 6. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
 7. watch needs to be installed.
 8. IBM Cloud CLI needs to be installed and logged in:
-```
+
+``` shell
 ibmcloud login --sso
 ibmcloud cr region-set global
 ```
@@ -95,9 +96,11 @@ Once an approver has approved, you can move on.
 3. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
 
 ### Deploy resources.galasa.dev 
+
 1. Run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
 
 ### Deploy images to IBM Cloud Container Registry
+
 1. run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
 
 ### Update external sites
@@ -113,9 +116,17 @@ The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to comp
 ### Bump to new version for development
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties: https://github.ibm.com/CICS/cicsts-galasa-config/blob/main/CPS.properties. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
-3. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasa-cli-ibm-amd64 to 'stable' (regression testing uses galasa-cli-ibm-amd64:stable):
+2. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties, using the galasa cli as show below. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
+
+``` shell
+galasactl properties set --namespace galasaecosystem --name isolated.full.zip --value https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.33.0/galasa-isolated-0.33.0.zip --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+galasactl properties set --namespace galasaecosystem --name isolated.mvp.zip --value https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/0.33.0/galasa-isolated-mvp-0.33.0.zip --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+galasactl properties set --namespace galasaecosystem --name runtime.version  --value 0.33.0 --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
 ```
+
+3. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasa-cli-ibm-amd64 to 'stable' (regression testing uses galasa-cli-ibm-amd64:stable):
+
+``` shell
 docker pull harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release
 docker image tag harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
 docker image push harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
