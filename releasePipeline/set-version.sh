@@ -99,42 +99,80 @@ function run_command {
 # Main logic.
 #-----------------------------------------------------------------------------------------   
 
-function ask_user_for_versions {
-    h1 "Please enter the old and new versions of this release..."
-    
-    read -p "Please enter the old version number: " old_version
-    read -p "Please enter the version number: " new_version
+#bumping version for the value of property test.stream.inttests.location
+function bump_test_stream_inttests_location_version {
+    property_name="test.stream.inttests.location"
+    h1 "Bumping up the version of '${property_name}'"
 
-    echo "You are doing a release for version ${new_version}, to replace the old version ${old_version}"
-}
-
-
-function change_ver_of_property_value {
     cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
-    
     file="cps-properties.yaml"
 
-    #TO DO: CHANGE so version numbers in example '-0.32.0-' can be replaced
-    #also consider how some values which are '/0.32.0/' should not be changed if not required
+    old_value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/dev[.]galasa[.]inttests[.]obr-[0-9.]+-testcatalog[.]json"
+    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/dev.galasa.inttests.obr-${galasa_version}-testcatalog.json"
     
-    #regex pattern to make sure that only version numbers 
-    #with a non-whitespace character in front are replaced
-    delimited_old_version="\\/${old_version}\\/"
-    delimited_new_version="\\/${new_version}\\/"
+    sed -i '' -E "s/${old_value_regex}/${new_value}/1" $file
+    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
+    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
     
-    # echo $delimited_old_version
-
-
-    sed -i '' "s/"${delimited_old_version}"/"${delimited_new_version}"/g" $file;
-
-    if grep $delimited_old_version $file; then
-        error "Failed to replace all occurrences of ${old_version}."
-        exit 1
-        break
-    fi
-    
-    success "Successfully replaced occurrences of the old version, ${old_version}, with ${new_version}"
+    success "'${property_name}' version bumped successfully"
 }
 
-ask_user_for_versions
-change_ver_of_property_value
+#bumping version for the value of property test.stream.inttests.obr
+function bump_test_stream_inttests_obr_version {
+    property_name="test.stream.inttests.obr"
+    h1 "Bumping up the version of '${property_name}'"
+
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    file="cps-properties.yaml"
+
+    old_value_regex="mvn:dev.galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/obr"
+    new_value="mvn:dev.galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/obr"
+
+    sed -i '' -E "s/${old_value_regex}/${new_value}/1" $file
+    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
+    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
+    
+    success "'${property_name}' version bumped successfully"
+}
+
+#bumping version for the value of property isolated.full.zip
+function bump_isolatd_full_zip_version {
+    property_name="isolated.full.zip"
+    h1 "Bumping up the version of '${property_name}'"
+
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    file="cps-properties.yaml"
+
+    old_value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/[0-9.]+\\/galasa-isolated-[0-9.]+.zip"
+    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\${galasa_version}\\/galasa-isolated-${galasa_version}.zip"
+
+    sed -i '' -E "s/${old_value_regex}/${new_value}/1" $file
+    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
+    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
+    
+    success "'${property_name}' version bumped successfully"
+}
+
+#bumping version for the value of property isolated.mvp.zip
+function bump_isolatd_mvp_zip_version {
+    property_name="isolated.mvp.zip"
+    h1 "Bumping up the version of '${property_name}'"
+
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    file="cps-properties.yaml"
+
+    old_value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/[0-9.]+\\/galasa-isolated-mvp-[0-9.]+[.]zip"
+    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/${galasa_version}\\/galasa-isolated-mvp-${galasa_version}.zip"
+
+    sed -i '' -E "s/${old_value_regex}/${new_value}/1" $file
+    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
+    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
+    
+    success "'${property_name}' version bumped successfully"
+}
+
+get_galasa_version_to_be_released
+bump_test_stream_inttests_location_version
+bump_test_stream_inttests_obr_version
+bump_isolatd_full_zip_version
+bump_isolatd_mvp_zip_version
