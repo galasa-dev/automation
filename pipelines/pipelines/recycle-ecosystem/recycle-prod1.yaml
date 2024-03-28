@@ -16,7 +16,7 @@ spec:
   params:
   - name: ecosystemNamespace
     type: string
-    default: galasa-prod
+    default: galasa-dev
   - name: api
     type: string
     default: galasa-prod1-api
