@@ -30,7 +30,7 @@ spec:
 #
   tasks:
   - name: clone-automation
-    taskRef: 
+    taskRef:
       name: git-clone
     params:
     - name: url
@@ -53,12 +53,12 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - clone-automation  
+    - clone-automation
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
+      value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name) 
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/repo-dockerfile
     - name: imageName
@@ -67,12 +67,12 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-obr"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=image=galasa-obr"
+        - "--build-arg=oldBranch=$(params.fromBranch)"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace     
+       workspace: git-workspace
 #
 #
 #
@@ -85,13 +85,13 @@ spec:
     - name: server
       value: argocd.galasa.dev
     - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
+      value:
+      - app
+      - actions
+      - run
       - $(params.appname)
-      - restart 
-      - --kind 
+      - restart
+      - --kind
       - Deployment
       - --resource-name
       - obr-$(params.imageTag)
@@ -107,16 +107,43 @@ spec:
     - name: server
       value: argocd.galasa.dev
     - name: command
-      value: 
-      - app 
+      value:
+      - app
       - wait
       - $(params.appname)
       - --resource
       - apps:Deployment:obr-$(params.imageTag)
       - --health
-# 
-# 
-# 
+#
+#
+#
+  - name: snapshot-webui
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: dockerfilePath
+      value: automation/dockerfiles/snapshots/repo-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-ui:$(params.toBranch)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=image=galasa-ui"
+        - "--build-arg=oldBranch=$(params.fromBranch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   - name: snapshot-boot-embedded
     taskRef:
       name: docker-build
@@ -124,9 +151,9 @@ spec:
     - clone-automation
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
+      value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name) 
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
@@ -135,12 +162,12 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-boot-embedded-amd64"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=image=galasa-boot-embedded-amd64"
+        - "--build-arg=oldBranch=$(params.fromBranch)"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace       
+       workspace: git-workspace
 #
 #
 #
@@ -151,9 +178,9 @@ spec:
     - snapshot-boot-embedded
     params:
     - name: pipelineRunName
-      value: $(context.pipelineRun.name) 
+      value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name) 
+      value: $(context.pipelineRun.name)
     - name: dockerfilePath
       value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
@@ -162,16 +189,16 @@ spec:
       value: ""
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"         
-        - "--build-arg=image=galasa-ibm-boot-embedded-amd64"   
-        - "--build-arg=oldBranch=$(params.fromBranch)"   
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=image=galasa-ibm-boot-embedded-amd64"
+        - "--build-arg=oldBranch=$(params.fromBranch)"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace  
+       workspace: git-workspace
 
-# 
+#
 # Recycle the galasa-prod Ecosystem which uses the 'prod' images
-# 
+#
   - name: trigger-recycle-ecosystem
     taskRef:
       name: tkn-cli
@@ -181,13 +208,13 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation
     - name: command
-      value: 
+      value:
       - pipeline
       - start
       - recycle-ecosystem
       - -n
       - galasa-build
-      - --prefix-name 
+      - --prefix-name
       - recycle-ecosystem
       - --use-param-defaults
       - --workspace
@@ -199,7 +226,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-      
+
 # Trigger CLI rebuild after OBR code is promoted to production...
   - name: trigger-cli
     when:
@@ -214,13 +241,13 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation
     - name: command
-      value: 
+      value:
       - pipeline
       - start
       - branch-cli
       - -n
       - galasa-build
-      - --prefix-name 
+      - --prefix-name
       - trigger-cli-main
       - --use-param-defaults
       - --workspace
@@ -231,7 +258,7 @@ spec:
       - galasa-build-bot
     workspaces:
      - name: git-workspace
-       workspace: git-workspace    
+       workspace: git-workspace
 
   finally:
   - name: report-failed-build
