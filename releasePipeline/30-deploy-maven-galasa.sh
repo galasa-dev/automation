@@ -84,7 +84,7 @@ function get_galasa_version_to_be_released {
     fi
 
     # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
-    galasa_version=$(cat temp/galasa-version.txt | grep '<a * href=\"[0-9]*\.[0-9]*\.[0-9]*\/\"' | head -2 | tail -1 | cut -f2 -d'"' | cut -f1 -d'/')
+    galasa_version=$(cat temp/galasa-version.txt | grep '<a * href=\"[0-9]*\.[0-9]*\.[0-9]*\/\"' | cut -f2 -d'"' | cut -f1 -d'/')
 
     success "Galasa version to be tested and released is ${galasa_version}"
     export galasa_version
@@ -190,5 +190,5 @@ EOF
 }
 
 get_galasa_version_to_be_released
-set_kubernetes_context
-deploy_maven_artifacts
+# set_kubernetes_context
+# deploy_maven_artifacts
