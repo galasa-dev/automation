@@ -128,7 +128,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: dockerfilePath
-      value: automation/dockerfiles/snapshots/repo-dockerfile
+      value: automation/dockerfiles/snapshots/generic-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-ui:$(params.toBranch)
     - name: noPush
