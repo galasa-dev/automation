@@ -124,8 +124,6 @@ run_command docker tag harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$F
 run_command docker tag icr.io/galasadev/galasa-resources:$FROM       \
            icr.io/galasadev/galasa-resources:$TO
 
-
-
 run_command docker tag harbor.galasa.dev/galasadev/galasa-javadoc-site:$FROM                \
            icr.io/galasadev/galasa-javadoc-amd64:latest
 
