@@ -73,6 +73,12 @@ spec:
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
+            env:
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
             volumeMounts:
             - mountPath: /galasa
               name: static-files
@@ -105,6 +111,12 @@ spec:
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
+            env:
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
             volumeMounts:
             - mountPath: /galasa
               name: static-files

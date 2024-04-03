@@ -21,11 +21,24 @@ spec:
   - name: galasactlImageTag
     type: string
     default: main
+  - name: galasaTokenSecretName
+    type: string
+    default: galasa-prod1-token
+  - name: galasaTokenSecretKey
+    type: string
+    default: token
   steps:
   - name: galasactl
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.galasactlImageTag)
     imagePullPolicy: Always
+    env:
+    - name: GALASA_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: $(params.galasaTokenSecretName)
+          key: $(params.galasaTokenSecretKey)
+          optional: false
     command:
     - galasactl
     - $(params.command[*])
