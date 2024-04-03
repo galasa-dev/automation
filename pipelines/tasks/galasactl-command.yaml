@@ -27,12 +27,17 @@ spec:
   - name: galasaTokenSecretKey
     type: string
     default: token
+  - name: galasaHome
+    type: string
+    default: /workspace/git/$(params.context)
   steps:
   - name: galasactl
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.galasactlImageTag)
     imagePullPolicy: Always
     env:
+    - name: GALASA_HOME
+      value: $(params.galasaHome)
     - name: GALASA_TOKEN
       valueFrom:
         secretKeyRef:
