@@ -55,7 +55,7 @@ spec:
             - runs
             - prepare
             - --bootstrap
-            - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
             - --stream
             - inttests
             - --portfolio
@@ -83,7 +83,7 @@ spec:
             - runs
             - submit
             - --bootstrap
-            - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
             - --portfolio
             - /galasa/tests.yaml
             - --throttle
