@@ -189,7 +189,9 @@ EOF
 
     success "All branches in github called ${release_type} are now deleted. Yay!"
 }
-
-ask_user_for_release_type
-set_kubernetes_context
-delete_branches
+# checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions
+if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
+    ask_user_for_release_type
+    set_kubernetes_context
+    delete_branches
+fi

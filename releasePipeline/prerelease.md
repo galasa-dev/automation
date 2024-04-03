@@ -1,5 +1,6 @@
 # PRE-RELEASE PROCESS
-It may be beneficial to complete a pre-release before starting a vx.xx.x release of Galasa. This is to ensure the main Galasa component builds successfully and to iron out any problems before the actual release, as there will be a freeze on delivering code during this time. 
+
+It may be beneficial to complete a pre-release before starting a vx.xx.x release of Galasa. This is to ensure the main Galasa component builds successfully and to iron out any problems before the actual release, as there will be a freeze on delivering code during this time.
 
 **Do not check in any changes you make to files during this work item unless you are correcting a mistake - back out everything at the end**
 
@@ -11,21 +12,29 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 4. Ensure the Tekton CLI is installed. You can download it [here](https://tekton.dev/docs/cli/).
 5. Authenticate to the cicsk8s cluster using `cicsk8s sso`
 
+## Pre-release steps - Automated
 
-## Pre-release steps
+1. Ensure you have completed the [set up](#set-up) before continuing.
+2. Run [01-run-pre-release.sh](./01-run-pre-release.sh). If the process fails at any stage, you can continue by re-running the script that failed from the manual steps and finish using the [manual steps below](#pre-release-steps---manual).
+3. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
+    - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
+
+4. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino or Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+
+## Pre-release steps - Manual
 
 1. Ensure you have completed the [set up](#set-up) before continuing.
 2. Run [02-create-argocd-apps.sh](./02-create-argocd-apps.sh). When prompted, choose the '`pre-release`' option.
-3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`pre-release`' option. 
+3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`pre-release`' option.
 This script kicks off a pipeline to delete all branches called `prerelease` in all the github repositories, so we know they are clean.
 4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`pre-release`' option.  This script creates
 a new branch called `prerelease` in every github repo we need to build. **Note:** Creating this branch in the 'Helm' repository is all that is required to trigger the GitHub Actions workflow that packages and releases a new Tag and Release of the Helm charts. As this is a prerelease, they will need to be deleted after.
-5. Run [05-helm-charts.sh](./05-helm-charts.sh). When prompted, choose the '`pre-release`' option. This script uses the GitHub API to check that all Helm charts that had changes in this release have a new Release and Tag object on GitHub. 
+5. Run [05-helm-charts.sh](./05-helm-charts.sh). When prompted, choose the '`pre-release`' option. This script uses the GitHub API to check that all Helm charts that had changes in this release have a new Release and Tag object on GitHub.
 6. Delete all Releases and Tags for the Helm charts that were just created by pushing to the `prerelease` branch.
     1. Delete all Releases that were created: [Releases](https://github.com/galasa-dev/helm/releases) - Next to a Release, click the Delete icon and 'Delete this release'.
     2. Delete all Tags that were created: [Tags](https://github.com/galasa-dev/helm/tags) - Next to a Tag, click the three dots, then 'Delete Tag' then 'Delete this Tag'.
 7. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`pre-release`' option.
-8. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option. 
+8. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
-9. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+9. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino or Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.

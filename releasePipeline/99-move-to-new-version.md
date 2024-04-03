@@ -14,10 +14,10 @@ These are manual steps to bump the version of Galasa to the next version.
 
     Make sure the main build this starts is complete (runs all the way to Isolated and finishes) before moving on to the next step, or the following builds will fail. **If you merge the PRs in a random order, for example, cli before Framework, the cli build will be looking for the next version of Framework, but that might not have been built yet.**
 
-2. Upgrade Managers
+3. Upgrade Managers
    As above, using the `build-locally.sh` script.
 
-3. Upgrade OBR
+4. Upgrade OBR
 
     a. Create branch
     b. Invoke the `set-version --version {new version}` script.
@@ -27,11 +27,12 @@ These are manual steps to bump the version of Galasa to the next version.
 
     As above, make sure the main build this starts has finished before moving on
 
-4. Upgrade CLI
+5. Upgrade CLI
 
     a. Change the VERSION file
     b. Change the following line in build.gradle
-    ```
+
+    ```groovy
     def galasaFrameworkVersion = '0.30.0'
     ```
 
@@ -47,4 +48,3 @@ These are manual steps to bump the version of Galasa to the next version.
     f. mvp/pomZip.xml
 
     g. Open PR for these changes and merge into main
-

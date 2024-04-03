@@ -193,7 +193,8 @@ EOF
     success "All branches in github called ${release_type} are now created. Yay!"
 }
 
-
-ask_user_for_release_type
-set_kubernetes_context
-create_branches
+if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
+    ask_user_for_release_type
+    set_kubernetes_context
+    create_branches
+fi
