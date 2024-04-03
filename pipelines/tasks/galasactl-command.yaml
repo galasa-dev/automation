@@ -27,9 +27,6 @@ spec:
   - name: galasaTokenSecretKey
     type: string
     default: token
-  - name: galasaHome
-    type: string
-    default: /workspace/git/$(params.context)
   steps:
   - name: galasactl
     workingDir: /workspace/git/$(params.context)
@@ -37,7 +34,7 @@ spec:
     imagePullPolicy: Always
     env:
     - name: GALASA_HOME
-      value: $(params.galasaHome)
+      value: /workspace/git/$(params.context)
     - name: GALASA_TOKEN
       valueFrom:
         secretKeyRef:
