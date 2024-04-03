@@ -33,6 +33,8 @@ spec:
     image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.galasactlImageTag)
     imagePullPolicy: Always
     env:
+    - name: GALASA_HOME
+      value: /workspace/git/$(params.context)
     - name: GALASA_TOKEN
       valueFrom:
         secretKeyRef:
