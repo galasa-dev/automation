@@ -8,7 +8,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: regression-test
-  namespace: galasa-prod
+  namespace: galasa-dev
 spec:
   schedule: 0 6 * * * # Daily at 06:00
   successfulJobsHistoryLimit: 1
