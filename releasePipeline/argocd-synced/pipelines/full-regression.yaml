@@ -33,6 +33,8 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
     - name: command
       value: 
         - runs
