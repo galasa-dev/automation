@@ -197,37 +197,6 @@ spec:
        workspace: git-workspace
 
 #
-# Recycle the galasa-prod Ecosystem which uses the 'prod' images
-#
-  - name: trigger-recycle-ecosystem
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - snapshot-ibm-boot-embedded
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value:
-      - pipeline
-      - start
-      - recycle-ecosystem
-      - -n
-      - galasa-build
-      - --prefix-name
-      - recycle-ecosystem
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
-#
 # Recycle the prod1 Ecosystem which uses the 'prod' images
 #
   - name: trigger-recycle-prod1
