@@ -12,7 +12,6 @@ metadata:
 secrets:
 - name: harbor-creds
 - name: icr-api-key
-- name: planb-harbor-creds
 - name: github-enterprise-credentials
 ---
 kind: Role
