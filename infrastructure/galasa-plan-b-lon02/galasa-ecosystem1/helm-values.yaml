@@ -74,7 +74,7 @@ ingress:
     - hosts:
       - "galasa-ecosystem1.galasa.dev"
       secretName: galasa-wildcard-cert
-  
+
   # The name of the Secret containing root and intermediate CA certificates in a single .pem file
   caCertSecretName: ""
 
@@ -114,6 +114,10 @@ dex:
         name: galasa-ecosystem1-github-oauth-app-for-dex
     - secretRef:
         name: galasa-ecosystem1-dex-webui-client
+
+  # Optional - An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
+  # The first JWT claim that is matched will be used as the requestor of a test.
+  usernameClaims: []
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
