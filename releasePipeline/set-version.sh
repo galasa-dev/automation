@@ -144,7 +144,7 @@ function upgrade_isolatd_full_zip_version {
     file="cps-properties.yaml"
 
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/[0-9.]+\\/galasa-isolated-[0-9.]+.zip"
-    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\${galasa_version}\\/galasa-isolated-${galasa_version}.zip"
+    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/${galasa_version}\\/galasa-isolated-${galasa_version}.zip"
 
     sed -i '' -E "s/${value_regex}/${new_value}/1" $file
     rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
@@ -177,8 +177,11 @@ function upgrade_runtime_version {
     h1 "Bumping up the version of '${property_name}'"
     
     #create a temp file
-    temp_file="${WORKSPACE_DIR}/temp/cps-prop.yaml"
+    temp_file="${WORKSPACE_DIR}/temp/cps-prop1.yaml"
     >$temp_file
+
+    #count variavle to find the 'value: X.XX.X' line
+    count=0
 
     cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
     source_file="cps-properties.yaml"
@@ -192,16 +195,25 @@ function upgrade_runtime_version {
         if [[ "$found_property_name" == "false" ]]; then
             if [[ "$line" =~ \s*${property_name}\s* ]]; then
                 found_property_name="true"
+                ((count++))
             fi
         else
-            info "Before: $line"
-            outputLine=$(echo "$line" | sed -E "s/[0-9.]+/${galasa_version}/1")
-            info "After: $outputLine"
-            found_property_name="false"
+            # the line containing the value of the property will always be 
+            # the 2nd line after we find the line containing the property name
+            if ((count == 2)); then
+                info "Before: $line"
+                outputLine=$(echo "$line" | sed -E "s/[0-9.]+/${galasa_version}/1")
+                info "After: $outputLine"
+                found_property_name="false"
+                count=0
+            else
+                #increment count if we've not yet reached the second line
+                ((count++))
+            fi
         fi
         echo "$outputLine" >> $temp_file
     done < $source_file
-    
+
     success "'${property_name}' version bumped successfully"
 }
 

@@ -155,7 +155,7 @@ metadata:
     namespace: galasaecosystem
     name: isolated.full.zip
 data:
-    value: https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated0.33.0/galasa-isolated-0.33.0.zip
+    value: https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.33.0/galasa-isolated-0.33.0.zip
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
