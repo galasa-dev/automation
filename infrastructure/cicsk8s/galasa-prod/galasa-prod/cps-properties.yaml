@@ -98,7 +98,7 @@ metadata:
     namespace: framework
     name: test.stream.simbank.location
 data:
-    value: http://galasa-galasa-prod1.cicsk8s.hursley.ibm.com/testcatalog/galasasimbank
+    value: https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/testcatalog/galasasimbank
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
