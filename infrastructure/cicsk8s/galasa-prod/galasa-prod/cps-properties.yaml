@@ -211,7 +211,7 @@ metadata:
     namespace: galasaecosystem
     name: runtime.version
 data:
-    value: 0.32.0
+    value: 0.33.0
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -235,4 +235,3 @@ metadata:
     namespace: galasaecosystem
     name: simplatform.version
 data:
-    value: 0.24.0

@@ -214,12 +214,15 @@ function upgrade_runtime_version {
         echo "$outputLine" >> $temp_file
     done < $source_file
 
+    #copy newly-updated temp file into source file with
+    cat $temp_file > $source_file
+
     success "'${property_name}' version bumped successfully"
 }
 
 get_galasa_version_to_be_released
-# upgrade_test_stream_inttests_location_version
-# upgrade_test_stream_inttests_obr_version
-# upgrade_isolatd_full_zip_version
-# upgrade_isolatd_mvp_zip_version
+upgrade_test_stream_inttests_location_version
+upgrade_test_stream_inttests_obr_version
+upgrade_isolatd_full_zip_version
+upgrade_isolatd_mvp_zip_version
 upgrade_runtime_version
