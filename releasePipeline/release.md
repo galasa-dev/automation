@@ -113,7 +113,7 @@ The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to comp
 ### Bump to new version for development
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. Upgrade the version of Galasa to the new development version in the galasa-prod Ecosystem CPS properties: https://github.ibm.com/CICS/cicsts-galasa-config/blob/main/CPS.properties. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
+2. Run the `set-version.sh` script to upgrade the versions of the CPS properties values.
 3. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasa-cli-ibm-amd64 to 'stable' (regression testing uses galasa-cli-ibm-amd64:stable):
 ```
 docker pull harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:release
