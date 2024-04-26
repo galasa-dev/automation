@@ -15,8 +15,11 @@ spec:
   params:
   - name: bootstrapUrl
     type: string
-    default: https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+    default: https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
   tasks:
+#
+#
+#
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -34,6 +37,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: run-prepare
     taskRef: 
       name: galasactl
@@ -42,6 +48,10 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
     - name: command
       value:
         - runs 
@@ -60,11 +70,12 @@ spec:
         - galasaecosystem.docker.version=main
         - --log
         - '-'
-    - name: galasactlImageTag
-      value: stable
     workspaces:
      - name: git-workspace
-       workspace: git-workspace   
+       workspace: git-workspace
+#
+#
+#
   - name: run-submit
     taskRef: 
       name: galasactl
@@ -73,6 +84,10 @@ spec:
     params:
     - name: context
       value: $(context.pipelineRun.name)
+    - name: image
+      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
     - name: command
       value:
         - runs 
@@ -99,12 +114,11 @@ spec:
         - junit.xml
         - --log
         - '-'
-    - name: galasactlImageTag
-      value: stable
     workspaces:
      - name: git-workspace
        workspace: git-workspace       
-
+#
+#
 # Snapshot the Main OBR to Prod now we have confirmed no environmental problems introduced
   - name: trigger-snapshot-obr-main-to-prod
     taskRef:
@@ -133,7 +147,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
+#
+#
+#
   finally:
   - name: report-failed-build
     when:

@@ -7,7 +7,7 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: recycle-ecosystem
+  name: recycle-prod1
   namespace: galasa-build
 spec:
 #
@@ -16,7 +16,22 @@ spec:
   params:
   - name: ecosystemNamespace
     type: string
-    default: galasa-prod
+    default: galasa-dev
+  - name: api
+    type: string
+    default: galasa-prod1-api
+  - name: engineController
+    type: string
+    default: galasa-prod1-engine-controller
+  - name: resourceMonitor
+    type: string
+    default: galasa-prod1-resource-monitor
+  - name: metrics
+    type: string
+    default: galasa-prod1-metrics
+  - name: webui
+    type: string
+    default: galasa-prod1-webui
 #
 #
 #
@@ -34,7 +49,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - restart
-        - deployment/api
+        - deployment/$(params.api)
   - name: wait-api
     taskRef:
       name: kubectl
@@ -47,38 +62,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - status
-        - deployment/api
-        - -w
-        - --timeout=3m
-#
-#
-#
-  - name: recycle-testcatalog
-    taskRef:
-      name: kubectl
-    runAfter:
-    - wait-api
-    params:
-    - name: command
-      value: 
-        - -n 
-        - $(params.ecosystemNamespace)
-        - rollout
-        - restart
-        - deployment/testcatalog
-  - name: wait-testcatalog
-    taskRef:
-      name: kubectl
-    runAfter:
-    - recycle-testcatalog
-    params:
-    - name: command
-      value: 
-        - -n 
-        - $(params.ecosystemNamespace)
-        - rollout
-        - status
-        - deployment/testcatalog
+        - deployment/$(params.api)
         - -w
         - --timeout=3m
 #
@@ -96,7 +80,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - restart
-        - deployment/engine-controller
+        - deployment/$(params.engineController)
   - name: wait-engine-controller
     taskRef:
       name: kubectl
@@ -109,7 +93,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - status
-        - deployment/engine-controller
+        - deployment/$(params.engineController)
         - -w
         - --timeout=3m
 #
@@ -127,7 +111,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - restart
-        - deployment/resource-monitor
+        - deployment/$(params.resourceMonitor)
   - name: wait-resource-monitor
     taskRef:
       name: kubectl
@@ -140,7 +124,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - status
-        - deployment/resource-monitor
+        - deployment/$(params.resourceMonitor)
         - -w
         - --timeout=3m
 #
@@ -158,7 +142,7 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - restart
-        - deployment/metrics
+        - deployment/$(params.metrics)
   - name: wait-metrics
     taskRef:
       name: kubectl
@@ -171,7 +155,38 @@ spec:
         - $(params.ecosystemNamespace)
         - rollout
         - status
-        - deployment/metrics
+        - deployment/$(params.metrics)
+        - -w
+        - --timeout=3m
+#
+#
+#
+  - name: recycle-webui
+    taskRef:
+      name: kubectl
+    runAfter:
+    - wait-api
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - restart
+        - deployment/$(params.webui)
+  - name: wait-webui
+    taskRef:
+      name: kubectl
+    runAfter:
+    - recycle-webui
+    params:
+    - name: command
+      value: 
+        - -n 
+        - $(params.ecosystemNamespace)
+        - rollout
+        - status
+        - deployment/$(params.webui)
         - -w
         - --timeout=3m
 

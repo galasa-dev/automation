@@ -288,7 +288,7 @@ spec:
 # 
   - name: test-galasactl-local-maven-linux-x86-64
     taskRef: 
-      name: general-command
+      name: galasactl
     runAfter:
       - chmod-local-script
     params:
@@ -296,9 +296,10 @@ spec:
       value: $(context.pipelineRun.name)/cli
     - name: image
       value: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.6-openjdk-11
+    - name: entrypoint
+      value: ./test-galasactl-local.sh
     - name: command
-      value: 
-        - ./test-galasactl-local.sh
+      value:
         - --buildTool
         - maven
     workspaces:
@@ -309,7 +310,7 @@ spec:
 # 
   - name: test-galasactl-local-gradle-linux-x86-64
     taskRef: 
-      name: general-command
+      name: galasactl
     runAfter:
       - test-galasactl-local-maven-linux-x86-64
     params:
@@ -317,9 +318,10 @@ spec:
       value: $(context.pipelineRun.name)/cli
     - name: image
       value: harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11 
+    - name: entrypoint
+      value: ./test-galasactl-local.sh
     - name: command
-      value: 
-        - ./test-galasactl-local.sh
+      value:
         - --buildTool
         - gradle
     workspaces:
@@ -355,7 +357,7 @@ spec:
 #----------------------------------------------------------------
   - name: test-galasactl-ecosystem-linux-x86-64
     taskRef: 
-      name: general-command
+      name: galasactl
     runAfter:
       - chmod-ecosystem-script
     params:
@@ -363,11 +365,14 @@ spec:
       value: $(context.pipelineRun.name)/cli
     - name: image
       value: harbor.galasa.dev/common/openjdk11-ibm:main 
+    - name: entrypoint
+      value: ./test-galasactl-ecosystem.sh
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
     - name: command
-      value: 
-        - ./test-galasactl-ecosystem.sh
+      value:
         - --bootstrap
-        - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
     workspaces:
      - name: git-workspace
        workspace: git-workspace

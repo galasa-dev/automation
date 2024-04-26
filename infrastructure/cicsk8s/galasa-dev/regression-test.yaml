@@ -8,7 +8,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: regression-test
-  namespace: galasa-prod
+  namespace: galasa-dev
 spec:
   schedule: 0 6 * * * # Daily at 06:00
   successfulJobsHistoryLimit: 1
@@ -55,7 +55,7 @@ spec:
             - runs
             - prepare
             - --bootstrap
-            - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
             - --stream
             - inttests
             - --portfolio
@@ -73,6 +73,14 @@ spec:
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
+            env:
+            - name: GALASA_HOME
+              value: /galasa
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
             volumeMounts:
             - mountPath: /galasa
               name: static-files
@@ -83,7 +91,7 @@ spec:
             - runs
             - submit
             - --bootstrap
-            - https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
             - --portfolio
             - /galasa/tests.yaml
             - --throttle
@@ -105,6 +113,14 @@ spec:
             resources: {}
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
+            env:
+            - name: GALASA_HOME
+              value: /galasa
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
             volumeMounts:
             - mountPath: /galasa
               name: static-files

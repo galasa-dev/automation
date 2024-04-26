@@ -72,14 +72,23 @@ mkdir -p temp
 
 export release_type="release"
 
-function ask_user_for_release_version {
-    h1 "Please type the version of this release..."
+function get_galasa_version_to_be_released {
+    h1 "Working out the version of Galasa to test and release."
 
-    read -p "Please enter the version number: " version
+    url="https://development.galasa.dev/main/maven-repo/obr/dev/galasa/dev.galasa.uber.obr/"
+    curl $url > temp/galasa-version.txt -s
+    rc=$?; 
+    if [[ "${rc}" != "0" ]]; then 
+      error "Failed to get galasa version"
+      exit 1
+    fi
 
-    echo "You are doing a release for version ${version}"
+    # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
+    galasa_version=$(cat temp/galasa-version.txt | grep '<a * href=\"[0-9]*\.[0-9]*\.[0-9]*\/\"' | cut -f2 -d'"' | cut -f1 -d'/')
+
+    success "Galasa version to be tested and released is ${galasa_version}"
+    export galasa_version
 }
-
 
 function set_kubernetes_context {
     namespace="galasa-build"
@@ -97,7 +106,7 @@ function set_kubernetes_context {
 
 function deploy_maven_artifacts {
 
-    h1 "Deploying all Galasa artifacts at version ${version}"
+    h1 "Deploying all Galasa artifacts at version ${galasa_version}"
 
     branch_name="${release_type}"
 
@@ -120,7 +129,7 @@ metadata:
 spec:
   params:
   - name: version
-    value: "$version"
+    value: "$galasa_version"
   pipelineRef:
     name: deploy-maven-galasa
   podTemplate:
@@ -180,6 +189,6 @@ EOF
     success "All maven artifacts have been successfully deployed. Yay!"
 }
 
-ask_user_for_release_version
-set_kubernetes_context
-deploy_maven_artifacts
+get_galasa_version_to_be_released
+# set_kubernetes_context
+# deploy_maven_artifacts

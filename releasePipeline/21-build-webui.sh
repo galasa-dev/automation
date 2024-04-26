@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Creates a new branch to use in each repo.
+# Objectives: Build the webui repository on release/prerelease branches.
 #
 # Environment variable over-rides:
 # 
@@ -42,26 +42,16 @@ blue=$(tput setaf 25)
 # Headers and Logging
 #
 #-----------------------------------------------------------------------------------------                   
-underline() { printf "${underline}${bold}%s${reset}\n" "$@"
-}
-h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@"
-}
-h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@"
-}
-debug() { printf "${white}%s${reset}\n" "$@"
-}
-info() { printf "${white}➜ %s${reset}\n" "$@"
-}
-success() { printf "${green}✔ %s${reset}\n" "$@"
-}
-error() { printf "${red}✖ %s${reset}\n" "$@"
-}
-warn() { printf "${tan}➜ %s${reset}\n" "$@"
-}
-bold() { printf "${bold}%s${reset}\n" "$@"
-}
-note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
-}
+underline() { printf "${underline}${bold}%s${reset}\n" "$@" ;}
+h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@" ;}
+h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@" ;}
+debug() { printf "${white}%s${reset}\n" "$@" ;}
+info() { printf "${white}➜ %s${reset}\n" "$@" ;}
+success() { printf "${green}✔ %s${reset}\n" "$@" ;}
+error() { printf "${red}✖ %s${reset}\n" "$@" ;}
+warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
+bold() { printf "${bold}%s${reset}\n" "$@" ;}
+note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 
 #-----------------------------------------------------------------------------------------                   
@@ -103,27 +93,49 @@ function set_kubernetes_context {
 
 
 
-function create_branches {
+function build_webui {
 
-    rm -f temp/create_branches.yaml
-    cat << EOF > temp/create_branches.yaml
+    yaml_file="build_webui.yaml"
+
+    rm -f temp/${yaml_file}
+    cat << EOF > temp/${yaml_file}
 
 #
-# Clones all the galasa repositories into the workspace and 
-# creates a branch in each one.
+# Copyright contributors to the Galasa project 
 #
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: branch-create-
+  generateName: webui-build-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
 spec:
+  params:
+  - name: toBranch
+    value: ${release_type}
+  - name: imageTag
+    value: ${release_type}
+#
+# 
+# 
   pipelineRef:
-    name: branch-create-galasa
+    name: branch-webui
+  serviceAccountName: galasa-build-bot
+# 
+# 
+# 
   podTemplate:
     volumes:
+    - name: gradle-properties
+      secret:
+        secretName: gradle-properties
+    - name: gpg-key
+      secret:
+        secretName: gpg-key
+    - name: mavengpg
+      secret:
+        secretName: mavengpg
     - name: githubcreds
       secret:
         secretName: github-token
@@ -133,24 +145,25 @@ spec:
     - name: mavencreds
       secret:
         secretName: maven-creds
-  params:
-  - name: distBranch
-    value: "${release_type}"
-  - name: fromBranch
-    value: "main"
-#  - name: overwrite
-#    value: "--overwrite"
-#  - name: force
-#    value: ""
+  workspaces:
+  - name: git-workspace
+    volumeClaimTemplate:
+      spec:
+        storageClassName: longhorn-temp
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
 
 EOF
 
-    output=$(kubectl -n galasa-build create -f temp/create_branches.yaml)
+    output=$(kubectl -n galasa-build create -f temp/${yaml_file})
     # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    # pipelinerun.tekton.dev/webui-build-8cbj8 created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to create the branches. rc=$?"
+        error "Failed to start the webui build pipeline. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
@@ -158,43 +171,13 @@ EOF
 
     pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
 
-    MAX_WAIT_ITERATIONS=30
-    COUNTER=0
-    while [  $COUNTER -lt $MAX_WAIT_ITERATIONS ]; do
-        info "Sleeping, waiting for pipeline run ${pipeline_run_name} to succeed.." 
-        # Sleep for a second.
-        sleep 10
-        let COUNTER=COUNTER+1 
 
-        # Find the status of the pipeline run...
-        status=$(kubectl get $pipeline_run_name | tail -1 | xargs | cut -f2 -d' ')
-        if [[ "${status}" == "True" ]]; then
-            info "Pipeline run completed OK."
-            break
-        fi
-
-        if [[ "${status}" == "True" ]]; then
-            info "Pipeline run completed OK."
-            break
-        fi
-
-        if [[ "${status}" == "False" ]]; then
-            error "Pipeline run $pipeline_run_name failed."
-            exit 1
-            break
-        fi
-    done
-    
-    if [ ${COUNTER} -ge $MAX_WAIT_ITERATIONS ]; then 
-        error "Timed out waiting for pipeline run ${pipeline_run_name} to complete."
-        exit 1
-    fi
-
-    success "All branches in github called ${release_type} are now created. Yay!"
+    success "Branch build for the Galasa Web UI kicked off."
+    bold "Now use the tekton dashboard to monitor it."
 }
 
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
-    ask_user_for_release_type
-    set_kubernetes_context
-    create_branches
+  ask_user_for_release_type
+  set_kubernetes_context
+  build_all_code
 fi

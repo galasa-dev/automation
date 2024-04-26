@@ -16,16 +16,37 @@ spec:
   params:
   - name: context
     type: string
+  - name: entrypoint
+    type: string
+    default: galasactl
   - name: command
     type: array
-  - name: galasactlImageTag
+  - name: image
     type: string
-    default: main
+    default: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
+  - name: galasaTokenSecretName
+    type: string
+    default: galasa-prod1-token
+  - name: galasaTokenSecretKey
+    type: string
+    default: token
+  - name: galasaHome
+    type: string
+    default: ""
   steps:
   - name: galasactl
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.galasactlImageTag)
+    image: $(params.image)
     imagePullPolicy: Always
+    env:
+    - name: GALASA_HOME
+      value: $(params.galasaHome)
+    - name: GALASA_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: $(params.galasaTokenSecretName)
+          key: $(params.galasaTokenSecretKey)
+          optional: false
     command:
-    - galasactl
+    - $(params.entrypoint)
     - $(params.command[*])

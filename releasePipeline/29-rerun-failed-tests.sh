@@ -112,7 +112,7 @@ function download_galasactl {
 
 function get_failed_tests {
 
-    bootstrap="https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap"
+    bootstrap="https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap"
 
     cd ${BASEDIR}/temp
     mkdir -p home
