@@ -32,6 +32,9 @@ spec:
   - name: action
     type: string
   tasks:
+#
+#
+#
   - name: git-verify
     taskRef:
       name: git-verify
@@ -42,6 +45,9 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+#
+#
+#
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -61,6 +67,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: clone-buildutils
     taskRef: 
       name: git-clone
@@ -79,7 +88,10 @@ spec:
       value: $(context.pipelineRun.name)/buildutils
     workspaces:
      - name: output
-       workspace: git-workspace 
+       workspace: git-workspace
+#
+#
+#
   - name: make
     taskRef:
       name: make-with-params
@@ -91,6 +103,23 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+# 
+# 
+#
+  - name: make-openapi2beans
+    taskRef:
+      name: make-with-params
+    runAfter:
+      - clone-buildutils
+    params:
+    - name: directory
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+#
+#
+#
   - name: build-galasabld-executable
     taskRef:
       name: docker-build
@@ -114,6 +143,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+#
+#
+#
   - name: build-galasabld-ibm-executable
     taskRef:
       name: docker-build
@@ -137,6 +169,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+#
+#
+#
   finally:
   - name: git-status
     when:

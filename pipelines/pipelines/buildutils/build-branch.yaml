@@ -82,6 +82,20 @@ spec:
        workspace: git-workspace 
 # 
 # 
+#
+  - name: make-openapi2beans
+    taskRef:
+      name: make-with-params
+    runAfter:
+      - clone-buildutils  
+    params:
+    - name: directory
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
 # 
   - name: build-galasabld-binary-downloadables
     taskRef:
