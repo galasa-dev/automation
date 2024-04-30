@@ -8,7 +8,7 @@
 
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Update the version of cps properties
+# Objectives: Update the version of CPS properties
 #
 # Environment variable over-rides:
 # 
