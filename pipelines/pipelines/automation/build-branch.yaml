@@ -504,7 +504,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/openjdk11-ibm-gradle-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/openjdk11-ibm-gradle:$(params.headSha)
+      value: harbor.galasa.dev/common/openjdk11-ibm-gradle:$(params.branch)
     - name: noPush
       value: ""
     workspaces:

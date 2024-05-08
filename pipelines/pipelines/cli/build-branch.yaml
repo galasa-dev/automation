@@ -329,7 +329,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: harbor.galasa.dev/common/openjdk11-ibm:main
+      value: harbor.galasa.dev/common/openjdk11-ibm-gradle:main
     - name: galasaHome
       value: /workspace/git/$(context.pipelineRun.name)
     - name: entrypoint
