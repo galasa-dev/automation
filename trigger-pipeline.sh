@@ -29,26 +29,16 @@ blue=$(tput setaf 25)
 # Headers and Logging
 #
 #--------------------------------------------------------------------------
-underline() { printf "${underline}${bold}%s${reset}\n" "$@"
-}
-h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@"
-}
-h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@"
-}
-debug() { printf "${white}%s${reset}\n" "$@"
-}
-info() { printf "${white}➜ %s${reset}\n" "$@"
-}
-success() { printf "${green}✔ %s${reset}\n" "$@"
-}
-error() { printf "${red}✖ %s${reset}\n" "$@"
-}
-warn() { printf "${tan}➜ %s${reset}\n" "$@"
-}
-bold() { printf "${bold}%s${reset}\n" "$@"
-}
-note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
-}
+underline() { printf "${underline}${bold}%s${reset}\n" "$@" ;}
+h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@" ;}
+h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@" ;}
+debug() { printf "${white}%s${reset}\n" "$@" ;}
+info() { printf "${white}➜ %s${reset}\n" "$@" ;}
+success() { printf "${green}✔ %s${reset}\n" "$@" ;}
+error() { printf "${red}✖ %s${reset}\n" "$@" ;}
+warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
+bold() { printf "${bold}%s${reset}\n" "$@" ;}
+note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 #-----------------------------------------------------------------------------------------                   
 # Functions
@@ -73,6 +63,7 @@ Options are:
 --obr-generic
 --simplatform
 --isolated
+--automation
 -p | --pipeline xxx : Set the name of pipeline to run explicitly
 
 Environment variables used:
@@ -120,6 +111,8 @@ while [ "$1" != "" ]; do
         --wrapping )            pipeline="branch-wrapping"
                                 ;;
         --obr-generic )         pipeline="branch-obr-generic"
+                                ;;
+        --automation )          pipeline="branch-automation"
                                 ;;
         --simplatform )         pipeline="branch-simplatform"
                                 ;;
