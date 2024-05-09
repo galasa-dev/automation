@@ -120,7 +120,8 @@ The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to comp
 ### Bump to new version for development
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. Upgrade the version of Galasa to the new development version. This can be done automated using the 99-update-development-version.sh, or manual in the galasa-prod Ecosystem CPS properties, using the galasa cli as show below, and replacing the value `0.33.0` with the new development version. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
+2. Upgrade the values of the galasa-prod Ecosystem CPS properties by running the `set-version.sh` script, which upgrades them automatically.
+   To manually update the values of the galasa-prod Ecosystem CPS properties, run the commands shown below on the Galasa CLI, replacing the value `0.33.0` with the new development version. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
 
    ``` shell
    galasactl properties set --namespace galasaecosystem --name isolated.full.zip --value https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.33.0/galasa-isolated-0.33.0.zip --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap

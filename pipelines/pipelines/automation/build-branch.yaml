@@ -43,6 +43,28 @@ spec:
      - name: output
        workspace: git-workspace
 # 
+#
+#
+  - name: apply-galasa-properties
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    - name: command
+      value:
+        - resources
+        - apply
+        - -f
+        - cps-properties.yaml 
+    - name: galasactlImageTag
+      value: stable
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
 # 
 # 
   - name: get-commit
