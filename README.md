@@ -9,7 +9,7 @@ Find out more about:
 1. [infrastructure](#infrastructure): The Galasa infrastructure as code, including the Kubernetes set-up
 1. [offline-tools](#offline-tools): Source code for the copyright checker tool
 1. [pipelines](#pipelines): The CustomResourceDefinitions used in our Tekton build pipelines, ClusterRoles, EventListeners, Pipelines, Roles, ServiceAccounts and Tasks
-1. [releasePipeline](#releasePipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
+1. [releasePipeline](#release-pipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
 
 
 # Build-images
