@@ -9,7 +9,7 @@ Find out more about:
 1. [infrastructure](#infrastructure): The Galasa infrastructure as code, including the Kubernetes set-up
 1. [offline-tools](#offline-tools): Source code for the copyright checker tool
 1. [pipelines](#pipelines): The CustomResourceDefinitions used in our Tekton build pipelines, ClusterRoles, EventListeners, Pipelines, Roles, ServiceAccounts and Tasks
-1. [releasePipeline](#releasePipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
+1. [releasePipeline](#release-pipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
 
 
 # Build-images
@@ -39,7 +39,7 @@ This directory is the single location for all Dockerfiles needed to build the im
 
 | Category | Dockerfiles |
 |----------|-------------|
-| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, github-monitor, github-receiver, gpg, kubectl, openapi, openjdk11-ibm, swagger, tkn, unzip | 
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, github-monitor, github-receiver, gpg, kubectl, openapi, openjdk11-ibm, openjdk11-ibm-gradle, swagger, tkn, unzip, zip | 
 | Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
 | Maven repositories for the built Galasa core components | wrapping, gradle, maven, framework, extensions, managers, obr, cli-binary, isolated |
@@ -75,6 +75,11 @@ galasa-plan-b-lon02:
 * Our image registry [Harbor](harbor.galasa.dev) is hosted on the external cluster.
 
 
+# Offline Tools
+
+The offline-tools directory contains the source code for the GitHub Copyright Checker tool. Read more [here](./offline-tools/copyrighter/README.md)
+
+
 # Pipelines
 
 ## Cluster Roles
@@ -104,7 +109,7 @@ This EventListener is triggered via webhook when code is pushed into the main br
 
 ## Pipelines
 
-Galasa's architecture means that the core components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping.
+Galasa's architecture means that the core components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping. In some instances, the build pipeline for a component triggers the next pipeline in the chain, and in some instances, the component is not connected in the chain, but when it is rebuilt, it draws on artifacts from the other.
 
 In the pipelines, you will see that during some of the Maven or Gradle builds, the Maven source is pointed at the Maven artifact repository of the previous component. So, Framework's Gradle build has the build argument _-PsourceMaven=https://development.galasa.dev/main/maven-repo/maven_ so it can use artifacts from Maven's build.
 
@@ -163,7 +168,8 @@ tkn pipeline start branch-framework -n galasa-build \
 --param refspec=refs/heads/iss001:refs/heads/iss001 \
 --param imageTag=iss001 \
 --param appname=iss001-maven-repo \ 
---param jacocoEnabled=false
+--param jacocoEnabled=false \ 
+--param isMainOrRelease=false
 ```
 5. The first pipeline should start, and then will trigger the following pipeline in the chain by running a similar tkn command in a task at the end of the pipeline.
 6. After the OBR pipeline has successfully ran, go to your app on Argo CD and 'Sync' your resources.
@@ -212,11 +218,6 @@ The Docker image for the galasactl CLI is pushed [here](https://harbor.galasa.de
 The Docker image conatining the galasactl CLI binaries is pushed [here](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-cli-binary-downloadables/artifacts-tab).
 
 The CLI binaries are downloadable from [here](https://development.galasa.dev/main/binary/cli).
-
-
-**Codecoverage**
-
-_More documentation to be written._ 
 
 
 **Extensions**
