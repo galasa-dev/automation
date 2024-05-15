@@ -1,0 +1,237 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.inttests.location
+data:
+    value: https://development.galasa.dev/main/maven-repo/inttests/dev/galasa/dev.galasa.inttests.obr/0.33.0/dev.galasa.inttests.obr-0.33.0-testcatalog.json
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.inttests.obr
+data:
+    value: mvn:dev.galasa/dev.galasa.inttests.obr/0.33.0/obr 
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: resource.management.dead.heartbeat.timeout
+data:
+    value: "40"
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: request.type.CLI.prefix
+data:
+    value: C
+--- 
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: request.type.LOCAL.prefix
+data:
+    value: L
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: request.type.REQUEST.prefix
+data:
+    value: R
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: resource.management.finished.timeout
+data:
+    value: "40"
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.cics-prod.description
+data:
+    value: CICS TS Tests - Production (New)
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.inttests.description
+data:
+    value: Galasa Integration tests
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.inttests.repo
+data:
+    value: https://development.galasa.dev/main/maven-repo/inttests/
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.simbank.description
+data:
+    value: SimBank Tests
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.simbank.location
+data:
+    value: https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/testcatalog/galasasimbank
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.simbank.obr
+data:
+    value: mvn:dev.galasa/dev.galasa.simbank.obr/0.15.0/obr
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.simbank.repo
+data:
+    value: https://repo.maven.apache.org/maven2/
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: request.prefix.maximum
+data:
+    value: "99999"
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: waiting.initial.delay
+data:
+    value: "180"
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: waiting.random.delay
+data:
+    value: "60"
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.streams
+data:
+    value: inttests,cip,simbank,resourcebuilder,pong,zosk8s,galasa-vtp-demo
+---
+# Galasa Ecosystem properties
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: isolated.full.zip
+data:
+    value: https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.33.0/galasa-isolated-0.33.0.zip
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: isolated.mvp.zip
+data:
+    value: https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/0.33.0/galasa-isolated-mvp-0.33.0.zip
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: simplatform.docker.version
+data:
+    value: main
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: central.repository
+data:
+    value: https://repo.maven.apache.org/maven2
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: docker.version
+data:
+    value: main
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: galasaboot.version
+data:
+    value: 0.31.0
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: runtime.repository
+data:
+    value: https://development.galasa.dev/main/maven-repo/obr
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: runtime.version
+data:
+    value: 0.33.0
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: simbanktests.version
+data:
+    value: 0.25.0
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: simplatform.repository
+data:
+    value: https://development.galasa.dev/main/maven-repo/simplatform
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: simplatform.version
+data:

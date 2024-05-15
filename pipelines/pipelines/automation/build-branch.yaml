@@ -43,6 +43,28 @@ spec:
      - name: output
        workspace: git-workspace
 # 
+#
+#
+  - name: apply-galasa-properties
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    - name: command
+      value:
+        - resources
+        - apply
+        - -f
+        - cps-properties.yaml 
+    - name: galasactlImageTag
+      value: stable
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
 # 
 # 
   - name: get-commit
@@ -487,6 +509,31 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
+
+
+# We need an image which can build tests and run galasactl locally, but has the IBM certificates so
+# we can reach an ecosystem within the IBM firewall.
+  - name: build-openjdk11-ibm-gradle-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/openjdk11-ibm-gradle-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/openjdk11-ibm-gradle:$(params.branch)
+    - name: noPush
+      value: ""
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+
 
   finally:
   - name: report-failed-build

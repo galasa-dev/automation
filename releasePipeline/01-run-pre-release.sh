@@ -84,3 +84,9 @@ source $BASEDIR/20-build-all-code.sh
 ask_user_for_release_type
 set_kubernetes_context
 build_all_code
+
+h1 "run 21-build-webui.sh"
+source $BASEDIR/21-build-webui.sh
+ask_user_for_release_type
+set_kubernetes_context
+build_webui

@@ -652,3 +652,23 @@ spec:
         - $(params.distBranch)
         - --credentials
         - /creds/githubcreds.yaml
+# 
+####### Web UI
+# 
+  - name: delete-branch-webui
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - webui
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml
