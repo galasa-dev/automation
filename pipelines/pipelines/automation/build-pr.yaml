@@ -430,9 +430,7 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-#
-#
-#
+
   - name: build-zip-image
     taskRef:
       name: docker-build
@@ -447,6 +445,26 @@ spec:
       value: automation/dockerfiles/common/zip-dockerfile
     - name: imageName
       value: harbor.galasa.dev/common/zip:$(params.headSha)
+    - name: noPush
+      value: --no-push
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: build-unified-agent-image
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/common
+    - name: dockerfilePath
+      value: automation/dockerfiles/common/unified-agent-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/common/unified-agent:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
