@@ -465,26 +465,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-
-  - name: build-unified-agent-image
-    taskRef:
-      name: docker-build
-    runAfter:
-    - clone-automation
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/common
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/unified-agent-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/unified-agent:$(params.branch)
-    - name: noPush
-      value: ""
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
   
   #---------------------------------------------------------------------
   # open jdk 11 image with the IBM certs installed in the trust store and JRE
