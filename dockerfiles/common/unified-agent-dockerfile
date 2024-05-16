@@ -1,0 +1,7 @@
+FROM harbor.galasa.dev/docker_proxy_cache/library/openjdk:11
+
+RUN mkdir /opt/wss-unified-agent
+
+RUN touch /opt/wss-unified-agent/wss-unified-agent.config
+
+RUN curl -L https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar -o /opt/wss-unified-agent/wss-unified-agent.jar

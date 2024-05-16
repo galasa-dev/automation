@@ -3,8 +3,5 @@ FROM harbor.galasa.dev/docker_proxy_cache/library/alpine:3.18.6
 RUN apk add curl
 RUN apk add sudo
 
-COPY pipelines/templates/git-workspace-template.yaml opt/templates
-COPY pipelines/templates/pod-template.yaml opt/templates
-
 RUN curl -LO https://github.com/tektoncd/cli/releases/download/v0.33.0/tkn_0.33.0_Linux_x86_64.tar.gz
 RUN sudo tar xvzf tkn_0.33.0_Linux_x86_64.tar.gz -C /usr/local/bin/ tkn
