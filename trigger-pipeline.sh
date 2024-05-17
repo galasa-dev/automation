@@ -63,6 +63,7 @@ Options are:
 --obr-generic
 --simplatform
 --isolated
+--buildutils
 --automation
 -p | --pipeline xxx : Set the name of pipeline to run explicitly
 
@@ -117,6 +118,8 @@ while [ "$1" != "" ]; do
         --simplatform )         pipeline="branch-simplatform"
                                 ;;
         --isolated )            pipeline="branch-isolated"
+                                ;;
+        --buildutils )          pipeline="branch-buildutils"
                                 ;;
         -p | --pipeline )       shift
                                 pipeline=$1
