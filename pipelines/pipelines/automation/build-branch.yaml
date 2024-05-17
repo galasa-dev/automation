@@ -51,14 +51,18 @@ spec:
     runAfter:
     - clone-automation
     params:
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-prod/galasa-prod
+      value: $(context.pipelineRun.name)/automation/infrastructure/cicsk8s/galasa-dev
     - name: command
       value:
         - resources
         - apply
         - -f
         - cps-properties.yaml 
+        - --bootstrap
+        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
     - name: galasactlImageTag
       value: stable
     workspaces:
