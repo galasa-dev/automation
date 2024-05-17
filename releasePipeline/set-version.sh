@@ -104,7 +104,7 @@ function upgrade_test_stream_inttests_location_version {
     property_name="test.stream.inttests.location"
     h1 "Bumping up the version of '${property_name}'"
 
-    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
     file="cps-properties.yaml"
 
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/dev[.]galasa[.]inttests[.]obr-[0-9.]+-testcatalog[.]json"
@@ -122,7 +122,7 @@ function upgrade_test_stream_inttests_obr_version {
     property_name="test.stream.inttests.obr"
     h1 "Bumping up the version of '${property_name}'"
 
-    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
     file="cps-properties.yaml"
 
     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/obr"
@@ -140,7 +140,7 @@ function upgrade_isolatd_full_zip_version {
     property_name="isolated.full.zip"
     h1 "Bumping up the version of '${property_name}'"
 
-    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
     file="cps-properties.yaml"
 
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/[0-9.]+\\/galasa-isolated-[0-9.]+.zip"
@@ -158,7 +158,7 @@ function upgrade_isolatd_mvp_zip_version {
     property_name="isolated.mvp.zip"
     h1 "Bumping up the version of '${property_name}'"
 
-    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
     file="cps-properties.yaml"
 
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/[0-9.]+\\/galasa-isolated-mvp-[0-9.]+[.]zip"
@@ -177,20 +177,21 @@ function upgrade_runtime_version {
     h1 "Bumping up the version of '${property_name}'"
     
     #create a temp file
-    temp_file="${WORKSPACE_DIR}/temp/cps-prop1.yaml"
+    temp_file="${WORKSPACE_DIR}/temp/cps-prop.yaml"
     >$temp_file
 
     #count variavle to find the 'value: X.XX.X' line
     count=0
 
-    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-prod/galasa-prod
+    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
     source_file="cps-properties.yaml"
 
     info "Updating file $source_file"
     # Note: There are several matches for value: X.XX.X so we need to find the correct one...
     rm -f $temp_file
     found_property_name="false"
-    while IFS= read -r line; do 
+    #[ -n "$line" ] prevents the last line from being deleted if it's not a new line
+    while IFS= read -r line || [ -n "$line" ]; do 
         outputLine="$line"
         if [[ "$found_property_name" == "false" ]]; then
             if [[ "$line" =~ \s*${property_name}\s* ]]; then
