@@ -195,7 +195,7 @@ metadata:
     namespace: galasaecosystem
     name: galasaboot.version
 data:
-    value: 0.31.0
+    value: 0.34.0
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
