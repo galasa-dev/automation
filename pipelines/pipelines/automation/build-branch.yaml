@@ -52,7 +52,7 @@ spec:
     - clone-automation
     params:
     - name: context
-      value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml
+      value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-dev
     - name: command
       value:
         - resources
