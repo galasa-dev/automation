@@ -51,6 +51,8 @@ spec:
     runAfter:
     - clone-automation
     params:
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)/.galasa
     - name: context
       value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-dev
     - name: command
