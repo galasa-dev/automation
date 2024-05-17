@@ -52,9 +52,9 @@ spec:
     - clone-automation
     params:
     - name: galasaHome
-      value: /workspace/git/$(context.pipelineRun.name)/.galasa
+      value: /workspace/git/$(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/infrastructure/cicsk8s/galasa-dev
+      value: $(context.pipelineRun.name)/automation/infrastructure/cicsk8s/galasa-dev
     - name: command
       value:
         - resources

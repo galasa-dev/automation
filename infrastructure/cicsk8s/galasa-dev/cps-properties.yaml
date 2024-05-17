@@ -235,3 +235,4 @@ metadata:
     namespace: galasaecosystem
     name: simplatform.version
 data:
+    value: 0.24.0
