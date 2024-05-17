@@ -301,6 +301,27 @@ spec:
 #
 #
 #
+  - name: generate-openapi-beans
+    taskRef:
+      name: openapi2beans
+    runAfter:
+    - clone-framework
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: yaml-location
+      value: galasa-parent/dev.galasa.framework.api.openapi/src/main/resources/openapi.yaml
+    - name: output-location
+      value: galasa-parent/dev.galasa.framework.api.beans/src/main/java
+    - name: package
+      value: dev.galasa.framework.api.beans.generated
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   # Trigger the next Pipeline (branch-extensions)
   - name: trigger-extensions
     taskRef:
