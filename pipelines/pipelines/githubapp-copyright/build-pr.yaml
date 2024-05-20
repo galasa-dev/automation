@@ -102,7 +102,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/githubapp-copyright:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     workspaces:
      - name: git-workspace
        workspace: git-workspace

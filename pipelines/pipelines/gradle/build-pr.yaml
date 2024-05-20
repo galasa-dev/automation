@@ -129,7 +129,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-gradle:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=tag=main"

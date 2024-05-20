@@ -221,7 +221,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-obr-generic:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=tag=main"
@@ -263,7 +263,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-boot-embedded-amd64:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=tag=main"
@@ -288,7 +288,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=tag=main"
