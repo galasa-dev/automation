@@ -190,5 +190,5 @@ EOF
 }
 
 get_galasa_version_to_be_released
-# set_kubernetes_context
-# deploy_maven_artifacts
+set_kubernetes_context
+deploy_maven_artifacts
