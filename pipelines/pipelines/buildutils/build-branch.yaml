@@ -195,7 +195,7 @@ spec:
        workspace: git-workspace 
 # 
 # 
-# 
+# builds openapi2beans binaries to a site for downloading from
   - name: build-openapi2beans-binary-downloadables
     taskRef:
       name: docker-build
@@ -221,7 +221,7 @@ spec:
        workspace: git-workspace 
 # 
 # 
-# 
+# causes argocd to recycle
   - name: recycle-openapi2beans-binaries
     taskRef:
       name: argocd-cli
@@ -243,12 +243,13 @@ spec:
       - bld-$(params.imageTag)
 # 
 # 
-# 
+# builds openapi2beans to a dockerfile
   - name: build-openapi2beans-executable
     taskRef:
       name: docker-build
     runAfter:
     - make-openapi2beans
+    - clone-automation
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
