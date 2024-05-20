@@ -7,52 +7,31 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: pr-buildutils
+  name: test-branch-buildutils
   namespace: galasa-build
 spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
+  - name: imageTag
+    type: string
+    default: main
+  - name: appname
+    type: string
+    default: main-bld
   workspaces:
   - name: git-workspace
-  params:
-  - name: headRef
-    type: string
-  - name: headSha
-    type: string
-  - name: baseRef
-    type: string
-  - name: prUrl
-    type: string
-  - name: statusesUrl
-    type: string
-  - name: issueUrl
-    type: string
-  - name: userId
-    type: string
-  - name: prNumber
-    type: string
-  - name: action
-    type: string
+# 
+# 
+#
   tasks:
-#
-#
-#
-  - name: git-verify
-    taskRef:
-      name: git-verify
-    params:
-    - name: userId
-      value: $(params.userId)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: action
-      value: $(params.action)
-#
-#
-#
   - name: clone-automation
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
@@ -67,30 +46,28 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
-#
-#
+# 
+# 
 #
   - name: clone-buildutils
     taskRef: 
       name: git-clone
-    runAfter:
-      - git-verify
     params:
     - name: url
       value: https://github.com/galasa-dev/buildutils
     - name: revision
-      value: $(params.baseRef)
+      value: $(params.branch)
     - name: refspec
-      value: refs/pull/$(params.prNumber)/head:refs/heads/$(params.baseRef)
+      value: $(params.refspec)
     - name: depth
       value: "99999999"
     - name: subdirectory
       value: $(context.pipelineRun.name)/buildutils
     workspaces:
      - name: output
-       workspace: git-workspace
-#
-#
+       workspace: git-workspace 
+# 
+# 
 #
   - name: make
     taskRef:
@@ -102,11 +79,11 @@ spec:
       value: $(context.pipelineRun.name)/buildutils
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
-#
-#
-#
-  - name: build-galasabld-executable
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: build-galasabld-binary-downloadables
     taskRef:
       name: docker-build
     runAfter:
@@ -116,11 +93,58 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
+      value: $(context.pipelineRun.name)
+    - name: dockerfilePath
+      value: automation/dockerfiles/galasabld/galasabld-binary-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=branch=$(params.branch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: recycle-galasabld-binaries
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - build-galasabld-binary-downloadables
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - bld-$(params.imageTag)
+# 
+# 
+# 
+  - name: build-galasabld-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - make
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
       value: $(context.pipelineRun.name)/buildutils
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
@@ -128,10 +152,10 @@ spec:
         - "--build-arg=platform=linux-amd64"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
-#
-#
-#
+       workspace: git-workspace
+# 
+# 
+# 
   - name: build-galasabld-ibm-executable
     taskRef:
       name: docker-build
@@ -145,16 +169,16 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/galasabld/galasabld-ibm-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=$(params.headSha)"
+        - "--build-arg=branch=$(params.imageTag)"
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
+       workspace: git-workspace
 # 
 # 
 #
@@ -162,16 +186,16 @@ spec:
     taskRef:
       name: make-with-params
     runAfter:
-      - clone-buildutils
+      - clone-buildutils  
     params:
     - name: directory
       value: $(context.pipelineRun.name)/buildutils/openapi2beans
     workspaces:
      - name: git-workspace
-       workspace: git-workspace
-#
-#
-#
+       workspace: git-workspace 
+# 
+# 
+# 
   - name: build-openapi2beans-binary-downloadables
     taskRef:
       name: docker-build
@@ -224,7 +248,7 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - make-openapi2beans
+    - make
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
@@ -242,25 +266,3 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-#
-#
-#
-  finally:
-  - name: git-status
-    when:
-      - input: "$(tasks.git-verify.status)"
-        operator: in
-        values: ["Succeeded"]
-    taskRef:
-      name: git-status
-    params:
-    - name: status
-      value: $(tasks.status)
-    - name: prUrl
-      value: $(params.prUrl)
-    - name: statusesUrl
-      value: $(params.statusesUrl)
-    - name: issueUrl
-      value: $(params.issueUrl)
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)

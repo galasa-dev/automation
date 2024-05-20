@@ -269,32 +269,6 @@ spec:
 # 
 # 
 # 
-  - name: build-openapi2beans-ibm-executable
-    taskRef:
-      name: docker-build
-    runAfter:
-    - build-openapi2beans-executable
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
-    - name: dockerfilePath
-      value: automation/dockerfiles/openapi2beans/openapi2beans-ibm-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/openapi2beans-ibm-amd64:$(params.imageTag)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
-        - "--build-arg=branch=$(params.imageTag)"
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
   finally:
   - name: report-failed-build
     when:

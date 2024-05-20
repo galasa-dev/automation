@@ -1,0 +1,368 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: test-branch-framework
+  namespace: galasa-build
+spec:
+  params:
+  - name: fromBranch
+    type: string
+    default: main
+  - name: toBranch
+    type: string
+    default: main
+  - name: revision
+    type: string
+    default: main
+  - name: refspec
+    type: string
+    default: refs/heads/main:refs/heads/main
+  - name: imageTag
+    type: string
+    default: main
+  - name: appname
+    type: string
+    default: main-maven-repos
+  - name: jacocoEnabled
+    type: string
+    default: "true"
+  # isMainOrRelease accepts a true or false value which is passed to the Gradle build script as a build argument later.
+  # When set to true, Gradle will complete signing tasks like signing artifacts with a GPG key.
+  # Should be set to true for Main or Release builds. Set to false if doing a branch build.
+  - name: isMainOrRelease
+    type: string
+    default: "true"
+  workspaces:
+  - name: git-workspace
+# 
+# 
+# 
+  tasks:
+  - name: clone-automation
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: clone-framework
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/framework
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/framework
+    workspaces:
+     - name: output
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: check-branch
+    taskRef: 
+      name: git-check-branch
+    runAfter:
+    - clone-framework  
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: branch
+      value: $(params.toBranch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# 
+  - name: get-commit
+    taskRef:
+      name: get-commit
+    runAfter:
+    - check-branch
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: repo
+      value: framework
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: branch-gradle-build-framework
+    taskRef:
+      name: gradle-build
+    runAfter: 
+      - check-branch
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework/galasa-parent
+    - name: buildArgs
+      value:
+        - "-PsourceMaven=https://development.galasa.dev/$(params.fromBranch)/maven-repo/maven"
+        - "-PcentralMaven=https://repo.maven.apache.org/maven2/"
+        - "-PtargetMaven=/workspace/git/$(context.pipelineRun.name)/framework/repo"
+        - "-PjacocoEnabled=$(params.jacocoEnabled)"
+        - "-PisMainOrRelease=$(params.isMainOrRelease)"
+    - name: command
+      value: 
+        - check
+        - publish
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# 
+  - name: branch-docker-build-framework
+    taskRef:
+      name: docker-build
+    runAfter:
+    - get-commit
+    - branch-gradle-build-framework
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: dockerfilePath
+      value: automation/dockerfiles/framework/framework-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-framework:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=tag=$(params.fromBranch)"
+        - "--build-arg=dockerRepository=harbor.galasa.dev"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: generate-api-docs
+    taskRef:
+      name: general-command
+    runAfter:
+    - clone-framework
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: image
+      value: harbor.galasa.dev/common/swagger:main
+    - name: command
+      value:
+        - java
+        - -jar
+        - /opt/swagger/swagger-codegen-cli.jar
+        - generate
+        - -i
+        - /workspace/git/$(context.pipelineRun.name)/framework/galasa-parent/dev.galasa.framework.api.openapi/src/main/resources/openapi.yaml
+        - -l
+        - html2
+        - -o
+        - docs/generated/galasaapi
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: docker-build-restapidoc-site
+    taskRef:
+      name: docker-build
+    runAfter:
+    - generate-api-docs
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/galasa-restapidoc-site:$(params.imageTag)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: noPush
+      value: ""
+    - name: dockerfilePath
+      value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  - name: recycle-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - branch-docker-build-framework
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - framework-$(params.imageTag)
+# 
+# 
+# 
+  - name: wait-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - wait
+      - $(params.appname) 
+      - --resource
+      - apps:Deployment:framework-$(params.imageTag)
+      - --health
+# 
+# 
+# 
+  - name: recycle-restapidoc-site-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - docker-build-restapidoc-site
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - actions
+      - run
+      - $(params.appname)
+      - restart
+      - --kind
+      - Deployment
+      - --resource-name
+      - restapidocsite-$(params.imageTag)
+# 
+# 
+# 
+  - name: wait-restapidoc-site-deployment
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - recycle-restapidoc-site-deployment
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value:
+      - app
+      - wait
+      - $(params.appname)
+      - --resource
+      - apps:Deployment:restapidocsite-$(params.imageTag)
+      - --health
+#
+#
+#
+  - name: generate-openapi-beans
+    taskRef:
+      name: openapi2beans
+    runAfter:
+    - clone-framework
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/framework
+    - name: yaml-location
+      value: galasa-parent/dev.galasa.framework.api.openapi/src/main/resources/openapi.yaml
+    - name: output-location
+      value: galasa-parent/dev.galasa.framework.api.beans/src/main/java
+    - name: package
+      value: dev.galasa.framework.api.beans.generated
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
+  # Trigger the next Pipeline (branch-extensions)
+  - name: trigger-extensions
+    taskRef:
+      name: tkn-cli
+    runAfter:
+    - wait-deployment
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation
+    - name: command
+      value: 
+      - pipeline
+      - start
+      - branch-extensions
+      - -n
+      - galasa-build
+      - --prefix-name 
+      - trigger-extensions-$(params.toBranch)
+      - --param
+      - fromBranch=$(params.toBranch)
+      - --param
+      - toBranch=$(params.toBranch)
+      - --param
+      - revision=$(params.revision)
+      - --param
+      - refspec=$(params.refspec)
+      - --param
+      - imageTag=$(params.imageTag)
+      - --param
+      - appname=$(params.appname)
+      - --param
+      - jacocoEnabled=$(params.jacocoEnabled)
+      - --param
+      - isMainOrRelease=$(params.isMainOrRelease)
+      - --use-param-defaults # This forces Tekton to use the default params of any we haven't passed in
+      - --workspace
+      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
+      - --pod-template
+      - ./pipelines/templates/pod-template.yaml
+      - --serviceaccount
+      - galasa-build-bot
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
