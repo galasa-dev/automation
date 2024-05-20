@@ -4,6 +4,10 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+
+#Objective: Contains Galasa Properties to be updated/created
+#Apply this file by running `kubectl apply -f <relative-path-of-cps-properties.yaml`
+
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
 metadata:
