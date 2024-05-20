@@ -248,12 +248,12 @@ spec:
     taskRef:
       name: docker-build
     runAfter:
-    - make
+    - make-openapi2beans
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/buildutils
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
     - name: dockerfilePath
       value: automation/dockerfiles/openapi2beans/openapi2beans-dockerfile
     - name: imageName

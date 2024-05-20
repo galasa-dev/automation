@@ -29,7 +29,7 @@ spec:
     default: main
   - name: image
     type: string
-    default: harbor.galasa.dev/galasadev/openapi2beans-x86_64
+    default: harbor.galasa.dev/galasadev/openapi2beans-amd64
   steps:
   - name: openapi2beans
     workingDir: /workspace/git/$(params.context)
