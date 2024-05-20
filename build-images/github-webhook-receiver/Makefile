@@ -14,7 +14,7 @@ clean:
 
 setup:
 	go get github.com/stretchr/testify/assert
-	go get github.com/spf13/viper
+	go get golang.org/x/net/http2
 
 github-webhook-receiver: bin/github-webhook-receiver-linux-amd64 \
 	bin/github-webhook-receiver-windows-amd64.exe  \
