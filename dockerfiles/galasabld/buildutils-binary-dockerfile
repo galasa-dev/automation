@@ -4,3 +4,4 @@ RUN rm -v /usr/local/apache2/htdocs/*
 COPY automation/dockerfiles/httpdconf/httpd.conf /usr/local/apache2/conf/httpd.conf
 
 COPY buildutils/bin/ /usr/local/apache2/htdocs/
+COPY buildutils/openapi2beans/bin/ /usr/local/apache2/htdocs/
