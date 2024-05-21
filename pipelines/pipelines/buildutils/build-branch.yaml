@@ -181,6 +181,94 @@ spec:
        workspace: git-workspace
 # 
 # 
+#
+  - name: make-openapi2beans
+    taskRef:
+      name: make-with-params
+    runAfter:
+      - clone-buildutils  
+    params:
+    - name: directory
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# builds openapi2beans binaries to a site for downloading from
+  - name: build-openapi2beans-binary-downloadables
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    - make-openapi2beans
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: dockerfilePath
+      value: automation/dockerfiles/openapi2beans/openapi2beans-binary-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/openapi2beans-binary-downloadables:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=branch=$(params.branch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+# causes argocd to recycle
+  - name: recycle-openapi2beans-binaries
+    taskRef:
+      name: argocd-cli
+    runAfter:
+    - build-openapi2beans-binary-downloadables
+    params:
+    - name: server
+      value: argocd.galasa.dev
+    - name: command
+      value: 
+      - app 
+      - actions 
+      - run 
+      - $(params.appname)
+      - restart 
+      - --kind 
+      - Deployment
+      - --resource-name
+      - bld-$(params.imageTag)
+# 
+# 
+# builds openapi2beans to a dockerfile
+  - name: build-openapi2beans-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - make-openapi2beans
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
+    - name: dockerfilePath
+      value: automation/dockerfiles/openapi2beans/openapi2beans-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/openapi2beans-amd64:$(params.imageTag)
+    - name: noPush
+      value: ""
+    - name: buildArgs
+      value:
+        - "--build-arg=platform=linux-amd64"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
 # 
   finally:
   - name: report-failed-build

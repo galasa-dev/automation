@@ -32,6 +32,9 @@ spec:
   - name: action
     type: string
   tasks:
+#
+#
+#
   - name: git-verify
     taskRef:
       name: git-verify
@@ -42,6 +45,9 @@ spec:
       value: $(params.prUrl)
     - name: action
       value: $(params.action)
+#
+#
+#
   - name: clone-automation
     taskRef: 
       name: git-clone
@@ -61,6 +67,9 @@ spec:
     workspaces:
      - name: output
        workspace: git-workspace
+#
+#
+#
   - name: clone-buildutils
     taskRef: 
       name: git-clone
@@ -79,7 +88,10 @@ spec:
       value: $(context.pipelineRun.name)/buildutils
     workspaces:
      - name: output
-       workspace: git-workspace 
+       workspace: git-workspace
+#
+#
+#
   - name: make
     taskRef:
       name: make-with-params
@@ -90,7 +102,10 @@ spec:
       value: $(context.pipelineRun.name)/buildutils
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
+       workspace: git-workspace
+#
+#
+#
   - name: build-galasabld-executable
     taskRef:
       name: docker-build
@@ -114,6 +129,9 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
+#
+#
+#
   - name: build-galasabld-ibm-executable
     taskRef:
       name: docker-build
@@ -136,7 +154,76 @@ spec:
         - "--build-arg=branch=$(params.headSha)"
     workspaces:
      - name: git-workspace
+       workspace: git-workspace 
+# 
+# 
+#
+  - name: make-openapi2beans
+    taskRef:
+      name: make-with-params
+    runAfter:
+      - clone-buildutils
+    params:
+    - name: directory
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
+    workspaces:
+     - name: git-workspace
        workspace: git-workspace
+#
+#
+# builds openapi2 beans tool on website to download
+  - name: build-openapi2beans-binary-downloadables
+    taskRef:
+      name: docker-build
+    runAfter:
+    - clone-automation
+    - make-openapi2beans
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: dockerfilePath
+      value: automation/dockerfiles/openapi2beans/openapi2beans-binary-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/openapi2beans-binary-downloadables:$(params.imageTag)
+    - name: noPush
+      value: "--no-push"
+    - name: buildArgs
+      value:
+        - "--build-arg=branch=$(params.branch)"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+# 
+# 
+# builds the openapi2beans tool in a docker image to be used in pipelines
+  - name: build-openapi2beans-executable
+    taskRef:
+      name: docker-build
+    runAfter:
+    - make-openapi2beans
+    - clone-automation
+    params:
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: context
+      value: $(context.pipelineRun.name)/buildutils/openapi2beans
+    - name: dockerfilePath
+      value: automation/dockerfiles/openapi2beans/openapi2beans-dockerfile
+    - name: imageName
+      value: harbor.galasa.dev/galasadev/openapi2beans-amd64:$(params.imageTag)
+    - name: noPush
+      value: "--no-push"
+    - name: buildArgs
+      value:
+        - "--build-arg=platform=linux-amd64"
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+#
+#
+#
   finally:
   - name: git-status
     when:
