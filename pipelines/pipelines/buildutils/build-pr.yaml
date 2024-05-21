@@ -186,12 +186,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/openapi2beans/openapi2beans-binary-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/openapi2beans-binary-downloadables:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/openapi2beans-binary-downloadables:$(params.headSha)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
       value:
-        - "--build-arg=branch=$(params.branch)"
+        - "--build-arg=branch=$(params.headSha)"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
@@ -212,7 +212,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/openapi2beans/openapi2beans-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/openapi2beans-amd64:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/openapi2beans-amd64:$(params.headSha)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
