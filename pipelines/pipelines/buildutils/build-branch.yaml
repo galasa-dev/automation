@@ -83,7 +83,7 @@ spec:
 # 
 # 
 # 
-  - name: build-galasabld-binary-downloadables
+  - name: build-buildutils-binary-downloadables
     taskRef:
       name: docker-build
     runAfter:
@@ -95,7 +95,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: dockerfilePath
-      value: automation/dockerfiles/galasabld/galasabld-binary-dockerfile
+      value: automation/dockerfiles/galasabld/buildutils-binary-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
     - name: noPush
@@ -113,7 +113,7 @@ spec:
     taskRef:
       name: argocd-cli
     runAfter:
-    - build-galasabld-binary-downloadables
+    - build-buildutils-binary-downloadables
     params:
     - name: server
       value: argocd.galasa.dev
@@ -192,33 +192,7 @@ spec:
       value: $(context.pipelineRun.name)/buildutils/openapi2beans
     workspaces:
      - name: git-workspace
-       workspace: git-workspace 
-# 
-# 
-# builds openapi2beans binaries to a site for downloading from
-  - name: build-openapi2beans-binary-downloadables
-    taskRef:
-      name: docker-build
-    runAfter:
-    - clone-automation
-    - make-openapi2beans
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: dockerfilePath
-      value: automation/dockerfiles/openapi2beans/openapi2beans-binary-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/galasadev/openapi2beans-binary-downloadables:$(params.imageTag)
-    - name: noPush
-      value: ""
-    - name: buildArgs
-      value:
-        - "--build-arg=branch=$(params.branch)"
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace 
+       workspace: git-workspace
 # 
 # 
 # causes argocd to recycle
