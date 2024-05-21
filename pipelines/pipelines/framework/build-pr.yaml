@@ -172,7 +172,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-framework:$(params.headSha)
     - name: noPush
-      value: "--no-push"
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=tag=main"
@@ -225,7 +225,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: noPush
-      value: "--no-push"
+      value: --no-push
     - name: dockerfilePath
       value: automation/dockerfiles/restapidoc/restapidoc-site-dockerfile
     workspaces:

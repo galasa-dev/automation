@@ -142,7 +142,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-managers:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=dockerRepository=harbor.galasa.dev"

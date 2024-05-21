@@ -156,7 +156,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasa-maven:$(params.headSha)
     - name: noPush
-      value: ""
+      value: --no-push
     - name: buildArgs
       value:
         - "--build-arg=tag=main"
