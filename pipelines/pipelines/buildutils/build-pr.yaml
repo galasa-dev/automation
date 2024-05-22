@@ -186,12 +186,12 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/openapi2beans/openapi2beans-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/openapi2beans-amd64:$(params.headSha)
+      value: harbor.galasa.dev/galasadev/openapi2beans-x86_64:$(params.headSha)
     - name: noPush
       value: "--no-push"
     - name: buildArgs
       value:
-        - "--build-arg=platform=linux-amd64"
+        - "--build-arg=platform=linux-x86_64"
     workspaces:
      - name: git-workspace
        workspace: git-workspace
