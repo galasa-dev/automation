@@ -103,7 +103,7 @@ spec:
     runAfter:
     - clone-automation
     - make
-    - make-openapi2bean
+    - make-openapi2beans
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
