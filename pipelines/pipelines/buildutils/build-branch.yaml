@@ -89,13 +89,14 @@ spec:
     runAfter:
     - clone-automation
     - make
+    - make-openapi2bean
     params:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
       value: $(context.pipelineRun.name)
     - name: dockerfilePath
-      value: automation/dockerfiles/galasabld/buildutils-binary-dockerfile
+      value: automation/dockerfiles/buildutils/buildutils-binary-dockerfile
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
     - name: noPush
@@ -109,7 +110,7 @@ spec:
 # 
 # 
 # 
-  - name: recycle-galasabld-binaries
+  - name: recycle-buildutils-binaries
     taskRef:
       name: argocd-cli
     runAfter:
@@ -193,28 +194,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace
-# 
-# 
-# causes argocd to recycle
-  - name: recycle-openapi2beans-binaries
-    taskRef:
-      name: argocd-cli
-    runAfter:
-    - build-openapi2beans-binary-downloadables
-    params:
-    - name: server
-      value: argocd.galasa.dev
-    - name: command
-      value: 
-      - app 
-      - actions 
-      - run 
-      - $(params.appname)
-      - restart 
-      - --kind 
-      - Deployment
-      - --resource-name
-      - bld-$(params.imageTag)
 # 
 # 
 # builds openapi2beans to a dockerfile
