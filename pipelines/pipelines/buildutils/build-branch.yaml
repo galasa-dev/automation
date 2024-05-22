@@ -98,7 +98,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/buildutils/buildutils-binary-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasabld-binary-downloadables:$(params.imageTag)
+      value: harbor.galasa.dev/galasadev/buildutils-binary-downloadables:$(params.imageTag)
     - name: noPush
       value: ""
     - name: buildArgs
