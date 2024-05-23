@@ -115,9 +115,12 @@ dex:
     - secretRef:
         name: galasa-ecosystem1-dex-webui-client
 
-  # Optional - An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
+  # An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
   # The first JWT claim that is matched will be used as the requestor of a test.
-  usernameClaims: []
+  usernameClaims:
+    - preferred_username
+    - name
+    - sub
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
