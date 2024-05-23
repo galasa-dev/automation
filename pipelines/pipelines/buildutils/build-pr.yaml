@@ -122,7 +122,7 @@ spec:
     - name: imageName
       value: harbor.galasa.dev/galasadev/galasabld-amd64:$(params.headSha)
     - name: noPush
-      value: --no-push
+      value: ""
     - name: buildArgs
       value:
         - "--build-arg=platform=linux-amd64"
