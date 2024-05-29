@@ -8,11 +8,12 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  NAMESPACE: galasa-dev
 
 jobs:
 
   set-up:
-    name: Set up
+    name: Log into GitHub Container registry
     runs-on: ubuntu-latest
 
     steps:
@@ -26,26 +27,74 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
   
-  build-and-push-gpg-image:
-    name: Build and push the GPG image
+  # build-and-push-gpg-image:
+  #   name: Build and push the `gpg` image
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
+
+  #     - name: Build and push `gpg` Docker image
+  #       id: push
+  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+  #       with:
+  #         context: dockerfiles/common
+  #         file: dockerfiles/common/gpg-dockerfile
+  #         push: true
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
+
+  # build-and-push-kubectl-image:
+  #   name: Build and push the `kubectl` image
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
+
+  #     - name: Build and push `kubectl` Docker image
+  #       id: push
+  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+  #       with:
+  #         context: dockerfiles/common
+  #         file: dockerfiles/common/kubectl-dockerfile
+  #         push: true
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-openapi-image:
+    name: Build and push the `openapi` image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/gpg
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openapi
 
-      - name: Build and push GPG Docker image
+      - name: Build and push `openapi` Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/gpg-dockerfile
+          file: dockerfiles/common/openapi-dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
