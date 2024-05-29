@@ -12,20 +12,20 @@ env:
 
 jobs:
 
-  set-up:
-    name: Log into GitHub Container registry
-    runs-on: ubuntu-latest
+  # set-up:
+  #   name: Log into GitHub Container registry
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: galasa-team
-          password: ${{ secrets.GH_PACKAGES_TOKEN }}
+  #     - name: Log in to the GitHub Container registry
+  #       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: galasa-team
+  #         password: ${{ secrets.GH_PACKAGES_TOKEN }}
   
   # build-and-push-gpg-image:
   #   name: Build and push the `gpg` image
@@ -80,6 +80,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: galasa-team
+          password: ${{ secrets.GH_PACKAGES_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
