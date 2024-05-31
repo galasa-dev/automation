@@ -273,7 +273,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/zip
 
       - name: Build 'zip' Docker image
-        if: github.event.pull_request.base.ref == 'main'
+        if: github.event.pull_request.base.ref == 'jade'
         id: build
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
@@ -284,7 +284,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push 'zip' Docker image
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/jade'
         id: build-push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
