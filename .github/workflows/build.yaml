@@ -1,11 +1,13 @@
-name: build-pr
-run-name: ${{ github.actor }} 
+name: build-automation
 on:
   pull_request:
     branches: 
       # All branches
       # - '**'
       - 'jade'
+  push:
+    branches: 
+      - main
 
 env:
   REGISTRY: ghcr.io
@@ -92,71 +94,71 @@ jobs:
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
 
-  # Not needed as we no longer need to refresh ArgoCD apps
-  # in GH Actions Workflows
-  # # build-argocd-cli-image:  
+  # # Not needed as we no longer need to refresh ArgoCD apps
+  # # in GH Actions Workflows
+  # # # build-argocd-cli-image:  
 
-  build-gitcli-image:
-    name: Build the 'gitcli' image
-    runs-on: ubuntu-latest
+  # build-gitcli-image:
+  #   name: Build the 'gitcli' image
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Log in to the GitHub Container registry
+  #       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gitcli
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gitcli
 
-      - name: Build 'gitcli' Docker image
-        id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gitcli-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Build 'gitcli' Docker image
+  #       id: push
+  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+  #       with:
+  #         context: dockerfiles/common
+  #         file: dockerfiles/common/gitcli-dockerfile
+  #         push: false
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
 
-  build-tkn-image:
-    name: Build the 'tkn' image
-    runs-on: ubuntu-latest
+  # build-tkn-image:
+  #   name: Build the 'tkn' image
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Log in to the GitHub Container registry
+  #       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/tkn
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/tkn
 
-      - name: Build 'tkn' Docker image
-        id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/tkn-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Build 'tkn' Docker image
+  #       id: push
+  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+  #       with:
+  #         context: dockerfiles/common
+  #         file: dockerfiles/common/tkn-dockerfile
+  #         push: false
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
 
   # build-openapi-image:
   #   name: Build the 'openapi' image
@@ -251,8 +253,51 @@ jobs:
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
 
-  # build-zip-image:
-  #   name: Build the 'zip' image
+  build-zip-image:
+    name: Build the 'zip' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/zip
+
+      - name: Build 'zip' Docker image
+        if: github.event.pull_request.base.ref == 'main'
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/zip-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push 'zip' Docker image
+        if: github.ref == 'refs/heads/main'
+        id: build-push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/zip-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # build-openjdk11-ibm-image:
+  #   name: Build the 'openjdk11-ibm' image
   #   runs-on: ubuntu-latest
 
   #   steps:
@@ -270,76 +315,45 @@ jobs:
   #       id: meta
   #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
   #       with:
-  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/zip
+  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk11-ibm
 
-  #     - name: Build 'zip' Docker image
+  #     - name: Build 'openjdk11-ibm' Docker image
   #       id: push
   #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
   #       with:
-  #         context: dockerfiles/common
-  #         file: dockerfiles/common/zip-dockerfile
+  #         context: dockerfiles/certs
+  #         file: dockerfiles/common/openjdk11-ibm-dockerfile
   #         push: false
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
 
-  build-openjdk11-ibm-image:
-    name: Build the 'openjdk11-ibm' image
-    runs-on: ubuntu-latest
+  # build-openjdk11-ibm-gradle-image:
+  #   name: Build the 'openjdk11-ibm-gradle' image
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Log in to the GitHub Container registry
+  #       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk11-ibm
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk11-ibm-gradle
 
-      - name: Build 'openjdk11-ibm' Docker image
-        id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/certs
-          file: dockerfiles/common/openjdk11-ibm-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  build-openjdk11-ibm-gradle-image:
-    name: Build the 'openjdk11-ibm-gradle' image
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk11-ibm-gradle
-
-      - name: Build 'openjdk11-ibm-gradle' Docker image
-        id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/certs
-          file: dockerfiles/common/openjdk11-ibm-gradle-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Build 'openjdk11-ibm-gradle' Docker image
+  #       id: push
+  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+  #       with:
+  #         context: dockerfiles/certs
+  #         file: dockerfiles/common/openjdk11-ibm-gradle-dockerfile
+  #         push: false
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
