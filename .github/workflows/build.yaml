@@ -3,9 +3,11 @@ on:
   pull_request:
     branches: 
       - 'main'
+      - 'jade'
   push:
     branches: 
-      - main
+      - 'main'
+      - 'jade'
 
 env:
   REGISTRY: ghcr.io
