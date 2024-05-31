@@ -43,9 +43,14 @@ nodeSelectors: {}
 storageClass: ""
 #
 #
+# The number of hours worth of etcd history to retain when etcd is compacted
+#
+etcdHistoryRetention: 10
+#
+#
 # The size of the persistent volumes for the data stores
 #
-etcdDiskSize: "1Gi"
+etcdDiskSize: "30Gi"
 couchdbDiskSize: "10Gi"
 catalogDiskSize: "1Gi"
 #
