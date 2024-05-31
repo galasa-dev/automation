@@ -472,9 +472,9 @@ spec:
   
 #---------------------------------------------------------------------
 # Gradle image with Open JDK 11 and the IBM certs installed in the trust store and JRE
+# We need an image which can build tests and run galasactl locally, but has the
+# IBM certificates so we can reach an ecosystem within the IBM firewall.
 #---------------------------------------------------------------------
-# We need an image which can build tests and run galasactl locally, but has the IBM certificates so
-# we can reach an ecosystem within the IBM firewall.
   - name: build-openjdk11-ibm-gradle-image
     taskRef:
       name: docker-build
