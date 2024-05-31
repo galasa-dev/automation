@@ -2,9 +2,7 @@ name: build-automation
 on:
   pull_request:
     branches: 
-      # All branches
-      # - '**'
-      - 'jade'
+      - 'main'
   push:
     branches: 
       - main
