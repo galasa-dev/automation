@@ -4,82 +4,23 @@ on:
   pull_request:
     branches: 
       # All branches
-      - '**'
+      # - '**'
+      - 'jade'
 
 env:
   REGISTRY: ghcr.io
   NAMESPACE: galasa-dev
 
 jobs:
-
-  # set-up:
-  #   name: Log into GitHub Container registry
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Log in to the GitHub Container registry
-  #       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-  #       with:
-  #         registry: ${{ env.REGISTRY }}
-  #         username: galasa-team
-  #         password: ${{ secrets.GH_PACKAGES_TOKEN }}
   
-  # build-and-push-gpg-image:
-  #   name: Build and push the `gpg` image
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Extract metadata (tags, labels) for Docker
-  #       id: meta
-  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-  #       with:
-  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
-
-  #     - name: Build and push `gpg` Docker image
-  #       id: push
-  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-  #       with:
-  #         context: dockerfiles/common
-  #         file: dockerfiles/common/gpg-dockerfile
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-
-  # build-and-push-kubectl-image:
-  #   name: Build and push the `kubectl` image
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Extract metadata (tags, labels) for Docker
-  #       id: meta
-  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-  #       with:
-  #         images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
-
-  #     - name: Build and push `kubectl` Docker image
-  #       id: push
-  #       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-  #       with:
-  #         context: dockerfiles/common
-  #         file: dockerfiles/common/kubectl-dockerfile
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-
-  build-and-push-openapi-image:
-    name: Build and push the `openapi` image
+  build-and-push-gpg-image:
+    name: Build and push the `gpg` image
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
@@ -87,8 +28,67 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
+
+      - name: Build and push `gpg` Docker image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/gpg-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-kubectl-image:
+    name: Build and push the `kubectl` image
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
+
+      - name: Build and push `kubectl` Docker image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/kubectl-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-openapi-image:
+    name: Build and push the `openapi` image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
