@@ -429,46 +429,6 @@ spec:
     workspaces:
      - name: git-workspace
        workspace: git-workspace 
-
-  - name: build-unzip-image
-    taskRef:
-      name: docker-build
-    runAfter:
-    - clone-automation
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/common
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/unzip-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/unzip:$(params.branch)
-    - name: noPush
-      value: ""
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace 
-
-  - name: build-zip-image
-    taskRef:
-      name: docker-build
-    runAfter:
-    - clone-automation
-    params:
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/common
-    - name: dockerfilePath
-      value: automation/dockerfiles/common/zip-dockerfile
-    - name: imageName
-      value: harbor.galasa.dev/common/zip:$(params.branch)
-    - name: noPush
-      value: ""
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
   
 #---------------------------------------------------------------------
 # Gradle image with Open JDK 11 and the IBM certs installed in the trust store and JRE
