@@ -354,7 +354,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/common
+      value: $(context.pipelineRun.name)/automation/pipelines/templates
     - name: dockerfilePath
       value: automation/dockerfiles/common/tkn-dockerfile
     - name: imageName
