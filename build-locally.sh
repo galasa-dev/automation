@@ -57,6 +57,31 @@ None
 EOF
 }
 
+#-------------------------------------------------------------
+function check_exit_code () {
+    # This function takes 3 parameters in the form:
+    # $1 an integer value of the expected exit code
+    # $2 an error message to display if $1 is not equal to 0
+    if [[ "$1" != "0" ]]; then 
+        error "$2" 
+        exit 1  
+    fi
+}
+#-------------------------------------------------------------
+function check_secrets {
+    h2 "updating secrets baseline"
+    detect-secrets scan --exclude-files '.*/src/test/.*' --update ${BASEDIR}/.secrets.baseline
+    rc=$? 
+    check_exit_code $rc "Failed to run detect-secrets. Please check it is installed properly" 
+    success "updated secrets file"
+
+    h2 "running audit for secrets"
+    detect-secrets audit ${BASEDIR}/.secrets.baseline
+    rc=$? 
+    check_exit_code 0 "Failed to audit detect-secrets."
+    success "secrets audit complete"
+}
+
 #--------------------------------------------------------------------------
 # 
 # Main script logic
@@ -98,7 +123,8 @@ if [[ "${build_type}" == "clean" ]]; then
     h2 "Cleaning the binaries out..."
     cd ${BASEDIR}/build-images/github-webhook-receiver
     make clean
-    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to build and run unit tests. rc=${rc}" ; exit 1 ; fi
+    rc=$?
+    check_exit_code $rc "Failed to build and run unit tests. rc=${rc}"
     success "Binaries cleaned up - OK"
 fi
 
@@ -108,7 +134,8 @@ fi
 h2 "Getting dependent Go packages..."
 cd ${BASEDIR}/build-images/github-webhook-receiver
 make setup
-rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to get golang dependencies. rc=${rc}" ; exit 1 ; fi
+rc=$?
+check_exit_code $rc "Failed to get golang dependencies. rc=${rc}"
 success "New binaries built - OK"
 
 #--------------------------------------------------------------------------
@@ -117,7 +144,8 @@ success "New binaries built - OK"
 h2 "Building new binaries..."
 cd ${BASEDIR}/build-images/github-webhook-receiver
 make delta-build
-rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to build binary executable programs. rc=${rc}" ; exit 1 ; fi
+rc=$?
+check_exit_code $rc "Failed to build binary executable programs. rc=${rc}"
 success "New binaries built - OK"
 
 #--------------------------------------------------------------------------
@@ -161,3 +189,5 @@ success "New binaries built - OK"
 h2 "Use the results.."
 info "Binary executable programs are found in the 'bin' folder."
 ls ${BASEDIR}/build-images/github-webhook-receiver/bin | grep -v "gendocs"
+
+check_secrets
