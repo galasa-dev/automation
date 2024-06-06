@@ -89,12 +89,12 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 			"head": {
 				"label": "galasa-dev:webhook-receiver",
 				"ref": "webhook-receiver",
-				"sha": "64f1ffbb8040574f44998423f2a436b7e16b8dfb",
-				"user": {
+				"sha": "64f1ffbb8040574f44998423f2a436b7e16b8dfb",`+ //Mock value, not a secret //pragma: allowlist secret 
+`				"user": {
 					"login": "galasa-dev",
 					"id": 53180681,
-					"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",
-					"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
+					"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",`+ //Mock value, not a secret //pragma: allowlist secret 
+`					"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
 					"gravatar_id": "",
 					"url": "https://api.github.com/users/galasa-dev",
 					"html_url": "https://github.com/galasa-dev",
@@ -119,8 +119,8 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 					"owner": {
 						"login": "galasa-dev",
 						"id": 53180681,
-						"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",
-						"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
+						"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",`+ //Mock value, not a secret //pragma: allowlist secret 
+`						"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
 						"gravatar_id": "",
 						"url": "https://api.github.com/users/galasa-dev",
 						"html_url": "https://github.com/galasa-dev",
@@ -231,12 +231,12 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 			"base": {
 				"label": "galasa-dev:main",
 				"ref": "main",
-				"sha": "7519cea732fafb7965700bca833d613ed24dfdea",
-				"user": {
+				"sha": "7519cea732fafb7965700bca833d613ed24dfdea",`+ //Mock value, not a secret //pragma: allowlist secret 
+`				"user": {
 					"login": "galasa-dev",
 					"id": 53180681,
-					"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",
-					"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
+					"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",`+ //Mock value, not a secret //pragma: allowlist secret 
+`					"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
 					"gravatar_id": "",
 					"url": "https://api.github.com/users/galasa-dev",
 					"html_url": "https://github.com/galasa-dev",
@@ -261,8 +261,8 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 					"owner": {
 						"login": "galasa-dev",
 						"id": 53180681,
-						"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",
-						"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
+						"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",`+ //Mock value, not a secret //pragma: allowlist secret 
+`						"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
 						"gravatar_id": "",
 						"url": "https://api.github.com/users/galasa-dev",
 						"html_url": "https://github.com/galasa-dev",
@@ -421,8 +421,8 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 			"owner": {
 				"login": "galasa-dev",
 				"id": 53180681,
-				"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",
-				"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
+				"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",`+ //Mock value, not a secret //pragma: allowlist secret 
+`				"avatar_url": "https://avatars.githubusercontent.com/u/53180681?v=4",
 				"gravatar_id": "",
 				"url": "https://api.github.com/users/galasa-dev",
 				"html_url": "https://github.com/galasa-dev",
@@ -521,8 +521,8 @@ func TestCanUnmarshallPullRequestOpen(t *testing.T) {
 		"organization": {
 			"login": "galasa-dev",
 			"id": 53180681,
-			"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",
-			"url": "https://api.github.com/orgs/galasa-dev",
+			"node_id": "MDEyOk9yZ2FuaXphdGlvbjUzMTgwNjgx",`+ //Mock value, not a secret //pragma: allowlist secret 
+`			"url": "https://api.github.com/orgs/galasa-dev",
 			"repos_url": "https://api.github.com/orgs/galasa-dev/repos",
 			"events_url": "https://api.github.com/orgs/galasa-dev/events",
 			"hooks_url": "https://api.github.com/orgs/galasa-dev/hooks",

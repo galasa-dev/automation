@@ -12,7 +12,7 @@ expose:
     # The source of the tls certificate. Set as "auto", "secret"
     # or "none" and fill the information in the corresponding section
     # 1) auto: generate the tls certificate automatically
-    # 2) secret: read the tls certificate from the specified secret.
+    # 2) secret: read the tls certificate from the specified secret. #comment, not a secret #pragma: allowlist secret 
     # The tls certificate can be generated manually or by cert manager
     # 3) none: configure no tls certificate for the ingress. If the default
     # tls certificate is configured in the ingress controller, choose this option
@@ -251,7 +251,7 @@ persistence:
     oss:
       accesskeyid: accesskeyid
       # Note: For secret detection software: Galasa does not use oss, so the following is never used.
-      accesskeysecret: accesskeysecret
+      accesskeysecret: accesskeysecret #Not a secret but logic for a kube secret #pragma: allowlist secret 
       region: regionname
       bucket: bucketname
       # key in existingSecret must be REGISTRY_STORAGE_OSS_ACCESSKEYSECRET
@@ -270,7 +270,7 @@ persistence:
 existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
 # Note: For secret detection software: The following value is substituted for a real secret value
 # by the install-harbor-using-helm.sh script.
-harborAdminPassword: "@@HARBOR_ADMIN_PASSWORD@@"
+harborAdminPassword: "@@HARBOR_ADMIN_PASSWORD@@" #Not a secret but template secret #pragma: allowlist secret 
 
 # The internal TLS used for harbor components secure communicating. In order to enable https
 # in each component tls cert files need to provided in advance.
@@ -718,7 +718,7 @@ registry:
   relativeurls: false
   credentials:
     username: "harbor_registry_user"
-    password: "harbor_registry_password"
+    password: "harbor_registry_password" #Not a secret but logic for a kube secret #pragma: allowlist secret 
     # If using existingSecret, the key must be REGISTRY_PASSWD and REGISTRY_HTPASSWD
     existingSecret: ""
     # Login and password in htpasswd string format. Excludes `registry.credentials.username`  and `registry.credentials.password`. May come in handy when integrating with tools like argocd or flux. This allows the same line to be generated each time the template is rendered, instead of the `htpasswd` function from helm, which generates different lines each time because of the salt.
@@ -734,7 +734,7 @@ registry:
       ipfilteredby: none
       # The secret key that should be present is CLOUDFRONT_KEY_DATA, which should be the encoded private key
       # that allows access to CloudFront
-      privateKeySecret: "my-secret"
+      privateKeySecret: "my-secret" #key to a secret, not a secret #pragma: allowlist secret
   # enable purge _upload directories
   upload_purging:
     enabled: true
@@ -855,7 +855,7 @@ database:
     ## The priority class to run the pod as
     priorityClassName:
     # The initial superuser password for internal database
-    password: "changeit"
+    password: "changeit" #this value get overwritten by the secret below #pragma: allowlist secret 
     # The size limit for Shared memory, pgSQL use it for shared_buffer
     # More details see:
     # https://github.com/goharbor/harbor/issues/15034

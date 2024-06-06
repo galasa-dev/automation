@@ -34,7 +34,7 @@ function ask_user_for_release_type {
     echo "Chosen type of release process: ${release_type}"
 }
 
-function create-maven-repos {           
+function create_maven_repos {           
     argocd app create ${release_type}-maven-repos \
                     --project default \
                     --sync-policy auto \
@@ -81,7 +81,8 @@ function create-maven-repos {
                     --helm-set mvp.imageTag=${release_type} \
                     --helm-set mvp.deploy=true 
 }
-function create-cli {   
+
+function create_cli {   
     argocd app create ${release_type}-cli \
                     --project default \
                     --sync-policy auto \
@@ -99,6 +100,6 @@ function create-cli {
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
     ask_user_for_release_type
     set -e
-    create-maven-repos
-    create-cli
+    create_maven_repos
+    create_cli
 fi
