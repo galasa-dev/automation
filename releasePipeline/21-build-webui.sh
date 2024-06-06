@@ -179,5 +179,5 @@ EOF
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
   ask_user_for_release_type
   set_kubernetes_context
-  build_all_code
+  build_webui
 fi

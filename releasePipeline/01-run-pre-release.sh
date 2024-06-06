@@ -52,27 +52,29 @@ note()      { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset
 
 
 #-----------------------------------------------------------------------------------------                   
-# Functions
+# Main Program
 #-----------------------------------------------------------------------------------------   
 set -e
+source $BASEDIR/02-create-argocd-apps.sh
+source $BASEDIR/03-repo-branches-delete.sh
+source $BASEDIR/04-repo-branches-create.sh
+source $BASEDIR/05-helm-charts.sh
+source $BASEDIR/20-build-all-code.sh
+source $BASEDIR/21-build-webui.sh
 
 h1 "run 02-create-argocd-apps.sh"
-source $BASEDIR/02-create-argocd-apps.sh
-create-maven-repos
-create-cli
+create_maven_repos
+create_cli
 
 h1 "run 03-repo-branches-delete.sh"
-source $BASEDIR/03-repo-branches-delete.sh
 set_kubernetes_context
 delete_branches
 
 h1 "run 04-repo-branches-create.sh"
-source $BASEDIR/04-repo-branches-create.sh
 set_kubernetes_context
 create_branches
 
 h1 "run 05-helm-charts.sh"
-source $BASEDIR/05-helm-charts.sh
 get_galasa_version_to_be_released
 clone_helm_repository
 get_helm_charts
@@ -80,13 +82,11 @@ check_helm_charts_released
 delete_pre_release_helm_charts
 
 h1 "run 20-build-all-code.sh"
-source $BASEDIR/20-build-all-code.sh
 ask_user_for_release_type
 set_kubernetes_context
 build_all_code
 
 h1 "run 21-build-webui.sh"
-source $BASEDIR/21-build-webui.sh
 ask_user_for_release_type
 set_kubernetes_context
 build_webui

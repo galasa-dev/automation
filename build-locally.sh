@@ -90,7 +90,39 @@ if [[ "${build_type}" == "" ]]; then
     exit 1  
 fi
 
+function check_exit_code () {
+    # This function takes 2 parameters in the form:
+    # $1 an integer value of the returned exit code
+    # $2 an error message to display if $1 is not equal to 0
+    if [[ "$1" != "0" ]]; then 
+        error "$2" 
+        exit 1  
+    fi
+}
 
+function check_secrets {
+    h2 "updating secrets baseline"
+    cd ${BASEDIR}
+    detect-secrets scan --exclude-files "build-images/github-webhook-receiver/go.sum|go.work.sum|offline-tools/copyrighter/go.sum|build-images/github-webhook-monitor/go.sum" --update .secrets.baseline
+    rc=$? 
+    check_exit_code $rc "Failed to run detect-secrets. Please check it is installed properly" 
+    success "updated secrets file"
+
+    h2 "running audit for secrets"
+    detect-secrets audit .secrets.baseline
+    rc=$? 
+    check_exit_code $rc "Failed to audit detect-secrets."
+    
+    #Check all secrets have been audited
+    secrets=$(grep -c hashed_secret .secrets.baseline)
+    audits=$(grep -c is_secret .secrets.baseline)
+    if [[ "$secrets" != "$audits" ]]; then 
+        error "Not all secrets found have been audited"
+        exit 1  
+    fi
+    sed -i '' '/[ ]*"generated_at": ".*",/d' .secrets.baseline
+    success "secrets audit complete"
+}
 #--------------------------------------------------------------------------
 # Clean up if we need to.
 #--------------------------------------------------------------------------
@@ -98,7 +130,8 @@ if [[ "${build_type}" == "clean" ]]; then
     h2 "Cleaning the binaries out..."
     cd ${BASEDIR}/build-images/github-webhook-receiver
     make clean
-    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to build and run unit tests. rc=${rc}" ; exit 1 ; fi
+    rc=$? 
+    check_exit_code $rc "Failed to build and run unit tests. rc=${rc}"
     success "Binaries cleaned up - OK"
 fi
 
@@ -108,7 +141,8 @@ fi
 h2 "Getting dependent Go packages..."
 cd ${BASEDIR}/build-images/github-webhook-receiver
 make setup
-rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to get golang dependencies. rc=${rc}" ; exit 1 ; fi
+rc=$? 
+check_exit_code $rc "Failed to get golang dependencies. rc=${rc}"
 success "New binaries built - OK"
 
 #--------------------------------------------------------------------------
@@ -117,7 +151,8 @@ success "New binaries built - OK"
 h2 "Building new binaries..."
 cd ${BASEDIR}/build-images/github-webhook-receiver
 make delta-build
-rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to build binary executable programs. rc=${rc}" ; exit 1 ; fi
+rc=$? 
+check_exit_code $rc "Failed to build binary executable programs. rc=${rc}"
 success "New binaries built - OK"
 
 #--------------------------------------------------------------------------
