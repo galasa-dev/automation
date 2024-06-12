@@ -239,3 +239,43 @@ spec:
         - $(params.tag)
         - --credentials
         - /creds/githubcreds.yaml
+
+  - name: tag-branch-helm
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - helm
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /creds/githubcreds.yaml
+
+  - name: tag-branch-webui
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - webui
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /creds/githubcreds.yaml
