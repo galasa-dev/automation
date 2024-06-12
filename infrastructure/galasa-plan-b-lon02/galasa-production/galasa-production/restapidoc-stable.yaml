@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: restapidoc-stable
-        image: icr.io/galasadev/galasa-restapidoc-amd64:0.34.0
+        image: icr.io/galasadev/galasa-restapidoc-amd64:0.34.1
         ports:
         - containerPort: 80
       affinity:
