@@ -11,6 +11,7 @@ metadata:
   namespace: galasa-build
 secrets:
 - name: harbor-creds
+- name: internal-harbor-creds
 - name: icr-api-key
 - name: github-enterprise-credentials
 ---
