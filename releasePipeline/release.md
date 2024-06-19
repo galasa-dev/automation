@@ -45,6 +45,10 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
    d. Repeat as required.
 
+### MEND scan (if releasing Distribution for Galasa)
+
+1. Follow instructions from the internal [developer-docs](https://pages.github.ibm.com/galasa/developer-docs/300-process/dfg-build-process/) on how to do this.
+
 ### Obtain release approval (if releasing Distribution for Galasa)
 
 1. Ask the Team and Product managers for release approval by:
@@ -96,8 +100,15 @@ Once an approver has approved, you can move on.
 
    7. `exit` the image. -->
    <!-- End of temporary steps -->
+
+**IMPORTANT if releasing a Galasa wrapper:** This step uses the release version number to identify artefacts that have been updated in this release. However, the Galasa wrappers for OSGi bundles do not share the version naming conventions with the rest of the Galasa components, so won't get picked up in this. If a Galasa wrapper has been updated and needs to be released:
+
+   a. Amend line 87 of the 30-deploy-maven-galasa.sh script to say `galasa_version="<VERSION OF WRAPPER>"`. So if you are wanting to release jta version 1.2: `galasa_version="1.2"`.
+   b. Run the script as normal and check in the output on Tekton that only 1 artefact has been found and it is the expected one.
+   c. The next step will have to be done multiple times for each staging repository: the one with most of the components, and the other(s) for the wrapper(s).
+
 2. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
-3. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins ? Kill the terminal to exit this process.
+3. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins. Kill the terminal to exit this process.
 
 ### Deploy resources.galasa.dev
 
@@ -111,22 +122,38 @@ Once an approver has approved, you can move on.
 
 1. 40-argocd-ibmcloud.md - Follow the instructions to update the IBM Cloud Galasa external sites.
 
-### Tag release and deploy CLI
+### Create version tag from release branch
 
 1. Run the `50-tag-github-repositories.sh` - It figures out the galasa version, then creates a version tag from all the release branches in all the repositories. So we can later delete the release branches and the tags will still be there.
 The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to complete. Check if finished OK on the tekton dashboard.
-2. 52-deploy-cli-release.md - Follow instructions to deploy the CLI to the repo release.
+
+### Upload built artefacts as new Releases on GitHub
+
+1. 52-deploy-cli-release.md - Follow instructions to upload the CLI binaries to the repository under a new release.
+1. 53-upload-isolated-release.md - Follow instructions to upload the Isolated and MVP zips to the repository under a new release.
 
 ### Bump to new version for development
 
 1. 99-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. Upgrade the values of the galasa-prod Ecosystem CPS properties by running the `set-version.sh` script, which upgrades them automatically.
-   To manually update the values of the galasa-prod Ecosystem CPS properties, run the commands shown below on the Galasa CLI, replacing the value `0.33.0` with the new development version. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
+<!-- 2. Upgrade the values of the galasa-prod Ecosystem CPS properties by running the `set-version.sh` script, which upgrades them automatically. REMOVING as the script doesn't work properly.-->
+2. In the file `../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml` update the CPS properties to contain the new development version number:
+   
+   a. galasaecosystem.runtime.version (the property will have been updated manually as part of the last step, but we need to update the record here)
+   
+   b. galasaecosystem.isolated.full.zip
+
+   c. galasaecosystem.isolated.mvp.zip
+
+   Deliver the changes to the automation repository and the CPS properties will be applied automatically.
+
+3. If the above fails and you need to update the CPS properties manually for some reason:
+
+   Run the commands shown below on the Galasa CLI, replacing the value `0.33.0` with the new development version. Upgrade the galasaecosystem.runtime.version, galasaecosystem.isolated.mvp.zip and galasaecosystem.isolated.full.zip properties.
 
    ``` shell
-   galasactl properties set --namespace galasaecosystem --name isolated.full.zip --value https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.33.0/galasa-isolated-0.33.0.zip --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
-   galasactl properties set --namespace galasaecosystem --name isolated.mvp.zip --value https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/0.33.0/galasa-isolated-mvp-0.33.0.zip --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
-   galasactl properties set --namespace galasaecosystem --name runtime.version  --value 0.33.0 --bootstrap https://galasa-galasa-prod.cicsk8s.hursley.ibm.com/bootstrap
+   galasactl properties set --namespace galasaecosystem --name isolated.full.zip --value https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.33.0/galasa-isolated-0.33.0.zip --bootstrap https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+   galasactl properties set --namespace galasaecosystem --name isolated.mvp.zip --value https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/0.33.0/galasa-isolated-mvp-0.33.0.zip --bootstrap https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+   galasactl properties set --namespace galasaecosystem --name runtime.version  --value 0.33.0 --bootstrap https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
    ```
 
 3. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasa-cli-ibm-amd64 to 'stable' (regression testing uses galasa-cli-ibm-amd64:stable):
