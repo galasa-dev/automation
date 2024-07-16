@@ -52,23 +52,4 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
-  params:
-  - name: headRef
-    type: string
-  - name: headSha
-    type: string
-  - name: baseRef
-    type: string
-  - name: prUrl
-    type: string
-  - name: statusesUrl
-    type: string
-  - name: issueUrl
-    type: string
-  - name: userId
-    type: string
-  - name: prNumber
-    type: string
-  - name: action
-    type: string
 

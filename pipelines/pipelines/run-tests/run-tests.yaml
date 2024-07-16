@@ -119,8 +119,9 @@ spec:
        workspace: git-workspace       
 #
 #
-# Snapshot the Main OBR to Prod now we have confirmed no environmental problems introduced
-  - name: trigger-snapshot-obr-main-to-prod
+#
+# Trigger CLI rebuild now we have confirmed ecosystem tests are running okay
+  - name: trigger-cli
     taskRef:
       name: tkn-cli
     runAfter:
@@ -129,14 +130,14 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation
     - name: command
-      value: 
+      value:
       - pipeline
       - start
-      - snapshot-obr-main-to-prod
+      - branch-cli
       - -n
       - galasa-build
-      - --prefix-name 
-      - trigger-snapshot-obr-main-to-prod
+      - --prefix-name
+      - trigger-cli-main
       - --use-param-defaults
       - --workspace
       - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
