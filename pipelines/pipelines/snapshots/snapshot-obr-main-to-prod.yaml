@@ -227,39 +227,6 @@ spec:
      - name: git-workspace
        workspace: git-workspace
 
-# Trigger CLI rebuild after OBR code is promoted to production...
-  - name: trigger-cli
-    when:
-      - input: "$(params.toBranch)"
-        operator: in
-        values: ["prod"]
-    taskRef:
-      name: tkn-cli
-    runAfter:
-    - snapshot-ibm-boot-embedded
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value:
-      - pipeline
-      - start
-      - branch-cli
-      - -n
-      - galasa-build
-      - --prefix-name
-      - trigger-cli-main
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-
   finally:
   - name: report-failed-build
     when:
