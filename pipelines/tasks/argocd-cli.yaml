@@ -23,7 +23,7 @@ spec:
     default: argocd-token
   steps:
   - name: argocd-cli
-    image: harbor.galasa.dev/common/argocd-cli:main
+    image: ghcr.io/galasa-dev/argocdcli:main
     imagePullPolicy: IfNotPresent
     env:
     - name: ARGOCD_AUTH_TOKEN

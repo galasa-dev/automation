@@ -29,7 +29,7 @@ spec:
     - $(params.settingsDirectory)
   - name: change-dir-permissions
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/gpg:main
+    image: ghcr.io/galasa-dev/gpg:main
     imagePullPolicy: IfNotPresent
     command:
     - chmod
@@ -37,7 +37,7 @@ spec:
     - $(params.settingsDirectory)
   - name: import-gpg
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/gpg:main
+    image: ghcr.io/galasa-dev/gpg:main
     imagePullPolicy: IfNotPresent
     command:
     - gpg
