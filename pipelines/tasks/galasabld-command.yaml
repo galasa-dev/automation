@@ -23,7 +23,7 @@ spec:
     default: main
   - name: image
     type: string
-    default: harbor.galasa.dev/galasadev/galasabld-amd64
+    default: ghcr.io/galasa-dev/galasabld-amd64
   steps:
   - name: galasabld
     workingDir: /workspace/git/$(params.context)

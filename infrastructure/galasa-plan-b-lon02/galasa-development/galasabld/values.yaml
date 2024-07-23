@@ -6,5 +6,5 @@
 
 namespace: galasa-development
 branch: main
-imageName: harbor.galasa.dev/galasadev/buildutils-binary-downloadables
+imageName: ghcr.io/galasa-dev/buildutils-executables
 imageTag: main

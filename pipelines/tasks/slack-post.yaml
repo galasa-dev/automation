@@ -22,7 +22,7 @@ spec:
     type: string
   steps:
   - name: make-slack-post
-    image: harbor.galasa.dev/galasadev/galasabld-ibm-amd64:main
+    image: ghcr.io/galasa-dev/galasabld-ibm:main
     imagePullPolicy: Always
     env:
     - name: HOOK
