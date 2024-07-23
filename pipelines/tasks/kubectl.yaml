@@ -15,7 +15,7 @@ spec:
     type: array       
   steps:
   - name: kubectl
-    image: harbor.galasa.dev/common/kubectl:main
+    image: ghcr.io/galasa-dev/kubectl:main
     imagePullPolicy: IfNotPresent
     args:
     - $(params.command)

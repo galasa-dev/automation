@@ -21,7 +21,7 @@ spec:
   steps:
   - name: get-commit
     workingDir: /workspace/git/$(params.pipelineRunName)/$(params.repo)
-    image: harbor.galasa.dev/common/gitcli:main
+    image: ghcr.io/galasa-dev/gitcli:main
     imagePullPolicy: IfNotPresent
     script: |
       #!/bin/sh

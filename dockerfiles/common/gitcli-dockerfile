@@ -1,4 +1,4 @@
-FROM harbor.galasa.dev/common/gpg:main
+FROM ghcr.io/galasa-dev/gpg:main
 RUN apt-get update
 
 

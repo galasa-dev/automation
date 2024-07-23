@@ -246,7 +246,7 @@ spec:
              /workspace/git/$(context.pipelineRun.name)/automation/dockerfiles/runtime/bootEmbedded/trace-log4j.properties 
              /workspace/git/$(context.pipelineRun.name)/obr/obr-generic/
     - name: image
-      value: harbor.galasa.dev/common/kubectl:main  
+      value: ghcr.io/galasa-dev/kubectl:main
     workspaces:
      - name: git-workspace
        workspace: git-workspace     

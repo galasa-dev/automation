@@ -21,7 +21,7 @@ spec:
   steps:
   - name: run-script
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/gitcli:main
+    image: ghcr.io/galasa-dev/gitcli:main
     imagePullPolicy: IfNotPresent
     env:
     - name: GITHUBTOKEN
