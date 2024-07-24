@@ -25,6 +25,21 @@ spec:
     workingDir: /workspace/git/$(params.context)
     image: harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11 
     imagePullPolicy: IfNotPresent
+    env:
+    - name: ORG_GRADLE_PROJECT_signingKeyId
+      value: 221FFDC2
+    - name: ORG_GRADLE_PROJECT_signingKey
+      valueFrom:
+        secretKeyRef:
+          name: gpg-key
+          key: gpg-key
+          optional: false
+    - name: ORG_GRADLE_PROJECT_signingPassword
+      valueFrom:
+        secretKeyRef:
+          name: gradle-properties
+          key: password
+          optional: false
     command:
     - gradle
     args:
