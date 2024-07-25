@@ -21,10 +21,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata for base image
+        id: metadata
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/base-image
+          tags: |
+            value=latest
+
       - name: Build and push base image
         uses: docker/build-push-action@v5
         with:
-            context: .
-            file: dockerfiles/base/base-dockerfile
-            push: true
-            tags: base-image:latest
+          context: .
+          file: dockerfiles/base/base-dockerfile
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
