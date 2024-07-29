@@ -18,6 +18,17 @@ externalHostname: "galasa-ecosystem1.galasa.dev"
 galasaVersion: "main"
 #
 #
+#
+# Name of the galasa service which will be shown as the title of the web user interface page.
+# Any bookmarks taken by users in their browsers will also receive this name.
+# Making this name distict helps users identify which Galasa service they are using.
+# If they are all called the same thing, users with access to multiple systems may find that 
+# confusing.
+# It is RECOMMENDED that this value is changed to be unique,
+# For example: Galasa Service XYZ
+galasaServiceName: "Galasa Service"
+#
+#
 # The container registry the Galasa images can be found in
 #
 galasaRegistry: "harbor.galasa.dev/galasadev"
