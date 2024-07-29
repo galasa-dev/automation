@@ -26,7 +26,7 @@ galasaVersion: "main"
 # confusing.
 # It is RECOMMENDED that this value is changed to be unique,
 # For example: Galasa Service XYZ
-galasaServiceName: "Galasa Service"
+galasaServiceName: "Galasa Ecosystem 1"
 #
 #
 # The container registry the Galasa images can be found in
