@@ -23,7 +23,7 @@ spec:
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11 
+    image: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk11 
     imagePullPolicy: IfNotPresent
     env:
     - name: ORG_GRADLE_PROJECT_signingKeyId

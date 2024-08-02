@@ -1,5 +1,5 @@
 
-FROM harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11
+FROM harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk11
 
 COPY ibmroot.pem  /etc/ssl/certs/ibmroot.pem
 COPY ibminter.pem /etc/ssl/certs/ibminter.pem

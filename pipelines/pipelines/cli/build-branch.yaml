@@ -281,7 +281,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/gradle:6.8.2-jdk11
+      value: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk11
     - name: entrypoint
       value: ./test-galasactl-local.sh
     - name: command
