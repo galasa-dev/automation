@@ -205,6 +205,14 @@ apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
 metadata:
     namespace: galasaecosystem
+    name: runs.timeout
+data:
+    value: 10
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
     name: runtime.repository
 data:
     value: https://development.galasa.dev/main/maven-repo/obr
