@@ -1,0 +1,47 @@
+name: Helm Build
+
+on:
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+env:
+    NAMESPACE: jaydee029
+
+jobs:
+    build-helm:
+        name: Build Helm
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Automation Repo
+              uses: actions/checkout@v4
+            
+            - name: Checkout Helm Repo
+              uses: actions/checkout@v4  
+              with:
+               repository: ${{ env.NAMESPACE }}/helm
+               path: helmrepo
+
+            - name: Setup helm
+              uses: azure/setup-helm@v4.2.0
+              with:
+                version: '3.13.2' # default is latest (stable)
+              id: install
+            
+            - name: setup kubeconfig secret
+              run: |
+               mkdir -p $HOME/.kube
+               echo ${{secrets.KUBECONFIG}} >> $HOME/.kube/config
+            
+            - name: uninstall ecosystem
+              run: |
+                helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-ecosystem1
+            
+            - name: install ecosystem
+              run: |
+                helm install main-ecosystem ${{github.workspace}}/helmrepo/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{github.workspace}}/automation/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --wait
+
+            - name: test ecosystem
+              run: |
+                helm test main-ecosystem --namespace=galasa-ecosystem1 
