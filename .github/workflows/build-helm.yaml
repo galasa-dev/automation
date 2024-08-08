@@ -1,7 +1,7 @@
 name: Helm Build
 
 on:
-    pull_request:
+    push:
         branches: [main]
     workflow_dispatch:
 
@@ -32,7 +32,7 @@ jobs:
             - name: setup kubeconfig secret
               run: |
                mkdir -p $HOME/.kube
-               echo ${{secrets.KUBECONFIG}} >> $HOME/.kube/config
+               echo "${{secrets.KUBECONFIG}}" >> $HOME/.kube/config
             
             - name: uninstall ecosystem
               run: |
