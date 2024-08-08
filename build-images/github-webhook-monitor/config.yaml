@@ -18,3 +18,5 @@ data:
         eventListener: "http://el-github-pr-review-builder-listener.galasa-build.svc.cluster.local:8080"
       push:
         eventListener: "http://el-github-main-builder-listener.galasa-build.svc.cluster.local:8080"
+      workflow_run:
+        eventListener: "http://el-github-workflow-completed-listener.galasa-build.svc.cluster.local:8080"
