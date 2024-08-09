@@ -47,3 +47,13 @@ spec:
               number: 8080
         path: /main
         pathType: Prefix
+  - host: triggers.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: el-github-workflow-completed-listener
+            port:
+              number: 8080
+        path: /workflow
+        pathType: Prefix
