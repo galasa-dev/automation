@@ -1,12 +1,10 @@
 name: Helm Build
 
 on:
-    push:
-        branches: [main]
     workflow_dispatch:
 
 env:
-    NAMESPACE: jaydee029
+    NAMESPACE: galasa-dev
 
 jobs:
     build-helm:
@@ -36,12 +34,12 @@ jobs:
             
             - name: uninstall ecosystem
               run: |
-                helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-ecosystem1
+                helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
             
             - name: install ecosystem
               run: |
-                helm install main-ecosystem ${{github.workspace}}/helmrepo/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{github.workspace}}/automation/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --wait
+                helm install main-ecosystem ${{github.workspace}}/helmrepo/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{github.workspace}}/automation/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --kubeconfig $HOME/.kube/config --wait
 
             - name: test ecosystem
               run: |
-                helm test main-ecosystem --namespace=galasa-ecosystem1 
+                helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
