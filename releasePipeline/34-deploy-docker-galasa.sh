@@ -34,29 +34,21 @@ blue=$(tput setaf 25)
 # Headers and Logging
 #
 #-----------------------------------------------------------------------------------------                   
-underline() { printf "${underline}${bold}%s${reset}\n" "$@"
-}
-h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@"
-}
-h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@"
-}
-debug() { printf "${white}%s${reset}\n" "$@"
-}
-info() { printf "${white}➜ %s${reset}\n" "$@"
-}
-success() { printf "${green}✔ %s${reset}\n" "$@"
-}
-error() { printf "${red}✖ %s${reset}\n" "$@"
-}
-warn() { printf "${tan}➜ %s${reset}\n" "$@"
-}
-bold() { printf "${bold}%s${reset}\n" "$@"
-}
-note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
-}
+underline() { printf "${underline}${bold}%s${reset}\n" "$@" ;}
+h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@" ;}
+h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@" ;}
+debug() { printf "${white}%s${reset}\n" "$@" ;}
+info() { printf "${white}➜ %s${reset}\n" "$@" ;}
+success() { printf "${green}✔ %s${reset}\n" "$@" ;}
+error() { printf "${red}✖ %s${reset}\n" "$@" ;}
+warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
+bold() { printf "${bold}%s${reset}\n" "$@" ;}
+note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 function get_galasa_version_to_be_released {
     h1 "Working out the version of Galasa to test and release."
+
+    mkdir -p temp
 
     url="https://development.galasa.dev/main/maven-repo/obr/dev/galasa/dev.galasa.uber.obr/"
     curl $url > temp/galasa-version.txt -s
@@ -167,3 +159,5 @@ run_command docker tag harbor.galasa.dev/galasadev/galasa-cli-amd64:$FROM \
            icr.io/galasadev/galasa-cli-amd64:latest
 run_command docker push icr.io/galasadev/galasa-cli-amd64:$TO
 run_command docker push icr.io/galasadev/galasa-cli-amd64:latest
+
+success "Completed. Updated the IBM container registry images from verison $FROM to version $TO"
