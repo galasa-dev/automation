@@ -99,3 +99,13 @@ These are manual steps to bump the version of Galasa to the next version.
     d. Push
 
     e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+
+8. Upgrade Helm charts
+
+    a. Create branch
+
+    b. Invoke the `set-version --version {new version}` script.
+    
+    c. Push
+
+    e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
