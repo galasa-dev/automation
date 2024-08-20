@@ -271,8 +271,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  build-openjdk11-ibm-gradle-image:
-    name: Build the 'openjdk11-ibm-gradle' image
+  build-openjdk17-ibm-gradle-image:
+    name: Build the 'openjdk17-ibm-gradle' image
     runs-on: ubuntu-latest
 
     steps:
@@ -290,26 +290,26 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk11-ibm-gradle
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle
 
-      - name: Build 'openjdk11-ibm-gradle' Docker image
+      - name: Build 'openjdk17-ibm-gradle' Docker image
         if: github.event.pull_request.base.ref == 'main'
         id: build
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: dockerfiles/certs
-          file: dockerfiles/common/openjdk11-ibm-gradle-dockerfile
+          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Build and push 'openjdk11-ibm-gradle' Docker image
+      - name: Build and push 'openjdk17-ibm-gradle' Docker image
         if: github.ref == 'refs/heads/main'
         id: build-push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: dockerfiles/certs
-          file: dockerfiles/common/openjdk11-ibm-gradle-dockerfile
+          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
