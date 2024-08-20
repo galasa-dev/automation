@@ -24,7 +24,7 @@ spec:
     type: array
   - name: image
     type: string
-    default: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.6-ibm-semeru-17-focal
+    default: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.5-openjdk-17
   steps:
   - name: maven-build
     workingDir: /workspace/git/$(params.context)
