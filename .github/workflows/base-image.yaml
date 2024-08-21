@@ -1,4 +1,5 @@
-name: build-base-image
+name: Build Galasa httpd base image
+
 on: workflow_dispatch
 
 env:

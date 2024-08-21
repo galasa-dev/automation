@@ -1,4 +1,5 @@
-name: build-automation
+name: Build custom images for automation
+
 on:
   pull_request:
     branches: 

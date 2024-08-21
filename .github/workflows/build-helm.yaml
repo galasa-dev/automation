@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4  
         with:
           repository: ${{ env.NAMESPACE }}/helm
-          path: helmrepo
+          path: helm
 
       - name: Setup helm
         uses: azure/setup-helm@v4.2.0
@@ -38,7 +38,7 @@ jobs:
       
       - name: Install ecosystem1
         run: |
-          helm install main-ecosystem ${{ github.workspace }}/helmrepo/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{ github.workspace }}/automation/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --kubeconfig $HOME/.kube/config --wait
+          helm install main-ecosystem ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{ github.workspace }}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --kubeconfig $HOME/.kube/config --wait
 
       - name: Test ecosystem1
         run: |
