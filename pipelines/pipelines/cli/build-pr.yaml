@@ -295,7 +295,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.6-openjdk-11
+      value: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.5-openjdk-17
     - name: entrypoint
       value: ./test-galasactl-local.sh
     - name: command
@@ -317,7 +317,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk11
+      value: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk17
     - name: entrypoint
       value: ./test-galasactl-local.sh
     - name: command
@@ -364,7 +364,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: ghcr.io/galasa-dev/openjdk11-ibm-gradle:main
+      value: ghcr.io/galasa-dev/openjdk17-ibm-gradle:main
     - name: entrypoint
       value: ./test-galasactl-ecosystem.sh
     - name: galasaHome
