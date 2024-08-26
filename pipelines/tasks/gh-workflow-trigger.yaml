@@ -28,7 +28,7 @@ spec:
     - name: GH_TOKEN
       valueFrom:
         secretKeyRef:
-          name: GALASA_TEAM_GITHUB_TOKEN
+          name: github-token
           key: password
           optional: false
     # onError: continue
@@ -36,6 +36,6 @@ spec:
       #!/bin/sh
       set +e
 
-     echo $GH_TOKEN | gh auth login --with-token  # not necessary just incase authentication fails 
-     gh workflow run $(params.workflowName) --repo https://github.com/galasa-dev/$(params.repoName) --ref $(params.refBranch)
+      gh workflow run $(params.workflowName) --repo https://github.com/galasa-dev/$(params.repoName) --ref $(params.refBranch)
+      echo "CLI Main build workflow triggered in GitHub Actions"
      
