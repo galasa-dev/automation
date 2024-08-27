@@ -18,15 +18,15 @@ runs:
       shell: bash
 
     - name: Copy settings.xml
-      run: echo "${{ inputs.MAVEN_SETTINGS_XML }}" > /home/runner/work/secrets/settings.xml
+      run: echo ${{ inputs.MAVEN_SETTINGS_XML }} > /home/runner/work/secrets/settings.xml
       shell: bash
 
     - name: Copy GPG passphrase
-      run: echo "${{ inputs.GPG_PASSPHRASE }}" > /home/runner/work/secrets/passphrase.file
+      run: echo ${{ inputs.GPG_PASSPHRASE }} > /home/runner/work/secrets/passphrase.file
       shell: bash
 
     - name: Copy GPG key
-      run: echo "${{ inputs.GPG_KEY_BASE64 }}" | base64 --decode > /home/runner/work/secrets/galasa.gpg
+      run: echo ${{ inputs.GPG_KEY_BASE64 }} | base64 --decode > /home/runner/work/secrets/galasa.gpg
       shell: bash
 
     - name: Make GPG home directory
@@ -34,7 +34,7 @@ runs:
       shell: bash
 
     - name: Change directory permissions
-      run: chmod 700 /home/runner/work/gpg
+      run: chmod '700' /home/runner/work/gpg
       shell: bash
 
     - name: Import GPG
