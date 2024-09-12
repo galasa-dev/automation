@@ -101,3 +101,566 @@ spec:
   workspaces:
   - name: git-workspace
 
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-integratedtests
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-integratedtests
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-webui
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-webui
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-helm
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-helm
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-wrapping
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-wrapping
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-gradle
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-gradle
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-maven
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-maven
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-framework
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-framework
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-extensions
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-extensions
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-managers
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-managers
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-obr
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-obr
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-obr-generic
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-obr-generic
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-isolated
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-isolated
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
