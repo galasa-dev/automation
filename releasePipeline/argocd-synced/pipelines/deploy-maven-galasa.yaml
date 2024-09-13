@@ -44,6 +44,6 @@ spec:
       - --credentials
       - /mavencreds/mavencreds.yaml
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-obr-with-galasabld
+      value: ghcr.io/galasa-dev/obr-and-galasabld-executable
     - name: galasabldImageTag
       value: release
