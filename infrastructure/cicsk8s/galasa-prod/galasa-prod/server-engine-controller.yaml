@@ -28,7 +28,7 @@ spec:
         applevel: critical
       containers:
       - name: resource-monitor
-        image: harbor.galasa.dev/galasadev/galasa-ibm-boot-embedded-amd64:prod
+        image: ghcr.io/galasa-dev/galasa-ibm-boot-embedded-x86_64:main
         imagePullPolicy: Always
         command: ["java"]
         args: 
