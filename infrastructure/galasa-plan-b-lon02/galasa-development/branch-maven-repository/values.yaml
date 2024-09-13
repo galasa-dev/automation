@@ -10,12 +10,12 @@ namespace: galasa-development
 managers:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-managers
+  imageName: ghcr.io/galasa-dev/managers-maven-artefacts
   imageTag: main
 extensions:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-extensions
+  imageName: ghcr.io/galasa-dev/extensions-maven-artefacts
   imageTag: main
 codecov:
   deploy: false
@@ -25,22 +25,22 @@ codecov:
 framework:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-framework
+  imageName: ghcr.io/galasa-dev/framework-maven-artefacts
   imageTag: main 
 obr:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-obr
+  imageName: ghcr.io/galasa-dev/obr-maven-artefacts
   imageTag: main
 maven:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-maven
+  imageName: ghcr.io/galasa-dev/maven-maven-artefacts
   imageTag: main
 gradle:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-gradle
+  imageName: ghcr.io/galasa-dev/gradle-maven-artefacts
   imageTag: main
 isolated:
   deploy: false
@@ -50,17 +50,17 @@ isolated:
 javadoc:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
+  imageName: ghcr.io/galasa-dev/javadoc-maven-artefacts
   imageTag: main
 javadocsite:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
+  imageName: ghcr.io/galasa-dev/javadoc-site
   imageTag: main  
 restApiDocSite:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
+  imageName: ghcr.io/galasa-dev/restapidoc-site
   imageTag: main 
 mvp:
   deploy: false
@@ -70,5 +70,5 @@ mvp:
 wrapping:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
+  imageName: ghcr.io/galasa-dev/wrapping-maven-artefacts
   imageTag: main

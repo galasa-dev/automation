@@ -4,71 +4,71 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
- 
+
 namespace: galasa-development
 
 managers:
   deploy: false
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-managers
-  imageTag: integration
+  branch: main
+  imageName: ghcr.io/galasa-dev/managers-maven-artefacts
+  imageTag: main
 extensions:
   deploy: false
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-extensions
-  imageTag: integration
+  branch: main
+  imageName: ghcr.io/galasa-dev/extensions-maven-artefacts
+  imageTag: main
 codecov:
   deploy: false
-  branch: integration
+  branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
-  imageTag: integration      
+  imageTag: main      
 framework:
   deploy: false
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-framework
-  imageTag: integration 
+  branch: main
+  imageName: ghcr.io/galasa-dev/framework-maven-artefacts
+  imageTag: main 
 obr:
-  deploy: true
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-obr
-  imageTag: integration
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/obr-maven-artefacts
+  imageTag: main
 maven:
   deploy: false
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-maven
-  imageTag: integration
+  branch: main
+  imageName: ghcr.io/galasa-dev/maven-maven-artefacts
+  imageTag: main
 gradle:
   deploy: false
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-gradle
-  imageTag: integration
+  branch: main
+  imageName: ghcr.io/galasa-dev/gradle-maven-artefacts
+  imageTag: main
 isolated:
-  deploy: true
-  branch: integration
+  deploy: false
+  branch: main
   imageName: icr.io/galasadev/galasa-isolated-zip
-  imageTag: integration
+  imageTag: main
 javadoc:
-  deploy: true
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
-  imageTag: integration
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/javadoc-maven-artefacts
+  imageTag: main
 javadocsite:
-  deploy: true
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
-  imageTag: integration  
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/javadoc-site
+  imageTag: main  
 restApiDocSite:
-  deploy: true
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
-  imageTag: integration 
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/restapidoc-site
+  imageTag: main 
 mvp:
-  deploy: true
-  branch: integration
+  deploy: false
+  branch: main
   imageName: icr.io/galasadev/galasa-mvp-zip
-  imageTag: integration
+  imageTag: main
 wrapping:
   deploy: false
-  branch: integration
-  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
-  imageTag: integration
+  branch: main
+  imageName: ghcr.io/galasa-dev/wrapping-maven-artefacts
+  imageTag: main
