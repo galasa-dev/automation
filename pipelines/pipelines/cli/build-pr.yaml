@@ -265,81 +265,11 @@ spec:
   # START OF TESTS
   #----------------------------------------------------------------
 
-  - name: chmod-local-script
-    taskRef: 
-      name: general-command
-    runAfter:
-      - galasactl-make
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/bash:3.2.57
-    - name: command
-      value: 
-        - chmod
-        - +x
-        - test-galasactl-local.sh
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: test-galasactl-local-maven-linux-x86-64
-    taskRef: 
-      name: galasactl
-    runAfter:
-      - chmod-local-script
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/maven:3.8.5-openjdk-17
-    - name: entrypoint
-      value: ./test-galasactl-local.sh
-    - name: command
-      value:
-        - --buildTool
-        - maven
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
-  - name: test-galasactl-local-gradle-linux-x86-64
-    taskRef: 
-      name: galasactl
-    runAfter:
-      - test-galasactl-local-maven-linux-x86-64
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)/cli
-    - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk17
-    - name: entrypoint
-      value: ./test-galasactl-local.sh
-    - name: command
-      value:
-        - --buildTool
-        - gradle
-    workspaces:
-     - name: git-workspace
-       workspace: git-workspace
-# 
-# 
-# 
-# TO-DO Add tests for the other binaries, darwin etc
-# 
-# 
-# 
-#----------------------------------------------------------------
   - name: chmod-ecosystem-script
     taskRef: 
       name: general-command
     runAfter:
-      - test-galasactl-local-gradle-linux-x86-64
+      - galasactl-make
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli
@@ -390,7 +320,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-cli-amd64:$(params.headSha)
+      value: ghcr.io/galasa-dev/galasactl-x86_64:$(params.headSha)
     - name: context
       value: $(context.pipelineRun.name)/cli/
     - name: noPush
@@ -414,7 +344,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:$(params.headSha)
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:$(params.headSha)
     - name: context
       value: $(context.pipelineRun.name)/automation/dockerfiles/certs
     - name: noPush
@@ -440,7 +370,7 @@ spec:
     - name: pipelineRunName
       value: $(context.pipelineRun.name)
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-cli-binary-downloadables:$(params.headSha)
+      value: ghcr.io/galasa-dev/galasactl-executables:$(params.headSha)
     - name: context
       value: $(context.pipelineRun.name)
     - name: noPush

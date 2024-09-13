@@ -49,7 +49,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
     - name: galasaHome
       value: /workspace/git/$(context.pipelineRun.name)
     - name: command
@@ -85,7 +85,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
     - name: galasaHome
       value: /workspace/git/$(context.pipelineRun.name)
     - name: command
