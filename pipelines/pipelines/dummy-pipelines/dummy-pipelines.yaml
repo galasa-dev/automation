@@ -664,3 +664,17 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-cli
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
