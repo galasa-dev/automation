@@ -7,7 +7,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: github-workflow-completed-listener
+  name: github-obr-workflow-completed-listener
   annotations:
     tekton.dev/payload-validation: "false"
 spec:

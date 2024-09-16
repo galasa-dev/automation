@@ -4,6 +4,11 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+# This Tekton pipeline runs in parallel to the GitHub Actions workflow for the CLI
+# This pipeline's purpose is to build the CLI binary and test the ecosystem related commands
+# Local commands are handled by the GitHub Actions workflow
+# Both this Tekton pipeline and GitHub Actions workflow must be successful for the PR checks to pass
+
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
