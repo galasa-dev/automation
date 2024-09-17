@@ -177,8 +177,8 @@ func submitEvents(events []string) error {
 	for _, id := range events {
 		log.Printf("submitEvents - Inspecting event: %s", id)
 
-		var hookRequest *http.Request
-		hookRequest, err = buildHookRequest(id)
+		var hookRequests []*http.Request
+		hookRequests, err := buildHookRequest(id)
 		if err != nil {
 			//skip events that return status 404 (not found)
 			if err.Error() == ERROR_MSG_EVENT_NOT_FOUND {
@@ -190,28 +190,30 @@ func submitEvents(events []string) error {
 			}
 		}
 
-		if hookRequest != nil {
-			var resp *http.Response
-			resp, err = client.Do(hookRequest)
-			if err != nil {
-				log.Printf("submitEvents - WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
-				break
-			} else {
-				log.Printf("submitEvents - URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
+		for _, hookRequest := range hookRequests {
+			if hookRequest != nil {
+				var resp *http.Response
+				resp, err = client.Do(hookRequest)
+				if err != nil {
+					log.Printf("submitEvents - WARNING: failed to send webhook to event listener: %s\n", hookRequest.URL)
+					break
+				} else {
+					log.Printf("submitEvents - URL: %s - Response: %v", resp.Request.URL, resp.StatusCode)
+				}
 			}
-		}
 
-		// We update the bookmark without ensuring 202 to prevent a backlog of missed events.
-		updateBookmark(id)
+			// We update the bookmark without ensuring 202 to prevent a backlog of missed events.
+			updateBookmark(id)
+		}
 	}
 
 	return err
 }
 
 // Does a look up with the Github API to find the hook requests and payloads. Then creates new http request from output
-func buildHookRequest(id string) (*http.Request, error) {
+func buildHookRequest(id string) ([]*http.Request, error) {
 	var request jsontypes.WebhookRequest
-	var webhookRequest *http.Request
+	var webhookRequests []*http.Request
 
 	resp := githubGet(fmt.Sprintf("https://api.github.com/orgs/%s/hooks/%s/deliveries/%s", *orgName, *hookId, id), nil)
 
@@ -230,13 +232,14 @@ func buildHookRequest(id string) (*http.Request, error) {
 					urls := eventType.EventListener
 					for _, url := range urls {
 						payload, _ := json.Marshal(request.Request.Payload)
-						webhookRequest, err = http.NewRequest("POST", url, bytes.NewReader(payload))
+						webhookRequest, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 						if err == nil {
 							// Add headers
 							for k, v := range request.Request.Headers {
 								webhookRequest.Header.Add(k, v)
 							}
 						}
+						webhookRequests = append(webhookRequests, webhookRequest)
 					}
 				} else {
 					log.Printf("buildHookRequest - No action required for type: %s\n", request.Event)
@@ -245,7 +248,7 @@ func buildHookRequest(id string) (*http.Request, error) {
 		}
 	}
 
-	return webhookRequest, err
+	return webhookRequests, err
 }
 
 // Extracts Delivery Json from body.
