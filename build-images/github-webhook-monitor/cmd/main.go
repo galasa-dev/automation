@@ -227,13 +227,15 @@ func buildHookRequest(id string) (*http.Request, error) {
 			if err == nil {
 				eventType, ok := triggerMap.Events[request.Event]
 				if ok {
-					url := eventType.EventListener
-					payload, _ := json.Marshal(request.Request.Payload)
-					webhookRequest, err = http.NewRequest("POST", url, bytes.NewReader(payload))
-					if err == nil {
-						// Add headers
-						for k, v := range request.Request.Headers {
-							webhookRequest.Header.Add(k, v)
+					urls := eventType.EventListener
+					for _, url := range urls {
+						payload, _ := json.Marshal(request.Request.Payload)
+						webhookRequest, err = http.NewRequest("POST", url, bytes.NewReader(payload))
+						if err == nil {
+							// Add headers
+							for k, v := range request.Request.Headers {
+								webhookRequest.Header.Add(k, v)
+							}
 						}
 					}
 				} else {
