@@ -45,7 +45,7 @@ gradle:
 isolated:
   deploy: false
   branch: main
-  imageName: icr.io/galasadev/galasa-isolated-zip
+  imageName: ghcr.io/galasa-dev/galasa-isolated-zip
   imageTag: main
 javadoc:
   deploy: false
@@ -65,7 +65,7 @@ restApiDocSite:
 mvp:
   deploy: false
   branch: main
-  imageName: icr.io/galasadev/galasa-mvp-zip
+  imageName: ghcr.io/galasa-dev/galasa-mvp-zip
   imageTag: main
 wrapping:
   deploy: false

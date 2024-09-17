@@ -67,7 +67,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:$(params.branch)
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64-testing:$(params.branch)
     - name: galasaHome
       value: /workspace/git/$(context.pipelineRun.name)
     - name: entrypoint
