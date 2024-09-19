@@ -259,3 +259,23 @@ spec:
         - $(params.distBranch)
         - --credentials
         - /creds/githubcreds.yaml
+# 
+####### Buildutils
+# 
+  - name: delete-branch-buildutils
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value: 
+        - github
+        - branch
+        - delete
+        - --repository
+        - buildutils
+        - --branch
+        - $(params.distBranch)
+        - --credentials
+        - /creds/githubcreds.yaml

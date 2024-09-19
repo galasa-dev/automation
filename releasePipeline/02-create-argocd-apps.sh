@@ -96,10 +96,27 @@ function create_cli {
                     --helm-set branch=${release_type} \
                     --helm-set imageTag=${release_type}
 }
+
+function create_simplatform {   
+    argocd app create ${release_type}-simplatform \
+                    --project default \
+                    --sync-policy auto \
+                    --sync-option Prune=true \
+                    --self-heal \
+                    --repo https://github.com/galasa-dev/automation \
+                    --revision HEAD  \
+                    --path infrastructure/galasa-plan-b-lon02/galasa-development/simplatform \
+                    --dest-server https://kubernetes.default.svc \
+                    --dest-namespace galasa-development \
+                    --helm-set branch=${release_type} \
+                    --helm-set imageTag=main
+}
+
 # checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
     ask_user_for_release_type
     set -e
     create_maven_repos
     create_cli
+    create_simplatform
 fi

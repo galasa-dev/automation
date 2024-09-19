@@ -279,3 +279,23 @@ spec:
         - $(params.tag)
         - --credentials
         - /creds/githubcreds.yaml
+
+  - name: tag-branch-buildutils
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - buildutils
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /creds/githubcreds.yaml
