@@ -26,5 +26,5 @@ spec:
             name: inttests-{{ .Values.branch }}
             port:
               number: 80
-        path: /{{ .Values.branch }}/maven-repo/inttests
+        path: /{{ .Values.branch }}/maven-repo/{{ .Values.ingressPathSuffix }}
         pathType: Prefix
