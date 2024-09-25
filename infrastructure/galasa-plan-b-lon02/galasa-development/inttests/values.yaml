@@ -8,3 +8,4 @@ namespace: galasa-development
 branch: main
 imageName: ghcr.io/galasa-dev/inttests-maven-artefacts
 imageTag: main
+ingressPathSuffix: inttests
