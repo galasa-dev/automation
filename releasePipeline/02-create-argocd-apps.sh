@@ -109,7 +109,7 @@ function create_simplatform {
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --helm-set branch=${release_type} \
-                    --helm-set imageTag=main
+                    --helm-set imageTag=${release_type}
 }
 
 # checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions

@@ -337,3 +337,27 @@ spec:
         - $(params.force)
         - --credentials
         - /creds/githubcreds.yaml
+# 
+# 
+# 
+  - name: clone-branch-simplatform
+    taskRef: 
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - simplatform
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /creds/githubcreds.yaml
