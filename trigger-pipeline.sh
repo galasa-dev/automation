@@ -52,19 +52,10 @@ function usage {
 Options are:
 
 (from the 'main' build chain)
---gradle
---maven
---framework
---extensions
---managers
---obr
---cli
---wrapping
---obr-generic
---simplatform
---isolated
---buildutils
 --automation
+--recycle-prod1
+--run-tests
+--test-cli
 -p | --pipeline xxx : Set the name of pipeline to run explicitly
 
 Environment variables used:
@@ -95,42 +86,24 @@ pipeline=""
 
 while [ "$1" != "" ]; do
     case $1 in
-        --gradle )              pipeline="branch-gradle"
-                                ;;
-        --maven )               pipeline="branch-maven"
-                                ;;
-        --framework )           pipeline="branch-framework"
-                                ;;
-        --extensions )          pipeline="branch-extensions"
-                                ;;
-        --managers )            pipeline="branch-managers"
-                                ;;
-        --obr )                 pipeline="branch-obr"
-                                ;;
-        --cli )                 pipeline="branch-cli"
-                                ;;
-        --wrapping )            pipeline="branch-wrapping"
-                                ;;
-        --obr-generic )         pipeline="branch-obr-generic"
-                                ;;
-        --automation )          pipeline="branch-automation"
-                                ;;
-        --simplatform )         pipeline="branch-simplatform"
-                                ;;
-        --isolated )            pipeline="branch-isolated"
-                                ;;
-        --buildutils )          pipeline="branch-buildutils"
-                                ;;
-        -p | --pipeline )       shift
-                                pipeline=$1
-                                ;;
+        --automation )              pipeline="branch-automation"
+                                    ;;
+        --recycle-prod1 )           pipeline="recycle-prod1"
+                                    ;;
+        --run-tests )                pipeline="run-tests"
+                                    ;;
+        --test-cli )                pipeline="test-cli-ecosystem-commands"
+                                    ;;
+        -p | --pipeline )           shift
+                                    pipeline=$1
+                                    ;;
 
-        -h | --help )           usage
-                                exit
-                                ;;
-        * )                     error "Unexpected argument $1"
-                                usage
-                                exit 1
+        -h | --help )               usage
+                                    exit
+                                    ;;
+        * )                         error "Unexpected argument $1"
+                                    usage
+                                    exit 1
     esac
     shift
 done
@@ -145,7 +118,7 @@ fi
 check_tkn_installed
 
 
-tkn pipeline start $pipeline -n galasa-build --prefix-name trigger-$pipeline-main \
+tkn pipeline start $pipeline -n galasa-build --prefix-name trigger-$pipeline \
 --workspace name=git-workspace,volumeClaimTemplateFile=pipelines/templates/git-workspace-template.yaml \
 --pod-template pipelines/templates/pod-template.yaml --serviceaccount galasa-build-bot --use-param-defaults
 
