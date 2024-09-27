@@ -299,3 +299,23 @@ spec:
         - $(params.tag)
         - --credentials
         - /creds/githubcreds.yaml
+
+  - name: tag-branch-simplatform
+    taskRef:
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - tag
+        - --repository
+        - simplatform
+        - --branch
+        - $(params.distBranch)
+        - --tag
+        - $(params.tag)
+        - --credentials
+        - /creds/githubcreds.yaml
