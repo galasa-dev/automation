@@ -14,7 +14,7 @@ metadata:
     namespace: framework
     name: test.stream.inttests.location
 data:
-    value: https://development.galasa.dev/main/maven-repo/inttests/dev/galasa/dev.galasa.inttests.obr/0.36.0/dev.galasa.inttests.obr-0.36.0-testcatalog.json
+    value: https://development.galasa.dev/main/maven-repo/inttests/dev/galasa/dev.galasa.inttests.obr/0.38.0/dev.galasa.inttests.obr-0.38.0-testcatalog.json
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -22,7 +22,7 @@ metadata:
     namespace: framework
     name: test.stream.inttests.obr
 data:
-    value: mvn:dev.galasa/dev.galasa.inttests.obr/0.36.0/obr 
+    value: mvn:dev.galasa/dev.galasa.inttests.obr/0.38.0/obr 
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
