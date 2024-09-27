@@ -9,16 +9,18 @@ kind: Ingress
 metadata:
   name: inttests-{{ .Values.branch }}
   namespace: {{ .Values.namespace }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
-    
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- with .Values.ingress.tls }}
   tls:
-  - hosts:
-    - development.galasa.dev
-    secretName: galasa-wildcard-cert
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   rules:
-  - host: development.galasa.dev
+  - host: {{ .Values.ingress.externalHostname }}
     http:
       paths:
       - backend:
@@ -26,5 +28,5 @@ spec:
             name: inttests-{{ .Values.branch }}
             port:
               number: 80
-        path: /{{ .Values.branch }}/maven-repo/inttests
+        path: /{{ .Values.branch }}/maven-repo/{{ .Values.ingress.pathSuffix }}
         pathType: Prefix

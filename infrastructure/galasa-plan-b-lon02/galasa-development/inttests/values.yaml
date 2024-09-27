@@ -8,3 +8,13 @@ namespace: galasa-development
 branch: main
 imageName: ghcr.io/galasa-dev/inttests-maven-artefacts
 imageTag: main
+
+ingress:
+  externalHostname: development.galasa.dev
+  ingressClassName: public-iks-k8s-nginx
+  pathSuffix: inttests
+  annotations: {}
+  tls:
+  - hosts:
+      - development.galasa.dev
+    secretName: galasa-wildcard-cert
