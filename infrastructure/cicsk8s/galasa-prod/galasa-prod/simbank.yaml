@@ -27,7 +27,7 @@ spec:
         applevel: critical
       containers:
       - name: simbank
-        image: harbor.galasa.dev/galasadev/galasa-simplatform-amd64:main
+        image: ghcr.io/galasa-dev/simplatform-jar:main
         imagePullPolicy: Always
         command: ["java"]
         args: 
