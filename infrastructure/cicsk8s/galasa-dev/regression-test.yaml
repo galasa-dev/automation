@@ -49,7 +49,7 @@ spec:
             - mountPath: /galasa
               name: static-files
 
-          - name: run-prepare
+          - name: run-prepare-inttests
             command:
             - galasactl
             - runs
@@ -58,8 +58,6 @@ spec:
             - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
             - --stream
             - inttests
-            - --stream
-            - internal-inttests
             - --portfolio
             - /galasa/tests.yaml
             - --package
@@ -68,6 +66,39 @@ spec:
             - kubernetes
             - --package
             - compilation
+            - --log
+            - '-'
+            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            imagePullPolicy: IfNotPresent
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            env:
+            - name: GALASA_HOME
+              value: /galasa
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+
+          - name: run-prepare-internal-inttests
+            command:
+            - galasactl
+            - runs
+            - prepare
+            - --bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+            - --stream
+            - internal-inttests
+            - --portfolio
+            - /galasa/tests.yaml
+            - --append
+            - --package
+            - local
             - --log
             - '-'
             image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
