@@ -57,6 +57,25 @@ spec:
                 pipelineRef:
                   name: recycle-prod1
                 serviceAccountName: galasa-build-bot
+                workspaces:
+                - name: git-workspace
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 20Gi
+
+            - apiVersion: tekton.dev/v1beta1
+              kind: PipelineRun
+              metadata:
+                generateName: build-internal-integratedtests-
+              spec:
+                pipelineRef:
+                  name: build-internal-integratedtests
+                serviceAccountName: galasa-build-bot
                 podTemplate:
                   volumes:
                   - name: gradle-properties
@@ -65,18 +84,6 @@ spec:
                   - name: gpg-key
                     secret:
                       secretName: gpg-key
-                  - name: mavengpg
-                    secret:
-                      secretName: mavengpg
-                  - name: githubcreds
-                    secret:
-                      secretName: github-token
-                  - name: harborcreds
-                    secret:
-                      secretName: harbor-creds-yaml
-                  - name: mavencreds
-                    secret:
-                      secretName: maven-creds
                 workspaces:
                 - name: git-workspace
                   volumeClaimTemplate:
