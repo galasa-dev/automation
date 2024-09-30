@@ -678,3 +678,50 @@ metadata:
 spec:
   workspaces:
   - name: git-workspace
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pr-simplatform
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace
+  params:
+  - name: headRef
+    type: string
+  - name: headSha
+    type: string
+  - name: baseRef
+    type: string
+  - name: prUrl
+    type: string
+  - name: statusesUrl
+    type: string
+  - name: issueUrl
+    type: string
+  - name: userId
+    type: string
+  - name: prNumber
+    type: string
+  - name: action
+    type: string
+
+---
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: branch-simplatform
+  namespace: galasa-build
+  # Tell ArgoCD never to prune this pipeline definition.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  workspaces:
+  - name: git-workspace

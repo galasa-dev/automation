@@ -40,7 +40,7 @@ spec:
             - rm
             - -rf
             - /galasa/*
-            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
             imagePullPolicy: Always
             resources: {}
             terminationMessagePath: /dev/termination-log
@@ -68,7 +68,7 @@ spec:
             - compilation
             - --log
             - '-'
-            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
             imagePullPolicy: IfNotPresent
             resources: {}
             terminationMessagePath: /dev/termination-log
@@ -141,7 +141,7 @@ spec:
             - --noexitcodeontestfailures
             - --log
             - '-'
-            image: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+            image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
             imagePullPolicy: IfNotPresent
             resources: {}
             terminationMessagePath: /dev/termination-log

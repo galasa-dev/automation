@@ -44,7 +44,6 @@ This directory is the single location for all Dockerfiles needed to build the im
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
 | Maven repositories for the built Galasa core components | cli-binary |
 | Galasa CLI | cli, cli-ibm |
-| Galasa Simplatform | simplatform, simplatform-amd64, webapp |
 | Galasa Resources site | resources |
 
 
@@ -102,6 +101,8 @@ This EventListener is triggered via webhook when code is pushed into the main br
 
 
 ## Pipelines
+
+**TO DO: Remove this section / update with GitHub workflows**
 
 Galasa's architecture means that the core components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping. In some instances, the build pipeline for a component triggers the next pipeline in the chain, and in some instances, the component is not connected in the chain, but when it is rebuilt, it draws on artifacts from the other.
 
