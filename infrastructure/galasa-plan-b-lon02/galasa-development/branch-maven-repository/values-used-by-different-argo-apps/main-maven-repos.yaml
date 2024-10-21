@@ -7,40 +7,15 @@
 
 namespace: galasa-development
 
-managers:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/managers-maven-artefacts
-  imageTag: main
-extensions:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/extensions-maven-artefacts
-  imageTag: main
 codecov:
   deploy: false
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
   imageTag: main      
-framework:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/framework-maven-artefacts
-  imageTag: main 
 obr:
   deploy: false
   branch: main
   imageName: ghcr.io/galasa-dev/obr-maven-artefacts
-  imageTag: main
-maven:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/maven-maven-artefacts
-  imageTag: main
-gradle:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/gradle-maven-artefacts
   imageTag: main
 isolated:
   deploy: false
@@ -66,9 +41,4 @@ mvp:
   deploy: false
   branch: main
   imageName: ghcr.io/galasa-dev/galasa-mvp-zip
-  imageTag: main
-wrapping:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/wrapping-maven-artefacts
   imageTag: main
