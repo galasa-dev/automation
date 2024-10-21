@@ -33,13 +33,15 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
 ### Build and test the Galasa core components
 
-1. Begin the complete build of Galasa by starting the Wrapping Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/wrapping/actions/workflows/build.yaml) and select the following inputs:
+1. Begin the build of Galasa by starting the Galasa mono repo release build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/galasa/actions/workflows/releases.yaml) and select the following inputs:
     - Branch: `release`
     - Enable Jacoco code coverage: `false`
-    - This build is for the main branch or a release: `true`
-2. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
+    - Artifacts should be signed: `true`
+2. Build the CLI and Isolated repositories that are not included in the mono repo. The CLI build which will trigger the Isolated build down the chain. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/cli/actions/workflows/build.yml) and select the following inputs:
+    - Branch: `release`
+3. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
    - Branch: `release`
-3. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
+4. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
 
    a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
 
@@ -164,12 +166,6 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
 
 1. Run `03-repo-branches-delete.sh` - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories.
 2. (**Manual until we automate it with GitHub Actions**) Delete the images in GHCR tagged 'release':
-   - wrapping-maven-artefacts
-   - gradle-maven-artefacts
-   - maven-maven-artefacts
-   - framework-maven-artefacts
-   - extensions-maven-artefacts
-   - managers-maven-artefacts
    - obr-maven-artefacts
    - obr-generic
    - galasa-boot-embedded-x86_64

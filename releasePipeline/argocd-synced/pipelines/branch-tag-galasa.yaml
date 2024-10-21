@@ -44,7 +44,7 @@ spec:
 #
 #
 #
-  - name: tag-branch-wrapping
+  - name: tag-branch-galasa
     taskRef:
       name: galasabld
     params:
@@ -56,139 +56,7 @@ spec:
         - branch
         - tag
         - --repository
-        - wrapping
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: tag-branch-gradle
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - gradle
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: tag-branch-maven
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - maven
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: tag-branch-framework
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - framework
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: tag-branch-extensions
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - extensions
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: tag-branch-managers
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - managers
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: tag-branch-obr
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - obr
+        - galasa
         - --branch
         - $(params.distBranch)
         - --tag
@@ -239,7 +107,9 @@ spec:
         - $(params.tag)
         - --credentials
         - /creds/githubcreds.yaml
-
+#
+#
+#
   - name: tag-branch-helm
     taskRef:
       name: galasabld
@@ -259,7 +129,9 @@ spec:
         - $(params.tag)
         - --credentials
         - /creds/githubcreds.yaml
-
+#
+#
+#
   - name: tag-branch-webui
     taskRef:
       name: galasabld
@@ -279,27 +151,9 @@ spec:
         - $(params.tag)
         - --credentials
         - /creds/githubcreds.yaml
-
-  - name: tag-branch-buildutils
-    taskRef:
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - tag
-        - --repository
-        - buildutils
-        - --branch
-        - $(params.distBranch)
-        - --tag
-        - $(params.tag)
-        - --credentials
-        - /creds/githubcreds.yaml
-
+#
+#
+#
   - name: tag-branch-simplatform
     taskRef:
       name: galasabld
