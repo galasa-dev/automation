@@ -21,25 +21,31 @@ spec:
           params:
           - name: "eventTypes"
             value: ["workflow_run"]
-        - name: "CEL filter: only when the workflow run was completed"
+        - name: "CEL filter: only when the workflow run is completed"
           ref:
             name: "cel"
           params:
           - name: "filter"
             value: "body.action in ['completed']"
-        - name: "CEL filter: only when the workflow run was successful"
+        - name: "CEL filter: only when the workflow run is successful"
           ref:
             name: "cel"
           params:
           - name: "filter"
             value: "body.workflow_run.conclusion in ['success']"
-        - name: "CEL filter: only when the workflow was for the 'galasa' repository"
+        - name: "CEL filter: only when the workflow run name is 'Main Build Orchestrator'"  
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.name in ['Main Build Orchestrator']"
+        - name: "CEL filter: only when the workflow is for the 'galasa' repository"
           ref:
             name: "cel"
           params:
           - name: "filter"
             value: "body.repository.name in ['galasa']"
-        - name: "CEL filter: only when the workflow branch was 'main'"
+        - name: "CEL filter: only when the workflow branch is 'main'"
           ref:
             name: "cel"
           params:
