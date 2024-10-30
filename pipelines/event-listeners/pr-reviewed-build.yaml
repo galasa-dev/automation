@@ -33,6 +33,12 @@ spec:
           params:
           - name: "filter"
             value: "body.review.body in ['Approved for building', 'approved for building']"
+        - name: "CEL filter: only when the workflow was for the automation or cli repositories"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.repository.name in ['automation','cli']"
       bindings:
         - name: git-repository-name
           value: $(body.pull_request.head.repo.name)
