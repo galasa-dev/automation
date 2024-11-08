@@ -125,7 +125,7 @@ spec:
     taskRef:
       name: gh-workflow-trigger
     runAfter:
-    - trigger-cli
+    - run-submit
     params:
     - name: workflowName
       value: build.yml

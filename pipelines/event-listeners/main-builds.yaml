@@ -27,6 +27,12 @@ spec:
           params:
           - name: "filter"
             value: "body.ref in ['refs/heads/main']"
+        - name: "CEL filter: only when the workflow was for the automation repository"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.repository.name in ['automation']"
 
       bindings:
         - name: git-repository-name
