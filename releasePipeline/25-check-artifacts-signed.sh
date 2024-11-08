@@ -159,7 +159,7 @@ ask_user_for_release_type
 # TOOD: Do the same thing for 
 
 
-declare -a repo_list=("maven" "wrapping" "gradle" "framework" "extensions" "managers" "obr" )
+declare -a repo_list=("obr" )
 
 # Iterate the string array using for loop
 for github_repo_name in ${repo_list[@]}; do
