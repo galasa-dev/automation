@@ -1,4 +1,3 @@
-FROM harbor.galasa.dev/docker_proxy_cache/library/httpd:2.4.59
+FROM harbor.galasa.dev/redhat_proxy_cache/ubi8/httpd-24:1-345
 
-RUN rm -v /usr/local/apache2/htdocs/*
-COPY dockerfiles/httpdconf/base-httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY dockerfiles/httpdconf/base-httpd.conf /etc/httpd/conf/httpd.conf
