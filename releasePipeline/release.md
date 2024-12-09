@@ -52,6 +52,11 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
    c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
 
    d. Repeat as required.
+5. Test the [mvp image](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline:
+    - https://galasa.dev/docs/cli-command-reference/zipped-prerequisites
+    - https://galasa.dev/docs/cli-command-reference/installing-offline
+    - https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline
+    - https://galasa.dev/docs/running-simbank-tests/running-simbank-tests-cli-offline
 
 ### MEND scan (if releasing Distribution for Galasa)
 
