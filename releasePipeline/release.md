@@ -37,8 +37,10 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
     - Branch: `release`
     - Enable Jacoco code coverage: `false`
     - Artifacts should be signed: `true`
-2. Build the CLI and Isolated repositories that are not included in the mono repo. The CLI build which will trigger the Isolated build down the chain. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/cli/actions/workflows/build.yml) and select the following inputs:
-    - Branch: `release`
+2. The build of the CLI repository and Isolated repository will be triggered automatically as part of the build chain, so monitor those builds and make sure they finish successfully. 
+    - The [CLI Main build workflow](https://github.com/galasa-dev/cli/actions/workflows/build.yml) should run with the `release` ref
+    - This will trigger the Tekton pipeline `test-cli-ecosystem-commands` so go to the Tekton dashboard
+    - That will then trigger the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `release` ref back in GitHub
 3. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
    - Branch: `release`
 4. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
@@ -50,6 +52,11 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
    c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
 
    d. Repeat as required.
+5. Test the [mvp image](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline:
+    - https://galasa.dev/docs/cli-command-reference/zipped-prerequisites
+    - https://galasa.dev/docs/cli-command-reference/installing-offline
+    - https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline
+    - https://galasa.dev/docs/running-simbank-tests/running-simbank-tests-cli-offline
 
 ### MEND scan (if releasing Distribution for Galasa)
 
@@ -106,12 +113,6 @@ Once an approver has approved, you can move on.
 
    7. `exit` the image. -->
    <!-- End of temporary steps -->
-
-**IMPORTANT if releasing a Galasa wrapper:** This step uses the release version number to identify artefacts that have been updated in this release. However, the Galasa wrappers for OSGi bundles do not share the version naming conventions with the rest of the Galasa components, so won't get picked up in this. If a Galasa wrapper has been updated and needs to be released:
-
-   a. Amend line 87 of the 30-deploy-maven-galasa.sh script to say `galasa_version="<VERSION OF WRAPPER>"`. So if you are wanting to release jta version 1.2: `galasa_version="1.2"`.
-   b. Run the script as normal and check in the output on Tekton that only 1 artefact has been found and it is the expected one.
-   c. The next step will have to be done multiple times for each staging repository: the one with most of the components, and the other(s) for the wrapper(s).
 
 2. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
 3. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins. Kill the terminal to exit this process.
