@@ -19,4 +19,4 @@ data:
       push:
         eventListener: ["http://el-github-main-builder-listener.galasa-build.svc.cluster.local:8080"]
       workflow_run:
-        eventListener: ["http://el-github-obr-workflow-completed-listener.galasa-build.svc.cluster.local:8080","http://el-github-galasa-monorepo-workflow-completed-listener.galasa-build.svc.cluster.local:8080","http://el-github-cli-workflow-completed-listener.galasa-build.svc.cluster.local:8080"]
+        eventListener: ["http://el-github-webui-workflow-completed-listener.galasa-build.svc.cluster.local:8080","http://el-github-galasa-monorepo-workflow-completed-listener.galasa-build.svc.cluster.local:8080","http://el-github-cli-workflow-completed-listener.galasa-build.svc.cluster.local:8080"]
