@@ -52,10 +52,10 @@ spec:
       paths:
       - backend:
           service:
-            name: el-github-obr-workflow-completed-listener
+            name: el-github-webui-workflow-completed-listener
             port:
               number: 8080
-        path: /obr-workflow
+        path: /webui-workflow
         pathType: Prefix
   - host: triggers.galasa.dev
     http:

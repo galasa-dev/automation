@@ -7,7 +7,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: github-obr-workflow-completed-listener
+  name: github-webui-workflow-completed-listener
   annotations:
     tekton.dev/payload-validation: "false"
 spec:
@@ -33,12 +33,12 @@ spec:
           params:
           - name: "filter"
             value: "body.workflow_run.conclusion in ['success']"
-        - name: "CEL filter: only when the workflow was for the OBR repository"
+        - name: "CEL filter: only when the workflow was for the webui repository"
           ref:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.repository.name in ['obr']"
+            value: "body.repository.name in ['webui']"
         - name: "CEL filter: only when the workflow branch was 'main'"
           ref:
             name: "cel"
@@ -57,33 +57,6 @@ spec:
                 pipelineRef:
                   name: recycle-prod1
                 serviceAccountName: galasa-build-bot
-                workspaces:
-                - name: git-workspace
-                  volumeClaimTemplate:
-                    spec:
-                      storageClassName: longhorn-temp
-                      accessModes:
-                        - ReadWriteOnce
-                      resources:
-                        requests:
-                          storage: 20Gi
-
-            - apiVersion: tekton.dev/v1beta1
-              kind: PipelineRun
-              metadata:
-                generateName: build-internal-integratedtests-
-              spec:
-                pipelineRef:
-                  name: build-internal-integratedtests
-                serviceAccountName: galasa-build-bot
-                podTemplate:
-                  volumes:
-                  - name: gradle-properties
-                    secret:
-                      secretName: gradle-properties
-                  - name: gpg-key
-                    secret:
-                      secretName: gpg-key
                 workspaces:
                 - name: git-workspace
                   volumeClaimTemplate:
