@@ -64,6 +64,21 @@ function create_maven_repos {
                     --helm-set mvp.deploy=true 
 }
 
+function create_bld {   
+    argocd app create ${release_type}-bld \
+                    --project default \
+                    --sync-policy auto \
+                    --sync-option Prune=true \
+                    --self-heal \
+                    --repo https://github.com/galasa-dev/automation \
+                    --revision HEAD  \
+                    --path infrastructure/galasa-plan-b-lon02/galasa-development/galasabld \
+                    --dest-server https://kubernetes.default.svc \
+                    --dest-namespace galasa-development \
+                    --helm-set branch=${release_type} \
+                    --helm-set imageTag=${release_type}
+}
+
 function create_cli {   
     argocd app create ${release_type}-cli \
                     --project default \
@@ -99,6 +114,7 @@ if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
     ask_user_for_release_type
     set -e
     create_maven_repos
+    create_bld
     create_cli
     create_simplatform
 fi

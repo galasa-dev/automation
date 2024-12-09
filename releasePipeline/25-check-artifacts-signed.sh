@@ -92,16 +92,16 @@ function ask_user_for_release_type {
 
 
 function check_maven_repo_for_jar_asc {
-    github_repo_name=$1
+    artifact_name=$1
 
     # For example, the following repo needs checking...
-    # https://development.galasa.dev/prerelease/maven-repo/maven/dev/galasa/com.auth0.jwt/
+    # https://development.galasa.dev/prerelease/maven-repo/obr/dev/galasa/dev.galasa.wrapping.com.auth0.jwt/
 
-    url="https://development.galasa.dev/${release_type}/maven-repo/${github_repo_name}/dev/galasa/com.auth0.jwt/"
-    curl $url > temp/top_level_maven_contents_${github_repo_name}.txt
+    url="https://development.galasa.dev/${release_type}/maven-repo/obr/dev/galasa/${artifact_name}/"
+    curl $url > temp/top_level_maven_contents_${artifact_name}.txt
     rc=$?; 
     if [[ "${rc}" != "0" ]]; then 
-      error "Failed to get top-level information from maven repo for github repo ${github_repo_name}"
+      error "Failed to get top-level information from maven repo for artifact ${artifact_name}"
       exit 1
     fi
 
@@ -109,61 +109,64 @@ function check_maven_repo_for_jar_asc {
     # Gives us something like this:
     # <html>
     #  <head>
-    #   <title>Index of /prerelease/maven-repo/maven/dev/galasa/com.auth0.jwt</title>
+    #   <title>Index of /prerelease/maven-repo/obr/dev/galasa/dev.galasa.wrapping.com.auth0.jwt</title>
     #  </head>
     #  <body>
-    # <h1>Index of /prerelease/maven-repo/maven/dev/galasa/com.auth0.jwt</h1>
+    # <h1>Index of /prerelease/maven-repo/obr/dev/galasa/dev.galasa.wrapping.com.auth0.jwt</h1>
     # <pre>      <a href="?C=N;O=D">Name</a>                                     <a href="?C=M;O=A">Last modified</a>      <a href="?C=S;O=A">Size</a>  <hr>      <a href="/prerelease/maven-repo/maven/dev/galasa/">Parent Directory</a>                                              -   
-    #       <a href="3.8.1/">3.8.1/</a>                                   2023-06-13 12:58    -   
+    #       <a href="0.39.0/">0.39.0/</a>                                   2023-06-13 12:58    -   
     #       <a href="maven-metadata.xml">maven-metadata.xml</a>                       2023-06-13 12:58  303   
     #       <a href="maven-metadata.xml.md5">maven-metadata.xml.md5</a>                   2023-06-13 12:58   32   
     #       <a href="maven-metadata.xml.sha1">maven-metadata.xml.sha1</a>                  2023-06-13 12:58   40   
     # <hr></pre>
     # </body></html>
     #
-    # ... and we need to pick-out the '3.8.1' version number.
+    # ... and we need to pick-out the '0.39.0' version number.
 
     # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
-    artifact_version=$(cat temp/top_level_maven_contents_${github_repo_name}.txt | grep "<a href" | head -2 | tail -1 | cut -f2 -d'"' | cut -f1 -d'/')
+    artifact_version=$(cat temp/top_level_maven_contents_${artifact_name}.txt | grep "<a href" | head -2 | tail -1 | cut -f2 -d'"' | cut -f1 -d'/')
 
-    info "Version of artifact in repo ${github_repo_name} is ${artifact_version}"
+    info "Version of artifact ${artifact_name} is ${artifact_version}"
 
-    url="https://development.galasa.dev/${release_type}/maven-repo/${github_repo_name}/dev/galasa/com.auth0.jwt/${artifact_version}/"
+    url="https://development.galasa.dev/${release_type}/maven-repo/obr/dev/galasa/${artifact_name}/${artifact_version}/"
     info "Looking at url for a more detailed list of artifacts. url: $url"
 
     # -L option follows re-directs.
-    curl -L $url > temp/detailed_level_maven_contents_${github_repo_name}.txt
+    curl -L $url > temp/detailed_level_maven_contents_${artifact_name}.txt
     rc=$?; 
     if [[ "${rc}" != "0" ]]; then 
-      error "Failed to get detailed-level information from maven repo for github repo ${github_repo_name}"
+      error "Failed to get detailed-level information from maven repo for artifact ${artifact_name}"
       exit 1
     fi
 
-    # That file downloaded should contain the string "com.auth0.jwt-${artifact_version}.jar.asc"
-    info "looking for the .jar.asc in the maven file listing..."
-    grep "com.auth0.jwt-${artifact_version}.jar.asc" temp/detailed_level_maven_contents_${github_repo_name}.txt 
+    # That file downloaded should contain the string "${artifact_name}-${artifact_version}.pom.asc"
+    info "looking for the .pom.asc in the maven file listing..."
+    grep "${artifact_name}-${artifact_version}.pom.asc" temp/detailed_level_maven_contents_${artifact_name}.txt 
     rc=$?
     if [[ "${rc}" != "0" ]]; then 
-        error "The .jar.asc file for repository ${github_repo_name} is missing!"
+        error "The .pom.asc file for artifact ${artifact_name} is missing!"
         exit 1
     fi
 
-    success "The .jar.asc file for repository ${github_repo_name} was found."
+    success "The .pom.asc file for artifact ${artifact_name} was found."
 }
-
 
 ask_user_for_release_type
 
-
-
-# TOOD: Do the same thing for 
-
-
-declare -a repo_list=("obr" )
+declare -a artifact_list=(
+    "dev.galasa.platform"\
+    "dev.galasa.wrapping.com.auth0.jwt"\
+    "dev.galasa.gradle.impl"\
+    "galasa-maven-plugin"\
+    "dev.galasa.framework"\
+    "dev.galasa.ras.couchdb"\
+    "dev.galasa.core.manager"\
+    "dev.galasa.uber.obr"
+)
 
 # Iterate the string array using for loop
-for github_repo_name in ${repo_list[@]}; do
-  check_maven_repo_for_jar_asc $github_repo_name
+for artifact in ${artifact_list[@]}; do
+  check_maven_repo_for_jar_asc $artifact
 done
 
 success "All checks done and passed."

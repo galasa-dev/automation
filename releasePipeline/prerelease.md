@@ -37,8 +37,10 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
     - Branch: `pre-release`
     - Enable Jacoco code coverage: `false`
     - Artifacts should be signed: `true`
-8. Build the CLI and Isolated repositories that are not included in the mono repo. The CLI build which will trigger the Isolated build down the chain. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/cli/actions/workflows/build.yml) and select the following inputs:
-    - Branch: `pre-release`
+8. The build of the CLI repository and Isolated repository will be triggered automatically as part of the build chain, so monitor those builds and make sure they finish successfully. 
+    - The [CLI Main build workflow](https://github.com/galasa-dev/cli/actions/workflows/build.yml) should run with the `prerelease` ref
+    - This will trigger the Tekton pipeline `test-cli-ecosystem-commands` so go to the Tekton dashboard
+    - That will then trigger the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `prerelease` ref back in GitHub
 9. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
    - Branch: `pre-release`
 10. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
