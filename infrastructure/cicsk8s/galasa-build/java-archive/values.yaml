@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-# These values are overridden in the ArgoCD app.
+# These values are overridden in the 'galasa-java-archive' app
+# which can be found in the internal cicsk8s ArgoCD instance.
 
 namespace: galasa-build
 branch: main

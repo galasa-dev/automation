@@ -6,7 +6,7 @@
 
 apiVersion: v2
 name: galasa-java-archive
-description: Configuration for an interanl OpenJDK download site
+description: Configuration for an internal OpenJDK download site
 type: application
 version: 0.1.0
 appVersion: "0.20.0"
