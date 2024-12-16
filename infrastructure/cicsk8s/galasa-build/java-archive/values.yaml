@@ -1,0 +1,21 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+# These values are overridden in the 'galasa-java-archive' app
+# which can be found in the internal cicsk8s ArgoCD instance.
+
+namespace: galasa-build
+branch: main
+imageName: ghcr.io/galasa-dev/base-image
+imageTag: latest
+
+ingress:
+  externalHostname: development.galasa.dev
+  ingressClassName: public-iks-k8s-nginx
+  tls:
+  - hosts:
+      - development.galasa.dev
+    secretName: galasa-wildcard-cert

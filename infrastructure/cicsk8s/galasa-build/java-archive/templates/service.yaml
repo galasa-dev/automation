@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: java-archive
+  name: java-archive
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: java-archive
