@@ -182,7 +182,7 @@ spec:
   # to the CLI change with the fixing script being delivered.
   - name: fix-generated-code
     taskRef:
-      name: general-command
+      name: script
     runAfter:
     - generate-api
     params:
