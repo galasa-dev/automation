@@ -176,13 +176,33 @@ spec:
        workspace: git-workspace         
 
   #----------------------------------------------------------------
+  # The files generated need an update to correct yaml serialisation issues.
+  # Without this, the `apiVersion` property gets rendered in yaml as `apiversion`
+  # We use an 'if' statement here so we can deliver this pipeline change prior
+  # to the CLI change with the fixing script being delivered.
+  - name: fix-generated-code
+    taskRef:
+      name: general-command
+    runAfter:
+    - generate-api
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli/pkg/galasaapi
+    - name: script
+      value:  
+        if [[ -x $(context.pipelineRun.name)/cli/fix-generated-code.sh ]]; then $(context.pipelineRun.name)/cli/fix-generated-code.sh ; fi
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace   
+
+  #----------------------------------------------------------------
   # The go.mod is out of date, as it doesn't include the generated code
   # So remove it. It gets re-generated when we compile.
   - name: clear-mod
     taskRef:
       name: general-command
     runAfter:
-    - generate-api
+    - fix-generated-code
     params:
     - name: context
       value: $(context.pipelineRun.name)/cli/pkg/galasaapi
