@@ -182,15 +182,16 @@ spec:
   # to the CLI change with the fixing script being delivered.
   - name: fix-generated-code
     taskRef:
-      name: general-command
+      name: script
     runAfter:
     - generate-api
     params:
     - name: context
-      value: $(context.pipelineRun.name)/cli/pkg/galasaapi
+      value: $(context.pipelineRun.name)/cli
     - name: script
-      value:  
-        if [[ -x $(context.pipelineRun.name)/cli/fix-generated-code.sh ]]; then $(context.pipelineRun.name)/cli/fix-generated-code.sh ; fi
+      value: 
+        ls -l &&
+        if [[ -e fix-generated-code.sh ]]; then chmod +x fix-generated-code.sh ; ./fix-generated-code.sh ; fi
     workspaces:
      - name: git-workspace
        workspace: git-workspace   
