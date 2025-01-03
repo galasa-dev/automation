@@ -23,7 +23,7 @@ spec:
     type: array
   - name: image
     type: string
-    default: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:main
+    default: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
   - name: galasaTokenSecretName
     type: string
     default: galasa-prod1-token

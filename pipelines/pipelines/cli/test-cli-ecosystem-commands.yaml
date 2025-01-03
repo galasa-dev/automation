@@ -1,0 +1,98 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: test-cli-ecosystem-commands
+  namespace: galasa-build
+spec:
+  params:
+  - name: branch
+    type: string
+    default: main
+  workspaces:
+  - name: git-workspace
+# 
+# 
+# 
+  tasks:
+
+  - name: clone-cli
+    taskRef: 
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/cli
+    - name: revision
+      value: $(params.branch)
+    - name: refspec
+      value: refs/heads/$(params.branch):refs/heads/$(params.branch)
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/cli
+    workspaces:
+     - name: output
+       workspace: git-workspace
+
+  - name: chmod-ecosystem-script
+    taskRef: 
+      name: general-command
+    runAfter:
+      - clone-cli
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: harbor.galasa.dev/docker_proxy_cache/library/bash:3.2.57
+    - name: command
+      value: 
+        - chmod
+        - +x
+        - test-galasactl-ecosystem.sh
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+  - name: test-galasactl-ecosystem-linux-x86-64
+    taskRef: 
+      name: galasactl
+    runAfter:
+      - chmod-ecosystem-script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/cli
+    - name: image
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64-testing:$(params.branch)
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
+    - name: entrypoint
+      value: ./test-galasactl-ecosystem.sh
+    - name: command
+      value:
+        - --bootstrap
+        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace
+
+# Trigger GitHub Actions Isolated workflow
+  - name: trigger-isolated-gh
+    taskRef:
+      name: gh-workflow-trigger
+    runAfter:
+    - test-galasactl-ecosystem-linux-x86-64
+    params:
+    - name: workflowName
+      value: build.yaml
+    - name: repoName
+      value: isolated
+    - name: refBranch
+      value: $(params.branch)
+    workspaces:
+     - name: git-workspace
+       workspace: git-workspace

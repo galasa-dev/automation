@@ -20,10 +20,13 @@ spec:
     type: array   
   - name: command
     type: array
+  - name: image
+    type: string
+    default: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk17
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk17
+    image: $(params.image)
     imagePullPolicy: IfNotPresent
     env:
     - name: ORG_GRADLE_PROJECT_signingKeyId

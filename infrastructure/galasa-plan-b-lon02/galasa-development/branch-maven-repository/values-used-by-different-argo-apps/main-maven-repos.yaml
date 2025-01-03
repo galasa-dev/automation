@@ -7,83 +7,38 @@
 
 namespace: galasa-development
 
-managers:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-managers
-  imageTag: main
-extensions:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-extensions
-  imageTag: main
 codecov:
   deploy: false
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
   imageTag: main      
-framework:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-framework
-  imageTag: main 
 obr:
-  deploy: true
+  deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-obr
-  imageTag: main
-maven:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-maven
-  imageTag: main
-gradle:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-gradle
+  imageName: ghcr.io/galasa-dev/obr-maven-artefacts
   imageTag: main
 isolated:
-  deploy: true
+  deploy: false
   branch: main
-  imageName: icr.io/galasadev/galasa-isolated-zip
+  imageName: ghcr.io/galasa-dev/galasa-isolated-zip
   imageTag: main
 javadoc:
-  deploy: true
+  deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
+  imageName: ghcr.io/galasa-dev/javadoc-maven-artefacts
   imageTag: main
 javadocsite:
-  deploy: true
+  deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
+  imageName: ghcr.io/galasa-dev/javadoc-site
   imageTag: main  
 restApiDocSite:
-  deploy: true
+  deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
+  imageName: ghcr.io/galasa-dev/restapidoc-site
   imageTag: main 
 mvp:
-  deploy: true
+  deploy: false
   branch: main
-  imageName: icr.io/galasadev/galasa-mvp-zip
-  imageTag: main
-wrapping:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
-  imageTag: main
-cli:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/cli
-  imageTag: main
-simplatform:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/simplatform
-  imageTag: main
-inttests:
-  deploy: true
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/inttests
+  imageName: ghcr.io/galasa-dev/galasa-mvp-zip
   imageTag: main

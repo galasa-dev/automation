@@ -27,6 +27,6 @@ spec:
           name: inttests-{{ .Values.branch }}
           env:
           - name: CONTEXTROOT
-            value: {{ .Values.branch }}/maven-repo/inttests
+            value: {{ .Values.branch }}/maven-repo/{{ .Values.ingress.pathSuffix }}
           ports:
             - containerPort: 80

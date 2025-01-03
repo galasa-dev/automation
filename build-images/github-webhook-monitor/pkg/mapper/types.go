@@ -10,5 +10,5 @@ type Config struct {
 }
 
 type Event struct {
-	EventListener string `yaml:"eventListener"`
+	EventListener []string `yaml:"eventListener"`
 }

@@ -1,0 +1,32 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-archive
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: java-archive
+  template:
+    metadata:
+      labels:
+        app: java-archive
+      name: java-archive
+    spec:
+      containers:
+      - env:
+          - name: CONTEXTROOT
+            value: {{ .Values.branch }}/java-archive
+        image: {{ .Values.imageName }}:{{ .Values.imageTag }}
+        imagePullPolicy: Always
+        name: java-archive
+        ports:
+        - containerPort: 80
+

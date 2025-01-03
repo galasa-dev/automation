@@ -1,0 +1,41 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: gh-workflow-trigger
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: workflowName
+    type: string 
+  - name: repoName
+    type: string 
+  - name: refBranch
+    type: string    
+  steps:
+  - name: trigger-workflow
+    image: ghcr.io/galasa-dev/gitcli:main
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: GH_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: github-token
+          key: password
+          optional: false
+    # onError: continue
+    script: |
+      #!/bin/sh
+      set +e
+
+      gh workflow run $(params.workflowName) --repo https://github.com/galasa-dev/$(params.repoName) --ref $(params.refBranch)
+      echo "CLI Main build workflow triggered in GitHub Actions"
+     

@@ -7,8 +7,12 @@
 #
 
 argocd app delete release-maven-repos
+argocd app delete release-bld
 argocd app delete release-cli
+argocd app delete release-simplatform
 argocd app delete prerelease-maven-repos
+argocd app delete prerelease-bld
 argocd app delete prerelease-cli
+argocd app delete prerelease-simplatform
 
 echo "Complete"

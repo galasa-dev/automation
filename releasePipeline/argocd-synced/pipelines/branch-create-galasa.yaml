@@ -52,7 +52,7 @@ spec:
 #
 #
 #
-  - name: clone-branch-wrapping
+  - name: clone-branch-galasa
     taskRef: 
       name: galasabld
     params:
@@ -64,151 +64,7 @@ spec:
         - branch
         - copy
         - --repository
-        - wrapping
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: clone-branch-gradle
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - gradle
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: clone-branch-maven
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - maven
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: clone-branch-framework
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - framework
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: clone-branch-extensions
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - extensions
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: clone-branch-managers
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - managers
-        - --to
-        - $(params.distBranch)
-        - --branch
-        - $(params.fromBranch)
-        - $(params.overwrite)
-        - $(params.force)
-        - --credentials
-        - /creds/githubcreds.yaml
-#
-#
-#
-  - name: clone-branch-obr
-    taskRef: 
-      name: galasabld
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: command
-      value:
-        - github
-        - branch
-        - copy
-        - --repository
-        - obr
+        - galasa
         - --to
         - $(params.distBranch)
         - --branch
@@ -305,6 +161,30 @@ spec:
         - copy
         - --repository
         - webui
+        - --to
+        - $(params.distBranch)
+        - --branch
+        - $(params.fromBranch)
+        - $(params.overwrite)
+        - $(params.force)
+        - --credentials
+        - /creds/githubcreds.yaml
+# 
+# 
+# 
+  - name: clone-branch-simplatform
+    taskRef: 
+      name: galasabld
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - github
+        - branch
+        - copy
+        - --repository
+        - simplatform
         - --to
         - $(params.distBranch)
         - --branch

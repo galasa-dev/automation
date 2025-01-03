@@ -1,3 +1,8 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 name: Build custom images for automation
 
 on:
@@ -13,7 +18,6 @@ env:
   NAMESPACE: galasa-dev
 
 jobs:
-  
   build-gpg-image:
     name: Build the 'gpg' image
     runs-on: ubuntu-latest
@@ -23,11 +27,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -66,11 +70,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -109,11 +113,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -152,11 +156,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -195,11 +199,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -238,11 +242,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -281,11 +285,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -314,3 +318,16 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  report-failure:
+    name: Report failure in workflow
+    runs-on: ubuntu-latest
+    needs: [build-gpg-image, build-kubectl-image, build-argocdcli-image, build-gitcli-image, build-openapi-image, build-swagger-image, build-openjdk17-ibm-gradle-image]
+    if: failure()
+
+    steps:
+      - name: Report failure in workflow to Slack
+        env: 
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run : |
+          docker run --rm -v ${{ github.workspace }}:/var/workspace ghcr.io/galasa-dev/galasabld-ibm:main slackpost workflows --repo "automation" --workflowName "${{ github.workflow }}" --workflowRunNum "${{ github.run_id }}" --ref "${{ env.BRANCH }}" --hook "${{ env.SLACK_WEBHOOK }}"

@@ -4,16 +4,17 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-namespace: galasa-development
+# These values are overridden in the 'galasa-java-archive' app
+# which can be found in the internal cicsk8s ArgoCD instance.
+
+namespace: galasa-build
 branch: main
-imageName: ghcr.io/galasa-dev/inttests-maven-artefacts
-imageTag: main
+imageName: ghcr.io/galasa-dev/base-image
+imageTag: latest
 
 ingress:
   externalHostname: development.galasa.dev
   ingressClassName: public-iks-k8s-nginx
-  pathSuffix: inttests
-  annotations: {}
   tls:
   - hosts:
       - development.galasa.dev

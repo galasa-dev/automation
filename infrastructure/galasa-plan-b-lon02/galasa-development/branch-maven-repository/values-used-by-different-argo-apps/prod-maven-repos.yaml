@@ -7,68 +7,38 @@
 
 namespace: galasa-development
 
-managers:
-  deploy: false
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-managers
-  imageTag: main
-extensions:
-  deploy: false
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-extensions
-  imageTag: main
 codecov:
   deploy: false
   branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
   imageTag: main      
-framework:
-  deploy: false
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-framework
-  imageTag: main 
 obr:
-  deploy: true
-  branch: prod
-  imageName: harbor.galasa.dev/galasadev/galasa-obr
-  imageTag: prod
-maven:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-maven
-  imageTag: main
-gradle:
-  deploy: false
-  branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-gradle
+  imageName: ghcr.io/galasa-dev/obr-maven-artefacts
   imageTag: main
 isolated:
-  deploy: true
-  branch: prod
-  imageName: icr.io/galasadev/galasa-isolated-zip
-  imageTag: prod
-javadoc:
-  deploy: true
-  branch: prod
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
-  imageTag: prod
-javadocsite:
-  deploy: true
-  branch: prod
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
-  imageTag: prod  
-restApiDocSite:
-  deploy: true
-  branch: prod
-  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
-  imageTag: prod 
-mvp:
-  deploy: true
-  branch: prod
-  imageName: icr.io/galasadev/galasa-mvp-zip
-  imageTag: prod
-wrapping:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
+  imageName: ghcr.io/galasa-dev/galasa-isolated-zip
+  imageTag: main
+javadoc:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/javadoc-maven-artefacts
+  imageTag: main
+javadocsite:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/javadoc-site
+  imageTag: main  
+restApiDocSite:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/restapidoc-site
+  imageTag: main 
+mvp:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/galasa-mvp-zip
   imageTag: main

@@ -7,68 +7,38 @@
 
 namespace: galasa-development
 
-managers:
-  deploy: false
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-managers
-  imageTag: codecov
-extensions:
-  deploy: false
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-extensions
-  imageTag: codecov
 codecov:
-  deploy: true
-  branch: codecov
+  deploy: false
+  branch: main
   imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
-  imageTag: codecov      
-framework:
-  deploy: false
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-framework
-  imageTag: codecov 
+  imageTag: main      
 obr:
-  deploy: true
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-obr
-  imageTag: codecov
-maven:
   deploy: false
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-maven
-  imageTag: codecov
-gradle:
-  deploy: false
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-gradle
-  imageTag: codecov
+  branch: main
+  imageName: ghcr.io/galasa-dev/obr-maven-artefacts
+  imageTag: main
 isolated:
-  deploy: true
-  branch: codecov
-  imageName: icr.io/galasadev/galasa-isolated-zip
-  imageTag: codecov
-javadoc:
-  deploy: true
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-maven-repo
-  imageTag: codecov
-javadocsite:
-  deploy: true
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-javadoc-site
-  imageTag: codecov  
-restApiDocSite:
-  deploy: true
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-restapidoc-site
-  imageTag: codecov 
-mvp:
-  deploy: true
-  branch: codecov
-  imageName: icr.io/galasadev/galasa-mvp-zip
-  imageTag: codecov
-wrapping:
   deploy: false
-  branch: codecov
-  imageName: harbor.galasa.dev/galasadev/galasa-wrapping
-  imageTag: codecov
+  branch: main
+  imageName: ghcr.io/galasa-dev/galasa-isolated-zip
+  imageTag: main
+javadoc:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/javadoc-maven-artefacts
+  imageTag: main
+javadocsite:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/javadoc-site
+  imageTag: main  
+restApiDocSite:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/restapidoc-site
+  imageTag: main 
+mvp:
+  deploy: false
+  branch: main
+  imageName: ghcr.io/galasa-dev/galasa-mvp-zip
+  imageTag: main

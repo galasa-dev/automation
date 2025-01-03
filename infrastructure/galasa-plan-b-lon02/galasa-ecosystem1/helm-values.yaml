@@ -31,7 +31,17 @@ galasaServiceName: "Galasa Ecosystem 1"
 #
 # The container registry the Galasa images can be found in
 #
-galasaRegistry: "harbor.galasa.dev/galasadev"
+galasaRegistry: "ghcr.io/galasa-dev"
+# 
+# 
+# The name of the Docker image that contains Galasa's boot.jar file to launch ecosystem services
+#
+galasaBootImage: "galasa-boot-embedded-x86_64"
+#
+#
+# The name of the Docker image that launches Galasa's web UI
+#
+galasaWebUiImage: "webui"
 #
 #
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes

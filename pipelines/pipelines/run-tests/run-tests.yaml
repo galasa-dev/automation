@@ -49,7 +49,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
     - name: galasaHome
       value: /workspace/git/$(context.pipelineRun.name)
     - name: command
@@ -85,7 +85,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)
     - name: image
-      value: harbor.galasa.dev/galasadev/galasa-cli-ibm-amd64:stable
+      value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
     - name: galasaHome
       value: /workspace/git/$(context.pipelineRun.name)
     - name: command
@@ -120,31 +120,19 @@ spec:
 #
 #
 #
-# Trigger CLI rebuild now we have confirmed ecosystem tests are running okay
-  - name: trigger-cli
+# Trigger github actions CLI Main Build workflow
+  - name: trigger-cli-gh
     taskRef:
-      name: tkn-cli
+      name: gh-workflow-trigger
     runAfter:
     - run-submit
     params:
-    - name: context
-      value: $(context.pipelineRun.name)/automation
-    - name: command
-      value:
-      - pipeline
-      - start
-      - branch-cli
-      - -n
-      - galasa-build
-      - --prefix-name
-      - trigger-cli-main
-      - --use-param-defaults
-      - --workspace
-      - name=git-workspace,volumeClaimTemplateFile=./pipelines/templates/git-workspace-template.yaml
-      - --pod-template
-      - ./pipelines/templates/pod-template.yaml
-      - --serviceaccount
-      - galasa-build-bot
+    - name: workflowName
+      value: build.yml
+    - name: repoName
+      value: cli
+    - name: refBranch
+      value: main
     workspaces:
      - name: git-workspace
        workspace: git-workspace

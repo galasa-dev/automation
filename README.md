@@ -42,15 +42,8 @@ This directory is the single location for all Dockerfiles needed to build the im
 | Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, github-monitor, github-receiver, gpg, kubectl, openapi, openjdk17-ibm-gradle, swagger, tkn | 
 | Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
-| Maven repositories for the built Galasa core components | wrapping, gradle, maven, framework, extensions, managers, obr, cli-binary, isolated |
-| Maven repositories for other components | galasabld-binary, javadoc-maven-repo |
-| Galasa runtime images | obrGeneric, bootEmbedded, ibmBootEmbedded | 
+| Maven repositories for the built Galasa core components | cli-binary |
 | Galasa CLI | cli, cli-ibm |
-| Galasa Isolated build | isolatedZip |
-| Galasa Integrated tests | inttests |
-| Galasa build utilities | galasabld, galasabld-ibm, galasabld-obr | 
-| Galasa Javadoc and REST API doc | javadoc-maven-repo, javadoc-site, restapidoc-site |
-| Galasa Simplatform | simplatform, simplatform-amd64, webapp |
 | Galasa Resources site | resources |
 
 
@@ -108,6 +101,8 @@ This EventListener is triggered via webhook when code is pushed into the main br
 
 
 ## Pipelines
+
+**TO DO: Remove this section / update with GitHub workflows**
 
 Galasa's architecture means that the core components are built on top of each other, using artifacts from the previous components. The diagram below shows the links between components, starting from Wrapping. In some instances, the build pipeline for a component triggers the next pipeline in the chain, and in some instances, the component is not connected in the chain, but when it is rebuilt, it draws on artifacts from the other.
 
@@ -491,17 +486,6 @@ This task gets the latest git commit hash from the provided repository, and stor
 Parameters:
 * pipelineRunName: The name of the currently running PipelineRun, from the PipelineRun context, to find the working directory.
 * repo: The name of the GitHub repository.
-
-This task uses the custom [gitcli image](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab).
-
-
-### git-checkout
-
-This task switches to the correct git branch for a branch-level build as the pipeline always clones the main branch.
-
-Parameters:
-* context: The directory to perform the command in.
-* branch: The name of branch to switch to.
 
 This task uses the custom [gitcli image](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab).
 

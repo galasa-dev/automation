@@ -1,0 +1,69 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-webui-workflow-completed-listener
+  annotations:
+    tekton.dev/payload-validation: "false"
+spec:
+  serviceAccountName: tekton-trigger
+  triggers:
+    - name: gitlab-push-events-trigger
+      interceptors:
+        - name: "validate GitHub payload and filter on eventType"
+          ref:
+            name: "github"
+          params:
+          - name: "eventTypes"
+            value: ["workflow_run"]
+        - name: "CEL filter: only when the workflow run was completed"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.action in ['completed']"
+        - name: "CEL filter: only when the workflow run was successful"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.conclusion in ['success']"
+        - name: "CEL filter: only when the workflow was for the webui repository"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.repository.name in ['webui']"
+        - name: "CEL filter: only when the workflow branch was 'main'"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.head_branch in ['main']"
+       
+      template:
+        spec:
+          resourcetemplates:
+            - apiVersion: tekton.dev/v1beta1
+              kind: PipelineRun
+              metadata:
+                generateName: recycle-prod1-
+              spec:
+                pipelineRef:
+                  name: recycle-prod1
+                serviceAccountName: galasa-build-bot
+                workspaces:
+                - name: git-workspace
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 20Gi

@@ -44,24 +44,6 @@ function create_maven_repos {
                     --path infrastructure/galasa-plan-b-lon02/galasa-development/branch-maven-repository \
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
-                    --helm-set wrapping.branch=${release_type} \
-                    --helm-set wrapping.imageTag=${release_type} \
-                    --helm-set wrapping.deploy=true \
-                    --helm-set gradle.branch=${release_type} \
-                    --helm-set gradle.imageTag=${release_type} \
-                    --helm-set gradle.deploy=true \
-                    --helm-set maven.branch=${release_type} \
-                    --helm-set maven.imageTag=${release_type} \
-                    --helm-set maven.deploy=true \
-                    --helm-set framework.branch=${release_type} \
-                    --helm-set framework.imageTag=${release_type} \
-                    --helm-set framework.deploy=true \
-                    --helm-set extensions.branch=${release_type} \
-                    --helm-set extensions.imageTag=${release_type} \
-                    --helm-set extensions.deploy=true \
-                    --helm-set managers.branch=${release_type} \
-                    --helm-set managers.imageTag=${release_type} \
-                    --helm-set managers.deploy=true \
                     --helm-set obr.branch=${release_type} \
                     --helm-set obr.imageTag=${release_type} \
                     --helm-set obr.deploy=true \
@@ -82,6 +64,21 @@ function create_maven_repos {
                     --helm-set mvp.deploy=true 
 }
 
+function create_bld {   
+    argocd app create ${release_type}-bld \
+                    --project default \
+                    --sync-policy auto \
+                    --sync-option Prune=true \
+                    --self-heal \
+                    --repo https://github.com/galasa-dev/automation \
+                    --revision HEAD  \
+                    --path infrastructure/galasa-plan-b-lon02/galasa-development/galasabld \
+                    --dest-server https://kubernetes.default.svc \
+                    --dest-namespace galasa-development \
+                    --helm-set branch=${release_type} \
+                    --helm-set imageTag=${release_type}
+}
+
 function create_cli {   
     argocd app create ${release_type}-cli \
                     --project default \
@@ -96,10 +93,28 @@ function create_cli {
                     --helm-set branch=${release_type} \
                     --helm-set imageTag=${release_type}
 }
+
+function create_simplatform {   
+    argocd app create ${release_type}-simplatform \
+                    --project default \
+                    --sync-policy auto \
+                    --sync-option Prune=true \
+                    --self-heal \
+                    --repo https://github.com/galasa-dev/automation \
+                    --revision HEAD  \
+                    --path infrastructure/galasa-plan-b-lon02/galasa-development/simplatform \
+                    --dest-server https://kubernetes.default.svc \
+                    --dest-namespace galasa-development \
+                    --helm-set branch=${release_type} \
+                    --helm-set imageTag=${release_type}
+}
+
 # checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
     ask_user_for_release_type
     set -e
     create_maven_repos
+    create_bld
     create_cli
+    create_simplatform
 fi

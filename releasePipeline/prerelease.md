@@ -33,9 +33,21 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
 6. Delete all Releases and Tags for the Helm charts that were just created by pushing to the `prerelease` branch.
     1. Delete all Releases that were created: [Releases](https://github.com/galasa-dev/helm/releases) - Next to a Release, click the Delete icon and 'Delete this release'.
     2. Delete all Tags that were created: [Tags](https://github.com/galasa-dev/helm/tags) - Next to a Tag, click the three dots, then 'Delete Tag' then 'Delete this Tag'.
-7. Run [20-build-all-code.sh](./20-build-all-code.sh). When prompted, choose the '`pre-release`' option.
-8. Run [21-build-webui.sh](./21-build-webui.sh). When prompted, choose the '`pre-release`' option.
-9. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
+7. Begin the build of Galasa by starting the Galasa mono repo release build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/galasa/actions/workflows/releases.yaml) and select the following inputs:
+    - Branch: `pre-release`
+    - Enable Jacoco code coverage: `false`
+    - Artifacts should be signed: `true`
+8. The build of the CLI repository and Isolated repository will be triggered automatically as part of the build chain, so monitor those builds and make sure they finish successfully. 
+    - The [CLI Main build workflow](https://github.com/galasa-dev/cli/actions/workflows/build.yml) should run with the `prerelease` ref
+    - This will trigger the Tekton pipeline `test-cli-ecosystem-commands` so go to the Tekton dashboard
+    - That will then trigger the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `prerelease` ref back in GitHub
+9. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
+   - Branch: `pre-release`
+10. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
-
-10. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino or Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+11. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino or Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+12. Test the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline:
+    - https://galasa.dev/docs/cli-command-reference/zipped-prerequisites
+    - https://galasa.dev/docs/cli-command-reference/installing-offline
+    - https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline
+    - https://galasa.dev/docs/running-simbank-tests/running-simbank-tests-cli-offline
