@@ -12,9 +12,18 @@ env:
   NAMESPACE: galasa-dev
 
 jobs:
+  check-required-secrets-configured:
+    name: Check required secrets configured
+    uses: galasa-dev/galasa/.github/workflows/check-required-secrets-configured.yaml@main
+    secrets: inherit
+    with:
+      write_github_packages_username: 'true'
+      write_github_packages_token: 'true'
+
   build-base-image:
     name: Build the base httpd image for hosting the development Maven registries
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
@@ -45,10 +54,11 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
 
   report-failure:
+    # Skip this job for forks
+    if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
     name: Report failure in workflow
     runs-on: ubuntu-latest
     needs: build-base-image
-    if: failure()
 
     steps:
       - name: Report failure in workflow to Slack
