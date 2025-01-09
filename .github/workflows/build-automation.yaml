@@ -6,9 +6,9 @@
 name: Build custom images for automation
 
 on:
-  pull_request:
-    branches: 
-      - 'main'
+  # pull_request:
+  #   branches: 
+  #     - 'main'
   push:
     branches: 
       - 'main'
@@ -43,16 +43,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
 
-      - name: Build 'gpg' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gpg-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'gpg' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/common
+      #     file: dockerfiles/common/gpg-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}
@@ -88,16 +88,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
 
-      - name: Build 'kubectl' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/kubectl-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'kubectl' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/common
+      #     file: dockerfiles/common/kubectl-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}
@@ -133,16 +133,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/argocdcli
 
-      - name: Build 'argocdcli' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/argocd-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'argocdcli' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/common
+      #     file: dockerfiles/common/argocd-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}
@@ -178,16 +178,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gitcli
 
-      - name: Build 'gitcli' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gitcli-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'gitcli' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/common
+      #     file: dockerfiles/common/gitcli-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}
@@ -223,16 +223,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openapi
 
-      - name: Build 'openapi' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/openapi-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'openapi' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/common
+      #     file: dockerfiles/common/openapi-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}
@@ -268,16 +268,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/swagger
 
-      - name: Build 'swagger' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/swagger-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'swagger' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/common
+      #     file: dockerfiles/common/swagger-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}
@@ -313,16 +313,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle
 
-      - name: Build 'openjdk17-ibm-gradle' Docker image
-        if: ${{ github.event.pull_request.base.ref == 'main' }}
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: dockerfiles/certs
-          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build 'openjdk17-ibm-gradle' Docker image
+      #   if: ${{ github.event.pull_request.base.ref == 'main' }}
+      #   id: build
+      #   uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      #   with:
+      #     context: dockerfiles/certs
+      #     file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
+      #     push: false
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Log in to the GitHub Container registry
         if: ${{ github.event_name == 'push' }}

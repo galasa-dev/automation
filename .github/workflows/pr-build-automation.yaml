@@ -1,0 +1,191 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Build custom images for automation
+
+on:
+  pull_request:
+    branches: 
+      - 'main'
+
+env:
+  REGISTRY: ghcr.io
+  NAMESPACE: ${{ github.repository_owner }}
+
+jobs:
+  build-gpg-image:
+    name: Build the 'gpg' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
+
+      - name: Build 'gpg' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/gpg-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-kubectl-image:
+    name: Build the 'kubectl' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
+
+      - name: Build 'kubectl' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/kubectl-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-argocdcli-image:
+    name: Build the 'argocdcli' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/argocdcli
+
+      - name: Build 'argocdcli' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/argocd-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-gitcli-image:
+    name: Build the 'gitcli' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gitcli
+
+      - name: Build 'gitcli' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/gitcli-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-openapi-image:
+    name: Build the 'openapi' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openapi
+
+      - name: Build 'openapi' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/openapi-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  
+  build-swagger-image:
+    name: Build the 'swagger' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/swagger
+
+      - name: Build 'swagger' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/common
+          file: dockerfiles/common/swagger-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-openjdk17-ibm-gradle-image:
+    name: Build the 'openjdk17-ibm-gradle' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle
+
+      - name: Build 'openjdk17-ibm-gradle' Docker image
+        if: ${{ github.event.pull_request.base.ref == 'main' }}
+        id: build
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: dockerfiles/certs
+          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
