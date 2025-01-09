@@ -19,8 +19,6 @@ env:
 
 jobs:
   check-required-secrets-configured:
-    # Authentication to GHCR only needed if doing a Main build.
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     name: Check required secrets configured
     uses: galasa-dev/galasa/.github/workflows/check-required-secrets-configured.yaml@main
     with:
