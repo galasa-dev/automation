@@ -2,91 +2,66 @@
 
 These are manual steps to bump the version of Galasa to the next version.
 
-1. Create a new branch in all of the repositories below called something like 'version-bump', don't call it 'release'
+1. Create a new branch in all of the repositories below called something like 'version-bump' (don't call it 'release').
 
-2. Upgrade the Galasa Monorepo
+2. Upgrade [Galasa](https://github.com/galasa-dev/galasa)
 
-    a. Create branch
+    a. Invoke the `./tools/set-version --version {new version}` script in which invokes a separate `set-version.sh` for each module.
 
-    b. Invoke the `./tools/set-version --version {new version}` script in which invokes a separate `set-version.sh` for each module.
+    b. Run the `./tools/build-locally.sh`, which will invoke each individual module's `build-locally.sh` script, which will update the versions in the generated `release.yaml`s.
 
-    c. Currently not all versions are found by the script alone such as dev.galasa.platform's version used throughout the code, so do a search for the current version in VSCode and replace with the new development version. Manually check that all dev.galasa bundles have been upgraded.
+    c. Manually check that all dev.galasa bundles have been upgraded. Do a search for the current version in VSCode to check for any versions that did not get uplifted by the script, and replace with the new development version.
 
-    d. Make sure it builds with `./tools/build-locally.sh` which will invoke each individual module's `build-locally.sh` script. Make sure the API Server starts locally also.
+    d. Make sure the API Server starts locally.
 
-    e. Push the changes to your branch
+    e. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
-    f. Open PR for this change and wait for the PR build to pass
+    **Note:** Once the Galasa mono repo's build finishes, this will trigger the `recycle-prod1` Tekton pipeline, which will then trigger the `run-tests` Tekton pipeline. The `run-tests` will fail as the CPS properties have not yet been upgraded to the new development version (unless you have already done it with galasactl) - this is okay.
 
-    g. Merge in the PR and wait for the Main build to pass and finish
+3. Upgrade [Helm](https://github.com/galasa-dev/helm)
 
-    **Note:** Once the Galasa mono repo's build finishes, this will trigger the `recycle-prod1` Tekton pipeline, which will then trigger the `run-tests` Tekton pipeline. The `run-tests` will fail as the CPS properties have not yet been upgraded to the new development version - this is okay.
-
-
-3. Upgrade CLI
-
-    a. Create branch
-
-    b. Invoke the `set-version --version {new version}` script.
-
-    c. Make sure it builds with `build-locally.sh`
+    a. Invoke the `set-version --version {new version}` script.
     
-    d. Push
+    b. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
-    e. Open PR for this change and wait for the PR build to pass
+4. Upgrade [Simplatform](https://github.com/galasa-dev/simplatform)
 
-    f. Merge in the PR and wait for the Main build to pass and finish
-
-    g. When the Isolated Main build is triggered, cancel it on the GitHub UI [here](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) with the "Cancel Workflow" button, as you are going to rebuild it in the next step anyway.
-
-4. Upgrade Isolated
-
-    a. Create branch
-
-    b. Invoke the `set-version --version {new version}` script. Currently not all versions are found by the script alone, so do a search for the current version in VSCode and replace with the new development version. Manually check that all dev.galasa bundles have been upgraded.
-
-    c. There is no `build-locally.sh` script for this repo so you will have to rely on the GitHub Actions workflow to confirm it builds okay.
+    a. Invoke the `set-version --version {new version}` script. **Note:** This will fail if the Galasa OBR has not been fully rebuilt and redeployed yet to the development.galasa.dev site, as the `set-version.sh` script uses `mvn` to uplift the versions, which will look for Simplatform's dependencies at the new version in Maven Central then the development.galasa.dev site.
     
-    d. Push
+    b. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
-    e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+5. Upgrade [Web UI](https://github.com/galasa-dev/webui)
 
-5. Upgrade Helm charts
-
-    a. Create branch
-
-    b. Invoke the `set-version --version {new version}` script.
+    a. Invoke the `set-version --version {new version}` script.
     
-    c. Push
+    b. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
-    e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+6. Upgrade [Integratedtests](https://github.com/galasa-dev/integratedtests) (not a released component)
 
-6. Upgrade Simplatform
-
-    a. Create branch
-
-    b. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. Manually check that all dev.galasa bundles have been upgraded then run `build-locally.sh` to check it builds.
+    a. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2107) is open to create a set-version script so this should be updated when that is complete. Manually check that all dev.galasa bundles have been upgraded then run `build-locally.sh` to check it builds.
     
-    c. Push
+    b. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
-    e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+7. Upgrade the [internal integrated tests](https://github.ibm.com/galasa/internal-integratedtests) (not a released component)
 
-7. Upgrade Web UI
-
-    a. Create branch
-
-    b. Invoke the `set-version --version {new version}` script.
+    a. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2107) is open to create a set-version script so this should be updated when that is complete. 
     
-    c. Push
+    b. Push the changes to your branch, open a PR, then merge in the PR, and wait for the Main build to pass and finish.
 
-    e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+8. Upgrade [CLI](https://github.com/galasa-dev/cli)
 
-8. Upgrade Integratedtests (not a released component)
+    a. Invoke the `set-version --version {new version}` script.
 
-    a. Create branch
+    b. Make sure it builds with `build-locally.sh`. This will also uplift the version in the generated docs files.
 
-    b. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. Manually check that all dev.galasa bundles have been upgraded then run `build-locally.sh` to check it builds.
+    c. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+
+    d. When the Isolated Main build is triggered, cancel it on the GitHub UI [here](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) with the "Cancel Workflow" button, as you are going to rebuild it in the next step anyway.
+
+9. Upgrade [Isolated](https://github.com/galasa-dev/isolated)
+
+    a. Invoke the `set-version --version {new version}` script.
+
+    b. Make sure it builds with the `build-locally.sh`.
     
-    c. Push
-
-    e. Open PR for this change, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
+    c. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
