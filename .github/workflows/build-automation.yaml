@@ -6,54 +6,57 @@
 name: Build custom images for automation
 
 on:
-  pull_request:
-    branches: 
-      - 'main'
   push:
     branches: 
       - 'main'
 
 env:
   REGISTRY: ghcr.io
-  NAMESPACE: galasa-dev
+  NAMESPACE: ${{ github.repository_owner }}
+  BRANCH: ${{ github.ref_name }}
 
 jobs:
+  check-required-secrets-configured:
+    name: Check required secrets configured
+    uses: galasa-dev/galasa/.github/workflows/check-required-secrets-configured.yaml@main
+    with:
+      check_write_github_packages_username: 'true'
+      check_write_github_packages_token: 'true'
+    secrets:
+      WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+      WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+
   build-gpg-image:
     name: Build the 'gpg' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
 
-      - name: Build 'gpg' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gpg-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'gpg' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
           file: dockerfiles/common/gpg-dockerfile
@@ -64,39 +67,34 @@ jobs:
   build-kubectl-image:
     name: Build the 'kubectl' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
 
-      - name: Build 'kubectl' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/common
-          file: dockerfiles/common/kubectl-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'kubectl' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
           file: dockerfiles/common/kubectl-dockerfile
@@ -107,39 +105,34 @@ jobs:
   build-argocdcli-image:
     name: Build the 'argocdcli' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/argocdcli
 
-      - name: Build 'argocdcli' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/common
-          file: dockerfiles/common/argocd-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'argocdcli' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
           file: dockerfiles/common/argocd-dockerfile
@@ -150,39 +143,34 @@ jobs:
   build-gitcli-image:
     name: Build the 'gitcli' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gitcli
 
-      - name: Build 'gitcli' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gitcli-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'gitcli' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
           file: dockerfiles/common/gitcli-dockerfile
@@ -193,39 +181,34 @@ jobs:
   build-openapi-image:
     name: Build the 'openapi' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openapi
 
-      - name: Build 'openapi' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/common
-          file: dockerfiles/common/openapi-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'openapi' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
           file: dockerfiles/common/openapi-dockerfile
@@ -236,39 +219,34 @@ jobs:
   build-swagger-image:
     name: Build the 'swagger' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/swagger
 
-      - name: Build 'swagger' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/common
-          file: dockerfiles/common/swagger-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'swagger' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
           file: dockerfiles/common/swagger-dockerfile
@@ -279,39 +257,35 @@ jobs:
   build-openjdk17-ibm-gradle-image:
     name: Build the 'openjdk17-ibm-gradle' image
     runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+          sparse-checkout: |
+            dockerfiles/certs
+            dockerfiles/common
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle
 
-      - name: Build 'openjdk17-ibm-gradle' Docker image
-        if: github.event.pull_request.base.ref == 'main'
-        id: build
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
         with:
-          context: dockerfiles/certs
-          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
       - name: Build and push 'openjdk17-ibm-gradle' Docker image
-        if: github.ref == 'refs/heads/main'
         id: build-push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: dockerfiles/certs
           file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
@@ -320,10 +294,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   report-failure:
+    # Skip this job for forks
+    if: ${{ failure() && github.event_name == 'push' && github.repository_owner == 'galasa-dev' }}
     name: Report failure in workflow
     runs-on: ubuntu-latest
     needs: [build-gpg-image, build-kubectl-image, build-argocdcli-image, build-gitcli-image, build-openapi-image, build-swagger-image, build-openjdk17-ibm-gradle-image]
-    if: failure()
 
     steps:
       - name: Report failure in workflow to Slack

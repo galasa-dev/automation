@@ -10,9 +10,12 @@ on:
 
 env:
   NAMESPACE: galasa-dev
+  BRANCH: ${{ github.ref_name }}
 
 jobs:
   build-helm:
+    # Skip this job for forks
+    if: ${{ github.repository_owner == 'galasa-dev' }}
     name: Build Helm chart for ecosystem1
     runs-on: ubuntu-latest
 
@@ -33,9 +36,11 @@ jobs:
         id: install
       
       - name: Setup kubeconfig secret
+        env: 
+          KUBE_CONFIG_PLAN_B_CLUSTER: ${{ secrets.KUBE_CONFIG_PLAN_B_CLUSTER }}
         run: |
           mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_PLAN_B_CLUSTER }}" >> $HOME/.kube/config
+          echo "${{ env.KUBE_CONFIG_PLAN_B_CLUSTER }}" >> $HOME/.kube/config
       
       - name: Uninstall ecosystem1
         run: |
@@ -50,10 +55,11 @@ jobs:
           helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
 
   report-failure:
+    # Skip this job for forks
+    if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
     name: Report failure in workflow
     runs-on: ubuntu-latest
     needs: build-helm
-    if: failure()
 
     steps:
       - name: Report failure in workflow to Slack
