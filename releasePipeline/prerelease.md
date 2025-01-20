@@ -44,10 +44,17 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
 9. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
    - Branch: `pre-release`
 10. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
-    - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
-11. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino or Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
-12. Test the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline:
-    - https://galasa.dev/docs/cli-command-reference/zipped-prerequisites
+    - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
+11. Send the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+12. Test the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline (although you will need to slightly adapt in some places as you are testing the MVP from the prerelease maven repo - these differences are documented below):
     - https://galasa.dev/docs/cli-command-reference/installing-offline
+        - 1: The output of `docker load -i isolated.tar` should instead be `Loaded image: ghcr.io/galasa-dev/galasa-mvp:main`.
+        - 2: Run the container by running `docker run -d -p 8080:80 --name galasa ghcr.io/galasa-dev/galasa-mvp:main` instead.
     - https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline
+        - After starting the Simplatform application by running the `run-simplatform.sh` script, you can start your 3270 emulator pointing it to port 2023 of localhost by running `c3270 localhost -port 2023` (you will need the x3270 tool installed).
     - https://galasa.dev/docs/running-simbank-tests/running-simbank-tests-cli-offline
+        - To run the Simbank tests using the galasactl binary and using only the Maven artifacts provided within the zip, you can run the below commands from the top level of the zip:
+            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.SimBankIVT`
+            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.BasicAccountCreditTest`
+            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.ProvisionedAccountCreditTests`
+            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.BatchAccountsOpenTest`
