@@ -38,13 +38,13 @@ These are manual steps to bump the version of Galasa to the next version.
 
 6. Upgrade [Integratedtests](https://github.com/galasa-dev/integratedtests) (not a released component)
 
-    a. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. Manually check that all dev.galasa bundles have been upgraded then run `build-locally.sh` to check it builds.
+    a. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2107) is open to create a set-version script so this should be updated when that is complete. Manually check that all dev.galasa bundles have been upgraded then run `build-locally.sh` to check it builds.
     
     b. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
 7. Upgrade the [internal integrated tests](https://github.ibm.com/galasa/internal-integratedtests) (not a released component)
 
-    a. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version.
+    a. Currently no `set-version.sh` script exists so do a search for the current version in VSCode and replace with the new development version. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2107) is open to create a set-version script so this should be updated when that is complete. 
     
     b. Push the changes to your branch, open a PR, then merge in the PR, and wait for the Main build to pass and finish.
 
