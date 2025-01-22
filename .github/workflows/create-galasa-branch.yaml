@@ -27,53 +27,53 @@ jobs:
                mkdir -p /home/runner/work/secrets
                echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone-branch-automation
+            - name: Clone branch automation
               run: |
                 docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository automation --to ${{github.event.inputs.distBranch}} \
-                --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+                --repository automation --to ${{ inputs.distBranch }} \
+                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite}} ${{ inputs.force }} \
                 --credentials /home/runner/work/secrets/githubcreds.yaml
             
-            - name: Clone-branch-Galasa
+            - name: Clone branch Galasa
               run: |
                 docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository galasa --to ${{github.event.inputs.distBranch}} \
-                --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+                --repository galasa --to ${{ inputs.distBranch }} \
+                --branch ${{ inputs.fromBranch }} ${{inputs.overwrite }} ${{ inputs.force}} \
                 --credentials /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone-branch-cli
+            - name: Clone branch cli
               run: |
                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-               --repository cli --to ${{github.event.inputs.distBranch}} \
-               --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+               --repository cli --to ${{ inputs.distBranch }} \
+               --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
                --credentials /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone-branch-isolated
+            - name: Clone branch isolated
               run: |
                 docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository isolated --to ${{github.event.inputs.distBranch}} \
-                --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+                --repository isolated --to ${{ inputs.distBranch }} \
+                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
                 --credentials /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone-branch-helm
+            - name: Clone branch helm
               run: |
                 docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository helm --to ${{github.event.inputs.distBranch}} \
-                --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+                --repository helm --to ${{ inputs.distBranch }} \
+                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
                 --credentials /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone-branch-webui
+            - name: Clone branch webui
               run: |
                 docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository webui --to ${{github.event.inputs.distBranch}} \
-                --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+                --repository webui --to ${{ inputs.distBranch }} \
+                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
                 --credentials /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone-branch-simplatform
+            - name: Clone branch simplatform
               run: |
                 docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository simplatform --to ${{github.event.inputs.distBranch}} \
-                --branch ${{github.event.inputs.fromBranch}} ${{github.event.inputs.overwrite}} ${{github.event.inputs.force}} \
+                --repository simplatform --to ${{ inputs.distBranch }} \
+                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
                 --credentials /home/runner/work/secrets/githubcreds.yaml
 
 
