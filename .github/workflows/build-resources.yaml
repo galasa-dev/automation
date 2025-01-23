@@ -1,0 +1,59 @@
+name: Build resources
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "galasa version"
+                required: true
+            distBranch:
+                description: 'Destination branch'
+                required: true
+            ref:
+                description: 'Source branch'
+                required: false
+                default: 'main'
+
+env:
+    REGISTRY: ghcr.io
+    NAMESPACE: galasa-dev
+
+jobs:
+    branch-docker-build-resources:
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Checkout resources in automation repository
+              uses: actions/checkout@v4
+              with:
+                ref: ${{inputs.ref}}
+                sparse-checkout: |
+                 dockerfiles/release/resources
+            
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/galasa-resources:${{inputs.distBranch}}
+         
+            - name: Log in to the GitHub Container registry
+              uses: docker/login-action@v3
+              env: 
+                WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+                WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+              with:
+                registry: ${{ env.REGISTRY }}
+                username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+                password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+         
+            - name: Build galasa resource Docker image
+              id: build
+              uses: docker/build-push-action@v5
+              with:
+                   context: dockerfiles/release/resources
+                   file: resources-dockerfile
+                   load: true
+                   tags: ${{ steps.meta.outputs.tags }}
+                   labels: ${{ steps.meta.outputs.labels }}
+                   build-args: |
+                    branch=${{inputs.distBranch}}
+                    version=${{inputs.version}}

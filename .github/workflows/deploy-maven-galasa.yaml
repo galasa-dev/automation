@@ -1,0 +1,28 @@
+name: deploy maven galasa
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "galasa version"
+                required: true
+            repository:
+                description: "maven deployment repository"
+                required: false
+                default: 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2'
+
+jobs:
+    deploy-maven-galasa:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Make secrets directory
+              run: |
+               mkdir -p /home/runner/work/secrets
+               echo ${{ secrets.MAVEN_CREDENTIALS }} > /home/runner/work/secrets/mavencreds.yaml
+    
+            - name: Deploy maven galasa
+              run: |
+                docker run ghcr.io/galasa-dev/obr-with-galasabld-executable:main maven deploy \
+                --repository ${{ inputs.repository }} --local /usr/local/apache2/htdocs \
+                --group dev.galasa --version ${{ inputs.version }} \
+                --credentials /home/runner/work/secrets/mavencreds.yaml

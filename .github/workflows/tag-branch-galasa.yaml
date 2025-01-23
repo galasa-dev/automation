@@ -1,0 +1,31 @@
+name: branch-tag-galasa
+
+on:
+    workflow_dispatch:
+        inputs:
+            distBranch:
+                description: 'Destination branch'
+                required: true
+            tag:
+                description: 'Required tag'
+                required: true
+                
+jobs:
+    branch-tag-galasa:
+      strategy:
+        matrix:
+          repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'splatform']
+      runs-on: ubuntu-latest
+      steps:
+        - name: Make secrets directory
+          run: |
+            mkdir -p /home/runner/work/secrets
+            echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
+
+        - name: Tag branch ${{matrix.repo}}
+          run: |
+            docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch tag \
+            --repository ${{matrix.repo}} --branch ${{ inputs.distBranch }} --tag ${{ inputs.tag }} \
+            --credentials /home/runner/work/secrets/githubcreds.yaml
+            
+           

@@ -20,62 +20,19 @@ on:
 
 jobs:
     branch-create-galasa:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Make secrets directory
-              run : |
-               mkdir -p /home/runner/work/secrets
-               echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
+      strategy:
+        matrix:
+          repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'splatform']
+      runs-on: ubuntu-latest
+      steps:
+        - name: Make secrets directory
+          run: |
+            mkdir -p /home/runner/work/secrets
+            echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
 
-            - name: Clone branch automation
-              run: |
-                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository automation --to ${{ inputs.distBranch }} \
-                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite}} ${{ inputs.force }} \
-                --credentials /home/runner/work/secrets/githubcreds.yaml
-            
-            - name: Clone branch Galasa
-              run: |
-                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository galasa --to ${{ inputs.distBranch }} \
-                --branch ${{ inputs.fromBranch }} ${{inputs.overwrite }} ${{ inputs.force}} \
-                --credentials /home/runner/work/secrets/githubcreds.yaml
-
-            - name: Clone branch cli
-              run: |
-               docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-               --repository cli --to ${{ inputs.distBranch }} \
-               --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
-               --credentials /home/runner/work/secrets/githubcreds.yaml
-
-            - name: Clone branch isolated
-              run: |
-                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository isolated --to ${{ inputs.distBranch }} \
-                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
-                --credentials /home/runner/work/secrets/githubcreds.yaml
-
-            - name: Clone branch helm
-              run: |
-                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository helm --to ${{ inputs.distBranch }} \
-                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
-                --credentials /home/runner/work/secrets/githubcreds.yaml
-
-            - name: Clone branch webui
-              run: |
-                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository webui --to ${{ inputs.distBranch }} \
-                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
-                --credentials /home/runner/work/secrets/githubcreds.yaml
-
-            - name: Clone branch simplatform
-              run: |
-                docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
-                --repository simplatform --to ${{ inputs.distBranch }} \
-                --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
-                --credentials /home/runner/work/secrets/githubcreds.yaml
-
-
-
-
+        - name: Clone branch ${{matrix.repo}}
+          run: |
+            docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
+            --repository ${{matrix.repo}} --to ${{ inputs.distBranch }} \
+            --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite}} ${{ inputs.force }} \
+            --credentials /home/runner/work/secrets/githubcreds.yaml
