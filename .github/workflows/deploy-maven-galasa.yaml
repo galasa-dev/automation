@@ -26,3 +26,4 @@ jobs:
                 --repository ${{ inputs.repository }} --local /usr/local/apache2/htdocs \
                 --group dev.galasa --version ${{ inputs.version }} \
                 --credentials /home/runner/work/secrets/mavencreds.yaml
+                

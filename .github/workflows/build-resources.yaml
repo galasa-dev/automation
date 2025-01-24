@@ -57,3 +57,4 @@ jobs:
                    build-args: |
                     branch=${{ inputs.distBranch }}
                     version=${{ inputs.version }}
+                    

@@ -24,3 +24,4 @@ jobs:
             docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch delete \
             --repository ${{ matrix.repo }} --branch ${{ inputs.distBranch }} \
             --credentials /home/runner/work/secrets/githubcreds.yaml
+            

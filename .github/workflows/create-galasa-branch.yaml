@@ -36,3 +36,4 @@ jobs:
             --repository ${{ matrix.repo }} --to ${{ inputs.distBranch }} \
             --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
             --credentials /home/runner/work/secrets/githubcreds.yaml
+            
