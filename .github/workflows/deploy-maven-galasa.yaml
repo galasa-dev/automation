@@ -25,5 +25,4 @@ jobs:
                 docker run ghcr.io/galasa-dev/obr-with-galasabld-executable:release maven deploy \
                 --repository ${{ inputs.repository }} --local /usr/local/apache2/htdocs \
                 --group dev.galasa --version ${{ inputs.version }} \
-                --credentials /home/runner/work/secrets/mavencreds.yaml
-                
+                --credentials /home/runner/work/secrets/sonatypecreds.yaml
