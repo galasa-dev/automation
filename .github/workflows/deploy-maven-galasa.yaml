@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
         inputs:
             version:
-                description: "galasa version"
+                description: "galasa release version, should be of the form x.xx.x"
                 required: true
             repository:
                 description: "maven deployment repository"
@@ -18,11 +18,11 @@ jobs:
             - name: Make secrets directory
               run: |
                mkdir -p /home/runner/work/secrets
-               echo ${{ secrets.MAVEN_CREDENTIALS }} > /home/runner/work/secrets/mavencreds.yaml
+               echo ${{ secrets.SONATYPE_CREDENTIALS }} > /home/runner/work/secrets/sonatypecreds.yaml
     
             - name: Deploy maven galasa
               run: |
-                docker run ghcr.io/galasa-dev/obr-with-galasabld-executable:main maven deploy \
+                docker run ghcr.io/galasa-dev/obr-with-galasabld-executable:release maven deploy \
                 --repository ${{ inputs.repository }} --local /usr/local/apache2/htdocs \
                 --group dev.galasa --version ${{ inputs.version }} \
                 --credentials /home/runner/work/secrets/mavencreds.yaml

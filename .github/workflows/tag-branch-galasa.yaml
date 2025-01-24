@@ -7,14 +7,14 @@ on:
                 description: 'Destination branch'
                 required: true
             tag:
-                description: 'Required tag'
+                description: 'Required tag for the branch, should be of the form vx.xx.x'
                 required: true
                 
 jobs:
     branch-tag-galasa:
       strategy:
         matrix:
-          repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'splatform']
+          repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'simplatform']
       runs-on: ubuntu-latest
       steps:
         - name: Make secrets directory
@@ -22,10 +22,8 @@ jobs:
             mkdir -p /home/runner/work/secrets
             echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
 
-        - name: Tag branch ${{matrix.repo}}
+        - name: Tag branch ${{ matrix.repo }}
           run: |
             docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch tag \
-            --repository ${{matrix.repo}} --branch ${{ inputs.distBranch }} --tag ${{ inputs.tag }} \
-            --credentials /home/runner/work/secrets/githubcreds.yaml
-            
-           
+            --repository ${{ matrix.repo }} --branch ${{ inputs.distBranch }} --tag ${{ inputs.tag }} \
+            --credentials /home/runner/work/secrets/githubcreds.yaml         
