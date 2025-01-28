@@ -23,7 +23,6 @@ jobs:
       check_write_github_packages_username: 'true'
       check_write_github_packages_token: 'true'
     secrets:
-      WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
       WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
   build-gpg-image:
