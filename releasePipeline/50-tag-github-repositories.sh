@@ -90,85 +90,71 @@ function get_galasa_version_to_be_released {
 }
 
 
-function set_kubernetes_context {
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
-    kubectl config set-context cicsk8s --namespace=galasa-build
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then 
-        error "Failed. rc=${rc}"
-        exit 1
-    fi
-    
-}
-
 function tag_galasa_github_repositories {
 
     h1 "Tagging the github repositories..."
 
-    cd ${WORKSPACE_DIR}/temp
-    yaml_file=${WORKSPACE_DIR}/temp/tag-galasa-repositories.yaml
-    cat << EOF > $yaml_file
-#
-# Copyright contributors to the Galasa project 
-#
-kind: PipelineRun
-apiVersion: tekton.dev/v1beta1
-metadata:
-  generateName: tag-galasa-
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: Prune=false
-#
-#
-#
-spec:
-#
-#
-#
-  pipelineRef:
-    name: branch-tag-galasa
-  
-  serviceAccountName: galasa-build-bot
+    dist_branch="release"
+    tag="v${galasa_version}"
 
-  podTemplate:
-    volumes:
-    - name: githubcreds
-      secret:
-        secretName: github-token
-    - name: harborcreds
-      secret:
-        secretName: harbor-creds-yaml
-    - name: mavencreds
-      secret:
-        secretName: maven-creds
+    github_username=$(gh api user --jq '.login')
 
-  params:
-  - name: distBranch
-    value: "release"
-#
-#  Tag must be in the format v0.0.0
-#
-  - name: tag
-    value: "v${galasa_version}"
-EOF
-
-    cmd="kubectl -n galasa-build create -f $yaml_file"
-    info "Command is $cmd"
-    $cmd
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "Failed to create the resources image. rc=$rc"
+    if [[ $? != 0 ]]; then
+        error "Failed to get the github username. $?"
         exit 1
     fi
 
-    success "Resources image build pipeline kicked off OK."
+    workflow_dispatch=$( gh workflow run branch-tag-galasa --repo ${github_username}/automation --ref main --field distBranch=${dist_branch} --field tag=${tag})
+
+    if [[ $? != 0 ]]; then
+        error "Failed to call the workflow. $?"
+        exit 1
+    fi
+
+    run_id=$(gh run list --repo ${github_username}/automation --user ${github_username} --limit 1 --json  databaseId --jq '.[0].databaseId')
+
+    if [[ $? != 0 ]]; then
+        error "Failed to get the workflow run_id. $?"
+        exit 1
+    fi
+
+    echo "Workflow started with Run ID: ${run_id}"
+
+    MAX_WAIT_ITERATIONS=30
+    COUNTER=0
+
+    while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
+        echo "Waiting for workflow ${run_id} to complete..."
+        sleep 10
+        ((COUNTER++))
+        
+        echo -e "\e]8;;https://github.com/jaydee029/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+
+        status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
+
+        if [[ "$status" == "success" ]]; then
+            echo "Workflow completed successfully."
+            break
+        elif [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
+            echo "Workflow failed. Check the workflow run for more details."
+            exit 1
+        fi
+    done
+
+    if [[ $COUNTER -ge $MAX_WAIT_ITERATIONS ]]; then
+        echo "⏳ Timed out waiting for workflow ${run_id} to complete."
+        exit 1
+    fi
+
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to tag the branches. rc=$?"
+        exit 1
+    fi
+
+    success "Tagged the github repositories with tag ${tag}"
 }
 
-set_kubernetes_context
 get_galasa_version_to_be_released
 
 tag_galasa_github_repositories
-
-note "Now wait for the 'tag-galasa-*' pipeline to complete."
-note "Expect it to take about a minute."
-note "Check that it passed"

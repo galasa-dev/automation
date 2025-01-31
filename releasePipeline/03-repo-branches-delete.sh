@@ -68,7 +68,6 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Main logic.
 #-----------------------------------------------------------------------------------------                   
 
-mkdir -p temp
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -126,6 +125,8 @@ function delete_branches {
         echo "Waiting for workflow ${run_id} to complete..."
         sleep 10
         ((COUNTER++))
+        
+        echo -e "\e]8;;https://github.com/jaydee029/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
 
         status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
 
