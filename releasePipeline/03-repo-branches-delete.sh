@@ -109,6 +109,8 @@ function delete_branches {
         exit 1
     fi
 
+    sleep 3
+
     run_id=$(gh run list --repo ${github_username}/automation --user ${github_username} --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
@@ -117,6 +119,9 @@ function delete_branches {
     fi
 
     echo "Workflow started with Run ID: ${run_id}"
+    
+    echo -e "\e]8;;https://github.com/jaydee029/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+
 
     MAX_WAIT_ITERATIONS=30
     COUNTER=0
@@ -126,8 +131,6 @@ function delete_branches {
         sleep 10
         ((COUNTER++))
         
-        echo -e "\e]8;;https://github.com/jaydee029/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
-
         status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
 
         if [[ "$status" == "success" ]]; then

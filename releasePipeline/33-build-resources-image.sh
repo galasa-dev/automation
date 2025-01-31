@@ -90,81 +90,41 @@ function get_galasa_version_to_be_released {
 }
 
 
-function set_kubernetes_context {
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
-    kubectl config set-context cicsk8s --namespace=galasa-build
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then 
-        error "Failed. rc=${rc}"
-        exit 1
-    fi
-    
-}
-
 function create_resources_image {
 
     h1 "Creating the resources image..."
-    if [ -d "${BASEDIR}/temp" ] ; then
-        mkdir ${BASEDIR}/temp
-    fi
-    cd ${WORKSPACE_DIR}/temp
-    yaml_file=${WORKSPACE_DIR}/temp/build-resources-images.yaml
-    cat << EOF > $yaml_file
-#
-# Copyright contributors to the Galasa project 
-#
-kind: PipelineRun
-apiVersion: tekton.dev/v1beta1
-metadata:
-  generateName: resources-
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: Prune=false
-#
-#
-#
-spec:
-#
-#
-#
-  pipelineRef:
-    name: resources-build
 
-  serviceAccountName: galasa-build-bot
+    dist_branch="release"
+    version="${galasa_version}"
 
-  params:
-  - name: distBranch
-    value: "release"
-  - name: version
-    value: "${galasa_version}"
-#
-#
-#
-  workspaces:
-  - name: git-workspace
-    volumeClaimTemplate:
-      spec:
-        storageClassName: longhorn-temp
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 20Gi
-EOF
+    github_username=$(gh api user --jq '.login')
 
-    cmd="kubectl -n galasa-build create -f $yaml_file"
-    info "Command is $cmd"
-    $cmd
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "Failed to create the resources image. rc=$rc"
+    if [[ $? != 0 ]]; then
+        error "Failed to get the github username. $?"
         exit 1
     fi
+
+    workflow_dispatch=$( gh workflow run "build resources" --repo ${github_username}/automation --ref main --field distBranch=${dist_branch} --field version=${version})
+    if [[ $? != 0 ]]; then
+        error "Failed to call the workflow. $?"
+        exit 1
+    fi
+
+    sleep 3
+
+    run_id=$(gh run list --repo ${github_username}/automation --user ${github_username} --limit 1 --json  databaseId --jq '.[0].databaseId')
+
+    if [[ $? != 0 ]]; then
+        error "Failed to get the workflow run_id. $?"
+        exit 1
+    fi
+
+    echo "Workflow started with Run ID: ${run_id}"
+    echo -e "\e]8;;https://github.com/jaydee029/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
 
     success "Resources image build pipeline kicked off OK."
 }
 
-set_kubernetes_context
 get_galasa_version_to_be_released
 
 create_resources_image
