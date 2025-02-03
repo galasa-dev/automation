@@ -95,7 +95,7 @@ function delete_branches {
 
     branch_name="${release_type}"
 
-    github_username=$(gh api user --jq '.login')
+    github_username="galasa-dev"
 
     if [[ $? != 0 ]]; then
         error "Failed to get the github username. $?"
@@ -120,7 +120,7 @@ function delete_branches {
 
     echo "Workflow started with Run ID: ${run_id}"
     
-    echo -e "\e]8;;https://github.com/jaydee029/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+    echo -e "\e]8;;https://github.com/${github_username}/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
 
 
     MAX_WAIT_ITERATIONS=30
