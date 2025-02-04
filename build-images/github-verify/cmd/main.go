@@ -55,49 +55,68 @@ func main() {
 	var pr types.Pull
 	req, _ := http.NewRequest("GET", *prUrl, nil)
 	resp, err := client.Do(req)
-	if err == nil {
+	if err != nil {
+		panic("GET failed. " + err.Error())
+	} else {
 		var data []byte
 		data, err = io.ReadAll(resp.Body)
-		if err == nil {
-
+		if err != nil {
+			panic("GET response payload could not be read. " + err.Error())
+		} else {
 			err = json.Unmarshal(data, &pr)
-			if err == nil {
+			if err != nil {
+				panic("GET response could not be un-marshalled. " + err.Error())
+			} else {
 				// Decide on what action to take
 				fmt.Println("Starting check for action: " + *action)
 				var isApproved bool
 
 				isApproved, err = CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ","))
-				if err == nil {
+				if err != nil {
+					panic("CheckForIdInApprovedTeam could not be checked. " + err.Error())
+				} else {
 
 					switch *action {
 					case "opened", "reopened":
 
 						if isApproved {
-							updateStatus("pending", "Build submited", pr)
-							exitCode = 0
+							err = updateStatus("pending", "Build submited", pr)
+							if err == nil {
+								exitCode = 0
+							}
 						} else {
-							commentOnPr(approvalRequest, pr)
-							updateStatus("pending", "Waiting admin approval", pr)
+							err = commentOnPr(approvalRequest, pr)
+							if err == nil {
+								err = updateStatus("pending", "Waiting admin approval", pr)
+							}
 						}
 
 					case "synchronize":
 
 						if isApproved {
-							updateStatus("pending", "Build submited", pr)
-							exitCode = 0
+							err = updateStatus("pending", "Build submited", pr)
+							if err == nil {
+								exitCode = 0
+							}
 						} else {
-							commentOnPr(approvalRequest, pr)
-							updateStatus("pending", "Waiting admin approval", pr)
+							err = commentOnPr(approvalRequest, pr)
+							if err == nil {
+								err = updateStatus("pending", "Waiting admin approval", pr)
+							}
 						}
 
 					case "submitted":
 
 						if isApproved {
-							updateStatus("pending", "Build submited", pr)
-							exitCode = 0
+							err = updateStatus("pending", "Build submited", pr)
+							if err == nil {
+								exitCode = 0
+							}
 						} else {
-							updateStatus("pending", "Waiting admin approval", pr)
-							commentOnPr("Build not run, please request an admin to approve", pr)
+							err = updateStatus("pending", "Waiting admin approval", pr)
+							if err == nil {
+								err = commentOnPr("Build not run, please request an admin to approve", pr)
+							}
 						}
 
 					default:
@@ -108,7 +127,7 @@ func main() {
 	}
 
 	if err != nil {
-		panic(err)
+		exitCode = 1
 	}
 
 	os.Exit(exitCode)
@@ -119,6 +138,9 @@ func updateStatus(status, message string, pr types.Pull) error {
 	req, _ := http.NewRequest("POST", pr.StatusUrl, strings.NewReader(body))
 	req.Header.Add("Accept", "application/vnd.github+json")
 	_, err := sendRequest(req)
+	if err != nil {
+		panic("Failed to Update the status on the PR " + err.Error())
+	}
 	return err
 }
 
@@ -126,6 +148,9 @@ func commentOnPr(message string, pr types.Pull) error {
 	body := fmt.Sprintf("{\"body\": \"%s\"}", message)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/comments", pr.IssueUrl), strings.NewReader(body))
 	_, err := sendRequest(req)
+	if err != nil {
+		panic("Failed to comment on PR. " + err.Error())
+	}
 	return err
 }
 
@@ -154,7 +179,9 @@ func fetchTeamIds(org string, approvedTeams []string) (map[string]int, error) {
 	var teamsJson []types.Team
 	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/orgs/%s/teams", org), nil)
 	resp, err := sendRequest(req)
-	if err == nil {
+	if err != nil {
+		panic("Failed to GET the team data. " + err.Error())
+	} else {
 		var data []byte
 		data, err = io.ReadAll(resp.Body)
 		if err == nil {
@@ -237,6 +264,12 @@ func sendRequest(req *http.Request) (*http.Response, error) {
 		default:
 			err = fmt.Errorf("bad response: %s", resp.Status)
 		}
+	} else {
+		err = fmt.Errorf("Sending the request failed. %v", err)
+	}
+
+	if err != nil {
+		panic(fmt.Sprintf("Sending request failed. %v", err.Error()))
 	}
 	return resp, err
 }
