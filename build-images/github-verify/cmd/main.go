@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -42,6 +42,7 @@ var client = http.Client{
 //	 now in-progress. If the checks fail, then a suitable comment will be appended
 //	 to the PR such as "Build not run, please request an admin to approve"
 func main() {
+	var exitCode = 1
 	token = os.Getenv("GITHUBTOKEN")
 	userId := flag.Int("userid", -1, "The UserId of PR opener")
 	prUrl := flag.String("pr", "", "URL of the pr to verify")
@@ -54,73 +55,98 @@ func main() {
 	var pr types.Pull
 	req, _ := http.NewRequest("GET", *prUrl, nil)
 	resp, err := client.Do(req)
-	if err != nil {
-		//handle error
-	}
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		//handle error
-	}
-	json.Unmarshal(data, &pr)
+	if err == nil {
+		var data []byte
+		data, err = io.ReadAll(resp.Body)
+		if err == nil {
 
-	// Decide on what action to take
-	fmt.Println("Starting check for action: " + *action)
-	switch *action {
-	case "opened", "reopened":
-		if CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ",")) {
-			updateStatus("pending", "Build submited", pr)
-			os.Exit(0)
+			err = json.Unmarshal(data, &pr)
+			if err == nil {
+				// Decide on what action to take
+				fmt.Println("Starting check for action: " + *action)
+				var isApproved bool
+
+				isApproved, err = CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ","))
+				if err == nil {
+
+					switch *action {
+					case "opened", "reopened":
+
+						if isApproved {
+							updateStatus("pending", "Build submited", pr)
+							exitCode = 0
+						} else {
+							commentOnPr(approvalRequest, pr)
+							updateStatus("pending", "Waiting admin approval", pr)
+						}
+
+					case "synchronize":
+
+						if isApproved {
+							updateStatus("pending", "Build submited", pr)
+							exitCode = 0
+						} else {
+							commentOnPr(approvalRequest, pr)
+							updateStatus("pending", "Waiting admin approval", pr)
+						}
+
+					case "submitted":
+
+						if isApproved {
+							updateStatus("pending", "Build submited", pr)
+							exitCode = 0
+						} else {
+							updateStatus("pending", "Waiting admin approval", pr)
+							commentOnPr("Build not run, please request an admin to approve", pr)
+						}
+
+					default:
+					}
+				}
+			}
 		}
-		commentOnPr(approvalRequest, pr)
-		updateStatus("pending", "Waiting admin approval", pr)
-		os.Exit(1)
-	case "synchronize":
-		if CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ",")) {
-			updateStatus("pending", "Build submited", pr)
-			os.Exit(0)
-		}
-		commentOnPr(approvalRequest, pr)
-		updateStatus("pending", "Waiting admin approval", pr)
-		os.Exit(1)
-	case "submitted":
-		if CheckForIdInApprovedTeam(*userId, *org, strings.Split(*approvedGroups, ",")) {
-			updateStatus("pending", "Build submited", pr)
-			os.Exit(0)
-		}
-		updateStatus("pending", "Waiting admin approval", pr)
-		commentOnPr("Build not run, please request an admin to approve", pr)
-		os.Exit(1)
-	default:
-		os.Exit(1)
 	}
-}
 
-func updateStatus(status, message string, pr types.Pull) {
-	body := fmt.Sprintf("{\"state\":\"%s\", \"description\":\"%s\", \"context\":\"Tekton\"}", status, message)
-	req, _ := http.NewRequest("POST", pr.StatusUrl, strings.NewReader(body))
-	req.Header.Add("Accept", "application/vnd.github+json")
-	sendRequest(req)
-}
-
-func commentOnPr(message string, pr types.Pull) {
-	body := fmt.Sprintf("{\"body\": \"%s\"}", message)
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/comments", pr.IssueUrl), strings.NewReader(body))
-	sendRequest(req)
-}
-
-func CheckForIdInApprovedTeam(userid int, org string, approvedTeams []string) bool {
-	orgId, err := fetchOrgId(org)
 	if err != nil {
 		panic(err)
 	}
-	approvedUsers, err := fetchUsers(org, orgId, approvedTeams)
-	for _, approvedUser := range approvedUsers {
-		if userid == approvedUser {
-			return true
+
+	os.Exit(exitCode)
+}
+
+func updateStatus(status, message string, pr types.Pull) error {
+	body := fmt.Sprintf("{\"state\":\"%s\", \"description\":\"%s\", \"context\":\"Tekton\"}", status, message)
+	req, _ := http.NewRequest("POST", pr.StatusUrl, strings.NewReader(body))
+	req.Header.Add("Accept", "application/vnd.github+json")
+	_, err := sendRequest(req)
+	return err
+}
+
+func commentOnPr(message string, pr types.Pull) error {
+	body := fmt.Sprintf("{\"body\": \"%s\"}", message)
+	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/comments", pr.IssueUrl), strings.NewReader(body))
+	_, err := sendRequest(req)
+	return err
+}
+
+func CheckForIdInApprovedTeam(userid int, org string, approvedTeams []string) (bool, error) {
+	orgId, err := fetchOrgId(org)
+	var isApproved bool
+	if err == nil {
+
+		var approvedUsers []int
+		approvedUsers, err = fetchUsers(org, orgId, approvedTeams)
+		if err == nil {
+			for _, approvedUser := range approvedUsers {
+				if userid == approvedUser {
+					isApproved = true
+					break
+				}
+			}
 		}
 	}
 
-	return false
+	return isApproved, err
 }
 
 func fetchTeamIds(org string, approvedTeams []string) (map[string]int, error) {
@@ -128,69 +154,89 @@ func fetchTeamIds(org string, approvedTeams []string) (map[string]int, error) {
 	var teamsJson []types.Team
 	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/orgs/%s/teams", org), nil)
 	resp, err := sendRequest(req)
-	if err != nil {
-		return m, err
-	}
-	data, err := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(data, &teamsJson)
+	if err == nil {
+		var data []byte
+		data, err = io.ReadAll(resp.Body)
+		if err == nil {
+			err = json.Unmarshal(data, &teamsJson)
 
-	for _, teamJson := range teamsJson {
-		for _, team := range approvedTeams {
-			if team == teamJson.Name {
-				m[team] = teamJson.Id
+			if err == nil {
+				for _, teamJson := range teamsJson {
+					for _, team := range approvedTeams {
+						if team == teamJson.Name {
+							m[team] = teamJson.Id
+						}
+					}
+				}
 			}
 		}
-
 	}
-	return m, nil
+	return m, err
 }
 
 func fetchUsers(org string, orgid int, approvedTeams []string) ([]int, error) {
+	var err error
 	var approvedUsers []int
-	teams, err := fetchTeamIds(org, approvedTeams)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, teamId := range teams {
-		var teamMembers []types.Member
-		req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/organizations/%v/team/%v/members", orgid, teamId), nil)
-		resp, err := sendRequest(req)
-		if err != nil {
-			return nil, err
+	var teams map[string]int
+	teams, err = fetchTeamIds(org, approvedTeams)
+	if err == nil {
+		for _, teamId := range teams {
+			var teamMembers []types.Member
+			req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/organizations/%v/team/%v/members", orgid, teamId), nil)
+			var resp *http.Response
+			resp, err = sendRequest(req)
+			if err == nil {
+				var data []byte
+				data, err = io.ReadAll(resp.Body)
+				if err == nil {
+					err = json.Unmarshal(data, &teamMembers)
+					if err == nil {
+						for _, member := range teamMembers {
+							approvedUsers = append(approvedUsers, member.Id)
+						}
+					}
+				}
+			}
 		}
-		data, err := ioutil.ReadAll(resp.Body)
-		json.Unmarshal(data, &teamMembers)
-		for _, member := range teamMembers {
-			approvedUsers = append(approvedUsers, member.Id)
-		}
 	}
-	return approvedUsers, nil
+	return approvedUsers, err
 }
 
 func fetchOrgId(org string) (int, error) {
+	var err error
+	var orgId int
 	var orgJson types.Org
-	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/orgs/%s", org), nil)
-	resp, err := sendRequest(req)
-	if err != nil {
-		return -1, err
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/orgs/%s", org), nil)
+	if err == nil {
+		resp, err := sendRequest(req)
+		if err == nil {
+			var data []byte
+			data, err = io.ReadAll(resp.Body)
+			if err == nil {
+				err = json.Unmarshal(data, &orgJson)
+				if err == nil {
+					orgId = orgJson.Id
+				}
+			}
+		}
 	}
-	data, err := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(data, &orgJson)
-	return orgJson.Id, nil
+	return orgId, err
 }
 
 func sendRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 	resp, err := client.Do(req)
-	if resp.StatusCode == http.StatusAccepted {
-		return resp, err
+	if err != nil {
+		switch resp.StatusCode {
+		case http.StatusAccepted:
+			fallthrough
+		case http.StatusCreated:
+			fallthrough
+		case http.StatusOK:
+			// does not fall through
+		default:
+			err = fmt.Errorf("bad response: %s", resp.Status)
+		}
 	}
-	if resp.StatusCode == http.StatusCreated {
-		return resp, err
-	}
-	if resp.StatusCode == http.StatusOK {
-		return resp, err
-	}
-	return resp, fmt.Errorf("bad response: %s", resp.Status)
+	return resp, err
 }
