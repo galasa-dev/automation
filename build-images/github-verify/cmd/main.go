@@ -253,7 +253,7 @@ func fetchOrgId(org string) (int, error) {
 func sendRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 	resp, err := client.Do(req)
-	if err != nil {
+	if err == nil {
 		switch resp.StatusCode {
 		case http.StatusAccepted:
 			fallthrough
