@@ -5,11 +5,13 @@
 1. Clone the 'automation' repository, main branch. All the yaml and scripts you will be using can be found in the releasePipeline folder.
 2. Ensure the ArgoCD CLI is installed. The argocd cli can be downloaded [here]( https://argo-cd.readthedocs.io/en/stable/cli_installation/).
 3. Log into ArgoCD `argocd login --sso argocd.galasa.dev`
-4. You will need to log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
-5. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
-6. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
-7. watch needs to be installed.
-8. IBM Cloud CLI needs to be installed and logged in:
+4. Ensure GitHub CLI is istalled. It can be installed using the guide [here](https://github.com/cli/cli?tab=readme-ov-file#installation)
+5. Authenticate github cli using `gh auth login`
+6. You will need to log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
+7. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
+8. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
+9. watch needs to be installed.
+10. IBM Cloud CLI needs to be installed and logged in:
 
 ``` shell
 ibmcloud login --sso
