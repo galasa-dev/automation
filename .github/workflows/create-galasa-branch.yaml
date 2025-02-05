@@ -25,15 +25,12 @@ jobs:
           repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'simplatform']
       runs-on: ubuntu-latest
       steps:
-        - name: Make secrets directory
-          run: |
-            mkdir -p /home/runner/work/secrets
-            echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
-
         - name: Clone branch ${{ matrix.repo }}
+          env:
+            GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
           run: |
             docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch copy \
             --repository ${{ matrix.repo }} --to ${{ inputs.distBranch }} \
             --branch ${{ inputs.fromBranch }} ${{ inputs.overwrite }} ${{ inputs.force }} \
-            --credentials /home/runner/work/secrets/githubcreds.yaml
-            
+            --username galasa-team \
+            --password ${{ env.GALASA_TEAM_GITHUB_TOKEN }}
