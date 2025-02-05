@@ -38,7 +38,7 @@ jobs:
             - name: Log in to the GitHub Container registry
               uses: docker/login-action@v3
               env: 
-                WRITE_GITHUB_PACKAGES_USERNAME: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+                WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
                 WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
               with:
                 registry: ${{ env.REGISTRY }}

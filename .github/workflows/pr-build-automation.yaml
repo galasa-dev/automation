@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-name: Build custom images for automation
+name: Build custom images for automation (Pull request)
 
 on:
   pull_request:
