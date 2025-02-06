@@ -110,9 +110,9 @@ function deploy_maven_artifacts {
         exit 1
     fi
 
-    sleep 3
+    sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --user ${github_username} --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo ${github_username}/automation --workflow "deploy maven galasa" --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
