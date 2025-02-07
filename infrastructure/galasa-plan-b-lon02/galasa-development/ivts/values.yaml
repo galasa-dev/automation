@@ -6,7 +6,7 @@
 
 namespace: galasa-development
 branch: main
-imageName: ghcr.io/jadecarino/ivts-maven-artefacts:main
+imageName: ghcr.io/jadecarino/ivts-maven-artefacts
 imageTag: main
 
 ingress:
