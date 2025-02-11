@@ -17,14 +17,11 @@ jobs:
           repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'simplatform']
       runs-on: ubuntu-latest
       steps:
-        - name: Make secrets directory
-          run: |
-            mkdir -p /home/runner/work/secrets
-            echo ${{ secrets.GITHUB_CREDENTIALS }} > /home/runner/work/secrets/githubcreds.yaml
-
         - name: Tag branch ${{ matrix.repo }}
+          env:
+            GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
           run: |
             docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch tag \
             --repository ${{ matrix.repo }} --branch ${{ inputs.distBranch }} --tag ${{ inputs.tag }} \
-            --credentials /home/runner/work/secrets/githubcreds.yaml         
-            
+            --username galasa-team \
+            --password ${{ env.GALASA_TEAM_GITHUB_TOKEN }}
