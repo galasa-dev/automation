@@ -90,99 +90,67 @@ function get_galasa_version_to_be_released {
     export galasa_version
 }
 
-function set_kubernetes_context {
-    namespace="galasa-build"
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace ${namespace}"
-    kubectl config set-context cicsk8s --namespace=${namespace}
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then 
-        error "Failed. rc=${rc}"
-        exit 1
-    fi
-    success "Kubernetes context set to cicsk8s using namespace ${namespace}"
-}
-
-
-
 function deploy_maven_artifacts {
 
     h1 "Deploying all Galasa artifacts at version ${galasa_version}"
 
-    branch_name="${release_type}"
+    version="${galasa_version}"
 
-    rm -f temp/deploy-maven-galasa.yaml
-    cat << EOF > temp/deploy-maven-galasa.yaml
+     github_username="galasa-dev"
 
-#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#
-
-kind: PipelineRun
-apiVersion: tekton.dev/v1beta1
-metadata:
-  generateName: deploy-maven-galasa-
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: Prune=false
-spec:
-  params:
-  - name: version
-    value: "$galasa_version"
-  pipelineRef:
-    name: deploy-maven-galasa
-  podTemplate:
-    volumes:
-    - name: githubcreds
-      secret:
-        secretName: github-token
-    - name: harborcreds
-      secret:
-        secretName: harbor-creds-yaml
-    - name: mavencreds
-      secret:
-        secretName: maven-creds
-
-EOF
-
-    output=$(kubectl -n galasa-build create -f temp/deploy-maven-galasa.yaml)
-    # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/deploy-maven-galasa-jzcvf created
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "Failed to deploy maven artifacts. rc=$?"
+    if [[ $? != 0 ]]; then
+        error "Failed to get the github username. $?"
         exit 1
     fi
-    info "kubectl create pipeline run output: $output"
 
+    workflow_dispatch=$( gh workflow run "deploy maven galasa" --repo ${github_username}/automation --ref main --field version=${version})
 
-    pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
+    if [[ $? != 0 ]]; then
+        error "Failed to call the workflow. $?"
+        exit 1
+    fi
+
+    sleep 5
+
+    run_id=$(gh run list --repo ${github_username}/automation --workflow "deploy maven galasa" --limit 1 --json  databaseId --jq '.[0].databaseId')
+
+    if [[ $? != 0 ]]; then
+        error "Failed to get the workflow run_id. $?"
+        exit 1
+    fi
+
+    echo "Workflow started with Run ID: ${run_id}"
+
+    echo -e "\e]8;;https://github.com/${github_username}/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+
 
     MAX_WAIT_ITERATIONS=30
     COUNTER=0
-    while [  $COUNTER -lt $MAX_WAIT_ITERATIONS ]; do
-        info "Sleeping, waiting for pipeline run ${pipeline_run_name} to succeed.." 
-        # Sleep for a second.
+
+    while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
+        echo "Waiting for workflow ${run_id} to complete..."
         sleep 10
-        let COUNTER=COUNTER+1 
+        ((COUNTER++))
+        
+        status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
 
-        # Find the status of the pipeline run...
-        status=$(kubectl get $pipeline_run_name | tail -1 | xargs | cut -f2 -d' ')
-        if [[ "${status}" == "True" ]]; then
-            info "Pipeline run completed OK."
+        if [[ "$status" == "success" ]]; then
+            echo "Workflow completed successfully."
             break
-        fi
-
-        if [[ "${status}" == "False" ]]; then
-            error "Pipeline run $pipeline_run_name failed."
+        elif [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
+            echo "Workflow failed. Check the workflow run for more details."
             exit 1
-            break
         fi
     done
-    
-    if [ ${COUNTER} -ge $MAX_WAIT_ITERATIONS ]; then 
-        error "Timed out waiting for pipeline run ${pipeline_run_name} to complete."
+
+    if [[ $COUNTER -ge $MAX_WAIT_ITERATIONS ]]; then
+        echo "⏳ Timed out waiting for workflow ${run_id} to complete."
+        exit 1
+    fi
+
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to deploy maven artifacts. rc=$?"
         exit 1
     fi
 
@@ -190,5 +158,4 @@ EOF
 }
 
 get_galasa_version_to_be_released
-set_kubernetes_context
 deploy_maven_artifacts

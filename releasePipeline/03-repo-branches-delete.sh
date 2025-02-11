@@ -68,7 +68,6 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Main logic.
 #-----------------------------------------------------------------------------------------                   
 
-mkdir -p temp
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -90,108 +89,69 @@ function ask_user_for_release_type {
     echo "Chosen type of release process: ${release_type}"
 }
 
-
-function set_kubernetes_context {
-    namespace="galasa-build"
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace ${namespace}"
-    kubectl config set-context cicsk8s --namespace=${namespace}
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then 
-        error "Failed. rc=${rc}"
-        exit 1
-    fi
-    success "Kubernetes context set to cicsk8s using namespace ${namespace}"
-}
-
-
-
 function delete_branches {
 
     h1 "Deleting all branches in github called ${release_type}"
 
     branch_name="${release_type}"
 
-    rm -f temp/delete_branches.yaml
-    cat << EOF > temp/delete_branches.yaml
+    github_username="galasa-dev"
 
-#
-# Copyright contributors to the Galasa project
-#
-# SPDX-License-Identifier: EPL-2.0
-#
+    workflow_dispatch=$( gh workflow run branch-delete-all --repo ${github_username}/automation --ref main --field distBranch=${branch_name})
 
-kind: PipelineRun
-apiVersion: tekton.dev/v1beta1
-metadata:
-  generateName: delete-branches-galasa-
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: Prune=false
-spec:
-  pipelineRef:
-    name: branch-delete-all
-  podTemplate:
-    volumes:
-    - name: githubcreds
-      secret:
-        secretName: github-token
-    - name: harborcreds
-      secret:
-        secretName: harbor-creds-yaml
-    - name: mavencreds
-      secret:
-        secretName: maven-creds
-  params:
-  - name: distBranch
-    value: "${branch_name}"
+    if [[ $? != 0 ]]; then
+        error "Failed to call the workflow. $?"
+        exit 1
+    fi
 
-EOF
+    sleep 5
 
-    output=$(kubectl -n galasa-build create -f temp/delete_branches.yaml)
-    # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    run_id=$(gh run list --repo ${github_username}/automation --workflow branch-delete-all --limit 1 --json  databaseId --jq '.[0].databaseId')
+
+    if [[ $? != 0 ]]; then
+        error "Failed to get the workflow run_id. $?"
+        exit 1
+    fi
+
+    echo "Workflow started with Run ID: ${run_id}"
+    
+    echo -e "\e]8;;https://github.com/${github_username}/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+
+
+    MAX_WAIT_ITERATIONS=30
+    COUNTER=0
+
+    while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
+        echo "Waiting for workflow ${run_id} to complete..."
+        sleep 10
+        ((COUNTER++))
+        
+        status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
+
+        if [[ "$status" == "success" ]]; then
+            echo "Workflow completed successfully."
+            break
+        elif [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
+            echo "Workflow failed. Check the workflow run for more details."
+            exit 1
+        fi
+    done
+
+    if [[ $COUNTER -ge $MAX_WAIT_ITERATIONS ]]; then
+        echo "⏳ Timed out waiting for workflow ${run_id} to complete."
+        exit 1
+    fi
+
     rc=$?
     if [[ "${rc}" != "0" ]]; then
         error "Failed to delete the branches. rc=$?"
         exit 1
     fi
-    info "kubectl create pipeline run output: $output"
 
-
-    pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
-
-    MAX_WAIT_ITERATIONS=30
-    COUNTER=0
-    while [  $COUNTER -lt $MAX_WAIT_ITERATIONS ]; do
-        info "Sleeping, waiting for pipeline run ${pipeline_run_name} to succeed.." 
-        # Sleep for a second.
-        sleep 10
-        let COUNTER=COUNTER+1 
-
-        # Find the status of the pipeline run...
-        status=$(kubectl get $pipeline_run_name | tail -1 | xargs | cut -f2 -d' ')
-        if [[ "${status}" == "True" ]]; then
-            info "Pipeline run completed OK."
-            break
-        fi
-
-        if [[ "${status}" == "False" ]]; then
-            error "Pipeline run $pipeline_run_name failed."
-            exit 1
-            break
-        fi
-    done
-    
-    if [ ${COUNTER} -ge $MAX_WAIT_ITERATIONS ]; then 
-        error "Timed out waiting for pipeline run ${pipeline_run_name} to complete."
-        exit 1
-    fi
-
-    success "All branches in github called ${release_type} are now deleted. Yay!"
+    success "All branches called ${release_type} are now deleted. Yay!"
 }
 # checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
     ask_user_for_release_type
-    set_kubernetes_context
     delete_branches
 fi

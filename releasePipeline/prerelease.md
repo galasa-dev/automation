@@ -9,8 +9,10 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 1. Clone the 'automation' repository, main branch. All the yaml and scripts you will be using can be found in the releasePipeline folder.
 2. Ensure the ArgoCD CLI is installed. The argocd cli can be downloaded [here]( https://argo-cd.readthedocs.io/en/stable/cli_installation/).
 3. Log into ArgoCD `argocd login --sso argocd.galasa.dev`
-4. Ensure the Tekton CLI is installed. You can download it [here](https://tekton.dev/docs/cli/).
-5. Authenticate to the cicsk8s cluster using `cicsk8s sso`
+4. Ensure GitHub CLI is istalled. It can be installed using the guide [here](https://github.com/cli/cli?tab=readme-ov-file#installation)
+5. Authenticate github cli using `gh auth login`
+6. Ensure the Tekton CLI is installed. You can download it [here](https://tekton.dev/docs/cli/).
+7. Authenticate to the cicsk8s cluster using `cicsk8s sso`
 
 ## Pre-release steps - Automated
 
