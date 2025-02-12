@@ -22,7 +22,7 @@ spec:
     type: array
   - name: image
     type: string
-    default: harbor.galasa.dev/docker_proxy_cache/library/gradle:8.9-jdk17
+    default: ghcr.io/galasa-dev/gradle:8.9-jdk17
   steps:
   - name: gradle-build
     workingDir: /workspace/git/$(params.context)

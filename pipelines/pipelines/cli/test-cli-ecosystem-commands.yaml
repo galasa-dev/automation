@@ -48,7 +48,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/cli
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/bash:3.2.57
+      value: ghcr.io/galasa-dev/bash:3.2.57
     - name: command
       value: 
         - chmod
