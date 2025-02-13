@@ -303,7 +303,7 @@ spec:
               java -jar target/org.jacoco.cli.jar merge target/unittests/*.exec --destfile target/image/unit/jacoco.exec &&
               java -jar target/org.jacoco.cli.jar report target/image/unit/jacoco.exec --classfiles target/classes --sourcefiles target/sources --name 'Galasa CC Unit only' --html target/image/unit/ --xml target/image/unit/jacoco.xml
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/openjdk:11    
+      value: ghcr.io/galasa-dev/openjdk:11    
     workspaces:
     - name: git-workspace
       workspace: git-workspace    
@@ -321,7 +321,7 @@ spec:
               java -jar target/org.jacoco.cli.jar merge target/inttests/dev.galasa.inttests/*.exec --destfile target/image/integrated/jacoco.exec &&
               java -jar target/org.jacoco.cli.jar report target/image/integrated/jacoco.exec --classfiles target/classes --sourcefiles target/sources --name 'Galasa CC Integrated only' --html target/image/integrated/ --xml target/image/integrated/jacoco.xml
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/openjdk:11    
+      value: ghcr.io/galasa-dev/openjdk:11    
     workspaces:
     - name: git-workspace
       workspace: git-workspace 
@@ -339,7 +339,7 @@ spec:
               java -jar target/org.jacoco.cli.jar merge target/image/unit/jacoco.exec target/image/integrated/jacoco.exec --destfile target/image/combined/jacoco.exec &&
               java -jar target/org.jacoco.cli.jar report target/image/combined/jacoco.exec --classfiles target/classes --sourcefiles target/sources --name 'Galasa CC Combined' --html target/image/combined/ --xml target/image/combined/jacoco.xml
     - name: image
-      value: harbor.galasa.dev/docker_proxy_cache/library/openjdk:11    
+      value: ghcr.io/galasa-dev/openjdk:11    
     workspaces:
     - name: git-workspace
       workspace: git-workspace 
@@ -355,7 +355,7 @@ spec:
     - name: script
       value: cp -v /workspace/git/$(context.pipelineRun.name)/obr/codecoveragetemplates/* /workspace/git/$(context.pipelineRun.name)/target/
     # - name: image
-    #   value: harbor.galasa.dev/docker_proxy_cache/library/openjdk:11    
+    #   value: ghcr.io/galasa-dev/openjdk:11    
     workspaces:
     - name: git-workspace
       workspace: git-workspace     

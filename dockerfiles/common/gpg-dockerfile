@@ -1,4 +1,4 @@
-FROM harbor.galasa.dev/docker_proxy_cache/library/ubuntu:20.04
+FROM ghcr.io/galasa-dev/ubuntu:20.04
 
 ENV DEBIAN_FRONTEND="noninteractive" TZ="Europe/London"
 RUN apt-get update && apt-get install -y unzip \
