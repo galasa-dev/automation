@@ -121,7 +121,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghverify:$(params.headSha)
+      value: ghcr.io/galasa-dev/ghverify:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -163,7 +163,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghstatus-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghstatus:$(params.headSha)
+      value: ghcr.io/galasa-dev/ghstatus:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -205,7 +205,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/github-monitor-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghmonitor:$(params.headSha)
+      value: ghcr.io/galasa-dev/ghmonitor:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -247,7 +247,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/github-receiver-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghreceiver:$(params.headSha)
+      value: ghcr.io/galasa-dev/ghreceiver:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
@@ -269,7 +269,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/tkn-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/tkn:$(params.headSha)
+      value: ghcr.io/galasa-dev/tkn:$(params.headSha)
     - name: noPush
       value: --no-push
     workspaces:
