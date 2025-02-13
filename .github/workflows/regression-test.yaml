@@ -1,0 +1,86 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Run Galasa regression tests (non z/OS)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *" # Daily at 06:00
+
+env:
+  NAMESPACE: ${{ github.repository_owner }}
+
+jobs:
+  run-regression-tests:
+    name: Run Galasa regression tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure permissions for mounted /galasa directory
+        run: |
+          sudo mkdir -p ${{ github.workspace }}/galasa
+          sudo chown -R 999:999 ${{ github.workspace }}/galasa
+
+      - name: Clean /galasa workspace in CLI image
+        run: |
+          docker run --rm \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          rm -rf /galasa/*
+
+      - name: Prepare test portfolio for 'ivts' test stream
+        env:
+          GALASA_HOME: /galasa
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+        run: |
+          docker run --rm \
+          --env GALASA_HOME=${{ env.GALASA_HOME }} \
+          --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa:rw \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          galasactl runs prepare \
+          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
+          --stream ivts \
+          --bundle dev.galasa.ivts \
+          --portfolio /galasa/tests.yaml \
+          --log -
+
+      - name: Submit test portfolio for 'ivts' test stream
+        env:
+          GALASA_HOME: /galasa
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+        run: |
+          docker run --rm \
+          --env GALASA_HOME=${{ env.GALASA_HOME }} \
+          --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa:rw \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          galasactl runs submit \
+          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
+          --portfolio /galasa/tests.yaml \
+          --throttle "30" \
+          --throttlefile throttle \
+          --poll "10" \
+          --progress "1" \
+          --trace \
+          --reportjson /galasa/test.json \
+          --noexitcodeontestfailures \
+          --log -
+
+      - name: Report results into Slack channel
+        env: 
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          docker run --rm \
+          --env SLACK_WEBHOOK=${{ env.SLACK_WEBHOOK }} \
+          -v ${{ github.workspace }}/galasa:/galasa:rw \
+          ghcr.io/${{ env.NAMESPACE }}/galasabld-ibm:main \
+          slackpost tests \
+          --path /galasa/test.json \
+          --hook ${{ env.SLACK_WEBHOOK }}
