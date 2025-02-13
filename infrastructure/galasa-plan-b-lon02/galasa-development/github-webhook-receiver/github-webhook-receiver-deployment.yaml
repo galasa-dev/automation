@@ -22,7 +22,7 @@ spec:
         app: github-webhook-receiver
     spec:
       containers:
-        - image: harbor.galasa.dev/common/ghreceiver:main
+        - image: ghcr.io/galasa-dev/ghreceiver:main
           imagePullPolicy: Always
           name: github-webhook-receiver
           env:

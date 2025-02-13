@@ -21,7 +21,7 @@ spec:
   steps:
   - name: tkn-cli
     workingDir: /workspace/git/$(params.context)
-    image: harbor.galasa.dev/common/tkn:main
+    image: ghcr.io/galasa-dev/tkn:main
     imagePullPolicy: IfNotPresent
     command:
       - tkn

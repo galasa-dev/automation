@@ -53,7 +53,7 @@ spec:
     - name: dockerfilePath
       value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghverify:main
+      value: ghcr.io/galasa-dev/ghverify:main
     - name: noPush
       value: $(params.noPush)
     workspaces:
