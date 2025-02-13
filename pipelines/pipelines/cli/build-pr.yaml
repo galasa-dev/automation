@@ -352,7 +352,7 @@ spec:
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
-      value: automation/dockerfiles/cli/cli-dockerfile
+      value: cli/dockerfiles/dockerfile.galasactl
     - name: buildArgs
       value:
         - "--build-arg=platform=linux-x86_64"
@@ -372,14 +372,14 @@ spec:
     - name: imageName
       value: ghcr.io/galasa-dev/galasactl-ibm-x86_64:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
+      value: $(context.pipelineRun.name)/cli/dockerfiles/certs
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
-      value: automation/dockerfiles/cli/cli-ibm-dockerfile
+      value: cli/dockerfiles/dockerfile.galasactl-ibm
     - name: buildArgs
       value:
-        - "--build-arg=dockerRepository=harbor.galasa.dev"
+        - "--build-arg=dockerRepository=ghcr.io"
         - "--build-arg=tag=main"
     workspaces:
      - name: git-workspace
@@ -398,11 +398,11 @@ spec:
     - name: imageName
       value: ghcr.io/galasa-dev/galasactl-executables:$(params.headSha)
     - name: context
-      value: $(context.pipelineRun.name)
+      value: $(context.pipelineRun.name)/cli
     - name: noPush
       value: "--no-push"
     - name: dockerfilePath
-      value: automation/dockerfiles/cli/cli-binary-dockerfile
+      value: cli/dockerfiles/dockerfile.galasactl-executables
     - name: buildArgs
       value:
         - "--build-arg=branch=$(params.headRef)"
