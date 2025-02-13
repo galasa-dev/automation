@@ -20,7 +20,7 @@ spec:
   steps:
   - name: github-verify
     workingDir: /workspace/git/
-    image: harbor.galasa.dev/common/ghverify:main
+    image: ghcr.io/galasa-dev/ghverify:main
     imagePullPolicy: Always
     env:
     - name: GITHUBTOKEN

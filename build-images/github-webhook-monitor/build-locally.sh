@@ -96,7 +96,7 @@ function build_and_tag_docker_image(){
 function push_image(){
     h2 "Pushing docker image..."
 
-    docker push harbor.galasa.dev/common/ghmonitor:main
+    docker push ghcr.io/galasa-dev/ghmonitor:main
 
     rc=$?
     if [[ "${rc}" != "0" ]]; then 

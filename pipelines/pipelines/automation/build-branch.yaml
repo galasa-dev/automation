@@ -120,7 +120,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghverify-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghverify:$(params.branch)
+      value: ghcr.io/galasa-dev/ghverify:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -164,7 +164,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/ghstatus-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghstatus:$(params.branch)
+      value: ghcr.io/galasa-dev/ghstatus:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -209,7 +209,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/github-monitor-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghmonitor:$(params.branch)
+      value: ghcr.io/galasa-dev/ghmonitor:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -259,7 +259,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/github-receiver-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/ghreceiver:$(params.branch)
+      value: ghcr.io/galasa-dev/ghreceiver:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
@@ -283,7 +283,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/common/tkn-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/common/tkn:$(params.branch)
+      value: ghcr.io/galasa-dev/tkn:$(params.branch)
     - name: noPush
       value: ""
     workspaces:
