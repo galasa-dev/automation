@@ -20,7 +20,7 @@ spec:
   steps:
   - name: clean-subdirectory
     workingDir: /workspace/git/
-    image: harbor.galasa.dev/docker_proxy_cache/library/busybox:1.36.1
+    image: ghcr.io/galasa-dev/busybox:1.36.1
     imagePullPolicy: IfNotPresent
     command:
     - rm

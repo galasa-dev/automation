@@ -23,7 +23,7 @@ spec:
   steps:
   - name: make
     workingDir: /workspace/git/$(params.directory)
-    image: harbor.galasa.dev/docker_proxy_cache/library/golang:1.20.1
+    image: ghcr.io/galasa-dev/golang:1.20.1
     imagePullPolicy: IfNotPresent
     command: 
       - make

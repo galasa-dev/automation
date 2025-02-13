@@ -1,0 +1,36 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Sync Docker Proxy Cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at 00:00
+
+env:
+  NAMESPACE: ${{ github.repository_owner }}
+
+jobs:
+  sync-docker-proxy-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log into GitHub Container Registry
+        env:
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        run: echo "${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}" | docker login ghcr.io -u ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }} --password-stdin
+
+      - name: Pull, Retag, and Push Images
+        run: |
+          IMAGES=("alpine:3.18.4" "alpine:3.18.5" "alpine:3.18.6" "bash:3.2.57" "busybox:1.32.0" "busybox:1.36.1" "golang:1.20.1" "gradle:8.9-jdk17" "httpd:alpine" "httpd:2.4.59" "maven:3.8.5-openjdk-17" "openjdk:11" "ubuntu:20.04")
+          for IMAGE in "${IMAGES[@]}"; do
+            docker pull docker.io/library/$IMAGE
+            docker tag docker.io/library/$IMAGE ghcr.io/${{ env.NAMESPACE }}/$IMAGE
+            docker push ghcr.io/${{ github.repository_owner }}/$IMAGE
+          done
