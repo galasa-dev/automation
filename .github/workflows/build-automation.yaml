@@ -343,6 +343,7 @@ jobs:
           sparse-checkout: |
             dockerfiles/common
             build-images
+            offline-tools/copyrighter
 
       - name: Setup up Go
         uses: actions/setup-go@v5
@@ -396,6 +397,7 @@ jobs:
           sparse-checkout: |
             dockerfiles/common
             build-images
+            offline-tools/copyrighter
 
       - name: Setup up Go
         uses: actions/setup-go@v5
@@ -449,6 +451,7 @@ jobs:
           sparse-checkout: |
             dockerfiles/common
             build-images
+            offline-tools/copyrighter
 
       - name: Setup up Go
         uses: actions/setup-go@v5
@@ -502,6 +505,7 @@ jobs:
           sparse-checkout: |
             dockerfiles/common
             build-images
+            offline-tools/copyrighter
 
       - name: Setup up Go
         uses: actions/setup-go@v5
