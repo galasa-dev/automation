@@ -53,30 +53,30 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Functions
 #-----------------------------------------------------------------------------------------   
 
-#Make sure to already have your Harbor details set as environment variables; HARBOR_USERNAME, HARBOR_CLI_SECRET
+#Make sure to already have your GitHub details set as environment variables; GITHUB_USERNAME, GITHUB_TOKEN
              
-function login_to_harbour(){
-    h2 "Logging into harbor..."
+function login_to_ghcr(){
+    h2 "Logging into GHCR..."
 
-    if [[ -z "${HARBOR_USERNAME}" ]]; then
-        error "Please set your Harbor Username as an environment variable"
+    if [[ -z "${GITHUB_USERNAME}" ]]; then
+        error "Please set your GitHub Username as an environment variable"
         exit 1
     fi
 
-    if [[ -z "${HARBOR_CLI_SECRET}" ]]; then
-        error "Please set your Harbor CLI Secret as an environment variable"
+    if [[ -z "${GITHUB_TOKEN}" ]]; then
+        error "Please set your GitHub personal access token with write:packages and read:packages scope as an environment variable"
         exit 1
     fi
 
-    echo "${HARBOR_CLI_SECRET}" | docker login harbor.galasa.dev -u "${HARBOR_USERNAME}" --password-stdin
+    echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "${GITHUB_USERNAME}" --password-stdin
 
     rc=$?
     if [[ "${rc}" != "0" ]]; then 
-        error "Failed to login to Harbor"
+        error "Failed to login to GHCR"
         exit 1
     fi
 
-    success "Logged in to Harbor successfully"
+    success "Logged in to GHCR successfully"
 }
 
 function build_and_tag_docker_image(){

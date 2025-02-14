@@ -22,7 +22,7 @@ spec:
       containers:
         - command:
             - copyright
-          image: 'harbor.galasa.dev/galasadev/galasa-copyright:latest'
+          image: 'ghcr.io/galasa-dev/galasa-copyright:latest'
           imagePullPolicy: Always
           name: copyright
           args: ["--githubAuthKeyFile","/secrets/key.pem","--debug"]

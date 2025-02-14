@@ -89,7 +89,7 @@ Once an approver has approved, you can move on.
 1. Run the 30-deploy-maven-galasa.sh script - Deploys the maven artifacts to OSS Sonatype.
 
    <!-- Temporary steps if there are issues with the 30-deploy-maven-galasa.sh script: -->
-   <!--  1. Pull the [galasa-obr-with-galasabld](https://harbor.galasa.dev/harbor/projects/3/repositories/galasa-obr-with-galasabld/artifacts-tab) image from Harbor using:
+   <!--  1. Pull the [obr-with-galasabld-executable](https://github.com/galasa-dev/galasa/pkgs/container/obr-with-galasabld-executable) image from GHCR using:
 
       ```shell
       docker pull ghcr.io/galasa-dev/obr-with-galasabld-executable:release

@@ -373,7 +373,7 @@ spec:
     - name: dockerfilePath
       value: ./Dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-codecoverage:$(params.imageTag)
+      value: ghcr.io/galasa-dev/galasa-codecoverage:$(params.imageTag)
     - name: noPush
       value: ""
     workspaces:

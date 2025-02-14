@@ -70,7 +70,7 @@ spec:
     - name: dockerfilePath
       value: githubapp-copyright/Dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-copyright:latest
+      value: ghcr.io/galasa-dev/galasa-copyright:latest
     - name: noPush
       value: ""
     workspaces:

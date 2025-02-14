@@ -136,7 +136,7 @@ spec:
     - name: dockerfilePath
       value: automation/dockerfiles/webapp/webapp-dockerfile
     - name: imageName
-      value: harbor.galasa.dev/galasadev/galasa-webapp:$(params.imageTag)
+      value: ghcr.io/galasa-dev/galasa-webapp:$(params.imageTag)
     - name: noPush
       value: ""
     workspaces:
