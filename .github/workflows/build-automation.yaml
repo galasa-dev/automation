@@ -292,6 +292,261 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  build-tkn-image:
+    name: Build the 'tkn' image
+    runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            pipelines/templates
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/tkn
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Build and push 'tkn' Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: pipelines/templates
+          file: dockerfiles/common/tkn-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghverify-image:
+    name: Build the 'ghverify' image
+    runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghverify'
+        working-directory: build-images/github-verify
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghverify cmd/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghverify
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Build and push 'ghverify' Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-verify
+          file: dockerfiles/common/ghverify-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghstatus-image:
+    name: Build the 'ghstatus' image
+    runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghstatus'
+        working-directory: build-images/github-status
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghstatus cmd/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghstatus
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Build and push 'ghstatus' Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-status
+          file: dockerfiles/common/ghstatus-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghmonitor-image:
+    name: Build the 'ghmonitor' image
+    runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghmonitor'
+        working-directory: build-images/github-webhook-monitor
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghmonitor cmd/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghmonitor
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Build and push 'ghmonitor' Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-webhook-monitor
+          file: dockerfiles/common/github-monitor-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghreceiver-image:
+    name: Build the 'ghreceiver' image
+    runs-on: ubuntu-latest
+    needs: check-required-secrets-configured
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghmonitor'
+        working-directory: build-images/github-webhook-receiver
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghreceiver cmd/github-webhook-receiver/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghreceiver
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Build and push 'ghreceiver' Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-webhook-receiver
+          file: dockerfiles/common/github-receiver-dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
   report-failure:
     # Skip this job for forks
     if: ${{ failure() && github.event_name == 'push' && github.repository_owner == 'galasa-dev' }}

@@ -204,3 +204,203 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  build-tkn-image:
+    name: Build the 'tkn' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            pipelines/templates
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/tkn
+
+      - name: Build 'tkn' Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: pipelines/templates
+          file: dockerfiles/common/tkn-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghverify-image:
+    name: Build the 'ghverify' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghverify'
+        working-directory: build-images/github-verify
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghverify cmd/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghverify
+
+      - name: Build 'ghverify' Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-verify
+          file: dockerfiles/common/ghverify-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghstatus-image:
+    name: Build the 'ghstatus' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghstatus'
+        working-directory: build-images/github-status
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghstatus cmd/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghstatus
+
+      - name: Build 'ghstatus' Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-status
+          file: dockerfiles/common/ghstatus-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghmonitor-image:
+    name: Build the 'ghmonitor' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghmonitor'
+        working-directory: build-images/github-webhook-monitor
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghmonitor cmd/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghmonitor
+
+      - name: Build 'ghmonitor' Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-webhook-monitor
+          file: dockerfiles/common/github-monitor-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-ghreceiver-image:
+    name: Build the 'ghreceiver' image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/common
+            build-images
+            offline-tools/copyrighter
+
+      - name: Setup up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version: 1.22
+
+      - name: Go build 'ghmonitor'
+        working-directory: build-images/github-webhook-receiver
+        run: |
+          export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GO111MODULE=auto
+          go build -o bin/ghreceiver cmd/github-webhook-receiver/main.go
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghreceiver
+
+      - name: Build 'ghreceiver' Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: build-images/github-webhook-receiver
+          file: dockerfiles/common/github-receiver-dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
