@@ -10,7 +10,7 @@ namespace: galasa-development
 codecov:
   deploy: false
   branch: main
-  imageName: harbor.galasa.dev/galasadev/galasa-codecoverage
+  imageName: ghcr.io/galasa-dev/galasa-codecoverage
   imageTag: main      
 obr:
   deploy: false
