@@ -30,7 +30,11 @@ spec:
     imagePullPolicy: IfNotPresent
     env:
     - name: ORG_GRADLE_PROJECT_signingKeyId
-      value: 221FFDC2
+      valueFrom:
+        secretKeyRef:
+          name: gradle-properties
+          key: keyid
+          optional: false
     - name: ORG_GRADLE_PROJECT_signingKey
       valueFrom:
         secretKeyRef:
