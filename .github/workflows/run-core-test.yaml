@@ -1,0 +1,66 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Run CoreManagerIVT
+
+on:
+  workflow_dispatch:
+
+env:
+  NAMESPACE: ${{ github.repository_owner }}
+
+jobs:
+  # This workflow runs a single test the CoreManagerIVT to verify the health of the Galasa service.
+  run-core-test:
+    name: Run CoreManagerIVT to verify Galasa service health
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure permissions for mounted /galasa directory
+        run: |
+          sudo mkdir -p ${{ github.workspace }}/galasa
+          sudo chown -R 999:999 ${{ github.workspace }}/galasa
+
+      - name: Clean /galasa workspace in CLI image
+        run: |
+          docker run --rm \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          rm -rf /galasa/*
+
+      - name: Run the 'CoreManagerIVT'
+        env:
+          GALASA_HOME: /galasa
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+        run: |
+          docker run --rm \
+          --env GALASA_HOME=${{ env.GALASA_HOME }} \
+          --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa:rw \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          galasactl runs submit \
+          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
+          --stream ivts \
+          --class dev.galasa.ivts/dev.galasa.ivts.core.CoreManagerIVT \
+          --throttle "10" \
+          --poll "10" \
+          --progress "1" \
+          --log -
+          
+  trigger-next-workflow:
+    # Skip this job for forks
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+    name: Trigger next workflow in the build chain
+    needs: [run-core-test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Triggering cli build
+        env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          gh workflow run build.yml --repo https://github.com/galasa-dev/cli --ref ${{ env.BRANCH }}
