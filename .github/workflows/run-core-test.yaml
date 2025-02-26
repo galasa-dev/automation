@@ -10,6 +10,7 @@ on:
 
 env:
   NAMESPACE: ${{ github.repository_owner }}
+  BRANCH: ${{ github.ref_name }}
 
 jobs:
   # This workflow runs a single test the CoreManagerIVT to verify the health of the Galasa service.
