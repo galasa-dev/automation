@@ -54,6 +54,21 @@ jobs:
         run: |
           helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
 
+  trigger-next-workflow:
+    # Skip this job for forks
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+    name: Trigger next workflow in the build chain
+    needs: [build-helm]
+    runs-on: ubuntu-latest
+
+    steps:
+      # This workflow runs a single test the CoreManagerIVT to verify the health of the Galasa service.
+      - name: Triggering workflow to run CoreManagerIVT
+        env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          gh workflow run run-core-test.yaml --repo https://github.com/galasa-dev/automation --ref ${{ env.BRANCH }}
+
   report-failure:
     # Skip this job for forks
     if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
