@@ -42,7 +42,7 @@ metadata:
   name: cleanup-pipelineruns
   namespace: galasa-build
 spec:
-  schedule: "0 * * * *"
+  schedule: "0,30 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -55,7 +55,7 @@ spec:
               image: ghcr.io/ctron/kubectl:latest
               env:
                 - name: NUM_TO_KEEP
-                  value: "10"
+                  value: "5"
               command:
                 - /bin/bash
                 - -c
