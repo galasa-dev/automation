@@ -32,7 +32,7 @@ spec:
             name: "cel"
           params:
           - name: "filter"
-            value: "body.repository.name in ['automation','cli']"
+            value: "body.repository.name in ['githubapp-copyright']"
       bindings:
         - name: git-repository-name
           value: $(body.pull_request.head.repo.name)
