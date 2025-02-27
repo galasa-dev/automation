@@ -128,7 +128,7 @@ spec:
             - --portfolio
             - /galasa/tests.yaml
             - --throttle
-            - "30"
+            - "10"
             - --throttlefile
             - throttle
             - --poll
