@@ -98,7 +98,7 @@ run_command ibmcloud cr login
 
 run_command docker pull ghcr.io/galasa-dev/javadoc-site:$FROM
 run_command docker pull ghcr.io/galasa-dev/restapidoc-site:$FROM
-run_command docker pull ghcr.io/galasa-dev/galasa-boot-embedded-x86_64:$FROM
+run_command docker pull ghcr.io/galasa-dev/galasa-boot-embedded:$FROM
 run_command docker pull icr.io/galasadev/galasa-resources:$FROM
 run_command docker pull ghcr.io/galasa-dev/webui:$FROM
 
@@ -111,7 +111,7 @@ run_command docker tag ghcr.io/galasa-dev/javadoc-site:$FROM                  \
 run_command docker tag ghcr.io/galasa-dev/restapidoc-site:$FROM \
            icr.io/galasadev/galasa-restapidoc-amd64:$TO
 
-run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded-x86_64:$FROM       \
+run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM       \
            icr.io/galasadev/galasa-boot-embedded-amd64:$TO
 
 run_command docker tag icr.io/galasadev/galasa-resources:$FROM       \
@@ -126,7 +126,7 @@ run_command docker tag ghcr.io/galasa-dev/javadoc-site:$FROM                \
 run_command docker tag ghcr.io/galasa-dev/restapidoc-site:$FROM \
            icr.io/galasadev/galasa-restapidoc-amd64:latest
 
-run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded-x86_64:$FROM      \
+run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM      \
            icr.io/galasadev/galasa-boot-embedded-amd64:latest
 
 run_command docker tag icr.io/galasadev/galasa-resources:$FROM      \

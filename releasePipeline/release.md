@@ -198,8 +198,8 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
 2. (**Manual until we automate it with GitHub Actions**) Delete the images in GHCR tagged 'release':
    - obr-maven-artefacts
    - obr-generic
-   - galasa-boot-embedded-x86_64
-   - galasa-ibm-boot-embedded-x86_64
+   - galasa-boot-embedded
+   - galasa-ibm-boot-embedded
    - javadoc-maven-artefacts
    - javadoc-site
    - galasactl-x86_64

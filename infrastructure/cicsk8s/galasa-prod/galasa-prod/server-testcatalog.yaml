@@ -52,7 +52,7 @@ spec:
           subPath: ""
       containers:
       - name: resource-monitor
-        image: ghcr.io/galasa-dev/galasa-ibm-boot-embedded-x86_64:main
+        image: ghcr.io/galasa-dev/galasa-ibm-boot-embedded:main
         imagePullPolicy: Always
         command: ["java"]
         args: 
