@@ -3,12 +3,20 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
+# ------------------------------------------------------------------------------------------------
+#
+# The values in this file are used to configure the "ecosystem1" Galasa service.
+# These values act as overrides for the default values provided in the service's Helm chart.
+# To view the values currently in use by ecosystem1, check that your Kubernetes context is 
+# set to the cluster and namespace where ecosystem1 is installed and run the following command:
+#
+# helm get values main-ecosystem --all
+#
+# ------------------------------------------------------------------------------------------------
 
 #
-# The external host name the Kubernetes NodePorts can be accessed on, can be an IP address if you are not using ingresses
-#
-# If you wish to access your Galasa Ecosystem through ingresses (see the `ingress` value below),
-# this is the host name that will be used and it must not be an IP address
+# The external hostname that the Galasa services can be accessed on via Ingress,
+# must be a valid DNS hostname without a URL scheme (i.e. without "https://").
 #
 externalHostname: "galasa-ecosystem1.galasa.dev"
 #
@@ -16,7 +24,6 @@ externalHostname: "galasa-ecosystem1.galasa.dev"
 # all the components are running the same version and a controlled upgrade can be performed
 #
 galasaVersion: "main"
-#
 #
 #
 # Name of the galasa service which will be shown as the title of the web user interface page.
@@ -52,36 +59,6 @@ pullPolicy: "Always"
 # The architecture the pods will be run on, at the moment, only adm64 is supported
 #
 architecture: amd64
-#
-#
-# Any nodeselectors you wish to use to restrict the nodes the pods will run on
-#
-nodeSelectors: {}
-#
-#
-# The storage class to be used for persistent volumes
-#
-storageClass: ""
-#
-#
-# The number of hours worth of etcd history to retain when etcd is compacted
-#
-etcdHistoryRetention: 10
-#
-#
-# The size of the persistent volumes for the data stores
-#
-etcdDiskSize: "30Gi"
-couchdbDiskSize: "10Gi"
-catalogDiskSize: "1Gi"
-#
-#
-# The image names and versions for the non-Galasa images
-#
-etcdImage: "quay.io/coreos/etcd:v3.2.25"
-couchdbImage: "couchdb:3.3.3"
-dexImage: "ghcr.io/dexidp/dex:v2.38.0"
-kubectlImage: "bitnami/kubectl:1.28"
 #
 #
 # Values to enable and configure the use of ingress
