@@ -64,7 +64,7 @@ jobs:
           galasactl runs submit \
           --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
           --portfolio /galasa/tests.yaml \
-          --throttle "30" \
+          --throttle "10" \
           --throttlefile throttle \
           --poll "10" \
           --progress "1" \
