@@ -18,7 +18,7 @@ jobs:
             - name: Make secrets directory
               run: |
                mkdir -p /home/runner/work/secrets
-               echo ${{ secrets.SONATYPE_CREDENTIALS }} > /home/runner/work/secrets/sonatypecreds.yaml
+               echo "${{ secrets.SONATYPE_CREDENTIALS }}" > /home/runner/work/secrets/sonatypecreds.yaml
     
             - name: Deploy maven galasa
               run: |
