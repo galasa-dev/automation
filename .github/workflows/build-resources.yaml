@@ -43,7 +43,7 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                    context: dockerfiles/release/resources
-                   file: resources-dockerfile
+                   file: dockerfiles/release/resources/resources-dockerfile
                    push: true
                    tags: ${{ steps.meta.outputs.tags }}
                    labels: ${{ steps.meta.outputs.labels }}
