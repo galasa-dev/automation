@@ -6,17 +6,11 @@ on:
             version:
                 description: "galasa release version, should be of the form x.xx.x"
                 required: true
-            distBranch:
-                description: 'Destination branch'
-                required: true
-            ref:
-                description: 'Source branch'
-                required: false
-                default: 'main'
 
 env:
     REGISTRY: ghcr.io
     NAMESPACE: galasa-dev
+    BRANCH: ${{ github.ref_name }}
 
 jobs:
     branch-docker-build-resources:
@@ -25,7 +19,6 @@ jobs:
             - name: Checkout resources in automation repository
               uses: actions/checkout@v4
               with:
-                ref: ${{ inputs.ref }}
                 sparse-checkout: |
                  dockerfiles/release/resources
             
@@ -33,7 +26,7 @@ jobs:
               id: meta
               uses: docker/metadata-action@v5
               with:
-                images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/galasa-resources:${{ inputs.distBranch }}
+                images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/galasa-resources
          
             - name: Log in to the GitHub Container registry
               uses: docker/login-action@v3
@@ -55,6 +48,6 @@ jobs:
                    tags: ${{ steps.meta.outputs.tags }}
                    labels: ${{ steps.meta.outputs.labels }}
                    build-args: |
-                    branch=${{ inputs.distBranch }}
+                    branch=${{ env.BRANCH }}
                     version=${{ inputs.version }}
                     
