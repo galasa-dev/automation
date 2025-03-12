@@ -23,5 +23,5 @@ jobs:
                 docker run ghcr.io/galasa-dev/obr-with-galasabld-executable:release maven deploy \
                 --repository ${{ inputs.repository }} --local /usr/local/apache2/htdocs \
                 --group dev.galasa --version ${{ inputs.version }} \
-                --username ${{ env.SONATYPE_USERNAME }} \
-                --password ${{ env.SONATYPE_PASSWORD }}
+                --username "${{ env.SONATYPE_USERNAME }}" \
+                --password "${{ env.SONATYPE_PASSWORD }}"
