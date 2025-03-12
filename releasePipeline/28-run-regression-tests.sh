@@ -143,7 +143,7 @@ spec:
   - name: distBranch
     value: release
   - name: version
-    value: "${version}"
+    value: "${galasa_version}"
   - name: bootVersion
     value: "${boot_version}"
 #
