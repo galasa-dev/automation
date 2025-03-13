@@ -7,7 +7,38 @@
 
 #Objective: Contains Galasa Properties to be updated/created
 #Apply this file by running `kubectl apply -f <relative-path-of-cps-properties.yaml`
-
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.description
+data:
+    value: Galasa IVTs
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.location
+data:
+    value: https://development.galasa.dev/main/maven-repo/ivts/dev/galasa/dev.galasa.ivts.obr/0.41.0/dev.galasa.ivts.obr-0.41.0-testcatalog.json
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.obr
+data:
+    value: mvn:dev.galasa/dev.galasa.ivts.obr/0.41.0/obr
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.repo
+data:
+    value: https://development.galasa.dev/main/maven-repo/ivts/
+---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
 metadata:
