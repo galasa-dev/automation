@@ -162,3 +162,247 @@ dex:
       refreshTokens:
         reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "300Mi"
+    limits:
+      cpu: "600m"
+      memory: "500Mi"
+
+
+#
+#
+# Values to configure the API server
+#
+apiServer:
+  #
+  #
+  # The number of API server replicas to deploy. This value is overridden when autoscaling is enabled.
+  #
+  replicaCount: 2
+  #
+  #
+  # The requests and limits to apply to resources, like CPU and memory, that the API server container consumes.
+  # See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ for details on resource management in Kubernetes Pods.
+  #
+  # For example, to assign 2 CPU cores and 512MB of memory to the API server, with a limit of up to 3 CPU cores and 1024MB of memory:
+  # resources:
+  #   requests:
+  #     cpu: "2"
+  #     memory: "512Mi"
+  #   limits:
+  #     cpu: "3"
+  #     memory: "1024Mi"
+  #
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "500Mi"
+    limits:
+      cpu: "900m"
+      memory: "800Mi"
+
+  #
+  # Values to configure autoscaling for the API server. Important: Resource requests must be defined via the `resources` value in order
+  # for autoscaling to work properly.
+  #
+  autoscaling:
+    #
+    # Enables or disables autoscaling
+    enabled: true
+    #
+    # The minimum number of API server replicas that should be deployed
+    minReplicas: 1
+    #
+    # The maximum number of API server replicas that should be deployed
+    maxReplicas: 10
+    #
+    # The target percentage of CPU utilization to consider when autoscaling.
+    # For example: `targetCPU: "50"` indicates that the autoscaler may increase the number of replicas when CPU utilization
+    # exceeds 50%. Similarly, when CPU utilization drops below 50%, the autoscaler may decrease the number of replicas.
+    targetCPUPercentageUsed: "50"
+    #
+    # The target percentage of memory utilization to consider when autoscaling.
+    # For example: `targetMemory: "50"` indicates that the autoscaler may increase the number of replicas when memory utilization
+    # exceeds 50%. Similarly, when memory utilization drops below 50%, the autoscaler may decrease the number of replicas.
+    targetMemoryPercentageUsed: "50"
+
+  #
+  #
+  # The Kubernetes annotations to apply to the Galasa API server's ingress resource alongside the global annotations provided via the `ingress.annotations` value.
+  # By default, a rate limit of 1000 requests from a given IP per second is applied to the API server's ingress, using the nginx ingress controller.
+  #
+  ingressAnnotations:
+    nginx.ingress.kubernetes.io/limit-rps: "1000"
+  #
+  #
+  # A list of origins that are allowed to receive responses from the Galasa API server.
+  # To limit the origins to a set of domains, you can use a wildcard (*) value.
+  #
+  # For example, to allow all subdomains of example.com, you can use the following value:
+  # allowedOrigins:
+  #   - "*.example.com"
+  #
+  # By default, all origins are allowed.
+  #
+  allowedOrigins:
+    - "*"
+
+#
+# The values below allow the location of the ETCD stores, DSS, CREDS, and CPS,
+# to be configurable. There is a separate URL for each store as you may want to
+# use the default store location for CPS and CREDS, but not for DSS, for example.
+#
+# If using the defaults below, RELEASE_NAME is replaced with {{ .Release.Name }}
+# when used in templates. If you override these default values with your own store
+# location, you do not have to include the release name in your store's URL.
+#
+# The "etcd:" prefix is appended in the templates so it should not be included here.
+#
+dssUrl: http://RELEASE_NAME-etcd:2379
+credsUrl: http://RELEASE_NAME-etcd:2379
+cpsUrl: http://RELEASE_NAME-etcd:2379
+#
+#
+# cleanupMonitor represents the values required to configure a custom resource cleanup
+# monitor for use by the Galasa service, so that resources provisioned by managers that
+# are not publicly available in the Galasa open source offering can be cleaned up.
+#
+cleanupMonitor:
+  #
+  # The name of the stream in which custom resource cleanup providers can be located.
+  stream: ""
+  #
+  # A list of glob patterns to be used in identifying which resource cleanup providers
+  # to load as part of the custom resource cleanup monitor.
+  #
+  # Supported glob patterns include the following special characters:
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern 'dev.galasa*' will match any monitor that includes 'dev.galasa' as its prefix,
+  # so a class like 'dev.galasa.core.CoreResourceMonitorClass' will be matched.
+  #
+  # A pattern like '*MyResourceMonitorClass' will match any monitor that ends with 'MyResourceMonitorClass',
+  # such as 'my.company.monitors.MyResourceMonitorClass'.
+  includes: []
+  #
+  # A list of glob patterns to be used in identifying which resource cleanup providers
+  # should not be loaded as part of the custom resource cleanup monitor.
+  #
+  # Supported glob patterns include the following special characters:
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern '*' will match any monitor, so a class like 'dev.galasa.core.CoreResourceMonitorClass'
+  # will be matched.
+  #
+  # A pattern like '*MyResourceMonitorClass' will match any monitor that ends with 'MyResourceMonitorClass',
+  # such as 'my.company.monitors.MyResourceMonitorClass'.
+  excludes: []
+
+# The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
+etcd:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "1000Mi"
+    limits:
+      cpu: "600m"
+      memory: "1500Mi"
+
+# The webui pod houses the web user interface.
+webui:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "400Mi"
+
+# The engine controller receives requests to start tests, and starts pods in which
+# the tests run.
+enginecontroller:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# The resource monitor is a component which monitors for failed/dead tests
+# and cleans up resources as required.
+resourcemonitor:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# The couchdb component stores run history and records, user records and other
+# persistent storage objects.
+couchdb:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "300Mi"
+    limits:
+      cpu: "600m"
+      memory: "500Mi"
+
+# The metrics component gathers metrics from other components in the system.
+metrics:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# Best practice is to set memory limits for each pod.
+# So we need to set 4 things:
+# - The amount of cpu and memory requested for the pod immediately
+# - The amount of CPU and memory that the pod can grow to use
+# - The value that the MAX_HEAP env var should be set to for the JVM when it starts inside the pod
+# These values are placed in the config map which is loaded into settings in the engine controller, which
+# uses them to launch pods.
+testPod:
+  memory:
+    # All values are integers, in units of 'Mi'
+    heap: 350
+    min: 400
+    max: 800
+  cpu:
+    # All values are integers, in units of 'm'
+    # A value of 0 indicates no CPU minimum should be set.
+    min: 600
+    # A value of 0 indicates no CPU maximum should be set.
+    max: 1000
