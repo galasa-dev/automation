@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -48,8 +49,15 @@ func main() {
 	prUrl := flag.String("pr", "", "URL of the pr to verify")
 	org := flag.String("org", "", "which github org are we looking for users in")
 	approvedGroups := flag.String("approved-groups", "", "the github groups get auto-build on PRs")
-	action := flag.String("action", "", "what github action occured")
+	action := flag.String("action", "", "what github action occurred")
 	flag.Parse()
+
+	log.Printf("github-verify tool.\n")
+	log.Printf("UserId of the PR opener : %v\n", userId)
+	log.Printf("URL of the PR to verify : %v\n", prUrl)
+	log.Printf("Github organisation we are looking for the user in : %v\n", org)
+	log.Printf("Github github groups which get auto-build on PRs : %v\n", approvedGroups)
+	log.Printf("Which github action just occurred : %v\n", action)
 
 	// Get PR object
 	var pr types.Pull
