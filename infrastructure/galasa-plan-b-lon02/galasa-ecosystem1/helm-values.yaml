@@ -162,3 +162,37 @@ dex:
       refreshTokens:
         reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
+#
+#
+# resourceMonitor represents the values used to configure the system resource cleanup 
+# monitor used by the Galasa service. Only the monitors that are available in the
+# dev.galasa.uber.OBR bundle can be included and excluded. For custom monitors,
+# see the 'cleanupMonitor' values.
+#
+resourceMonitor:
+  #
+  # A list of glob patterns to be used in identifying which resource cleanup providers to load.
+  #
+  # Supported glob patterns include the following special characters: 
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern 'dev.galasa*' will match any provider that includes 'dev.galasa' as its prefix,
+  # so a class like 'dev.galasa.core.CoreResourceMonitorClass' will be matched.
+  #
+  # By default, all of the providers matching 'dev.galasa.*' are included.
+  includes:
+    - 'dev.galasa.*'
+  #
+  # A list of glob patterns to be used in identifying which resource cleanup providers
+  # should not be loaded.
+  #
+  # Supported glob patterns include the following special characters: 
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern '*' will match any monitor, so a class like 'dev.galasa.core.CoreResourceMonitorClass'
+  # will be matched.
+  #
+  # By default, no providers are excluded.
+  excludes: []
