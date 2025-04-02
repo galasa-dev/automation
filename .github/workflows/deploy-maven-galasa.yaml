@@ -15,14 +15,13 @@ jobs:
     deploy-maven-galasa:
         runs-on: ubuntu-latest
         steps:
-            - name: Make secrets directory
-              run: |
-               mkdir -p /home/runner/work/secrets
-               echo ${{ secrets.SONATYPE_CREDENTIALS }} > /home/runner/work/secrets/sonatypecreds.yaml
-    
             - name: Deploy maven galasa
+              env:
+                SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+                SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
               run: |
                 docker run ghcr.io/galasa-dev/obr-with-galasabld-executable:release maven deploy \
                 --repository ${{ inputs.repository }} --local /usr/local/apache2/htdocs \
                 --group dev.galasa --version ${{ inputs.version }} \
-                --credentials /home/runner/work/secrets/sonatypecreds.yaml
+                --username "${{ env.SONATYPE_USERNAME }}" \
+                --password "${{ env.SONATYPE_PASSWORD }}"

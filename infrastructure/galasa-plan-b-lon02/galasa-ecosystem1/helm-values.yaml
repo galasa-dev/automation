@@ -296,6 +296,32 @@ cleanupMonitor:
   # should not be loaded as part of the custom resource cleanup monitor.
   #
   # Supported glob patterns include the following special characters:
+#
+#
+# resourceMonitor represents the values used to configure the system resource cleanup 
+# monitor used by the Galasa service. Only the monitors that are available in the
+# dev.galasa.uber.OBR bundle can be included and excluded. For custom monitors,
+# see the 'cleanupMonitor' values.
+#
+resourceMonitor:
+  #
+  # A list of glob patterns to be used in identifying which resource cleanup providers to load.
+  #
+  # Supported glob patterns include the following special characters: 
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern 'dev.galasa*' will match any provider that includes 'dev.galasa' as its prefix,
+  # so a class like 'dev.galasa.core.CoreResourceMonitorClass' will be matched.
+  #
+  # By default, all of the providers matching 'dev.galasa.*' are included.
+  includes:
+    - 'dev.galasa.*'
+  #
+  # A list of glob patterns to be used in identifying which resource cleanup providers
+  # should not be loaded.
+  #
+  # Supported glob patterns include the following special characters: 
   # '*' (wildcard) Matches zero or more characters
   # '?' matches exactly one character
   #
@@ -305,6 +331,18 @@ cleanupMonitor:
   # A pattern like '*MyResourceMonitorClass' will match any monitor that ends with 'MyResourceMonitorClass',
   # such as 'my.company.monitors.MyResourceMonitorClass'.
   excludes: []
+  #
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
 
 # The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
 etcd:
@@ -406,3 +444,5 @@ testPod:
     min: 600
     # A value of 0 indicates no CPU maximum should be set.
     max: 1000
+
+  
