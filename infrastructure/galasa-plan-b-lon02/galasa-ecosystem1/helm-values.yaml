@@ -296,6 +296,18 @@ cleanupMonitor:
   # should not be loaded as part of the custom resource cleanup monitor.
   #
   # Supported glob patterns include the following special characters:
+  #
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
 #
 #
 # resourceMonitor represents the values used to configure the system resource cleanup 
