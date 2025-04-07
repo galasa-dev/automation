@@ -167,10 +167,10 @@ dex:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "400m"
+      cpu: "500m"
       memory: "300Mi"
     limits:
-      cpu: "600m"
+      cpu: "700m"
       memory: "500Mi"
 
 
@@ -201,10 +201,10 @@ apiServer:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
+      cpu: "700m"
       memory: "500Mi"
     limits:
-      cpu: "900m"
+      cpu: "1000m"
       memory: "800Mi"
 
   #
@@ -303,10 +303,10 @@ cleanupMonitor:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
+      cpu: "700m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
+      cpu: "900m"
       memory: "500Mi"
 #
 #
@@ -350,10 +350,10 @@ resourceMonitor:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
+      cpu: "700m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
+      cpu: "900m"
       memory: "500Mi"
 
 # The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
@@ -363,10 +363,10 @@ etcd:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "400m"
+      cpu: "500m"
       memory: "1000Mi"
     limits:
-      cpu: "600m"
+      cpu: "700m"
       memory: "1500Mi"
 
 # The webui pod houses the web user interface.
@@ -376,10 +376,10 @@ webui:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
+      cpu: "700m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
+      cpu: "900m"
       memory: "400Mi"
 
 # The engine controller receives requests to start tests, and starts pods in which
@@ -390,10 +390,10 @@ enginecontroller:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
+      cpu: "700m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
+      cpu: "900m"
       memory: "500Mi"
 
 # The resource monitor is a component which monitors for failed/dead tests
@@ -404,10 +404,10 @@ resourcemonitor:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
+      cpu: "700m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
+      cpu: "900m"
       memory: "500Mi"
 
 # The couchdb component stores run history and records, user records and other
@@ -418,10 +418,10 @@ couchdb:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "400m"
+      cpu: "500m"
       memory: "300Mi"
     limits:
-      cpu: "600m"
+      cpu: "700m"
       memory: "500Mi"
 
 # The metrics component gathers metrics from other components in the system.
@@ -447,14 +447,14 @@ metrics:
 testPod:
   memory:
     # All values are integers, in units of 'Mi'
-    heap: 350
+    heap: 50
     min: 400
     max: 800
   cpu:
     # All values are integers, in units of 'm'
     # A value of 0 indicates no CPU minimum should be set.
-    min: 600
+    min: 700
     # A value of 0 indicates no CPU maximum should be set.
-    max: 1000
+    max: 1100
 
   
