@@ -7,7 +7,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: run-cicsts-and-base-zos-tests
+  name: run-zos-mf-zos-tests
   namespace: galasa-dev
 spec:
   schedule: 0 6 * * * # Daily at 06:00
@@ -58,24 +58,17 @@ spec:
             - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
             - --stream
             - ivts
-            # Overrides the current CPS property which says to use SEM.
+            # Tells the IVTs to use the z/OS MF implementation of the z/OS Manager.
             - --override
-            - cicsts.provision.type=dse
+            - zos.bundle.extra.batch.manager=dev.galasa.zosbatch.zosmf.manager
             - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cicsts.CICSTSManagerIVT
+            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerBatchIVT
             - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cemt.CEMTManagerIVT
+            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerFileIVT
             - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceda.CedaManagerIVT
-            # Currently not set up - will add in when it is...
-            # - --class
-            # - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceci.CECIManagerIVT
+            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerFileDatasetIVT
             - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos3270.Zos3270IVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerIVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerTSOCommandIVT
+            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerFileVSAMIVT
             - --throttle
             - "10"
             - --poll
