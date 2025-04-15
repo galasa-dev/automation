@@ -166,6 +166,10 @@ spec:
             - tests
             - --path
             - /galasa/test.json
+            - --name
+            - "inttests - prod1"
+            - --desc
+            - "Remaining inttests to be replaced"
             - --hook
             args:
             - $(HOOK)

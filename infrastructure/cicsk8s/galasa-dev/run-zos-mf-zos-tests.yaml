@@ -106,6 +106,10 @@ spec:
             - tests
             - --path
             - /galasa/test.json
+            - --name
+            - "z/OS MF - prod1"
+            - --desc
+            - "z/OS MF testing of z/OS Batch and File Managers"
             - --hook
             args:
             - $(HOOK)
