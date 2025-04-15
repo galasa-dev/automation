@@ -106,6 +106,10 @@ spec:
             - tests
             - --path
             - /galasa/test.json
+            - --name
+            - "RSE API - prod1"
+            - --desc
+            - "RSE API testing of z/OS Batch and File Managers"
             - --hook
             args:
             - $(HOOK)

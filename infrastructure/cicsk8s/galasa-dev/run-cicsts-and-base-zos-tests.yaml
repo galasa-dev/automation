@@ -113,6 +113,10 @@ spec:
             - tests
             - --path
             - /galasa/test.json
+            - --name
+            - "CICS and basic z/OS - prod1"
+            - --desc
+            - "All CICS TS, 3270, z/OS Manager, TSO"
             - --hook
             args:
             - $(HOOK)

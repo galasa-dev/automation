@@ -83,4 +83,6 @@ jobs:
           ghcr.io/${{ env.NAMESPACE }}/galasabld-ibm:main \
           slackpost tests \
           --path /galasa/test.json \
+          --name "Core tests - ecosystem1" \
+          --desc "Core, HTTP, Artifact etc" \
           --hook ${{ env.SLACK_WEBHOOK }}
