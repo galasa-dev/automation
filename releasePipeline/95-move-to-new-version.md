@@ -16,6 +16,8 @@ These are manual steps to bump the version of Galasa to the next version.
 
     e. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
+    f. When the Isolated Main build is triggered following the CLI module build, cancel it on the GitHub UI [here](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) with the "Cancel Workflow" button, as you are going to rebuild it in a next step anyway.
+
     **Note:** Once the Galasa mono repo's build finishes, this will trigger the `recycle-prod1` Tekton pipeline, which will then trigger the `run-tests` Tekton pipeline. The `run-tests` will fail as the CPS properties have not yet been upgraded to the new development version (unless you have already done it with galasactl) - this is okay.
 
 3. Upgrade [Helm](https://github.com/galasa-dev/helm)
@@ -48,17 +50,7 @@ These are manual steps to bump the version of Galasa to the next version.
     
     b. Push the changes to your branch, open a PR, then merge in the PR, and wait for the Main build to pass and finish.
 
-8. Upgrade [CLI](https://github.com/galasa-dev/cli)
-
-    a. Invoke the `set-version --version {new version}` script.
-
-    b. Make sure it builds with `build-locally.sh`. This will also uplift the version in the generated docs files.
-
-    c. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
-
-    d. When the Isolated Main build is triggered, cancel it on the GitHub UI [here](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) with the "Cancel Workflow" button, as you are going to rebuild it in the next step anyway.
-
-9. Upgrade [Isolated](https://github.com/galasa-dev/isolated)
+8. Upgrade [Isolated](https://github.com/galasa-dev/isolated)
 
     a. Invoke the `set-version --version {new version}` script.
 

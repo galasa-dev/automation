@@ -90,10 +90,6 @@ while [ "$1" != "" ]; do
                                     ;;
         --recycle-prod1 )           pipeline="recycle-prod1"
                                     ;;
-        --run-tests )                pipeline="run-tests"
-                                    ;;
-        --test-cli )                pipeline="test-cli-ecosystem-commands"
-                                    ;;
         -p | --pipeline )           shift
                                     pipeline=$1
                                     ;;
