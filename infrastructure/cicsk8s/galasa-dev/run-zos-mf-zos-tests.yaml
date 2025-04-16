@@ -101,18 +101,10 @@ spec:
           containers:
           - name: submit-report
             command:
-            - galasabld
-            - slackpost
-            - tests
-            - --path
-            - /galasa/test.json
-            - --name
-            - "z/OS MF - prod1"
-            - --desc
-            - "z/OS MF testing of z/OS Batch and File Managers"
-            - --hook
-            args:
-            - $(HOOK)
+            - "/bin/sh"
+            - "-c"
+            - |
+              galasabld slackpost tests --path /galasa/test.json --name="z/OS MF - prod1" --desc="z/OS MF testing of z/OS Batch and File Managers" --hook $(HOOK)
             env:
             - name: HOOK
               valueFrom:

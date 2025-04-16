@@ -108,18 +108,10 @@ spec:
           containers:
           - name: submit-report
             command:
-            - galasabld
-            - slackpost
-            - tests
-            - --path
-            - /galasa/test.json
-            - --name
-            - "CICS and basic z/OS - prod1"
-            - --desc
-            - "All CICS TS, 3270, z/OS Manager, TSO"
-            - --hook
-            args:
-            - $(HOOK)
+            - "/bin/sh"
+            - "-c"
+            - |
+              galasabld slackpost tests --path /galasa/test.json --name="CICS and basic z/OS - prod1" --desc="All CICS TS, 3270, z/OS Manager, TSO" --hook $(HOOK)
             env:
             - name: HOOK
               valueFrom:
