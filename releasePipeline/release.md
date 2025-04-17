@@ -39,10 +39,8 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
     - Branch: `release`
     - Enable Jacoco code coverage: `false`
     - Artifacts should be signed: `true`
-2. The build of the CLI repository and Isolated repository will be triggered automatically as part of the build chain, so monitor those builds and make sure they finish successfully. 
-    - The [CLI Main build workflow](https://github.com/galasa-dev/cli/actions/workflows/build.yml) should run with the `release` ref
-    - This will trigger the Tekton pipeline `test-cli-ecosystem-commands` so go to the Tekton dashboard
-    - That will then trigger the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `release` ref back in GitHub
+2. The build of the Isolated repository will be triggered automatically as part of the build chain, so monitor this build and make sure it finishes successfully. 
+    - Watch the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `release` ref back in GitHub
 3. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
    - Branch: `release`
 4. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`release`' option.
