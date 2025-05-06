@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: resources
-        image: icr.io/galasadev/galasa-resources:0.40.0
+        image: icr.io/galasadev/galasa-resources:0.41.0
         ports:
         - containerPort: 80
       affinity:
