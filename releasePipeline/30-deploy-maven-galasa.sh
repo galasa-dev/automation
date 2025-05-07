@@ -121,7 +121,7 @@ function deploy_maven_artifacts {
 
     echo "Workflow started with Run ID: ${run_id}"
 
-    echo -e "\e]8;;https://github.com/${github_username}/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+    echo "Open Workflow Log at https://github.com/${github_username}/automation/actions/runs/${run_id} for more info."
 
 
     MAX_WAIT_ITERATIONS=30
