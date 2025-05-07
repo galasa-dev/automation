@@ -21,7 +21,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 3. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
-4. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino or Will Yates to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+4. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
 
 ## Pre-release steps - Manual
 

@@ -94,12 +94,12 @@ function create_resources_image {
 
     h1 "Creating the resources image..."
 
-    dist_branch="release"
+    branch="release"
     version="${galasa_version}"
 
     github_username="galasa-dev"
 
-    workflow_dispatch=$( gh workflow run "build resources" --repo ${github_username}/automation --ref main --field distBranch=${dist_branch} --field version=${version})
+    workflow_dispatch=$( gh workflow run "build resources" --repo ${github_username}/automation --ref ${branch} --field version=${version})
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
         exit 1
@@ -115,7 +115,7 @@ function create_resources_image {
     fi
 
     echo "Workflow started with Run ID: ${run_id}"
-    echo -e "\e]8;;https://github.com/${github_username}/automation/actions/runs/${run_id}\e\\Open Workflow Log\e]8;;\e\\ for more info."
+    echo "Open Workflow Log at https://github.com/${github_username}/automation/actions/runs/${run_id} for more info."
 
     success "Resources image build pipeline kicked off OK."
 }

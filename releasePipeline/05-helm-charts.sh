@@ -230,7 +230,7 @@ function delete_pre_release_helm_charts {
         release_url=$(grep -Ei ' *"url" *: *"(https:\/\/api\.github\.com\/repos\/galasa-dev\/helm\/releases\/[0-9]*)"' $release_json_details | cut -d \" -f 4)
 
         # Delete pre-release github release
-        response_code= $(curl -X DELETE $release_url -w "${response_code}")
+        response_code=$(curl -X DELETE $release_url -w "${response_code}")
         if [[ "${response_code}" != "204" ]]; then 
             error "Unable to delete release for $release_tag using the api url '$release_url'. Expected status code '204' and got '$response_code'."
             exit 1

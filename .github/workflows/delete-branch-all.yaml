@@ -11,7 +11,7 @@ jobs:
     branch-delete-all:
       strategy:
         matrix:
-          repo: ['automation', 'galasa', 'cli', 'isolated', 'helm', 'webui', 'simplatform']
+          repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']
       runs-on: ubuntu-latest
       steps:
         - name: Delete branch ${{ matrix.repo }}
