@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-name: Run Galasa regression tests (non z/OS)
+name: Galasa Core Regression Tests (non z/OS)
 
 on:
   workflow_dispatch:
