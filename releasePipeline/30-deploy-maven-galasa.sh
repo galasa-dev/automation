@@ -103,7 +103,7 @@ function deploy_maven_artifacts {
         exit 1
     fi
 
-    workflow_dispatch=$( gh workflow run "deploy maven galasa" --repo ${github_username}/automation --ref main --field version=${version})
+    workflow_dispatch=$( gh workflow run "Deploy to Staging Repository" --repo ${github_username}/automation --ref main --field version=${version})
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -112,7 +112,7 @@ function deploy_maven_artifacts {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow "deploy maven galasa" --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo ${github_username}/automation --workflow "Deploy to Staging Repository" --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"

@@ -1,0 +1,29 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Branch Delete
+
+on:
+  workflow_dispatch:
+    inputs:
+      distBranch:
+        description: 'Destination branch'
+        required: true
+
+jobs:
+  branch-delete:
+    strategy:
+      matrix:
+        repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch ${{ matrix.repo }}
+        env:
+            GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          docker run ghcr.io/galasa-dev/galasabld-amd64:main github branch delete \
+          --repository ${{ matrix.repo }} --branch ${{ inputs.distBranch }} \
+          --username galasa-team \
+          --password ${{ env.GALASA_TEAM_GITHUB_TOKEN }}

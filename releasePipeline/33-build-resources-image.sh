@@ -99,7 +99,7 @@ function create_resources_image {
 
     github_username="galasa-dev"
 
-    workflow_dispatch=$( gh workflow run "build resources" --repo ${github_username}/automation --ref ${branch} --field version=${version})
+    workflow_dispatch=$( gh workflow run "Build resources.galasa.dev" --repo ${github_username}/automation --ref ${branch} --field version=${version})
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
         exit 1
@@ -107,7 +107,7 @@ function create_resources_image {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow "build resources" --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo ${github_username}/automation --workflow "Build resources.galasa.dev" --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"

@@ -99,7 +99,7 @@ function tag_galasa_github_repositories {
 
     github_username="galasa-dev"
 
-    workflow_dispatch=$( gh workflow run branch-tag-galasa --repo ${github_username}/automation --ref main --field distBranch=${dist_branch} --field tag=${tag})
+    workflow_dispatch=$( gh workflow run "Branch Tag" --repo ${github_username}/automation --ref main --field distBranch=${dist_branch} --field tag=${tag})
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -108,7 +108,7 @@ function tag_galasa_github_repositories {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow branch-tag-galasa --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo ${github_username}/automation --workflow "Branch Tag" --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
