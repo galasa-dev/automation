@@ -42,32 +42,20 @@ blue=$(tput setaf 25)
 # Headers and Logging
 #
 #-----------------------------------------------------------------------------------------                   
-underline() { printf "${underline}${bold}%s${reset}\n" "$@"
-}
-h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@"
-}
-h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@"
-}
-debug() { printf "${white}%s${reset}\n" "$@"
-}
-info() { printf "${white}➜ %s${reset}\n" "$@"
-}
-success() { printf "${green}✔ %s${reset}\n" "$@"
-}
-error() { printf "${red}✖ %s${reset}\n" "$@"
-}
-warn() { printf "${tan}➜ %s${reset}\n" "$@"
-}
-bold() { printf "${bold}%s${reset}\n" "$@"
-}
-note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
-}
-
+underline() { printf "${underline}${bold}%s${reset}\n" "$@" ;}
+h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@" ;}
+h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@" ;}
+debug() { printf "${white}%s${reset}\n" "$@" ;}
+info() { printf "${white}➜ %s${reset}\n" "$@" ;}
+success() { printf "${green}✔ %s${reset}\n" "$@" ;}
+error() { printf "${red}✖ %s${reset}\n" "$@" ;}
+warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
+bold() { printf "${bold}%s${reset}\n" "$@" ;}
+note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 #-----------------------------------------------------------------------------------------                   
 # Main logic.
 #-----------------------------------------------------------------------------------------                   
-
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -93,11 +81,7 @@ function delete_branches {
 
     h1 "Deleting all branches in github called ${release_type}"
 
-    branch_name="${release_type}"
-
-    github_username="galasa-dev"
-
-    workflow_dispatch=$( gh workflow run "Branch Delete" --repo ${github_username}/automation --ref main --field distBranch=${branch_name})
+    workflow_dispatch=$( gh workflow run "Branch Delete" --repo galasa-dev/automation --ref main --field distBranch=${release_type})
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -106,7 +90,7 @@ function delete_branches {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow "Branch Delete" --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/automation --workflow "Branch Delete" --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
@@ -115,7 +99,7 @@ function delete_branches {
 
     echo "Workflow started with Run ID: ${run_id}"
     
-    echo "Open Workflow Log at https://github.com/${github_username}/automation/actions/runs/${run_id} for more info."
+    echo "Open Workflow Log at https://github.com/galasa-dev/automation/actions/runs/${run_id} for more info."
 
 
     MAX_WAIT_ITERATIONS=30
@@ -126,7 +110,7 @@ function delete_branches {
         sleep 10
         ((COUNTER++))
         
-        status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
+        status=$(gh run view "$run_id" --repo galasa-dev/automation --json conclusion --jq '.conclusion')
 
         if [[ "$status" == "success" ]]; then
             echo "Workflow completed successfully."
