@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Build the webui repository on release/prerelease branches.
+# Objectives: Build all the code in github release/prerelease branches.
 #
 # Environment variable over-rides:
 # 
@@ -53,7 +53,6 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
 bold() { printf "${bold}%s${reset}\n" "$@" ;}
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
-
 #-----------------------------------------------------------------------------------------                   
 # Main logic.
 #-----------------------------------------------------------------------------------------                   
@@ -80,34 +79,34 @@ function ask_user_for_release_type {
     echo "Chosen type of release process: ${release_type}"
 }
 
-function build_webui {
+function build_galasa_mono_repo {
 
-    info "About to start the Main build for the 'webui' repo"
+    info "About to start the Release Build Orchestrator for the 'galasa' repo"
 
-    workflow_dispatch=$( gh workflow run build.yaml --repo galasa-dev/webui --ref ${release_type} )
+    workflow_dispatch=$( gh workflow run releases.yaml --repo galasa-dev/galasa --ref ${release_type} --field jacoco_enabled=false --field sign_artifacts=true)
 
     if [[ $? != 0 ]]; then
-        error "Failed to call the workflow. $?"
+        error "Failed to start the workflow. $?"
         exit 1
     fi
 
     # Sleep to give the workflow a chance to start
     sleep 5
 
-    run_id=$(gh run list --repo galasa-dev/webui --workflow build.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/galasa --workflow releases.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
         exit 1
     fi
 
-    success "Web UI Main build started with Run ID: ${run_id}"
+    success "Release Build Orchestrator started with Run ID: ${run_id}"
     
-    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/webui/actions/runs/${run_id}"
+    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/galasa/actions/runs/${run_id}"
 
 }
 
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
   ask_user_for_release_type
-  build_webui
+  build_galasa_mono_repo
 fi
