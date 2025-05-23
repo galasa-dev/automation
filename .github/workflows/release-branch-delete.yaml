@@ -13,7 +13,7 @@ on:
         required: true
 
 jobs:
-  branch-delete-all:
+  branch-delete:
     strategy:
       matrix:
         repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']

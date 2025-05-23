@@ -97,7 +97,7 @@ function delete_branches {
 
     github_username="galasa-dev"
 
-    workflow_dispatch=$( gh workflow run branch-delete-all --repo ${github_username}/automation --ref main --field distBranch=${branch_name})
+    workflow_dispatch=$( gh workflow run "Branch Delete" --repo ${github_username}/automation --ref main --field distBranch=${branch_name})
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -106,7 +106,7 @@ function delete_branches {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow branch-delete-all --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo ${github_username}/automation --workflow "Branch Delete" --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"

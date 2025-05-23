@@ -16,7 +16,7 @@ on:
         required: true
 
 jobs:
-  branch-tag-galasa:
+  branch-tag:
     strategy:
       matrix:
         repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']

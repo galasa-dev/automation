@@ -17,10 +17,10 @@ on:
         default: 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2'
 
 jobs:
-  deploy-maven-galasa:
+  deploy-maven:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy maven galasa
+      - name: Deploy Maven artifacts to Staging Repository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}

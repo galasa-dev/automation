@@ -24,7 +24,7 @@ on:
         default: ''
 
 jobs:
-  branch-create-galasa:
+  branch-create:
     strategy:
       matrix:
         repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']
