@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Deletes all the release-type branches in each github repo
+# Objectives: Build all the code in github release/prerelease branches.
 #
 # Environment variable over-rides:
 # 
@@ -57,6 +57,8 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Main logic.
 #-----------------------------------------------------------------------------------------                   
 
+mkdir -p temp
+
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
     select lng in release pre-release
@@ -77,65 +79,34 @@ function ask_user_for_release_type {
     echo "Chosen type of release process: ${release_type}"
 }
 
-function delete_branches {
+function build_galasa_mono_repo {
 
-    h1 "Deleting all branches in github called ${release_type}"
+    info "About to start the Release Build Orchestrator for the 'galasa' repo"
 
-    workflow_dispatch=$( gh workflow run "Branch Delete" --repo galasa-dev/automation --ref main --field distBranch=${release_type})
+    workflow_dispatch=$( gh workflow run releases.yaml --repo galasa-dev/galasa --ref ${release_type} --field jacoco_enabled=false --field sign_artifacts=true)
 
     if [[ $? != 0 ]]; then
-        error "Failed to call the workflow. $?"
+        error "Failed to start the workflow. $?"
         exit 1
     fi
 
+    # Sleep to give the workflow a chance to start
     sleep 5
 
-    run_id=$(gh run list --repo galasa-dev/automation --workflow "Branch Delete" --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/galasa --workflow releases.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
         exit 1
     fi
 
-    echo "Workflow started with Run ID: ${run_id}"
+    success "Release Build Orchestrator started with Run ID: ${run_id}"
     
-    echo "Open Workflow Log at https://github.com/galasa-dev/automation/actions/runs/${run_id} for more info."
+    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/galasa/actions/runs/${run_id}"
 
-
-    MAX_WAIT_ITERATIONS=30
-    COUNTER=0
-
-    while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
-        echo "Waiting for workflow ${run_id} to complete..."
-        sleep 10
-        ((COUNTER++))
-        
-        status=$(gh run view "$run_id" --repo galasa-dev/automation --json conclusion --jq '.conclusion')
-
-        if [[ "$status" == "success" ]]; then
-            echo "Workflow completed successfully."
-            break
-        elif [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
-            echo "Workflow failed. Check the workflow run for more details."
-            exit 1
-        fi
-    done
-
-    if [[ $COUNTER -ge $MAX_WAIT_ITERATIONS ]]; then
-        echo "⏳ Timed out waiting for workflow ${run_id} to complete."
-        exit 1
-    fi
-
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "Failed to delete the branches. rc=$?"
-        exit 1
-    fi
-
-    success "All branches called ${release_type} are now deleted. Yay!"
 }
-# checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions
+
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
-    ask_user_for_release_type
-    delete_branches
+  ask_user_for_release_type
+  build_galasa_mono_repo
 fi

@@ -18,7 +18,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 
 1. Ensure you have completed the [set up](#set-up) before continuing.
 2. Run [01-run-pre-release.sh](./01-run-pre-release.sh). If the process fails at any stage, you can continue by re-running the script that failed from the manual steps and finish using the [manual steps below](#pre-release-steps---manual).
-3. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
+3. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
 4. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
@@ -35,15 +35,11 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
 6. Delete all Releases and Tags for the Helm charts that were just created by pushing to the `prerelease` branch.
     1. Delete all Releases that were created: [Releases](https://github.com/galasa-dev/helm/releases) - Next to a Release, click the Delete icon and 'Delete this release'.
     2. Delete all Tags that were created: [Tags](https://github.com/galasa-dev/helm/tags) - Next to a Tag, click the three dots, then 'Delete Tag' then 'Delete this Tag'.
-7. Begin the build of Galasa by starting the Galasa mono repo release build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/galasa/actions/workflows/releases.yaml) and select the following inputs:
-    - Branch: `pre-release`
-    - Enable Jacoco code coverage: `false`
-    - Artifacts should be signed: `true`
+7. Begin the build of Galasa by starting the Galasa mono repo release build. Run [10-build-galasa-mono-repo.sh](./10-build-galasa-mono-repo.sh). When prompted, choose the '`pre-release`' option. This script uses the GitHub CLI to start the [Release Build Orchestrator](https://github.com/galasa-dev/galasa/actions/workflows/releases.yaml). You will have to monitor the workflow run and ensure it finishes successfully.
 8. The build of the Isolated repository will be triggered automatically as part of the build chain, so monitor this build and make sure it finishes successfully. 
     - Watch the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `prerelease` ref back in GitHub
-9. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
-   - Branch: `pre-release`
-10. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
+9. Now run the Web UI Main build. Run [11-build-webui.sh](./11-build-webui.sh). When prompted, choose the '`pre-release`' option. This script uses the GitHub CLI to start the [Main build](https://github.com/galasa-dev/webui/actions/workflows/build.yaml). You will have to monitor the workflow run and ensure it finishes successfully.
+10. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 11. Send the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
 12. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases. Test the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline (although you will need to slightly adapt in some places as you are testing the MVP from the prerelease maven repo - these differences are documented below):

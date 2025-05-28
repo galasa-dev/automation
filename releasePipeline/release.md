@@ -33,19 +33,22 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
 1. Run [05-helm-charts.sh](./05-helm-charts.sh). When prompted, choose the '`release`' option. This script uses the GitHub API to check that all Helm charts that had changes in this release have a new Release and Tag object on GitHub.
 
-### Build and test the Galasa core components
+### Build Galasa
 
-1. Begin the build of Galasa by starting the Galasa mono repo release build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/galasa/actions/workflows/releases.yaml) and select the following inputs:
-    - Branch: `release`
-    - Enable Jacoco code coverage: `false`
-    - Artifacts should be signed: `true`
+1. Begin the build of Galasa by starting the Galasa mono repo release build. Run [10-build-galasa-mono-repo.sh](./10-build-galasa-mono-repo.sh). When prompted, choose the '`release`' option. This script uses the GitHub CLI to start the [Release Build Orchestrator](https://github.com/galasa-dev/galasa/actions/workflows/releases.yaml). You will have to monitor the workflow run and ensure it finishes successfully.
 2. The build of the Isolated repository will be triggered automatically as part of the build chain, so monitor this build and make sure it finishes successfully. 
     - Watch the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `release` ref back in GitHub
-3. Run the Web UI Main build. Select the "Run workflow" button on [this page](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) and select the following inputs:
-   - Branch: `release`
-4. Run [25-check-artifacts-signed.sh](./25-check-artifacts-signed.sh). When prompted, choose the '`release`' option.
+3. Now run the Web UI Main build. Run [11-build-webui.sh](./11-build-webui.sh). When prompted, choose the '`release`' option. This script uses the GitHub CLI to start the [Main build](https://github.com/galasa-dev/webui/actions/workflows/build.yaml). You will have to monitor the workflow run and ensure it finishes successfully.
+
+### Check the built artifacts are signed
+1. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`release`' option.
     - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
-5. Run [28-run-regression-tests.sh](./28-run-regression-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
+
+### Run the regression tests
+1. Run [25-run-simbank-ivts.sh](./25-run-simbank-ivts.sh). You will have to monitor the workflow run in GitHub Actions and ensure it finishes successfully.
+2. Run [26-run-ecosystem1-ivts.sh](./26-run-ecosystem1-ivts.sh). You will have to monitor the workflow run in GitHub Actions and ensure it finishes successfully.
+3. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). You will have to monitor the pipeline run on Tekton and ensure it finishes successfully.
+4. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh). All the tests must pass before moving on. For the ones which fail, run them individually:
 
    a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
 
@@ -54,7 +57,7 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
    c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
 
    d. Repeat as required.
-6. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases. Test the [MVP zip](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline (although you will need to slightly adapt in some places as you are testing the MVP from the prerelease maven repo - these differences are documented below):
+5. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases. Test the [MVP zip](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline (although you will need to slightly adapt in some places as you are testing the MVP from the prerelease maven repo - these differences are documented below):
     - https://galasa.dev/docs/cli-command-reference/installing-offline
         - 1: The output of `docker load -i isolated.tar` should instead be `Loaded image: ghcr.io/galasa-dev/galasa-mvp:main`.
         - 2: Run the container by running `docker run -d -p 8080:80 --name galasa ghcr.io/galasa-dev/galasa-mvp:main` instead.

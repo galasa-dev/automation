@@ -7,10 +7,10 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: To create the resources image.
+# Objectives: Run Simbank IVTs in GitHub Actions.
 #
 # Environment variable over-rides:
-# None.
+# 
 #-----------------------------------------------------------------------------------------                   
 
 # Where is this script executing from ?
@@ -57,38 +57,14 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Main logic.
 #-----------------------------------------------------------------------------------------   
 
-mkdir -p ${WORKSPACE_DIR}/temp
+mkdir -p temp
 
+function run_simbank_ivts {
 
-function get_galasa_version_to_be_released {
-    h1 "Working out the version of Galasa to test and release."
+    info "Running Test Simbank in GitHub Actions"
 
-    url="https://development.galasa.dev/main/maven-repo/obr/dev/galasa/dev.galasa.uber.obr/"
-    curl $url > temp/galasa-version.txt -s
-    rc=$?; 
-    if [[ "${rc}" != "0" ]]; then 
-      error "Failed to get galasa version"
-      exit 1
-    fi
+    workflow_dispatch=$( gh workflow run test.yaml --repo galasa-dev/simplatform --ref ${release_type} )
 
-    # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
-    galasa_version=$(cat temp/galasa-version.txt | grep "<a href" | head -2 | tail -1 | cut -f2 -d'"' | cut -f1 -d'/')
-
-    success "Galasa version to be tested and released is ${galasa_version}"
-    export galasa_version
-}
-
-
-function create_resources_image {
-
-    h1 "Creating the resources image..."
-
-    branch="release"
-    version="${galasa_version}"
-
-    github_username="galasa-dev"
-
-    workflow_dispatch=$( gh workflow run "Build resources.galasa.dev" --repo ${github_username}/automation --ref ${branch} --field version=${version})
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
         exit 1
@@ -96,21 +72,15 @@ function create_resources_image {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow "Build resources.galasa.dev" --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/simplatform --workflow test.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
         exit 1
     fi
 
-    echo "Workflow started with Run ID: ${run_id}"
-    echo "Open Workflow Log at https://github.com/${github_username}/automation/actions/runs/${run_id} for more info."
+    success "Test Simbank workflow started with Run ID: ${run_id}"
+    
+    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/simplatform/actions/runs/${run_id}"
 
-    success "Resources image build pipeline kicked off OK."
 }
-
-get_galasa_version_to_be_released
-
-create_resources_image
-
-note "Now wait for the 'resources-*' pipeline to complete."

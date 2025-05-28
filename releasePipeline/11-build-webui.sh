@@ -80,104 +80,34 @@ function ask_user_for_release_type {
     echo "Chosen type of release process: ${release_type}"
 }
 
-
-function set_kubernetes_context {
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
-    kubectl config set-context cicsk8s --namespace=galasa-build
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then 
-        error "Failed. rc=${rc}"
-        exit 1
-    fi
-}
-
-
-
 function build_webui {
 
-    yaml_file="build_webui.yaml"
+    info "About to start the Main build for the 'webui' repo"
 
-    rm -f temp/${yaml_file}
-    cat << EOF > temp/${yaml_file}
+    workflow_dispatch=$( gh workflow run build.yaml --repo galasa-dev/webui --ref ${release_type} )
 
-#
-# Copyright contributors to the Galasa project 
-#
-kind: PipelineRun
-apiVersion: tekton.dev/v1beta1
-metadata:
-  generateName: webui-build-
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: Prune=false
-spec:
-  params:
-  - name: toBranch
-    value: ${release_type}
-  - name: imageTag
-    value: ${release_type}
-#
-# 
-# 
-  pipelineRef:
-    name: branch-webui
-  serviceAccountName: galasa-build-bot
-# 
-# 
-# 
-  podTemplate:
-    volumes:
-    - name: gradle-properties
-      secret:
-        secretName: gradle-properties
-    - name: gpg-key
-      secret:
-        secretName: gpg-key
-    - name: mavengpg
-      secret:
-        secretName: mavengpg
-    - name: githubcreds
-      secret:
-        secretName: github-token
-    - name: harborcreds
-      secret:
-        secretName: harbor-creds-yaml
-    - name: mavencreds
-      secret:
-        secretName: maven-creds
-  workspaces:
-  - name: git-workspace
-    volumeClaimTemplate:
-      spec:
-        storageClassName: longhorn-temp
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 20Gi
-
-EOF
-
-    output=$(kubectl -n galasa-build create -f temp/${yaml_file})
-    # Outputs a line of text like this: 
-    # pipelinerun.tekton.dev/webui-build-8cbj8 created
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "Failed to start the webui build pipeline. rc=$?"
+    if [[ $? != 0 ]]; then
+        error "Failed to call the workflow. $?"
         exit 1
     fi
-    info "kubectl create pipeline run output: $output"
 
+    # Sleep to give the workflow a chance to start
+    sleep 5
 
-    pipeline_run_name=$(echo $output | grep "created" | cut -f1 -d" " | xargs)
+    run_id=$(gh run list --repo galasa-dev/webui --workflow build.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
+    if [[ $? != 0 ]]; then
+        error "Failed to get the workflow run_id. $?"
+        exit 1
+    fi
 
-    success "Branch build for the Galasa Web UI kicked off."
-    bold "Now use the tekton dashboard to monitor it."
+    success "Web UI Main build started with Run ID: ${run_id}"
+    
+    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/webui/actions/runs/${run_id}"
+
 }
 
 if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
   ask_user_for_release_type
-  set_kubernetes_context
   build_webui
 fi

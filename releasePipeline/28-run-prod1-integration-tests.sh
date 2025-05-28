@@ -7,10 +7,10 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: To create the resources image.
+# Objectives: Run integration tests in prod1.
 #
 # Environment variable over-rides:
-# None.
+# 
 #-----------------------------------------------------------------------------------------                   
 
 # Where is this script executing from ?
@@ -57,8 +57,18 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Main logic.
 #-----------------------------------------------------------------------------------------   
 
-mkdir -p ${WORKSPACE_DIR}/temp
+mkdir -p temp
 
+function set_kubernetes_context {
+    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
+    kubectl config set-context cicsk8s --namespace=galasa-build
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then 
+        error "Failed. rc=${rc}"
+        exit 1
+    fi
+    
+}
 
 function get_galasa_version_to_be_released {
     h1 "Working out the version of Galasa to test and release."
@@ -78,39 +88,77 @@ function get_galasa_version_to_be_released {
     export galasa_version
 }
 
+function get_current_boot_version {
+    h1 "Working out the current galasa-boot version."
 
-function create_resources_image {
-
-    h1 "Creating the resources image..."
-
-    branch="release"
-    version="${galasa_version}"
-
-    github_username="galasa-dev"
-
-    workflow_dispatch=$( gh workflow run "Build resources.galasa.dev" --repo ${github_username}/automation --ref ${branch} --field version=${version})
-    if [[ $? != 0 ]]; then
-        error "Failed to call the workflow. $?"
-        exit 1
+    url="https://development.galasa.dev/main/maven-repo/obr/dev/galasa/galasa-boot/"
+    curl $url > temp/galasa-boot.txt -s
+    rc=$?; 
+    if [[ "${rc}" != "0" ]]; then 
+      error "Failed to get galasa boot"
+      exit 1
     fi
 
-    sleep 5
+    # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
+    boot_version=$(cat temp/galasa-boot.txt | grep "<a href" | head -2 | tail -1 | cut -f2 -d'"' | cut -f1 -d'/')
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow "Build resources.galasa.dev" --limit 1 --json  databaseId --jq '.[0].databaseId')
-
-    if [[ $? != 0 ]]; then
-        error "Failed to get the workflow run_id. $?"
-        exit 1
-    fi
-
-    echo "Workflow started with Run ID: ${run_id}"
-    echo "Open Workflow Log at https://github.com/${github_username}/automation/actions/runs/${run_id} for more info."
-
-    success "Resources image build pipeline kicked off OK."
+    success "Current boot version is ${boot_version}"
+    export boot_version
 }
 
+
+function run_regression_tests {
+    h1 "Trying to kick off regression tests..."
+
+    yaml_file="run_tests.yaml"
+
+    rm -f temp/${yaml_file}
+    cat << EOF > temp/${yaml_file}
+#
+# Copyright contributors to the Galasa project 
+#
+kind: PipelineRun
+apiVersion: tekton.dev/v1beta1
+metadata:
+  generateName: regression-test-
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
+#
+spec:
+  params:
+  - name: distBranch
+    value: release
+  - name: version
+    value: "${galasa_version}"
+  - name: bootVersion
+    value: "${boot_version}"
+#
+#
+#
+  pipelineRef:
+    name: full-regression    
+
+
+EOF
+
+    output=$(kubectl -n galasa-build create -f temp/${yaml_file})
+    # Outputs a line of text like this: 
+    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to run regression tests. rc=$?"
+        exit 1
+    fi
+    info "kubectl create pipeline run output: $output"
+
+
+    success "Regression tests kicked off."
+    bold "Now use the tekton dashboard to monitor it to see that they all work."
+    note "If any fail, you will need to re-run these tests."
+}    
+
+set_kubernetes_context
 get_galasa_version_to_be_released
-
-create_resources_image
-
-note "Now wait for the 'resources-*' pipeline to complete."
+get_current_boot_version
+run_regression_tests
