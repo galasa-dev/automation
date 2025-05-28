@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Run all regression tests.
+# Objectives: Run CICS and z/OS IVTs in prod1.
 #
 # Environment variable over-rides:
 # 
@@ -59,6 +59,16 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 
 mkdir -p temp
 
+function set_kubernetes_context {
+    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
+    kubectl config set-context cicsk8s --namespace=galasa-build
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then 
+        error "Failed. rc=${rc}"
+        exit 1
+    fi
+    
+}
 
 function get_galasa_version_to_be_released {
     h1 "Working out the version of Galasa to test and release."
@@ -76,18 +86,6 @@ function get_galasa_version_to_be_released {
 
     success "Galasa version to be tested and released is ${galasa_version}"
     export galasa_version
-}
-
-
-function set_kubernetes_context {
-    h1 "Setting the kubernetes context to be cicsk8s, using namespace galasa-build"
-    kubectl config set-context cicsk8s --namespace=galasa-build
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then 
-        error "Failed. rc=${rc}"
-        exit 1
-    fi
-    
 }
 
 function get_current_boot_version {
@@ -109,10 +107,10 @@ function get_current_boot_version {
 }
 
 
-function run_regression_tests {
-    h1 "Trying to kick off regression tests..."
+function run_ivts_prod1 {
+    h1 "Trying to kick off CICS and z/OS IVTs on prod1..."
 
-    yaml_file="run_tests.yaml"
+    yaml_file="run_ivts_prod1.yaml"
 
     rm -f temp/${yaml_file}
     cat << EOF > temp/${yaml_file}
@@ -122,7 +120,7 @@ function run_regression_tests {
 kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
 metadata:
-  generateName: regression-test-
+  generateName: run-ivts-prod1-
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
@@ -139,7 +137,7 @@ spec:
 #
 #
   pipelineRef:
-    name: full-regression    
+    name: run-ivts-prod1
 
 
 EOF
@@ -149,20 +147,18 @@ EOF
     # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to run regression tests. rc=$?"
+        error "Failed to run ivts on prod1. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
 
 
-    success "Regression tests kicked off."
-    bold "Now use the tekton dashboard to monitor it to see that they all work."
+    success "run-ivts-prod1 kicked off."
+    bold "Now use the Tekton dashboard to monitor it to see that they all work."
     note "If any fail, you will need to re-run these tests."
-}    
+}
 
-
-
-
+set_kubernetes_context
 get_galasa_version_to_be_released
 get_current_boot_version
-run_regression_tests
+run_ivts_prod1
