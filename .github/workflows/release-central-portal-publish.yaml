@@ -87,6 +87,7 @@ jobs:
       #     docker run --rm \
       #       --env PAT=${{ env.PAT }} \
       #       --env RELEASE_VERSION=${{ env.RELEASE_VERSION }} \
+      #       --workdir /usr/local/apache2/htdocs \
       #       ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
       #       curl --request POST \
       #       --verbose \
