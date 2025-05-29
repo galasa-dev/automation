@@ -92,9 +92,6 @@ spec:
                   - name: gpg-key
                     secret:
                       secretName: gpg-key
-                  - name: mavengpg
-                    secret:
-                      secretName: mavengpg
                   - name: githubcreds
                     secret:
                       secretName: github-token
