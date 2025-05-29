@@ -22,7 +22,7 @@ spec:
       containers:
         - command:
             - copyright
-          image: 'ghcr.io/galasa-dev/galasa-copyright:latest'
+          image: 'ghcr.io/galasa-dev/githubapp-copyright:main'
           imagePullPolicy: Always
           name: copyright
           args: ["--githubAuthKeyFile","/secrets/key.pem","--debug"]
@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: secrets-volume
           secret:
-            secretName: github-copyright-app-key
+            secretName: githubapp-copyright-unit-test-key
             items:
               - key: key.pem
                 path: key.pem
