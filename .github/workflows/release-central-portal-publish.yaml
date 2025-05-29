@@ -1,0 +1,91 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Publish to Central Publisher Portal
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Galasa release version in the form 'x.xx.x'"
+        required: true
+
+env:
+  NAMESPACE: ${{ github.repository_owner }}
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  publish-to-central-publisher-portal:
+    name: Publish to Central Publisher Portal
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to the GitHub Container Registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Extract metadata
+        id: metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/dev-galasa-bundler
+
+      - name: Build Docker image that bundles the dev.galasa artifacts
+        uses: docker/build-push-action@v5
+        with:
+          file: dockerfiles/release/bundler.Dockerfile
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+
+      # TEMP
+      - name: Set up temp directory
+        run: |
+          mkdir -p temp
+
+      # TEMP
+      - name: Copy zip file from Docker image
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/temp:/output \
+            ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
+            sh -c "cp /usr/local/apache2/htdocs/dev-galasa-bundle-0.42.0.zip /output/"
+
+      # TEMP 
+      - name: Verify ZIP file exists
+        run: |
+          ls -l temp
+
+      # TEMP 
+      - name: Upload zip to workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-galasa-bundle-0.42.0
+          path: temp/dev-galasa-bundle-0.42.0.zip
+
+      # - name: Publish dev.galasa bundle to Central Publisher Portal
+      #   env:
+      #     PAT: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
+      #     RELEASE_VERSION: ${{ inputs.version }}
+      #   run: |
+      #     docker run --rm \
+      #       --env PAT=${{ env.PAT }} \
+      #       --env RELEASE_VERSION=${{ env.RELEASE_VERSION }} \
+      #       ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
+      #       curl --request POST \
+      #       --verbose \
+      #       --header 'Authorization: Bearer ${{ env.PAT }}' \
+      #       --form bundle=@dev-galasa-${{ env.RELEASE_VERSION }}.zip \
+      #       https://central.sonatype.com/api/v1/publisher/upload
+
