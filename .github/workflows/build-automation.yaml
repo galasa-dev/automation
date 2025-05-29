@@ -25,44 +25,6 @@ jobs:
     secrets:
       WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
-  build-gpg-image:
-    name: Build the 'gpg' image
-    runs-on: ubuntu-latest
-    needs: check-required-secrets-configured
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/common
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
-        env: 
-          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
-          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
-
-      - name: Build and push 'gpg' Docker image
-        id: build-push
-        uses: docker/build-push-action@v5
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gpg-dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
   build-kubectl-image:
     name: Build the 'kubectl' image
     runs-on: ubuntu-latest
@@ -96,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/kubectl-dockerfile
+          file: dockerfiles/common/kubectl.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -134,7 +96,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/argocd-dockerfile
+          file: dockerfiles/common/argocd.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -172,7 +134,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/gitcli-dockerfile
+          file: dockerfiles/common/gitcli.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -210,7 +172,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/openapi-dockerfile
+          file: dockerfiles/common/openapi.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -248,7 +210,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/swagger-dockerfile
+          file: dockerfiles/common/swagger.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -287,7 +249,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/certs
-          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
+          file: dockerfiles/common/openjdk17ibmgradle.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -326,7 +288,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: pipelines/templates
-          file: dockerfiles/common/tkn-dockerfile
+          file: dockerfiles/common/tkn.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -380,7 +342,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-verify
-          file: dockerfiles/common/ghverify-dockerfile
+          file: dockerfiles/common/ghverify.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -434,7 +396,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-status
-          file: dockerfiles/common/ghstatus-dockerfile
+          file: dockerfiles/common/ghstatus.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -488,7 +450,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-webhook-monitor
-          file: dockerfiles/common/github-monitor-dockerfile
+          file: dockerfiles/common/githubmonitor.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -542,7 +504,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-webhook-receiver
-          file: dockerfiles/common/github-receiver-dockerfile
+          file: dockerfiles/common/githubreceiver.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

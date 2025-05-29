@@ -1,9 +1,0 @@
-ARG dockerRepository
-ARG image
-ARG oldBranch
-FROM ${dockerRepository}/galasadev/${image}:${oldBranch}
-
-ARG branch
-ARG oldBranch
-
-RUN sed -i "s/\/${oldBranch}/\/${branch}/" /usr/local/apache2/conf/httpd.conf

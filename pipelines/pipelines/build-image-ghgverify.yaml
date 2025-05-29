@@ -51,7 +51,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/automation/build-images/github-verify
     - name: dockerfilePath
-      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghverify-dockerfile
+      value: $(context.pipelineRun.name)/automation/dockerfiles/build-images/ghverify.Dockerfile
     - name: imageName
       value: ghcr.io/galasa-dev/ghverify:main
     - name: noPush
