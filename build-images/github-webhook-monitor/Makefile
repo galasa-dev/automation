@@ -14,8 +14,8 @@ ghmonitor-source: \
 bin/ghmonitor: ghmonitor-source
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/ghmonitor ./cmd
 
-docker-build: ../../dockerfiles/common/github-monitor-dockerfile bin/ghmonitor
-	docker build -f ../../dockerfiles/common/github-monitor-dockerfile -t ghcr.io/galasa-dev/ghmonitor:main .
+docker-build: ../../dockerfiles/common/githubmonitor.Dockerfile bin/ghmonitor
+	docker build -f ../../dockerfiles/common/githubmonitor.Dockerfile -t ghcr.io/galasa-dev/ghmonitor:main .
 
 docker-run:
 	sh docker_run.sh

@@ -28,7 +28,7 @@ The path for this config is expected to be passed with this flag: `-trigger-map=
 
 Use docker from this repo to build this image. Example:
 ```
-docker build -f ../../dockerfiles/common/github-monitor-dockerfile -t github-monitor .
+docker build -f ../../dockerfiles/common/githubmonitor.Dockerfile -t github-monitor .
 ```
 
 ### Running the monitor

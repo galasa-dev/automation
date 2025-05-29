@@ -134,7 +134,7 @@ spec:
     - name: context
       value: $(context.pipelineRun.name)/simplatform/galasa-simplatform-application/galasa-simplatform-webapp
     - name: dockerfilePath
-      value: automation/dockerfiles/webapp/webapp-dockerfile
+      value: automation/dockerfiles/webapp/webapp.Dockerfile
     - name: imageName
       value: ghcr.io/galasa-dev/galasa-webapp:$(params.imageTag)
     - name: noPush

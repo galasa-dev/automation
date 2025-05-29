@@ -39,11 +39,9 @@ This directory is the single location for all Dockerfiles needed to build the im
 
 | Category | Dockerfiles |
 |----------|-------------|
-| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, github-monitor, github-receiver, gpg, kubectl, openapi, openjdk17-ibm-gradle, swagger, tkn | 
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, githubmonitor, githubreceiver, gpg, kubectl, openapi, openjdk17ibmgradle, swagger, tkn | 
 | Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
-| Maven repositories for the built Galasa core components | cli-binary |
-| Galasa CLI | cli, cli-ibm |
 | Galasa Resources site | resources |
 
 

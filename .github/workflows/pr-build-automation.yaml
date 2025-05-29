@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/gpg-dockerfile
+          file: dockerfiles/common/gpg.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/kubectl-dockerfile
+          file: dockerfiles/common/kubectl.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -91,7 +91,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/argocd-dockerfile
+          file: dockerfiles/common/argocd.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -118,7 +118,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/gitcli-dockerfile
+          file: dockerfiles/common/gitcli.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -145,7 +145,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/openapi-dockerfile
+          file: dockerfiles/common/openapi.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -172,7 +172,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/common
-          file: dockerfiles/common/swagger-dockerfile
+          file: dockerfiles/common/swagger.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -200,7 +200,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: dockerfiles/certs
-          file: dockerfiles/common/openjdk17-ibm-gradle-dockerfile
+          file: dockerfiles/common/openjdk17ibmgradle.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -228,7 +228,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: pipelines/templates
-          file: dockerfiles/common/tkn-dockerfile
+          file: dockerfiles/common/tkn.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -271,7 +271,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-verify
-          file: dockerfiles/common/ghverify-dockerfile
+          file: dockerfiles/common/ghverify-Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -314,7 +314,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-status
-          file: dockerfiles/common/ghstatus-dockerfile
+          file: dockerfiles/common/ghstatus.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -357,7 +357,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-webhook-monitor
-          file: dockerfiles/common/github-monitor-dockerfile
+          file: dockerfiles/common/githubmonitor.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -400,7 +400,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: build-images/github-webhook-receiver
-          file: dockerfiles/common/github-receiver-dockerfile
+          file: dockerfiles/common/githubreceiver.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

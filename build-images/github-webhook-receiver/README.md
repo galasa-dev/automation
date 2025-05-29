@@ -25,7 +25,7 @@ curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <TOKEN>"
 
 Use docker from this repo to build this image. Example:
 ```
-docker build -f ../../dockerfiles/common/github-receiver-dockerfile -t github-receiver .
+docker build -f ../../dockerfiles/common/githubreceiver.Dockerfile -t github-receiver .
 ```
 
 ### Running the receiver
