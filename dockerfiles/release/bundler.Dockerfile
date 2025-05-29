@@ -4,8 +4,11 @@ FROM ghcr.io/galasa-dev/obr-maven-artefacts:release
 # The version of Galasa to be released to label the bundle with.
 ARG version
 
-# Install the `zip` tool.
+# Install the `zip` tool to create the bundle.
 RUN apk add --no-cache zip
+
+# Install the `curl` tool to contact the Central Publisher Portal REST API.
+RUN apk add --no-cache curl
 
 # Go to the directory within the image that contains all the built artifacts.
 WORKDIR /usr/local/apache2/htdocs
