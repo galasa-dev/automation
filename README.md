@@ -440,19 +440,6 @@ Definitions for the ServiceAccounts used during pipelines.
 
 ## Tasks
 
-### argocd-cli
-
-This task uses the Argo CD CLI to interact with resources that are managed by Argo CD, including resources for our Maven repositories. 
-
-Parameters:
-* command: An array of each part of the argocd command to execute.
-* server: The argocd server to perform the command on.
-* authSecretName: The secret name to use to authenticate to the server.
-* authSecretKey: The secret key to use to authenticate to the server.
-
-This task uses the custom [argocd-cli image](https://harbor.galasa.dev/harbor/projects/5/repositories/argocd-cli/artifacts-tab). 
-
-
 ### galasabld-command
 
 This task uses the galasabld CLI to perform galasabld commands, such as galasabld template.

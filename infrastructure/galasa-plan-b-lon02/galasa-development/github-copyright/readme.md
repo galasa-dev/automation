@@ -7,9 +7,9 @@ We need to go create some kubernetes resources objects:
 
 2. Service, please use the port number 3001 to connect your service to your container.
 
-3. External secret on wich the deployment depends, so gitgub can be sure it's the correct authenticated app back-end.
+3. External secret on which the deployment depends, so gitgub can be sure it's the correct authenticated app back-end.
 
-The secret name is: `github-copyright-app-key``
+The secret name is: `githubapp-copyright-unit-test-key`
 The secret itself is something like:
 ```
 -----BEGIN RSA PRIVATE KEY-----
