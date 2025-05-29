@@ -43,12 +43,16 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/dev-galasa-bundler
 
       - name: Build Docker image that bundles the dev.galasa artifacts
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
         uses: docker/build-push-action@v5
         with:
           file: dockerfiles/release/bundler.Dockerfile
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+          build-args: |
+            version=${{ env.RELEASE_VERSION }}
 
       # TEMP
       - name: Set up temp directory
