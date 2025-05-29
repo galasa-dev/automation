@@ -15,33 +15,6 @@ env:
   NAMESPACE: ${{ github.repository_owner }}
 
 jobs:
-  build-gpg-image:
-    name: Build the 'gpg' image
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/common
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
-
-      - name: Build 'gpg' Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gpg.Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
   build-kubectl-image:
     name: Build the 'kubectl' image
     runs-on: ubuntu-latest

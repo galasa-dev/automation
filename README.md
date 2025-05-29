@@ -570,21 +570,6 @@ Parameters:
 This task uses the offical [Maven 3.8.6 with the IBM Semeru Java 17 image](https://hub.docker.com/_/maven) from DockerHub unless overridden.
 
 
-### maven-gpg
-
-The Maven build uses the Maven GPG Plugin to sign all of the built artifacts using GnuPG. This task uses the GnuPG CLI to put the correct secrets in place for the Maven GPG Plugin to use during the maven-build task. This task uses the ExternalSecret mavengpg.
-
-1. The first step makes a new directory within the provided working directory.
-1. The second step performs a gpg command to import the passphrase and gpg key.
-1. In the last step, the settings.xml from the mavengpg secret that has been populated with the galasa.passphrase is copied and put in the directory made in the first step.
-
-Parameters:
-* context: The directory to execute the command in.
-* settingsDirectory: The location of the settings.xml to use in the subsequent Maven build, defaults to /workspace/git/gpg if not overriden.
-
-This task uses the custom [gpg image](https://harbor.galasa.dev/harbor/projects/5/repositories/gpg/artifacts-tab). This task also uses the offical [busybox image](https://hub.docker.com/_/busybox) from DockerHub to perform Unix commands.
-
-
 ### script
 
 This task is used to perform a script.

@@ -25,44 +25,6 @@ jobs:
     secrets:
       WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
 
-  build-gpg-image:
-    name: Build the 'gpg' image
-    runs-on: ubuntu-latest
-    needs: check-required-secrets-configured
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/common
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/gpg
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
-        env: 
-          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
-          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
-
-      - name: Build and push 'gpg' Docker image
-        id: build-push
-        uses: docker/build-push-action@v5
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/gpg.Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
   build-kubectl-image:
     name: Build the 'kubectl' image
     runs-on: ubuntu-latest
