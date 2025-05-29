@@ -12,10 +12,6 @@ metadata:
 data: 
   config.yaml: |
     events:
-      pull_request:
-        eventListener: ["http://el-github-pr-builder-listener.galasa-build.svc.cluster.local:8080"]
-      pull_request_review:
-        eventListener: ["http://el-github-pr-review-builder-listener.galasa-build.svc.cluster.local:8080"]
       push:
         eventListener: ["http://el-github-main-builder-listener.galasa-build.svc.cluster.local:8080"]
       workflow_run:

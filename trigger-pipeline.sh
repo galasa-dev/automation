@@ -54,7 +54,6 @@ Options are:
 (from the 'main' build chain)
 --automation
 --recycle-prod1
---run-tests
 --test-cli
 -p | --pipeline xxx : Set the name of pipeline to run explicitly
 
