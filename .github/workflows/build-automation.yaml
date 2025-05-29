@@ -514,7 +514,7 @@ jobs:
     if: ${{ failure() && github.event_name == 'push' && github.repository_owner == 'galasa-dev' }}
     name: Report failure in workflow
     runs-on: ubuntu-latest
-    needs: [build-gpg-image, build-kubectl-image, build-argocdcli-image, build-gitcli-image, build-openapi-image, build-swagger-image, build-openjdk17-ibm-gradle-image]
+    needs: [build-kubectl-image, build-argocdcli-image, build-gitcli-image, build-openapi-image, build-swagger-image, build-openjdk17-ibm-gradle-image]
 
     steps:
       - name: Report failure in workflow to Slack
