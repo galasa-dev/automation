@@ -35,7 +35,3 @@ spec:
     volumeMounts:
     - name: githubcreds
       mountPath: /creds
-    - name: harborcreds
-      mountPath: /harborcreds
-    - name: mavencreds
-      mountPath: /mavencreds

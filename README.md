@@ -479,17 +479,6 @@ Parameters:
 This task uses the custom [galasactl image](https://harbor.galasa.dev/harbor/projects/2/repositories/galasa-cli-ibm-amd64/artifacts-tab).
 
 
-### get-commit
-
-This task gets the latest git commit hash from the provided repository, and stores it in a location in the workspace.
-
-Parameters:
-* pipelineRunName: The name of the currently running PipelineRun, from the PipelineRun context, to find the working directory.
-* repo: The name of the GitHub repository.
-
-This task uses the custom [gitcli image](https://harbor.galasa.dev/harbor/projects/5/repositories/gitcli/artifacts-tab).
-
-
 ### git-clean
 
 This task cleans a provided subdirectory from the workspace.
@@ -531,30 +520,6 @@ Parameters:
 * action: Describes whether the pull request is opened, closed, synchronized etc.
 
 This task uses the custom [ghverify image](https://harbor.galasa.dev/harbor/projects/5/repositories/ghverify/artifacts-tab).
-
-
-### go-build
-
-This task is used to build Go code. 
-
-Parameters:
-* context: Describes the path to the Go code to build.
-* goArgs: Include the Go command to be executed such as build or install, and any other flags and arguments needed.
-* The other paramters are all environment variables which have default values and can be overwritten if necessary.
-
-This task uses the latest official [GoLang image](https://hub.docker.com/_/golang).
-
-
-### gradle-build
-
-This task executes a Gradle build. It is generic and allows for parameters to dictate the exact type of build.
-
-Parameters:
-* context: The directory where you want the Gradle build to take place (where the gradle.build file is).
-* build-args: An array used to pass any additional arguments to the Gradle build.
-* command: An array of commands to use in the build such as 'publish' and 'check'.
-
-This task uses the offical [Gradle image](https://hub.docker.com/_/gradle) from DockerHub.
 
 
 ### kaniko-builder
