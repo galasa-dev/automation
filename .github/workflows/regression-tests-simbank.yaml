@@ -15,6 +15,9 @@ jobs:
     name: Trigger 'Test SimBank' Workflow
     runs-on: ubuntu-latest
 
+    # Don't run this for forks.
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+
     steps:
     - name: Trigger 'Test SimBank' Workflow in the Simbank Repository
       env:
