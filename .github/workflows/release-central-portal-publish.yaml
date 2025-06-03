@@ -54,26 +54,18 @@ jobs:
           build-args: |
             version=${{ env.RELEASE_VERSION }}
 
-      # TEMP
-      - name: Set up temp directory
+      - name: Set up temp directory to download dev-galasa-bundle zip
         run: |
           mkdir -p temp
 
-      # TEMP
-      - name: Copy zip file from Docker image
+      - name: Copy dev-galasa-bundle zip from Docker image
         run: |
           docker run --rm \
             -v ${{ github.workspace }}/temp:/output \
             ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
             sh -c "cp /usr/local/apache2/htdocs/dev-galasa-bundle-0.42.0.zip /output/"
 
-      # TEMP 
-      - name: Verify ZIP file exists
-        run: |
-          ls -l temp
-
-      # TEMP 
-      - name: Upload zip to workflow
+      - name: Upload dev-galasa-bundle zip to workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dev-galasa-bundle-0.42.0
@@ -81,8 +73,7 @@ jobs:
 
       - name: Publish dev.galasa bundle to Central Publisher Portal
         env:
-          # PAT: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
-          PAT: ${{ secrets.JADE_MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
+          PAT: ${{ secrets.BUILDGALASA_MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
           RELEASE_VERSION: ${{ inputs.version }}
         run: |
           docker run --rm \
