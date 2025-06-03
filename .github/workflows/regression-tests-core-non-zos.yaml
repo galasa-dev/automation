@@ -18,6 +18,9 @@ jobs:
     name: Run Galasa regression tests
     runs-on: ubuntu-latest
 
+    # Don't run this for forks.
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+
     steps:
       - name: Ensure permissions for mounted /galasa directory
         run: |

@@ -16,6 +16,10 @@ env:
 jobs:
   sync-docker-proxy-cache:
     runs-on: ubuntu-latest
+
+    # Don't run this for forks.
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+
     steps:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
