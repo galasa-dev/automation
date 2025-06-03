@@ -52,7 +52,7 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 
    a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
 
-   b. If there are any failures from the regression testing, amend 29-regression-reruns.yaml to supply the correct version and argocd-synced/pipelines/regression-reruns.yaml. Add the tests that failed as shown in the example, to run them again.
+   b. If there are any failures from the regression testing, amend [29-regression-reruns.yaml](./29-regression-reruns.yaml) to supply the correct version and argocd-synced/pipelines/regression-reruns.yaml. Add the tests that failed as shown in the example, to run them again.
 
    c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
 
@@ -87,74 +87,36 @@ Once an approver has approved, you can move on.
 
 ### Deploy the Galasa artifacts to Maven Central
 
-1. Run the 30-deploy-maven-galasa.sh script - Deploys the maven artifacts to OSS Sonatype.
-
-   <!-- Temporary steps if there are issues with the 30-deploy-maven-galasa.sh script: -->
-   <!--  1. Pull the [obr-with-galasabld-executable](https://github.com/galasa-dev/galasa/pkgs/container/obr-with-galasabld-executable) image from GHCR using:
-
-      ```shell
-      docker pull ghcr.io/galasa-dev/obr-with-galasabld-executable:release
-      ```
-
-   2. Exec into the image so you can run commands from inside it by running:
-
-      ```shell
-      docker run -it --entrypoint /bin/sh ghcr.io/galasa-dev/obr-with-galasabld-executable:release
-      ```
-
-   3. When inside the image, run:
-
-      ```shell
-      cd htdocs/dev/galasa
-      ```
-
-   4. If the files maven-metadata.xml, maven-metadata.xml.md5 and maven-metadata.xml.sha1 are present, delete them:
-
-      ```shell
-      rm maven-metadata.xml
-      rm maven-metadata.xml.md5
-      rm maven-metadata.xml.sha1
-      ```
-
-   5. Go to the IBM Cloud Secrets Manager and find the sonatype-credentials secret, to use the username and password in the next step.
-   6. Navigate to the root directory in the image and then run the following command, to deploy all of the Maven artefacts we are releasing to the staging repository:
-
-      ```shell
-      galasabld maven deploy --repository https://s01.oss.sonatype.org/service/local/staging/deploy/maven2 --local /usr/local/apache2/htdocs --group dev.galasa --version <GALASA_VERSION_WE_ARE_RELEASING> --username <USERNAME> --password <PASSWORD>
-      ```
-
-   7. `exit` the image. -->
-   <!-- End of temporary steps -->
-
-2. 31-oss-sonatype-actions.md - Do the Sonatype actions detailed in this document, to check the maven artifacts are OK, and release them to maven central.
-3. 32-wait-maven.sh - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins. Kill the terminal to exit this process.
+1. Run the [30-central-publisher-portal.sh](./30-central-publisher-portal.sh) script which publishes a bundle of 'dev.galasa' artifacts to the Maven Central Publisher Portal with the Publisher API.
+1. Once the bundle reaches the portal, various validation checks will be done on the bundle. If all validation checks pass, you will have to log into the Central Publisher Portal and publish the bundle manually. Complete the steps detailed in [31-publish-to-maven-central.md](./31-publish-to-maven-central.md) to publish the bundle to Maven Central.
+3. [32-wait-maven.sh](./32-wait-maven.sh) - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins. Kill the terminal to exit this process.
 
 ### Deploy resources.galasa.dev
 
-1. Run the `33-build-resources-image.sh` script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
+1. Run the [33-build-resources-image.sh](./33-build-resources-image.sh) script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
 
 ### Deploy images to IBM Cloud Container Registry
 
-1. run 34-deploy-docker-galasa.sh - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
+1. Run [34-deploy-docker-galasa.sh](./34-deploy-docker-galasa.sh) - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
 
 ### Update external sites
 
-1. 40-production-sites.md - Follow the instructions to update the IBM Cloud Galasa external sites.
+1. [40-production-sites.md](./40-production-sites.md) - Follow the instructions to update the IBM Cloud Galasa external sites.
 
 ### Create version tag from release branch
 
-1. Run the `50-tag-github-repositories.sh` - It figures out the galasa version, then creates a version tag from all the release branches in all the repositories. So we can later delete the release branches and the tags will still be there.
+1. Run the [41-tag-github-repositories.sh](./41-tag-github-repositories.sh) - It figures out the galasa version, then creates a version tag from all the release branches in all the repositories. So we can later delete the release branches and the tags will still be there.
 The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to complete. Check if finished OK on the tekton dashboard.
 
 ### Upload built artefacts as new Releases on GitHub
 
-1. 52-deploy-cli-release.md - Follow instructions to upload the CLI binaries to the repository under a new release.
-1. 53-upload-isolated-release.md - Follow instructions to upload the Isolated and MVP zips to the repository under a new release.
+1. [42-deploy-cli-release.md](./42-deploy-cli-release.md) - Follow instructions to upload the CLI binaries to the repository under a new release.
+1. [43-upload-isolated-release.md](./43-upload-isolated-release.md) - Follow instructions to upload the Isolated and MVP zips to the repository under a new release.
 
 ### Bump to new version for development
 
-1. 95-move-to-new-version.md - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. 97-update-homebrew.md - Follow the manual steps in this file to make the new version of the CLI available for the homebrew installer.
+1. [95-move-to-new-version.md](./95-move-to-new-version.md) - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
+2. [97-update-homebrew.md](./97-update-homebrew.md) - Follow the manual steps in this file to make the new version of the CLI available for the homebrew installer.
 3. In the file `../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml` update the CPS properties to contain the new development version number:
    
    a. galasaecosystem.runtime.version
@@ -177,7 +139,7 @@ The pipeline it kicks off is called `tag-galasa-*`. Takes about a minute to comp
 
    Deliver the changes to the automation repository and the CPS properties will be applied automatically.
 
-4. If the above fails and you need to update the CPS properties manually for some reason, run the `99-update-development-version.sh` script.
+4. If the above fails and you need to update the CPS properties manually for some reason, run the [99-update-development-version.sh](./99-update-development-version.sh) script.
 
 5. Update the CPS properties for the internal integrated tests using galasactl:
 
@@ -195,7 +157,7 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
 
 ### Clean up
 
-1. Run `03-repo-branches-delete.sh` - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories.
+1. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh) - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories.
 2. (**Manual until we automate it with GitHub Actions**) Delete the images in GHCR tagged 'release':
    - obr-maven-artefacts
    - obr-generic

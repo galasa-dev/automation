@@ -7,7 +7,8 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Deploys maven artifacts to OSS Sonatype
+# Objectives: Runs a GitHub Actions workflow that uses the Publisher API to publish a
+#             dev.galasa bundle to the Maven Central Publisher Portal.
 #
 # Environment variable over-rides:
 # 
@@ -79,20 +80,11 @@ function get_galasa_version_to_be_released {
     export galasa_version
 }
 
-function deploy_maven_artifacts {
+function run_release_central_publisher_portal {
 
-    h1 "Deploying all Galasa artifacts at version ${galasa_version}"
+    h1 "Attempting to publish all dev.galasa Galasa artifacts at version ${galasa_version} to the Maven Central Publisher Portal"
 
-    version="${galasa_version}"
-
-     github_username="galasa-dev"
-
-    if [[ $? != 0 ]]; then
-        error "Failed to get the github username. $?"
-        exit 1
-    fi
-
-    workflow_dispatch=$( gh workflow run "Deploy to Staging Repository" --repo ${github_username}/automation --ref main --field version=${version})
+    workflow_dispatch=$( gh workflow run release-central-publisher-portal.yaml --repo galasa-dev/automation --ref main --field version=${galasa_version} )
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -101,50 +93,17 @@ function deploy_maven_artifacts {
 
     sleep 5
 
-    run_id=$(gh run list --repo ${github_username}/automation --workflow "Deploy to Staging Repository" --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/automation --workflow release-central-publisher-portal.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
         exit 1
     fi
 
-    echo "Workflow started with Run ID: ${run_id}"
+    success "Workflow started with Run ID: ${run_id}"
 
-    echo "Open Workflow Log at https://github.com/${github_username}/automation/actions/runs/${run_id} for more info."
-
-
-    MAX_WAIT_ITERATIONS=30
-    COUNTER=0
-
-    while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
-        echo "Waiting for workflow ${run_id} to complete..."
-        sleep 10
-        ((COUNTER++))
-        
-        status=$(gh run view "$run_id" --repo ${github_username}/automation --json conclusion --jq '.conclusion')
-
-        if [[ "$status" == "success" ]]; then
-            echo "Workflow completed successfully."
-            break
-        elif [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
-            echo "Workflow failed. Check the workflow run for more details."
-            exit 1
-        fi
-    done
-
-    if [[ $COUNTER -ge $MAX_WAIT_ITERATIONS ]]; then
-        echo "⏳ Timed out waiting for workflow ${run_id} to complete."
-        exit 1
-    fi
-
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "Failed to deploy maven artifacts. rc=$?"
-        exit 1
-    fi
-
-    success "All maven artifacts have been successfully deployed. Yay!"
+    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/automation/actions/runs/${run_id}"
 }
 
 get_galasa_version_to_be_released
-deploy_maven_artifacts
+run_release_central_publisher_portal
