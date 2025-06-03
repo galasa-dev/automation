@@ -70,11 +70,9 @@ jobs:
 
       - name: Upload dev-galasa-bundle zip to workflow artifacts
         uses: actions/upload-artifact@v4
-        env:
-          RELEASE_VERSION: ${{ inputs.version }}
         with:
-          name: dev-galasa-bundle-${{ env.RELEASE_VERSION }}
-          path: temp/dev-galasa-bundle-${{ env.RELEASE_VERSION }}.zip
+          name: dev-galasa-bundle-${{ inputs.version }}
+          path: temp/dev-galasa-bundle-${{ inputs.version }}.zip
 
       - name: Publish dev.galasa bundle to Central Publisher Portal
         env:
