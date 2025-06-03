@@ -79,19 +79,19 @@ jobs:
           name: dev-galasa-bundle-0.42.0
           path: temp/dev-galasa-bundle-0.42.0.zip
 
-      # - name: Publish dev.galasa bundle to Central Publisher Portal
-      #   env:
-      #     PAT: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
-      #     RELEASE_VERSION: ${{ inputs.version }}
-      #   run: |
-      #     docker run --rm \
-      #       --env PAT=${{ env.PAT }} \
-      #       --env RELEASE_VERSION=${{ env.RELEASE_VERSION }} \
-      #       --workdir /usr/local/apache2/htdocs \
-      #       ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
-      #       curl --request POST \
-      #       --verbose \
-      #       --header 'Authorization: Bearer ${{ env.PAT }}' \
-      #       --form bundle=@dev-galasa-${{ env.RELEASE_VERSION }}.zip \
-      #       https://central.sonatype.com/api/v1/publisher/upload
-
+      - name: Publish dev.galasa bundle to Central Publisher Portal
+        env:
+          # PAT: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
+          PAT: ${{ secrets.JADE_MAVEN_CENTRAL_PUBLISHING_PORTAL_PAT }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          docker run --rm \
+            --env PAT=${{ env.PAT }} \
+            --env RELEASE_VERSION=${{ env.RELEASE_VERSION }} \
+            --workdir /usr/local/apache2/htdocs \
+            ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
+            curl --request POST \
+            --verbose \
+            --header 'Authorization: Bearer ${{ env.PAT }}' \
+            --form bundle=@dev-galasa-${{ env.RELEASE_VERSION }}.zip \
+            https://central.sonatype.com/api/v1/publisher/upload?publishType=USER_MANAGED
