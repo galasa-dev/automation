@@ -59,17 +59,22 @@ jobs:
           mkdir -p temp
 
       - name: Copy dev-galasa-bundle zip from Docker image
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
         run: |
           docker run --rm \
+            --env RELEASE_VERSION=${{ env.RELEASE_VERSION }} \
             -v ${{ github.workspace }}/temp:/output \
             ghcr.io/${{ env.NAMESPACE }}/dev-galasa-bundler:${{ env.BRANCH }} \
-            sh -c "cp /usr/local/apache2/htdocs/dev-galasa-bundle-0.42.0.zip /output/"
+            sh -c "cp /usr/local/apache2/htdocs/dev-galasa-bundle-${{ env.RELEASE_VERSION }}.zip /output/"
 
       - name: Upload dev-galasa-bundle zip to workflow artifacts
         uses: actions/upload-artifact@v4
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
         with:
-          name: dev-galasa-bundle-0.42.0
-          path: temp/dev-galasa-bundle-0.42.0.zip
+          name: dev-galasa-bundle-${{ env.RELEASE_VERSION }}
+          path: temp/dev-galasa-bundle-${{ env.RELEASE_VERSION }}.zip
 
       - name: Publish dev.galasa bundle to Central Publisher Portal
         env:
