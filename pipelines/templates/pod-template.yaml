@@ -8,12 +8,22 @@
 # Includes all needed secrets
 
 volumes:
+# Used to provide a gradle.properties file to the Task gradle-build that
+# contains signing.keyId, signing.password and signing.secretKeyRingFile values.
 - name: gradle-properties
   secret:
     secretName: gradle-properties
+# Used to provide a GPG key payload to the Task gradle-build.
 - name: gpg-key
   secret:
     secretName: gpg-key
+# Used to provide a githubcreds.yaml file to `galasabld` with a GitHub username
+# and Personal Access Token to use when communicating with the GitHub API.
 - name: githubcreds
   secret:
     secretName: github-token
+# Used to provide a cps.properties and credentials.properties file that contains
+# secret information from Vault, to the Pipeline cicsts-isolated-tests.
+- name: test-cps-and-creds
+  secret:
+    secretName: test-cps-and-creds
