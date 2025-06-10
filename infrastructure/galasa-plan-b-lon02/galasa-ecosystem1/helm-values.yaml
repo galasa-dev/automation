@@ -427,7 +427,7 @@ metrics:
 testPod:
   memory:
     # All values are integers, in units of 'Mi'
-    heap: 50
+    heap: 450
     min: 400
     max: 800
   cpu:
