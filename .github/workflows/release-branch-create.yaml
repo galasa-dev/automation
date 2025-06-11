@@ -27,7 +27,7 @@ jobs:
   branch-create:
     strategy:
       matrix:
-        repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']
+        repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform', 'galasa-docs-preview', 'galasa-docs']
     runs-on: ubuntu-latest
     steps:
       - name: Clone branch ${{ matrix.repo }}
