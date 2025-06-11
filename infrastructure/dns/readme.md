@@ -24,7 +24,7 @@ These are the settings currently held in the DNS table currently.
 | A | harbor.galasa.dev | 169.50.192.70 | old. Can be deleted. |
 | A | harbor-b.galasa.dev | 169.50.192.70 | old. Can be deleted. |
 | A | hobbit.galasa.dev | 169.50.192.70 | old. Can be deleted. |
-| A | javadoc.galasa.dev | 169.50.192.70 ||
+| A | javadoc.galasa.dev | URL redirect to https://galasa.dev/docs/reference/javadoc/ | |
 | A | javadoc-snapshot.galasa.dev | 169.50.192.70 ||
 | A | nexus.galasa.dev | 169.50.192.70 | old. Can be deleted |
 | A | nexus-planb.galasa.dev | 169.50.192.70 | old. Can be deleted |
