@@ -59,6 +59,26 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 
 mkdir -p temp
 
+function ask_user_for_release_type {
+    PS3="Select the type of release process please: "
+    select lng in release pre-release
+    do
+        case $lng in
+            "release")
+                export release_type="release"
+                break
+                ;;
+            "pre-release")
+                export release_type="prerelease"
+                break
+                ;;
+            *)
+            echo "Unrecognised input.";;
+        esac
+    done
+    echo "Chosen type of release process: ${release_type}"
+}
+
 function run_simbank_ivts {
 
     info "Running Test Simbank in GitHub Actions"
@@ -84,3 +104,6 @@ function run_simbank_ivts {
     bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/simplatform/actions/runs/${run_id}"
 
 }
+
+ask_user_for_release_type
+run_simbank_ivts

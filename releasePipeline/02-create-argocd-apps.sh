@@ -61,7 +61,8 @@ function create_maven_repos {
                     --helm-set isolated.deploy=true \
                     --helm-set mvp.branch=${release_type} \
                     --helm-set mvp.imageTag=${release_type} \
-                    --helm-set mvp.deploy=true 
+                    --helm-set mvp.deploy=true \
+                    --grpc-web
 }
 
 function create_bld {   
@@ -76,7 +77,8 @@ function create_bld {
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --helm-set branch=${release_type} \
-                    --helm-set imageTag=${release_type}
+                    --helm-set imageTag=${release_type} \
+                    --grpc-web
 }
 
 function create_cli {   
@@ -91,7 +93,8 @@ function create_cli {
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --helm-set branch=${release_type} \
-                    --helm-set imageTag=${release_type}
+                    --helm-set imageTag=${release_type} \
+                    --grpc-web
 }
 
 function create_simplatform {   
@@ -106,7 +109,8 @@ function create_simplatform {
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --helm-set branch=${release_type} \
-                    --helm-set imageTag=${release_type}
+                    --helm-set imageTag=${release_type} \
+                    --grpc-web
 }
 
 # checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions

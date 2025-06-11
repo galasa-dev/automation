@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Run Core IVTs in ecosystem1.
+# Objectives: Run Core, Artifact and Simbank tests in GitHub with just the Isolated/MVP.
 #
 # Environment variable over-rides:
 # 
@@ -59,11 +59,31 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 
 mkdir -p temp
 
-function run_core_ivts {
+function ask_user_for_release_type {
+    PS3="Select the type of release process please: "
+    select lng in release pre-release
+    do
+        case $lng in
+            "release")
+                export release_type="release"
+                break
+                ;;
+            "pre-release")
+                export release_type="prerelease"
+                break
+                ;;
+            *)
+            echo "Unrecognised input.";;
+        esac
+    done
+    echo "Chosen type of release process: ${release_type}"
+}
 
-    info "Running 'Galasa Core Regression Tests (non z/OS)' in GitHub Actions"
+function run_isolated_tests {
 
-    workflow_dispatch=$( gh workflow run regression-tests-core-non-zos.yaml --repo galasa-dev/automation --ref ${release_type} )
+    info "Running Test Isolated and MVP in GitHub Actions"
+
+    workflow_dispatch=$( gh workflow run test.yaml --repo galasa-dev/isolated --ref ${release_type} )
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -72,15 +92,18 @@ function run_core_ivts {
 
     sleep 5
 
-    run_id=$(gh run list --repo galasa-dev/automation --workflow regression-tests-core-non-zos.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/isolated --workflow test.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
         exit 1
     fi
 
-    success "'Galasa Core Regression Tests (non z/OS)' workflow started with Run ID: ${run_id}"
+    success "Test Isolated and MVP workflow started with Run ID: ${run_id}"
     
-    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/automation/actions/runs/${run_id}"
+    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/isolated/actions/runs/${run_id}"
 
 }
+
+ask_user_for_release_type
+run_isolated_tests

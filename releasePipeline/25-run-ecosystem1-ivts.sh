@@ -7,8 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Runs a GitHub Actions workflow that uses the Publisher API to publish a
-#             dev.galasa bundle to the Maven Central Publisher Portal.
+# Objectives: Run Core IVTs in ecosystem1.
 #
 # Environment variable over-rides:
 # 
@@ -56,35 +55,35 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 
 #-----------------------------------------------------------------------------------------                   
 # Main logic.
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------   
 
 mkdir -p temp
 
-export release_type="release"
-
-function get_galasa_version_to_be_released {
-    h1 "Working out the version of Galasa to test and release."
-
-    url="https://development.galasa.dev/main/maven-repo/obr/dev/galasa/dev.galasa.uber.obr/"
-    curl $url > temp/galasa-version.txt -s
-    rc=$?; 
-    if [[ "${rc}" != "0" ]]; then 
-      error "Failed to get galasa version"
-      exit 1
-    fi
-
-    # Note: We take the 2nd line which has an "<a href" string on... hopefully it won't change...
-    galasa_version=$(cat temp/galasa-version.txt | grep '<a * href=\"[0-9]*\.[0-9]*\.[0-9]*\/\"' | cut -f2 -d'"' | cut -f1 -d'/')
-
-    success "Galasa version to be tested and released is ${galasa_version}"
-    export galasa_version
+function ask_user_for_release_type {
+    PS3="Select the type of release process please: "
+    select lng in release pre-release
+    do
+        case $lng in
+            "release")
+                export release_type="release"
+                break
+                ;;
+            "pre-release")
+                export release_type="prerelease"
+                break
+                ;;
+            *)
+            echo "Unrecognised input.";;
+        esac
+    done
+    echo "Chosen type of release process: ${release_type}"
 }
 
-function run_release_central_publisher_portal {
+function run_core_ivts {
 
-    h1 "Attempting to publish all dev.galasa Galasa artifacts at version ${galasa_version} to the Maven Central Publisher Portal"
+    info "Running 'Galasa Core Regression Tests (non z/OS)' in GitHub Actions"
 
-    workflow_dispatch=$( gh workflow run release-central-publisher-portal.yaml --repo galasa-dev/automation --ref main --field version=${galasa_version} )
+    workflow_dispatch=$( gh workflow run regression-tests-core-non-zos.yaml --repo galasa-dev/automation --ref ${release_type} )
 
     if [[ $? != 0 ]]; then
         error "Failed to call the workflow. $?"
@@ -93,17 +92,18 @@ function run_release_central_publisher_portal {
 
     sleep 5
 
-    run_id=$(gh run list --repo galasa-dev/automation --workflow release-central-publisher-portal.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
+    run_id=$(gh run list --repo galasa-dev/automation --workflow regression-tests-core-non-zos.yaml --limit 1 --json  databaseId --jq '.[0].databaseId')
 
     if [[ $? != 0 ]]; then
         error "Failed to get the workflow run_id. $?"
         exit 1
     fi
 
-    success "Workflow started with Run ID: ${run_id}"
-
+    success "'Galasa Core Regression Tests (non z/OS)' workflow started with Run ID: ${run_id}"
+    
     bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/automation/actions/runs/${run_id}"
+
 }
 
-get_galasa_version_to_be_released
-run_release_central_publisher_portal
+ask_user_for_release_type
+run_core_ivts

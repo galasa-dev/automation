@@ -19,7 +19,7 @@ jobs:
   branch-tag:
     strategy:
       matrix:
-        repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform']
+        repo: ['automation', 'galasa', 'isolated', 'helm', 'webui', 'simplatform', 'galasa-docs-preview', 'galasa-docs']
     runs-on: ubuntu-latest
     steps:
       - name: Tag branch ${{ matrix.repo }}
