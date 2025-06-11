@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Run CICS and z/OS IVTs in prod1.
+# Objectives: Run CICS tests with the Isolated zip.
 #
 # Environment variable over-rides:
 # 
@@ -107,39 +107,43 @@ function get_current_boot_version {
 }
 
 
-function run_ivts_prod1 {
-    h1 "Trying to kick off CICS and z/OS IVTs on prod1..."
+function run_cics_isolated {
+    h1 "Trying to kick off CICS tests with the Isolated zip..."
 
-    yaml_file="run_ivts_prod1.yaml"
+    yaml_file="run_cics_isolated.yaml"
 
     rm -f temp/${yaml_file}
     cat << EOF > temp/${yaml_file}
 #
 # Copyright contributors to the Galasa project 
 #
-kind: PipelineRun
 apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
 metadata:
-  generateName: run-ivts-prod1-
+  generateName: run-cicsts-isolated-tests-
+  namespace: galasa-build
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
-#
 spec:
-  params:
-  - name: distBranch
-    value: release
-  - name: version
-    value: "${galasa_version}"
-  - name: bootVersion
-    value: "${boot_version}"
-#
-#
-#
   pipelineRef:
-    name: run-ivts-prod1
-
-
+    name: cicsts-isolated-tests
+  serviceAccountName: galasa-build-bot
+  podTemplate:
+    volumes:
+    - name: test-cps-and-creds
+      secret:
+        secretName: test-cps-and-creds
+  workspaces:
+  - name: git-workspace
+    volumeClaimTemplate:
+      spec:
+        storageClassName: longhorn-temp
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
 EOF
 
     output=$(kubectl -n galasa-build create -f temp/${yaml_file})
@@ -147,13 +151,13 @@ EOF
     # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
     rc=$?
     if [[ "${rc}" != "0" ]]; then
-        error "Failed to run ivts on prod1. rc=$?"
+        error "Failed to run CICS isolated tests. rc=$?"
         exit 1
     fi
     info "kubectl create pipeline run output: $output"
 
 
-    success "run-ivts-prod1 kicked off."
+    success "cicsts-isolated-tests kicked off."
     bold "Now use the Tekton dashboard to monitor it to see that they all work."
     note "If any fail, you will need to re-run these tests."
 }
@@ -161,4 +165,4 @@ EOF
 set_kubernetes_context
 get_galasa_version_to_be_released
 get_current_boot_version
-run_ivts_prod1
+run_cics_isolated
