@@ -35,6 +35,9 @@ jobs:
           ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
           rm -rf /galasa/*
 
+      # Only include the non-zos tests that can run on ecosystem1.
+      # This currently excludes the `dev.galasa.ivts.docker` and `dev.galasa.ivts.compilation` tests
+      # as they require a remote Docker engine to be available.
       - name: Prepare test portfolio for 'ivts' test stream
         env:
           GALASA_HOME: /galasa
