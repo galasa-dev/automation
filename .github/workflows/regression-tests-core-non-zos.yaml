@@ -49,7 +49,9 @@ jobs:
           galasactl runs prepare \
           --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
           --stream ivts \
-          --bundle dev.galasa.ivts \
+          --package artifact \
+          --package core \
+          --package http \
           --portfolio /galasa/tests.yaml \
           --log -
 
