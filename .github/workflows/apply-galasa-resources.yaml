@@ -20,6 +20,9 @@ jobs:
     name: Apply Galasa resources YAML file
     runs-on: ubuntu-latest
 
+    # Don't run this job for forks.
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+
     steps:
       - name: Checkout Galasa resources file
         uses: actions/checkout@v4
