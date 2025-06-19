@@ -1,0 +1,37 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# The Galasa resources defined in this file are applied to the 'ecosystem1' service.
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.description
+data:
+    value: Galasa IVTs
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.location
+data:
+    value: https://development.galasa.dev/main/maven-repo/ivts/dev/galasa/dev.galasa.ivts.obr/0.43.0/dev.galasa.ivts.obr-0.43.0-testcatalog.json
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.obr
+data:
+    value: mvn:dev.galasa/dev.galasa.ivts.obr/0.43.0/obr
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.ivts.repo
+data:
+    value: https://development.galasa.dev/main/maven-repo/ivts/
