@@ -35,3 +35,14 @@ metadata:
     name: test.stream.ivts.repo
 data:
     value: https://development.galasa.dev/main/maven-repo/ivts/
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: service
+    name: welcome.markdown
+data:
+    value: |-
+        # Welcome to your Galasa service
+        To Make the most of your Galasa experience, please refer to the [Galasa documentation](https://galasa.dev/)
+        ![image](https://raw.githubusercontent.com/galasa-dev/webui/ee5cf521ebb392079b3d672c78ad2da128d8fef9/galasa-ui/public/static/homeGraphic.svg)
