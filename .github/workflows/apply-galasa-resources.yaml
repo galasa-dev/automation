@@ -1,0 +1,62 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Apply Galasa Resources for 'ecosystem1'
+
+on:
+  push:
+    branches: 
+      - 'main'
+
+env:
+  NAMESPACE: ${{ github.repository_owner }}
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  # This workflow applies the Galasa resources YAML file used by the 'ecosystem1' Galasa service.
+  apply-galasa-resources:
+    name: Apply Galasa resources YAML file
+    runs-on: ubuntu-latest
+
+    # Don't run this job for forks.
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+
+    steps:
+      - name: Checkout Galasa resources file
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Ensure permissions for mounted /galasa directory
+        run: |
+          sudo mkdir -p ${{ github.workspace }}/galasa
+          sudo chown -R 999:999 ${{ github.workspace }}/galasa
+
+      - name: Clean /galasa workspace in CLI image
+        run: |
+          docker run --rm \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          rm -rf /galasa/*
+
+      - name: Run the 'galasactl resources apply' command
+        env:
+          GALASA_HOME: /galasa
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+        run: |
+          docker run --rm \
+          --env GALASA_HOME=${{ env.GALASA_HOME }} \
+          --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml:/var/workspace/galasa-ecosystem1-resources.yaml \
+          -v ${{ github.workspace }}/galasa:/galasa:rw \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          galasactl resources apply \
+          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
+          --file /var/workspace/galasa-ecosystem1-resources.yaml \
+          --log -
