@@ -7,10 +7,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: run-cicsts-and-base-zos-tests
+  name: regression-test-docker
   namespace: galasa-dev
 spec:
-  schedule: 0 6 * * * # Daily at 06:00
+  schedule: 0 5 * * * # Daily at 05:00
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
@@ -49,6 +49,38 @@ spec:
             - mountPath: /galasa
               name: static-files
 
+          - name: run-prepare
+            command:
+            - galasactl
+            - runs
+            - prepare
+            - --bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+            - --portfolio
+            - /galasa/tests.yaml
+            - --stream
+            - inttests
+            - --test
+            - local.DockerLocalJava11Ubuntu
+            - --log
+            - '-'
+            image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
+            imagePullPolicy: IfNotPresent
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            env:
+            - name: GALASA_HOME
+              value: /galasa
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+
           - name: run-submit
             command:
             - galasactl
@@ -56,38 +88,22 @@ spec:
             - submit
             - --bootstrap
             - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
-            - --stream
-            - ivts
-            # Overrides the current CPS property which says to use SEM.
-            - --override
-            - cicsts.provision.type=dse
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cicsts.CICSTSManagerIVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cemt.CEMTManagerIVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceda.CedaManagerIVT
-            # Currently not set up - will add in when it is...
-            # - --class
-            # - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceci.CECIManagerIVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos3270.Zos3270IVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerIVT
-            - --class
-            - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerTSOCommandIVT
+            - --portfolio
+            - /galasa/tests.yaml
             - --throttle
             - "10"
+            - --throttlefile
+            - throttle
             - --poll
             - "10"
-            - --progress 
+            - --progress
             - "1"
             - --trace
             - --reportjson
             - /galasa/test.json
             - --noexitcodeontestfailures
             - --log
-            - "-"
+            - '-'
             image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
             imagePullPolicy: IfNotPresent
             resources: {}
@@ -108,10 +124,18 @@ spec:
           containers:
           - name: submit-report
             command:
-            - "/bin/sh"
-            - "-c"
-            - |
-              galasabld slackpost tests --path /galasa/test.json --name="CICS and basic z/OS - prod1" --desc="All CICS TS, 3270, z/OS Manager, TSO" --hook $(HOOK)
+            - galasabld
+            - slackpost
+            - tests
+            - --path
+            - /galasa/test.json
+            - --name
+            - "Docker - prod1"
+            - --desc
+            - "DockerManagerIVT running in the DKRENGINE01"
+            - --hook
+            args:
+            - $(HOOK)
             env:
             - name: HOOK
               valueFrom:
