@@ -10,7 +10,7 @@ metadata:
   name: regression-test-docker
   namespace: galasa-dev
 spec:
-  schedule: 0 5 * * * # Daily at 05:00
+  schedule: 5 5 * * * # Daily at 05:05
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
