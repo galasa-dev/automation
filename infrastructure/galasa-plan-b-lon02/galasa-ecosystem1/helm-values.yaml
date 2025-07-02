@@ -373,6 +373,9 @@ webui:
 # The engine controller receives requests to start tests, and starts pods in which
 # the tests run.
 enginecontroller:
+  # Maximum number a run will re-try to create a test pod.
+  maxPodRetryLimit: 5
+  
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
   # This default is suitable for a lightly loaded Galasa service:
