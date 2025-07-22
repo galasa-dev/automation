@@ -52,10 +52,9 @@ jobs:
         run: |
           helm install main-ecosystem ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{ github.workspace }}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
 
-      # Commenting out for now as the validate-ecosystem Job will fail due to recent changes.
-      # - name: Test ecosystem1
-      #   run: |
-      #     helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
+      - name: Test ecosystem1
+        run: |
+          helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
 
   trigger-next-workflow:
     # Skip this job for forks
