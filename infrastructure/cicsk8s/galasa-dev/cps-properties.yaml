@@ -21,7 +21,7 @@ metadata:
     namespace: framework
     name: test.stream.ivts.location
 data:
-    value: https://development.galasa.dev/main/maven-repo/ivts/dev/galasa/dev.galasa.ivts.obr/0.43.0/dev.galasa.ivts.obr-0.43.0-testcatalog.json
+    value: https://development.galasa.dev/main/maven-repo/ivts/dev/galasa/dev.galasa.ivts.obr/0.44.0/dev.galasa.ivts.obr-0.44.0-testcatalog.json
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -29,7 +29,7 @@ metadata:
     namespace: framework
     name: test.stream.ivts.obr
 data:
-    value: mvn:dev.galasa/dev.galasa.ivts.obr/0.43.0/obr
+    value: mvn:dev.galasa/dev.galasa.ivts.obr/0.44.0/obr
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -45,7 +45,7 @@ metadata:
     namespace: framework
     name: test.stream.inttests.location
 data:
-    value: https://development.galasa.dev/main/maven-repo/inttests/dev/galasa/dev.galasa.inttests.obr/0.43.0/dev.galasa.inttests.obr-0.43.0-testcatalog.json
+    value: https://development.galasa.dev/main/maven-repo/inttests/dev/galasa/dev.galasa.inttests.obr/0.44.0/dev.galasa.inttests.obr-0.44.0-testcatalog.json
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -53,7 +53,7 @@ metadata:
     namespace: framework
     name: test.stream.inttests.obr
 data:
-    value: mvn:dev.galasa/dev.galasa.inttests.obr/0.43.0/obr 
+    value: mvn:dev.galasa/dev.galasa.inttests.obr/0.44.0/obr 
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -190,7 +190,7 @@ metadata:
     namespace: galasaecosystem
     name: isolated.full.zip
 data:
-    value: https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.43.0/galasa-isolated-0.43.0.zip
+    value: https://development.galasa.dev/main/maven-repo/isolated/dev/galasa/galasa-isolated/0.44.0/galasa-isolated-0.44.0.zip
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -198,7 +198,7 @@ metadata:
     namespace: galasaecosystem
     name: isolated.mvp.zip
 data:
-    value: https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/0.43.0/galasa-isolated-mvp-0.43.0.zip
+    value: https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp/0.44.0/galasa-isolated-mvp-0.44.0.zip
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -230,7 +230,7 @@ metadata:
     namespace: galasaecosystem
     name: galasaboot.version
 data:
-    value: 0.43.0
+    value: 0.44.0
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -254,7 +254,7 @@ metadata:
     namespace: galasaecosystem
     name: runtime.version
 data:
-    value: 0.43.0
+    value: 0.44.0
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -262,7 +262,7 @@ metadata:
     namespace: galasaecosystem
     name: simbanktests.version
 data:
-    value: 0.43.0
+    value: 0.44.0
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -278,4 +278,4 @@ metadata:
     namespace: galasaecosystem
     name: simplatform.version
 data:
-    value: 0.43.0
+    value: 0.44.0
