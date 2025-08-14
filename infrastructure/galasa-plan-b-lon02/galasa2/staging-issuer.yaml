@@ -1,0 +1,27 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# This is a namespaced Issuer resource that requests certificates to be issued from the Let's Encrypt
+# staging issuer. The staging issuer should be used for development and testing purposes only.
+# Use the letsencrypt-prod issuer for production use.
+# 
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # The ACME certificate profile
+    profile: tlsserver
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx

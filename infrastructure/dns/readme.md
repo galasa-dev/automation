@@ -19,6 +19,7 @@ These are the settings currently held in the DNS table currently.
 | A | copyright.galasa.dev | 169.50.192.70 ||
 | A | development.galasa.dev | 169.50.192.70 ||
 | A | dex.galasa.dev | 169.50.192.70 | What is this one ? |
+| A | galasa2.galasa.dev | 169.50.192.66 | Created to try out cert-manager for a Galasa service. Maps to the IP of the ingress-nginx-controller LoadBalancer in the ingress-nginx namespace |
 | A | galasa-ecosystem1.galasa.dev | 169.50.192.70 ||
 | A | hobbit.galasa.dev | 169.50.192.70 | old. Can be deleted. |
 | A | javadoc.galasa.dev | URL redirect to https://galasa.dev/docs/reference/javadoc/ | |
