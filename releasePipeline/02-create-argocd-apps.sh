@@ -12,7 +12,14 @@
 # Environment variable over-rides:
 # 
 #-----------------------------------------------------------------------------------------                   
-
+function usage {
+    info "Syntax: 02-create-argocd-apps.sh [OPTIONS]"
+    cat << EOF
+Options are:
+--prerelease : Creates the ArgoCD apps for a Galasa pre-release.
+--release : Creates the ArgoCD apps for a Galasa release.
+EOF
+}
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -113,12 +120,34 @@ function create_simplatform {
                     --grpc-web
 }
 
-# checks if it's been called by 01-run-pre-release.sh, if it isn't run all functions
-if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
+#-----------------------------------------------------------------------------------------
+# Process parameters
+#-----------------------------------------------------------------------------------------
+release_type=""
+while [ "$1" != "" ]; do
+    case $1 in
+        --prerelease )          release_type="prerelease"
+                                ;;
+        --release )             release_type="release"
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     error "Unexpected argument $1"
+                                usage
+                                exit 1
+    esac
+    shift
+done
+
+# ------------------------------------------------------------------------
+# Main logic
+# ------------------------------------------------------------------------
+if [[ -z "${release_type}" ]]; then
     ask_user_for_release_type
-    set -e
-    create_maven_repos
-    create_bld
-    create_cli
-    create_simplatform
 fi
+
+create_maven_repos
+create_bld
+create_cli
+create_simplatform

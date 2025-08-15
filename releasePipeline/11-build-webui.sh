@@ -55,10 +55,16 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 
 
 #-----------------------------------------------------------------------------------------                   
-# Main logic.
+# Functions
 #-----------------------------------------------------------------------------------------                   
-
-mkdir -p temp
+function usage {
+    info "Syntax: 11-build-webui.sh [OPTIONS]"
+    cat << EOF
+Options are:
+--prerelease : Builds the Galasa web UI for a pre-release.
+--release : Builds the Galasa web UI for a release.
+EOF
+}
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -107,7 +113,32 @@ function build_webui {
 
 }
 
-if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
-  ask_user_for_release_type
-  build_webui
+#-----------------------------------------------------------------------------------------
+# Process parameters
+#-----------------------------------------------------------------------------------------
+release_type=""
+while [ "$1" != "" ]; do
+    case $1 in
+        --prerelease )          release_type="prerelease"
+                                ;;
+        --release )             release_type="release"
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     error "Unexpected argument $1"
+                                usage
+                                exit 1
+    esac
+    shift
+done
+
+# ------------------------------------------------------------------------
+# Main program logic
+# ------------------------------------------------------------------------
+mkdir -p temp
+if [[ -z "${release_type}" ]]; then
+    ask_user_for_release_type
 fi
+
+build_webui

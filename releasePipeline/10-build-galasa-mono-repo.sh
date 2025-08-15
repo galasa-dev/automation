@@ -54,10 +54,18 @@ bold() { printf "${bold}%s${reset}\n" "$@" ;}
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 #-----------------------------------------------------------------------------------------                   
-# Main logic.
+# Functions
 #-----------------------------------------------------------------------------------------                   
 
-mkdir -p temp
+function usage {
+    info "Syntax: 10-build-galasa-mono-repo.sh [OPTIONS]"
+    cat << EOF
+Options are:
+--prerelease : Builds the Galasa mono repo for a pre-release.
+--release : Builds the Galasa mono repo for a release.
+--wait : Waits for the GitHub Actions workflow to finish before exiting.
+EOF
+}
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -101,12 +109,71 @@ function build_galasa_mono_repo {
     fi
 
     success "Release Build Orchestrator started with Run ID: ${run_id}"
-    
-    bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/galasa/actions/runs/${run_id}"
 
+    if [[ "${is_wait_requested}" == "true" ]]; then
+        wait_for_workflow "${run_id}"
+    else
+        bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/galasa/actions/runs/${run_id}"
+    fi
 }
 
-if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
-  ask_user_for_release_type
-  build_galasa_mono_repo
+function wait_for_workflow {
+    run_id=$1
+
+    MAX_WAIT_ITERATIONS=50
+    COUNTER=0
+
+    while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
+        echo "Waiting 10 minutes for workflow ${run_id} to complete..."
+        sleep 600
+        ((COUNTER++))
+        
+        status=$(gh run view "$run_id" --repo galasa-dev/galasa --json conclusion --jq '.conclusion')
+
+        if [[ "$status" == "success" ]]; then
+            echo "Workflow completed successfully."
+            break
+        elif [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
+            echo "Workflow failed. Check the workflow run for more details."
+            exit 1
+        fi
+    done
+
+    if [[ $COUNTER -ge $MAX_WAIT_ITERATIONS ]]; then
+        echo "⏳ Timed out waiting for workflow ${run_id} to complete."
+        exit 1
+    fi
+}
+
+#-----------------------------------------------------------------------------------------
+# Process parameters
+#-----------------------------------------------------------------------------------------
+is_wait_requested=""
+release_type=""
+while [ "$1" != "" ]; do
+    case $1 in
+        --prerelease )          release_type="prerelease"
+                                ;;
+        --release )             release_type="release"
+                                ;;
+        --wait )                is_wait_requested="true"
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     error "Unexpected argument $1"
+                                usage
+                                exit 1
+    esac
+    shift
+done
+
+# ------------------------------------------------------------------------
+# Main logic
+# ------------------------------------------------------------------------
+mkdir -p temp
+if [[ -z "${release_type}" ]]; then
+    ask_user_for_release_type
 fi
+
+build_galasa_mono_repo

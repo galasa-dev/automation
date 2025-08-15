@@ -17,8 +17,6 @@
 RELEASE_BASEDIR=$(dirname "$0");pushd $RELEASE_BASEDIR 2>&1 >> /dev/null ;RELEASE_BASEDIR=$(pwd);popd 2>&1 >> /dev/null
 export ORIGINAL_DIR=$(pwd)
 cd "${RELEASE_BASEDIR}"
-CALLED_BY_PRERELEASE="true"
-export release_type="prerelease" 
 
 #--------------------------------------------------------------------------
 #
@@ -54,48 +52,27 @@ note()      { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset
 #-----------------------------------------------------------------------------------------                   
 # Main Program
 #-----------------------------------------------------------------------------------------   
-function load_script {
-    cd ${RELEASE_BASEDIR}
-    script_path="$1"
-
-    source "${script_path}"
-}
-
 set -e
 
-load_script $RELEASE_BASEDIR/02-create-argocd-apps.sh
 h1 "run 02-create-argocd-apps.sh"
-create_maven_repos
-create_cli
+$RELEASE_BASEDIR/02-create-argocd-apps.sh --prerelease
 
-load_script $RELEASE_BASEDIR/03-repo-branches-delete.sh
 h1 "run 03-repo-branches-delete.sh"
-set_kubernetes_context
-delete_branches
+$RELEASE_BASEDIR/03-repo-branches-delete.sh --prerelease
 
-load_script $RELEASE_BASEDIR/04-repo-branches-create.sh
 h1 "run 04-repo-branches-create.sh"
-set_kubernetes_context
-create_branches
+$RELEASE_BASEDIR/04-repo-branches-create.sh --prerelease
 
-load_script $RELEASE_BASEDIR/05-helm-charts.sh
 h1 "run 05-helm-charts.sh"
-get_galasa_version_to_be_released
-clone_helm_repository
-get_helm_charts
-check_helm_charts_released
-delete_pre_release_helm_charts
+$RELEASE_BASEDIR/05-helm-charts.sh --prerelease
 
-load_script $RELEASE_BASEDIR/20-build-all-code.sh
-h1 "run 20-build-all-code.sh"
-ask_user_for_release_type
-set_kubernetes_context
-build_all_code
+h1 "run 10-build-galasa-mono-repo.sh"
+$RELEASE_BASEDIR/10-build-galasa-mono-repo.sh --prerelease --wait
 
 # This will need to be removed once the webui is built as part of the main build chain
 # (see https://github.com/galasa-dev/projectmanagement/issues/1960)
-load_script $RELEASE_BASEDIR/21-build-webui.sh
-h1 "run 21-build-webui.sh"
-ask_user_for_release_type
-set_kubernetes_context
-build_webui
+h1 "run 11-build-webui.sh"
+$RELEASE_BASEDIR/11-build-webui.sh --prerelease
+
+h1 "run 20-check-artifacts-signed.sh"
+$RELEASE_BASEDIR/20-check-artifacts-signed.sh
