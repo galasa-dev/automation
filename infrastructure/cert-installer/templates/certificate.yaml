@@ -1,0 +1,22 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-cert
+spec:
+  secretName: {{ .Release.Name }}-secret
+  dnsNames:
+    {{- with .Values.dnsNames }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  issuerRef:
+    kind: Issuer
+  {{- if .Values.useIssuerProductionUrl }}
+    name: {{ .Release.Name }}-letsencrypt-prod
+  {{- else }}
+    name: {{ .Release.Name }}-letsencrypt-staging
+  {{- end }}
