@@ -76,7 +76,7 @@ ingress:
   tls:
     - hosts:
       - "galasa-ecosystem1.galasa.dev"
-      secretName: galasa-wildcard-cert
+      secretName: ecosystem1-tls-secret
 
   # The name of the Secret containing root and intermediate CA certificates in a single .pem file
   caCertSecretName: ""
