@@ -54,9 +54,17 @@ bold() { printf "${bold}%s${reset}\n" "$@" ;}
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 #-----------------------------------------------------------------------------------------                   
-# Main logic.
+# Functions
 #-----------------------------------------------------------------------------------------                   
 
+function usage {
+    info "Syntax: 04-repo-branches-create.sh [OPTIONS]"
+    cat << EOF
+Options are:
+--prerelease : Creates pre-release branches in the galasa-dev repositories.
+--release : Creates release branches in the galasa-dev repositories.
+EOF
+}
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -142,7 +150,31 @@ function create_branches {
 
 }
 
-if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
+#-----------------------------------------------------------------------------------------
+# Process parameters
+#-----------------------------------------------------------------------------------------
+release_type=""
+while [ "$1" != "" ]; do
+    case $1 in
+        --prerelease )          release_type="prerelease"
+                                ;;
+        --release )             release_type="release"
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     error "Unexpected argument $1"
+                                usage
+                                exit 1
+    esac
+    shift
+done
+
+# ------------------------------------------------------------------------
+# Main logic
+# ------------------------------------------------------------------------
+if [[ -z "${release_type}" ]]; then
     ask_user_for_release_type
-    create_branches
 fi
+
+create_branches

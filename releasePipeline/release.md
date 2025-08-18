@@ -147,7 +147,7 @@ Once an approver has approved, you can move on.
 ### Bump to new version for development
 
 1. [95-move-to-new-version.md](./95-move-to-new-version.md) - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. In the file `../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml` update all CPS properties that contain the just released version to contain the new development version number. Deliver the changes to the automation repository and the CPS properties will be applied automatically.
+2. Run the [set-version.sh](./set-version.sh) script which updates all CPS properties in the [`../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`](../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file that contain the version that was just released to the new development version. Deliver the changes to the automation repository and the CPS properties will be applied automatically.
 
 3. If the above fails and you need to update the CPS properties manually for some reason, run the [99-update-development-version.sh](./99-update-development-version.sh) script.
 
@@ -167,7 +167,7 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
 
 ### Clean up
 
-1. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh) - Say you are doing a 'release' when it asks. That Deletes the 'release' branch in the GitHub repositories.
+1. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh) - Say you are doing a 'release' when it asks. That deletes the 'release' branch in the GitHub repositories.
 2. (**Manual until we automate it with GitHub Actions**) Delete the images in GHCR tagged 'release':
    - obr-maven-artefacts
    - obr-generic

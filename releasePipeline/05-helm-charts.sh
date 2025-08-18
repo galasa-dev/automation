@@ -54,11 +54,17 @@ bold() { printf "${bold}%s${reset}\n" "$@" ;}
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
 #-----------------------------------------------------------------------------------------                   
-# Main logic.
+# Functions
 #-----------------------------------------------------------------------------------------   
 
-mkdir -p ${WORKSPACE_DIR}/temp
-
+function usage {
+    info "Syntax: 05-helm-charts.sh [OPTIONS]"
+    cat << EOF
+Options are:
+--prerelease : Checks the Galasa helm charts can be released for the pre-release process.
+--release : Checks the Galasa helm charts have been released for the release process.
+EOF
+}
 
 function ask_user_for_release_type {
     PS3="Select the type of release process please: "
@@ -237,16 +243,42 @@ function delete_pre_release_helm_charts {
     done
 }
 
-if [[ "$CALLED_BY_PRERELEASE" == "" ]]; then
-    ask_user_for_release_type
-    get_galasa_version_to_be_released
-    clone_helm_repository
-    get_helm_charts
-    check_helm_charts_released
+#-----------------------------------------------------------------------------------------
+# Process parameters
+#-----------------------------------------------------------------------------------------
+release_type=""
+while [ "$1" != "" ]; do
+    case $1 in
+        --prerelease )          release_type="prerelease"
+                                ;;
+        --release )             release_type="release"
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     error "Unexpected argument $1"
+                                usage
+                                exit 1
+    esac
+    shift
+done
 
-    if [[ "$release_type" == "prerelease" ]]; then
-        delete_pre_release_helm_charts
-        bold "This is a pre-release. We don't actually want to keep the Release/Tags that were just created. Make sure to delete them!"
-    fi
+# ------------------------------------------------------------------------
+# Main logic
+# ------------------------------------------------------------------------
+mkdir -p ${WORKSPACE_DIR}/temp
+
+if [[ -z "${release_type}" ]]; then
+    ask_user_for_release_type
+fi
+
+get_galasa_version_to_be_released
+clone_helm_repository
+get_helm_charts
+check_helm_charts_released
+
+if [[ "$release_type" == "prerelease" ]]; then
+    delete_pre_release_helm_charts
+    bold "This is a pre-release. We don't actually want to keep the Release/Tags that were just created. Make sure to delete them!"
 fi
 

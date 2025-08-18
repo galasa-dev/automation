@@ -10,8 +10,6 @@ These are manual steps to bump the version of Galasa to the next version.
 
     b. Run the `./tools/build-locally.sh`, which will invoke each individual module's `build-locally.sh` script, which will update the versions in the generated `release.yaml`s.
 
-    **You will have to manually update the 'docs' for now as there is no set-version.sh. Update all versions in the documentation content, apart from the file with the release notes for the released version.**
-
     c. Manually check that all dev.galasa bundles have been upgraded. Do a search for the current version in VSCode to check for any versions that did not get uplifted by the script, and replace with the new development version.
 
     d. Make sure the API Server starts locally.

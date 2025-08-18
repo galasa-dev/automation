@@ -21,7 +21,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 3. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - Each maven artifact should contain a file called com.auth0.jwt-<*VERSION*>.jar.asc. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
-4. Send the [mvp image](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+4. Run a MEND scan for the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by following the instructions in the internal [Developer docs](https://github.ibm.com/galasa/developer-docs/blob/322ea364dd63ad533427c984c6c7dd4c5f8c75cc/docs/300-process/dfg-build-process.md) to check for any vulnerabilities before moving onto the release process.
 
 ## Pre-release steps - Manual
 
@@ -41,7 +41,7 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
 9. Now run the Web UI Main build. Run [11-build-webui.sh](./11-build-webui.sh). When prompted, choose the '`pre-release`' option. This script uses the GitHub CLI to start the [Main build](https://github.com/galasa-dev/webui/actions/workflows/build.yaml). You will have to monitor the workflow run and ensure it finishes successfully.
 10. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
-11. Send the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) to Jade Carino to perform the MEND scan to check for any vulnerabilities before moving onto the release process.
+11. Run a MEND scan for the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by following the instructions in the internal [Developer docs](https://github.ibm.com/galasa/developer-docs/blob/322ea364dd63ad533427c984c6c7dd4c5f8c75cc/docs/300-process/dfg-build-process.md) to check for any vulnerabilities before moving onto the release process.
 12. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases. Test the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline (although you will need to slightly adapt in some places as you are testing the MVP from the prerelease maven repo - these differences are documented below):
     - https://galasa.dev/docs/cli-command-reference/installing-offline
         - 1: The output of `docker load -i isolated.tar` should instead be `Loaded image: ghcr.io/galasa-dev/galasa-mvp:main`.
