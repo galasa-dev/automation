@@ -36,10 +36,23 @@ helm install \
 
 The [cert-installer](https://github.com/galasa-dev/helm/tree/main/charts/cert-installer) Helm chart exists to automate the installation of `Issuer` and `Certificate` resources on Kubernetes. See the chart's [README](https://github.com/galasa-dev/helm/blob/main/charts/cert-installer/README.md) for instructions on how to use it.
 
+To quickly apply any changes to a values.yaml file used for any of the namespaces that cert-installer is installed in, run the following command:
+
+```
+helm upgrade --values /path/to/cert-installer-values.yaml <helm-install-name> /path/to/cert-installer --namespace <namespace>
+```
+
+where:
+- `/path/to/cert-installer-values.yaml` is the file path to the values.yaml file that you wish to apply
+- `<helm-install-name>` is the name of the Helm chart's installation. You can run `helm list --namespace <namespace>` to get a list of Helm installations in a given namespace.
+- `/path/to/cert-installer` is the path to the cert-installer Helm chart (this will be in the Galasa Helm repo)
+-  `<namespace>` is the namespace in which the Helm chart was installed in
+
 Namespaces in which cert-installer has been installed in:
 
-- galasa-ecosystem1
-- galasa2
+- argocd (Helm install name: `argocd-tls`)
+- galasa-ecosystem1 (Helm install name: `ecosystem1-tls`)
+- galasa2 (Helm install name: `galasa2-tls`)
 
 ## Issuing a certificate manually
 
