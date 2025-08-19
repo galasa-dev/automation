@@ -12,13 +12,9 @@ metadata:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
-  # Testing a theory that the tls section is not needed as this 
-  # Ingress is only used for internal cluster traffic over HTTP
-  # therefore it does not need TLS configuration to a certificate.
-  # tls:
-  # - hosts:
-  #   - triggers.galasa.dev
-  #   secretName: unknown-secret
+  # No tls section required for this Ingress it is only used for 
+  # internal cluster traffic over HTTP therefore it does not need 
+  # TLS configuration to a certificate.
   rules:
   - host: triggers.galasa.dev
     http:
