@@ -15,7 +15,11 @@ spec:
   tls:
   - hosts:
     - triggers.galasa.dev
-    secretName: galasa-wildcard-cert
+    # secretName: galasa-wildcard-cert
+    secretName: unknown-secret
+    # Testing a theory that 1) galasa-wildcard-cert doesn't exist so
+    # 2) this tls section does not need to reference an existing secret
+    # so 3) does this Ingress break if we set secretName to something random?
   rules:
   - host: triggers.galasa.dev
     http:
