@@ -38,6 +38,7 @@ The [cert-installer](https://github.com/galasa-dev/helm/tree/main/charts/cert-in
 
 Namespaces in which cert-installer has been installed in:
 
+- argocd
 - galasa-ecosystem1
 - galasa2
 

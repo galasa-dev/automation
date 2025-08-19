@@ -17,7 +17,7 @@ spec:
   tls:
   - hosts:
     - argocd.galasa.dev
-    secretName: argocd-server-tls
+    secretName: argocd-tls-secret
   rules:
   - host: argocd.galasa.dev
     http:
