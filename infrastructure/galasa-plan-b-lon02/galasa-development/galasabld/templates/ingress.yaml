@@ -15,7 +15,7 @@ spec:
   tls:
   - hosts:
     - development.galasa.dev
-    secretName: galasa-wildcard-cert
+    secretName: devgalasa-tls-secret
   rules:
   - host: development.galasa.dev
     http:

@@ -17,4 +17,4 @@ ingress:
   tls:
   - hosts:
       - development.galasa.dev
-    secretName: galasa-wildcard-cert
+    secretName: devgalasa-tls-secret

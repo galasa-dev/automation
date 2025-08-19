@@ -13,44 +13,11 @@ metadata:
 spec:
   tls:
   - hosts:
-    - resources.galasa.dev
-    - javadoc.galasa.dev
-    - javadoc-snapshot.galasa.dev
     - rest.galasa.dev
-    - development.galasa.dev
-    secretName: galasa-wildcard-cert
+    # - development.galasa.dev
+    secretName: restapidoc-tls-secret
   rules:
  
-  - host: javadoc.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: javadoc-stable
-            port:
-              number: 80
-        path: /
-        pathType: ImplementationSpecific
-  - host: javadoc-snapshot.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: javadoc-snapshot
-            port:
-              number: 80
-        path: /
-        pathType: ImplementationSpecific
-  - host: resources.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: resources
-            port:
-              number: 80
-        path: /
-        pathType: ImplementationSpecific
   - host: rest.galasa.dev
     http:
       paths:
@@ -62,14 +29,15 @@ spec:
         path: /
         pathType: ImplementationSpecific
 
-  - host: development.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: githubappcopyright
-            port:
-              number: 3000
-        path: /githubapp/copyright/event_handler
-        pathType: ImplementationSpecific
-
+  # Commented-out as the GitHub copyright app is not in use and is not functional at the moment.
+  # Should it be re-instated in the future, this Ingress path may be useful as a reference point.
+  # - host: development.galasa.dev
+  #   http:
+  #     paths:
+  #     - backend:
+  #         service:
+  #           name: githubappcopyright
+  #           port:
+  #             number: 3000
+  #       path: /githubapp/copyright/event_handler
+  #       pathType: ImplementationSpecific
