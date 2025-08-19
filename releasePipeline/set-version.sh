@@ -97,130 +97,88 @@ fi
 # Functions
 #-----------------------------------------------------------------------------------------
 
-# bumping version for the value of property test.stream.ivts.location
-function upgrade_test_stream_ivts_location_version {
-    property_name="test.stream.inttests.location"
-    h1 "Bumping up the version of '${property_name}'"
-    mkdir -p ${BASEDIR}/temp
+function update_property_version {
+    file_path=$1
+    property_name=$2
+    value_regex=$3
+    new_value=$4
 
-    file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+    h1 "Bumping up the version of '${property_name}' in ${file_path}"
+
+    mkdir -p ${BASEDIR}/temp
     temp_file="${BASEDIR}/temp/cps-properties.yaml"
 
-    value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/dev[.]galasa[.]ivts[.]obr-[0-9.]+-testcatalog[.]json"
-    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/dev.galasa.ivts.obr-${galasa_version}-testcatalog.json"
-    
-    cat ${file} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
-    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
+    cat ${file_path} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
+    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in ${file_path} file."; exit 1; fi
 
-    cp ${temp_file} ${file}
-    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
+    cp ${temp_file} ${file_path}
+    if ! grep -q -E "${new_value}" ${file_path}; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
 
     success "'${property_name}' version bumped successfully"
 }
 
+# bumping version for the value of property test.stream.ivts.location
+function upgrade_test_stream_ivts_location_version {
+    property_name="test.stream.ivts.location"
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+    ecosystem1_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml"
+    value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/dev[.]galasa[.]ivts[.]obr-[0-9.]+-testcatalog[.]json"
+    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/dev.galasa.ivts.obr-${galasa_version}-testcatalog.json"
+
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+    update_property_version "${ecosystem1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+}
+
 # bumping version for the value of property test.stream.ivts.obr
 function upgrade_test_stream_ivts_obr_version {
-    property_name="test.stream.inttests.location"
-    h1 "Bumping up the version of '${property_name}'"
-    mkdir -p ${BASEDIR}/temp
-
-    file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    temp_file="${BASEDIR}/temp/cps-properties.yaml"
-
+    property_name="test.stream.ivts.obr"
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+    ecosystem1_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml"
     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/obr"
     new_value="mvn:dev.galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/obr"
-    
-    cat ${file} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
-    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
 
-    cp ${temp_file} ${file}
-    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
-
-    success "'${property_name}' version bumped successfully"
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+    update_property_version "${ecosystem1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
 #bumping version for the value of property test.stream.inttests.location
 function upgrade_test_stream_inttests_location_version {
     property_name="test.stream.inttests.location"
-    h1 "Bumping up the version of '${property_name}'"
-    mkdir -p ${BASEDIR}/temp
-
-    file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    temp_file="${BASEDIR}/temp/cps-properties.yaml"
-
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/dev[.]galasa[.]inttests[.]obr-[0-9.]+-testcatalog[.]json"
     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/dev.galasa.inttests.obr-${galasa_version}-testcatalog.json"
-    
-    cat ${file} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
-    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
 
-    cp ${temp_file} ${file}
-    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
-
-    success "'${property_name}' version bumped successfully"
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
 #bumping version for the value of property test.stream.inttests.obr
 function upgrade_test_stream_inttests_obr_version {
     property_name="test.stream.inttests.obr"
-    h1 "Bumping up the version of '${property_name}'"
-    mkdir -p ${BASEDIR}/temp
-
-    file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    temp_file="${BASEDIR}/temp/cps-properties.yaml"
-
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/obr"
     new_value="mvn:dev.galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/obr"
 
-    cat ${file} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
-    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
-
-    cp ${temp_file} ${file}
-    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
-    
-    success "'${property_name}' version bumped successfully"
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
 #bumping version for the value of property isolated.full.zip
 function upgrade_isolated_full_zip_version {
     property_name="isolated.full.zip"
-    h1 "Bumping up the version of '${property_name}'"
-    mkdir -p ${BASEDIR}/temp
-
-    file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    temp_file="${BASEDIR}/temp/cps-properties.yaml"
-
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/[0-9.]+\\/galasa-isolated-[0-9.]+.zip"
     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/${galasa_version}\\/galasa-isolated-${galasa_version}.zip"
 
-    cat ${file} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
-    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
-
-    cp ${temp_file} ${file}
-    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
-    
-    success "'${property_name}' version bumped successfully"
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
 #bumping version for the value of property isolated.mvp.zip
 function upgrade_isolated_mvp_zip_version {
     property_name="isolated.mvp.zip"
-    h1 "Bumping up the version of '${property_name}'"
-    mkdir -p ${BASEDIR}/temp
-
-    file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    temp_file="${BASEDIR}/temp/cps-properties.yaml"
-
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/[0-9.]+\\/galasa-isolated-mvp-[0-9.]+[.]zip"
     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/${galasa_version}\\/galasa-isolated-mvp-${galasa_version}.zip"
 
-    cat ${file} | sed -E "s/${value_regex}/${new_value}/1" > ${temp_file}
-    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version of '${property_name}' in $file file."; exit 1; fi
-
-    cp ${temp_file} ${file}
-    if ! grep -q -E "${new_value}" $file; then error "Failed to replace all relevant occurrences of the old version value."; exit 1; fi
-    
-    success "'${property_name}' version bumped successfully"
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
 #bumping version for the value of property runtime.version
