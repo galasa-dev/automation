@@ -4,6 +4,16 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+# This EventListener gets called when there is a 'Main Build Orchestrator'
+# workflow run that has completed successfully in the 'galasa' repository.
+
+# It calls the Tekton Pipeline 'recycle-prod1' which is responsible for 
+# recycling the Deployments of the prod1 Galasa service.
+
+# It also calls the Tekton Pipeline 'build-internal-integratedtests' which
+# builds the integration tests for Galasa Managers which require internal 
+# resources (z/OS, CICS etc) and publishes these to a remote maven repo.
+
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:

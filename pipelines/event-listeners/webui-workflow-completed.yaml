@@ -4,6 +4,12 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+# This EventListener gets called when there is a successful, completed
+# workflow run of the 'Main build' on the 'webui' repository.
+
+# It calls the Tekton Pipeline 'recycle-prod1' which is responsible for 
+# recycling the Deployments of the prod1 Galasa service.
+
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:

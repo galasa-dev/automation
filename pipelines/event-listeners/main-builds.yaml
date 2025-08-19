@@ -4,6 +4,13 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+# This EventListener gets called when pushes are made to the 'main'
+# branch of the https://github.com/galasa-dev/automation repository.
+
+# It calls the Tekton Pipeline 'branch-automation'. This pipeline's
+# job is to apply CPS properties from a file checked into the repo
+# to the prod1 Galasa service's CPS with `galasactl resources apply`
+
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
