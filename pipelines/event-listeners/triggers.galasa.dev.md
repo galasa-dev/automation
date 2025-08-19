@@ -13,7 +13,7 @@ All deliveries to the triggers.galasa.dev Webhook have the following warning:
 We couldn't deliver this payload: tls: failed to verify certificate: x509: certificate is valid for *.galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud, galasa-plan-b-lon02-3fdc13787e8248a7d32fa4e5af5b0294-0000.eu-gb.containers.appdomain.cloud, gal...
 ```
 
-This warning is irrelevant however as the POST requests about the events are not processed directly. The [github-webhook-monitor](../../build-images/github-webhook-monitor/cmd/main.go) sends a GET request to https://api.github.com/orgs/galasa-dev/hooks/386623630/deliveries?per_page=50 and then processes the event deliveries itself.
+We theorise that this is because it cannot find a certificate for triggers.galasa.dev and so it defaults to the default TLS certificate provided by IBM Cloud (this is because the triggers-ingress described below is handled by the "public-iks-k8s-nginx" ingress controller). This warning is irrelevant however as the POST requests about the events are not processed directly. The [github-webhook-monitor](../../build-images/github-webhook-monitor/cmd/main.go) sends a GET request to https://api.github.com/orgs/galasa-dev/hooks/386623630/deliveries?per_page=50 and then processes the event deliveries itself.
 
 The ConfigMap [githubmonitor-configmap](../../build-images/github-webhook-monitor/config.yaml) is used to route the different events to a particular EventListener. Events are sent to one of two EventListeners based on what the event type is, `push` or `workflow_run`. The EventListeners then call Tekton Pipelines.
 
