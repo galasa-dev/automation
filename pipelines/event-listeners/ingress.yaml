@@ -51,13 +51,3 @@ spec:
               number: 8080
         path: /galasa-monorepo-workflow
         pathType: Prefix
-  - host: triggers.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: el-github-cli-workflow-completed-listener
-            port:
-              number: 8080
-        path: /cli-workflow
-        pathType: Prefix
