@@ -34,7 +34,7 @@ helm install \
 
 ## Issuing a certificate using Helm
 
-The [cert-installer](../cert-installer) Helm chart exists to automate the installation of `Issuer` and `Certificate` resources on Kubernetes. See the chart's [README](../cert-installer/README.md) for instructions on how to use it.
+The [cert-installer](https://github.com/galasa-dev/helm/tree/main/charts/cert-installer) Helm chart exists to automate the installation of `Issuer` and `Certificate` resources on Kubernetes. See the chart's [README](https://github.com/galasa-dev/helm/blob/main/charts/cert-installer/README.md) for instructions on how to use it.
 
 Namespaces in which cert-installer has been installed in:
 
@@ -91,6 +91,3 @@ spec:
     kind: Issuer
 
 ```
-## Issuing Certificates
-
-A [cert-installer](../cert-installer) Helm chart exists to automate the installation of an Issuer and 
