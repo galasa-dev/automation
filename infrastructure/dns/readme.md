@@ -18,20 +18,18 @@ These are the settings currently held in the DNS table currently.
 | A | argocd-b.galasa.dev | 169.50.192.70 ||
 | A | copyright.galasa.dev | 169.50.192.70 ||
 | A | development.galasa.dev | 169.50.192.70 ||
-| A | dex.galasa.dev | 169.50.192.70 | What is this one ? |
 | A | galasa2.galasa.dev | 169.50.192.66 | Created to try out cert-manager for a Galasa service. Maps to the IP of the ingress-nginx-controller LoadBalancer in the ingress-nginx namespace |
 | A | galasa-ecosystem1.galasa.dev | 169.50.192.70 ||
-| A | hobbit.galasa.dev | 169.50.192.70 | old. Can be deleted. |
 | A | javadoc.galasa.dev | URL redirect to https://galasa.dev/docs/reference/javadoc/ | |
 | A | javadoc-snapshot.galasa.dev | 169.50.192.70 ||
-| A | resources.galasa.dev | 169.50.192.70 ||
 | A | rest.galasa.dev | 169.50.192.70 ||
 | A | triggers.galasa.dev | 169.50.192.70 ||
 | ALIAS | galasa.dev | galasa-dev.github.io | Main documentation site. See galasa-dev/galasa-docs repo |
 | CNAME | www.galasa.dev | galasa-dev.github.io | Main documentation site. See galasa-dev/galasa-docs repo |
 | CNAME | vnext.galasa.dev | galasa-dev.github.io | Preview of documentation. See galasa-dev/galasa-docs-preview repo |
+| URL | resources.galasa.dev | URL redirect to https://github.com/galasa-dev/isolated/releases ||
 
-As of 12th June, the DNS records look like this:
+As of 9th July, the DNS records look like this:
 ```
 $ORIGIN galasa.dev.
 $TTL 1h
@@ -44,10 +42,7 @@ argocd-b.galasa.dev. 60 IN A 169.50.192.70
 argocd.galasa.dev. 60 IN A 169.50.192.70
 copyright.galasa.dev. 60 IN A 169.50.192.70
 development.galasa.dev. 60 IN A 169.50.192.70
-dex.galasa.dev. 60 IN A 169.50.192.70
 galasa-ecosystem1.galasa.dev. 60 IN A 169.50.192.70
-hobbit.galasa.dev. 60 IN A 169.50.192.70
-resources.galasa.dev. 1 IN A 169.50.192.70
 rest.galasa.dev. 60 IN A 169.50.192.70
 triggers.galasa.dev. 60 IN A 169.50.192.70
 vnext.galasa.dev. 600 IN CNAME galasa-dev.github.io.
