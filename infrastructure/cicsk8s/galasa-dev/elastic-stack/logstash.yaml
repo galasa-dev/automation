@@ -1,0 +1,48 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: logstash.k8s.elastic.co/v1alpha1
+kind: Logstash
+metadata:
+  name: galasa-elastic
+  namespace: galasa-dev
+spec:
+  count: 1
+  elasticsearchRefs:
+    - name: galasa-elastic
+      clusterName: galasa
+  version: 9.1.4
+  pipelines:
+    - pipeline.id: main
+      config.string: |
+        input {
+          tcp {
+            port => 4560
+          }
+        }
+        filter {
+          json {
+            source => "message"
+          }
+        }
+        output {
+          elasticsearch {
+            hosts => [ "${GALASA_ES_HOSTS}" ]
+            user => "${GALASA_ES_USER}"
+            password => "${GALASA_ES_PASSWORD}"
+            ssl_certificate_authorities => "${GALASA_ES_SSL_CERTIFICATE_AUTHORITY}"
+            index => "logs-%{+YYYY.MM.dd}"
+          }
+        }
+  services:
+    - name: tcp
+      service:
+        spec:
+          type: ClusterIP
+          ports:
+            - port: 4560
+              name: "tcp"
+              protocol: TCP
+              targetPort: 4560

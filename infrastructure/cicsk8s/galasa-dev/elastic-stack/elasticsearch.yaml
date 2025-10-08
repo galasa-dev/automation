@@ -1,0 +1,38 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: galasa-elastic
+  namespace: galasa-dev
+spec:
+  version: 9.1.4
+  volumeClaimDeletePolicy: DeleteOnScaledownOnly
+  nodeSets:
+  - name: default
+    count: 3
+    config:
+      node.store.allow_mmap: false
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data # Do not change this name unless you set up a volume mount for the data path.
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
+        storageClassName: longhorn
+    podTemplate:
+      spec:
+        nodeSelector:
+          applevel: critical
+          longhorn: "true"
+          kubernetes.io/arch: amd64
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
