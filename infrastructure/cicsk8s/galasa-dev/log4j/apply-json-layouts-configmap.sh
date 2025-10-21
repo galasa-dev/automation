@@ -10,6 +10,9 @@
 # used by the prod1 service. The ConfigMap contains the GalasaLogsLayout.json file, so this script 
 # should be run to apply any changes made to that JSON layout file.
 #
+# Make sure that your kubectl context is pointing at the internal Kubernetes cluster that prod1 is
+# available on.
+#
 #-----------------------------------------------------------------------------------------
 
 # Where is this script executing from ?
