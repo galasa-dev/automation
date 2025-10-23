@@ -1,0 +1,29 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kibana-ingress
+  namespace: galasa-dev
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - '*.cicsk8s.hursley.ibm.com'
+  rules:
+  - host: kibana-galasa-dev.cicsk8s.hursley.ibm.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: galasa-elastic-kb-http
+            port:
+              number: 5601
+        path: /
+        pathType: Prefix
