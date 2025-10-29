@@ -124,8 +124,8 @@ function wait_for_workflow {
     COUNTER=0
 
     while [[ $COUNTER -lt $MAX_WAIT_ITERATIONS ]]; do
-        echo "Waiting 10 minutes for workflow ${run_id} to complete..."
-        sleep 600
+        echo "Waiting 2 minutes for workflow ${run_id} to complete..."
+        sleep 120
         ((COUNTER++))
         
         status=$(gh run view "$run_id" --repo galasa-dev/galasa --json conclusion --jq '.conclusion')

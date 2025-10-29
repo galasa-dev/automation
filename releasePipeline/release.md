@@ -11,14 +11,11 @@
 7. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
 8. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
 9. watch needs to be installed.
-10. IBM Cloud CLI needs to be installed and logged in:
+10. The ibmcloud CLI container registry service needs to be configured to the global region:
 
 ``` shell
-ibmcloud login --sso
 ibmcloud cr region-set global
 ```
-
-For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-build pr logs -f --last to watch it's progress. Only move onto the next command once the previous is completed successfully.
 
 ## Release steps
 
@@ -44,6 +41,23 @@ For each of the Kubernetes Tekton command, you can follow with tkn -n galasa-bui
 1. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`release`' option.
     - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
+### Test the MVP zip
+
+The steps below are to ensure the MVP zip works as described in the documentation.
+
+**Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases.
+
+1. Download the [MVP zip](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp).
+2. Unpack the zip and go to the folder in the command line.
+3. Run `docker load -i isolated.tar` and confirm that the output is `Loaded image: ghcr.io/galasa-dev/galasa-mvp:main`. This is to ensure that the isolated.tar can be successfully untarred and loads a Docker image. 
+4. If the last step was successful, run the provided Docker image by running `docker run -d -p 8080:80 --name galasa ghcr.io/galasa-dev/galasa-mvp:main`. Navigate to `localhost:8080` in a browser and confirm that the hosted version of the MVP zip appears. 
+5. Follow the instructions on the [Exploring Galasa SimBank offline](https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline) page of the documentation to ensure that a 3270 emulator can connect to the Simplatform application.
+    - After starting the Simplatform application by running the `run-simplatform.sh` script, you can start your 3270 emulator pointing it to port 2023 of localhost by running `c3270 localhost -port 2023` (you will need the x3270 tool installed)
+
+### MEND scan
+
+1. Follow instructions from the internal [developer-docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp) on how to do this.
+
 ### Run the regression tests
 
 #### Tests that run from GitHub Actions
@@ -68,55 +82,25 @@ The script will give you the pipeline run name. You will have to monitor the pip
 
 1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip.
 2. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
-3. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh). **These are the remaining inttests that have not yet been converted to an IVT.** All the tests must pass before moving on. For the ones which fail, run them individually:
+3. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
 
-   a. As currently some tests pass if run a second time due to the vaguaries of system resource availability. Also make sure @hobbit1983's VM image isn't down.
+Some tests may fail on the first run due to the lack of system resource availability. Rerunning the test should hopefully result in a pass. Make sure that external systems the tests connect to are active and healthy (for example, @hobbit1983's CICS Region).
 
-   b. If there are any failures from the regression testing, amend [29-regression-reruns.yaml](./29-regression-reruns.yaml) to supply the correct version and [regression-reruns.yaml](./argocd-synced/pipelines/regression-reruns.yaml). Add the tests that failed as shown in the example, to run them again.
+For any tests which fail, run them again individually:
 
-   c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml` - Retest the failing tests.
+   b. Amend [29-regression-reruns.yaml](./29-regression-reruns.yaml) to supply the correct version and [regression-reruns.yaml](./argocd-synced/pipelines/regression-reruns.yaml). Add the tests that failed as shown in the example, to run them again.
+
+   c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml`.
 
    d. Repeat as required.
 
-### Test the MVP zip contents against the galasa.dev documentation
-
-1. **Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases. Test the [MVP zip](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by working through the instructions on the Galasa website to do with using Galasa offline (although you will need to slightly adapt in some places as you are testing the MVP from the prerelease maven repo - these differences are documented below):
-    - https://galasa.dev/docs/cli-command-reference/installing-offline
-        - 1: The output of `docker load -i isolated.tar` should instead be `Loaded image: ghcr.io/galasa-dev/galasa-mvp:main`.
-        - 2: Run the container by running `docker run -d -p 8080:80 --name galasa ghcr.io/galasa-dev/galasa-mvp:main` instead.
-    - https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline
-        - After starting the Simplatform application by running the `run-simplatform.sh` script, you can start your 3270 emulator pointing it to port 2023 of localhost by running `c3270 localhost -port 2023` (you will need the x3270 tool installed)
-    - https://galasa.dev/docs/running-simbank-tests/running-simbank-tests-cli-offline
-        - To run the Simbank tests using the galasactl binary and using only the Maven artifacts provided within the zip, you can run the below commands from the top level of the zip:
-            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.SimBankIVT`
-            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.BasicAccountCreditTest`
-            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.ProvisionedAccountCreditTests`
-            - `./galasactl/galasactl runs submit local --log - --obr mvn:dev.galasa/dev.galasa.simbank.obr/<VERSION>/obr --localMaven file:////Users/<YOURUSER>/Downloads/galasa-isolated-mvp-<VERSION>/maven --class dev.galasa.simbank.tests/dev.galasa.simbank.tests.BatchAccountsOpenTest`
-
-### MEND scan (if releasing Distribution for Galasa)
-
-1. Follow instructions from the internal [developer-docs](https://pages.github.ibm.com/galasa/developer-docs/300-process/dfg-build-process/) on how to do this.
-
-### Obtain release approval (if releasing Distribution for Galasa)
-
-1. Ask the Team and Product managers for release approval by:
-   1. Finding the GitHub issue related to the release you are working on in the GHE repository cics/cics-ts-tracking.
-   2. Checking off the tasks that are listed in the issue.
-   3. Commenting, ensuring to tag the approvers (Roger and Simon) with a link to the regression test results for the 'release' branch on the Phoenix dashboard. Explain any failures that are due to external problems if necessary.
-
-Have a look at the GHE issues for previous releases for examples on how this has been done before.
-
-Once an approver has approved, you can move on.
+**All the tests must pass before moving on.**
 
 ### Deploy the Galasa artifacts to Maven Central
 
 1. Run the [30-central-publisher-portal.sh](./30-central-publisher-portal.sh) script which publishes a bundle of 'dev.galasa' artifacts to the Maven Central Publisher Portal with the Publisher API.
-1. Once the bundle reaches the portal, various validation checks will be done on the bundle. If all validation checks pass, you will have to log into the Central Publisher Portal and publish the bundle manually. Complete the steps detailed in [31-publish-to-maven-central.md](./31-publish-to-maven-central.md) to publish the bundle to Maven Central.
-3. [32-wait-maven.sh](./32-wait-maven.sh) - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. Takes a while. 20 to 40-ish mins. Kill the terminal to exit this process.
-
-### Deploy resources.galasa.dev
-
-1. Run the [33-build-resources-image.sh](./33-build-resources-image.sh) script. It will find the version number we are releasing, and kick off the pipeline `release-*`. Wait for the pipeline to complete. Fairly quick. 5-ish mins.
+2. Log on to the Central Publisher Portal and publish the 'dev.galasa' artifacts by following the steps in [31-publish-to-maven-central.md](./31-publish-to-maven-central.md).
+3. [32-wait-maven.sh](./32-wait-maven.sh) - Run the watch command to wait for the artifacts to reach Maven Central. The release will appear in the BOM metadata. Wait until Maven Central is updated. This could take around 20 to 40 minutes. Kill the terminal to exit this process.
 
 ### Deploy images to IBM Cloud Container Registry
 
@@ -173,11 +157,15 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
    - obr-generic
    - galasa-boot-embedded
    - galasa-ibm-boot-embedded
-   - javadoc-maven-artefacts
-   - javadoc-site
    - galasactl-x86_64
    - galasactl-ibm-x86_64
    - galasactl-executables
-2. Go through the images in [IBM Cloud Container Registry](https://cloud.ibm.com/registry/images) and delete all images tagged 'release' that were built as part of this release (click three dots next to 'release' image and select Delete image). _This is a temporary step that we are working to automate._
-3. Repeat steps 1, 2 and 3 but with the branch 'pre-release'
-4. 92-delete-argocd-apps.sh - Remove the ArgoCD applications, and therefore the Kubernetes resources.
+   - galasa-isolated
+   - galasa-isolated-zip
+   - galasa-mvp
+   - galasa-mvp-zip
+   - restapidoc-site
+   - buildutils-executables
+   - simplatform-maven-artefacts
+3. Repeat steps 1 and 2 but with the branch 'pre-release'
+4. [92-delete-argocd-apps.sh](./92-delete-argocd-apps.sh) - Remove the ArgoCD applications, and therefore the Kubernetes resources.
