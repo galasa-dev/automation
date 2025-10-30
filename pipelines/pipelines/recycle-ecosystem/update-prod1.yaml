@@ -1,0 +1,205 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: update-prod1
+  namespace: galasa-build
+spec:
+#
+#
+#
+  params:
+  - name: kubeNamespace
+    type: string
+    default: galasa-dev
+  - name: galasaServiceName
+    type: string
+    default: prod1
+  - name: certificatesConfigMapName
+    type: string
+    default: ibm-certificates
+  - name: log4jJsonTemplatesConfigMapName
+    type: string
+    default: galasa-log4j-json-templates
+#
+#
+#
+  workspaces:
+  - name: git-workspace
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: clone-galasa-config
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.ibm.com/galasa/internal-config
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/internal-config
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: clone-helm
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/helm
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/helm
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: clone-automation
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/automation
+    - name: revision
+      value: main
+    - name: refspec
+      value: refs/heads/main:refs/heads/main
+    - name: depth
+      value: "99999999"
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/automation
+    workspaces:
+     - name: output
+       workspace: git-workspace
+#
+#
+#
+  - name: update-certificates-configmap
+    taskRef:
+      name: script
+    runAfter:
+    - clone-galasa-config
+    - clone-helm
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/dockerfiles/certs
+    - name: image
+      value: ghcr.io/galasa-dev/kubectl:main
+    - name: script
+      value: |
+        kubectl --namespace=$(params.kubeNamespace) create configmap $(params.certificatesConfigMapName) \
+        --from-file=carootcert.der \
+        --from-file=caintermediatecert.der \
+        --output=yaml \
+        --dry-run=client | kubectl apply -f -
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace 
+#
+#
+#
+  - name: update-log4j-json-layouts-configmap
+    taskRef:
+      name: script
+    runAfter:
+    - clone-galasa-config
+    - clone-helm
+    - clone-automation
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/automation/infrastructure/cicsk8s/galasa-dev/log4j
+    - name: image
+      value: ghcr.io/galasa-dev/kubectl:main
+    - name: script
+      value: |
+        kubectl create configmap $(params.log4jJsonTemplatesConfigMapName) \
+        --namespace=galasa-dev \
+        --from-file=GalasaLogsLayout.json \
+        --output=yaml \
+        --dry-run=client | kubectl apply -f -
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace 
+#
+#
+#
+  - name: upgrade-prod1
+    taskRef:
+      name: helm
+    runAfter:
+    - update-certificates-configmap
+    - update-log4j-json-layouts-configmap
+    params:
+    - name: command
+      value:
+        - --namespace
+        - $(params.kubeNamespace)
+        - install
+        - --upgrade
+        - $(params.galasaServiceName)
+        - $(context.pipelineRun.name)/helm/charts/ecosystem
+        - --values
+        - $(context.pipelineRun.name)/internal-config/prod1-helm-values.yaml
+        - --timeout
+        - 10m0s
+        - --wait
+#
+#
+#
+  - name: test-prod1
+    taskRef:
+      name: helm
+    runAfter:
+    - upgrade-prod1
+    params:
+    - name: command
+      value:
+        - --namespace
+        - $(params.kubeNamespace)
+        - test
+        - $(params.galasaServiceName)
+#
+#
+#
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: branchFlag
+      value: ""
+    - name: branch
+      value: ""
