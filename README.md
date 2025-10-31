@@ -98,6 +98,9 @@ This pipeline generates and deploys a [code coverage report](https://development
 recycle-prod1:
 This pipeline recycles deployments in the prod1 ecosystem: api, testcatalog, engine-controller, resource-monitor and metrics. This is triggered after code is promoted to production so that the ecosystem has the latest Galasa code.
 
+update-prod1:
+This pipeline runs a `helm upgrade` to update the prod1 service using the [latest Galasa service Helm chart](https://github.com/galasa-dev/helm). This is triggered after code is promoted to production so that the service has the latest Galasa code.
+
 
 ## Roles
 
