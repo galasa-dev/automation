@@ -11,11 +11,16 @@ metadata:
   namespace: galasa-build
 spec:
   workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
   params:
+  - name: context
+    type: string
   - name: command
     type: array
   steps:
   - name: helm
+    workingDir: /workspace/git/$(params.context)
     image: ghcr.io/galasa-dev/helm:main
     imagePullPolicy: IfNotPresent
     args:

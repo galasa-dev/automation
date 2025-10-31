@@ -144,7 +144,7 @@ spec:
         --dry-run=client | kubectl apply -f -
     workspaces:
     - name: git-workspace
-      workspace: git-workspace 
+      workspace: git-workspace
 #
 #
 #
@@ -155,19 +155,24 @@ spec:
     - update-certificates-configmap
     - update-log4j-json-layouts-configmap
     params:
+    - name: context
+      value: $(context.pipelineRun.name)
     - name: command
       value:
         - --namespace
         - $(params.kubeNamespace)
-        - install
-        - --upgrade
+        - upgrade
+        - --install
         - $(params.galasaServiceName)
-        - $(context.pipelineRun.name)/helm/charts/ecosystem
+        - helm/charts/ecosystem
         - --values
-        - $(context.pipelineRun.name)/internal-config/prod1-helm-values.yaml
+        - internal-config/prod1-helm-values.yaml
         - --timeout
         - 10m0s
         - --wait
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
 #
 #
 #
@@ -177,29 +182,35 @@ spec:
     runAfter:
     - upgrade-prod1
     params:
+    - name: context
+      value: $(context.pipelineRun.name)
     - name: command
       value:
         - --namespace
         - $(params.kubeNamespace)
         - test
         - $(params.galasaServiceName)
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
 #
 #
 #
-  finally:
-  - name: report-failed-build
-    when:
-      - input: "$(tasks.status)"
-        operator: in
-        values: ["Failed"]
-    taskRef:
-      name: slack-post
-    params:
-    - name: pipelineName
-      value: $(context.pipeline.name)
-    - name: pipelineRunName
-      value: $(context.pipelineRun.name)
-    - name: branchFlag
-      value: ""
-    - name: branch
-      value: ""
+# Uncomment the following 'finally' block once we have checked that the pipeline is working as intended
+  # finally:
+  # - name: report-failed-build
+  #   when:
+  #     - input: "$(tasks.status)"
+  #       operator: in
+  #       values: ["Failed"]
+  #   taskRef:
+  #     name: slack-post
+  #   params:
+  #   - name: pipelineName
+  #     value: $(context.pipeline.name)
+  #   - name: pipelineRunName
+  #     value: $(context.pipelineRun.name)
+  #   - name: branchFlag
+  #     value: ""
+  #   - name: branch
+  #     value: ""
