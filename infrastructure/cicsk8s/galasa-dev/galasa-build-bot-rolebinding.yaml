@@ -1,0 +1,21 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Gives the galasa-build-bot ServiceAccount permissions
+# that are stored in the galasa-dev-admin Role.
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: galasa-build-bot-access
+  namespace: galasa-dev
+roleRef:
+  kind: Role
+  name: galasa-dev-admin
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: galasa-build-bot
+    namespace: galasa-build

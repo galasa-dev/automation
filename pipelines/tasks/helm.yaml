@@ -1,0 +1,27 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: helm
+  namespace: galasa-build
+spec:
+  workspaces:
+  - name: git-workspace
+    mountPath: /workspace/git
+  params:
+  - name: context
+    type: string
+  - name: command
+    type: array
+  steps:
+  - name: helm
+    workingDir: /workspace/git/$(params.context)
+    image: ghcr.io/galasa-dev/helm:main
+    imagePullPolicy: IfNotPresent
+    args:
+    - $(params.command)
