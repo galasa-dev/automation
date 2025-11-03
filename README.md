@@ -94,9 +94,6 @@ The pipeline applies changes to the prod1 Galasa service's CPS properties using 
 codecoverage (**this pipeline is inactive and due to be converted into a GitHub Actions workflow**): 
 This pipeline generates and deploys a [code coverage report](https://development.galasa.dev/codecoverage) for Galasa based on data from Jacoco.
 
-recycle-prod1:
-This pipeline recycles deployments in the prod1 ecosystem: api, testcatalog, engine-controller, resource-monitor and metrics. This is triggered after code is promoted to production so that the ecosystem has the latest Galasa code.
-
 update-prod1:
 This pipeline runs a `helm upgrade` to update the prod1 service using the [latest Galasa service Helm chart](https://github.com/galasa-dev/helm). This is triggered after code is promoted to production so that the service has the latest Galasa code.
 

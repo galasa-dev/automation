@@ -7,7 +7,7 @@
 # This EventListener gets called when there is a 'Main Build Orchestrator'
 # workflow run that has completed successfully in the 'galasa' repository.
 
-# It calls the Tekton Pipeline 'recycle-prod1' which is responsible for 
+# It calls the Tekton Pipeline 'update-prod1' which is responsible for 
 # recycling the Deployments of the prod1 Galasa service.
 
 # It also calls the Tekton Pipeline 'build-internal-integratedtests' which
@@ -68,10 +68,10 @@ spec:
             - apiVersion: tekton.dev/v1beta1
               kind: PipelineRun
               metadata:
-                generateName: recycle-prod1-
+                generateName: update-prod1-
               spec:
                 pipelineRef:
-                  name: recycle-prod1
+                  name: update-prod1
                 serviceAccountName: galasa-build-bot
                 workspaces:
                 - name: git-workspace

@@ -53,7 +53,7 @@ Options are:
 
 (from the 'main' build chain)
 --automation
---recycle-prod1
+--update-prod1
 --test-cli
 -p | --pipeline xxx : Set the name of pipeline to run explicitly
 
@@ -87,7 +87,7 @@ while [ "$1" != "" ]; do
     case $1 in
         --automation )              pipeline="branch-automation"
                                     ;;
-        --recycle-prod1 )           pipeline="recycle-prod1"
+        --update-prod1 )           pipeline="update-prod1"
                                     ;;
         -p | --pipeline )           shift
                                     pipeline=$1
