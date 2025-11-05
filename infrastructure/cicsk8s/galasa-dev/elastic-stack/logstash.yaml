@@ -33,7 +33,9 @@ spec:
             user => "${GALASA_ES_USER}"
             password => "${GALASA_ES_PASSWORD}"
             ssl_certificate_authorities => "${GALASA_ES_SSL_CERTIFICATE_AUTHORITY}"
-            index => "logs-%{+YYYY.MM.dd}"
+            data_stream => true
+            data_stream_type => "logs"
+            data_stream_dataset => "prod1"
           }
         }
   services:
