@@ -196,21 +196,20 @@ spec:
 #
 #
 #
-# Uncomment the following 'finally' block once we have checked that the pipeline is working as intended
-  # finally:
-  # - name: report-failed-build
-  #   when:
-  #     - input: "$(tasks.status)"
-  #       operator: in
-  #       values: ["Failed"]
-  #   taskRef:
-  #     name: slack-post
-  #   params:
-  #   - name: pipelineName
-  #     value: $(context.pipeline.name)
-  #   - name: pipelineRunName
-  #     value: $(context.pipelineRun.name)
-  #   - name: branchFlag
-  #     value: ""
-  #   - name: branch
-  #     value: ""
+  finally:
+  - name: report-failed-build
+    when:
+      - input: "$(tasks.status)"
+        operator: in
+        values: ["Failed"]
+    taskRef:
+      name: slack-post
+    params:
+    - name: pipelineName
+      value: $(context.pipeline.name)
+    - name: pipelineRunName
+      value: $(context.pipelineRun.name)
+    - name: branchFlag
+      value: ""
+    - name: branch
+      value: ""

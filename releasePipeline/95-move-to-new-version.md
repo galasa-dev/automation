@@ -18,8 +18,6 @@ These are manual steps to bump the version of Galasa to the next version.
 
     f. When the Isolated Main build is triggered following the CLI module build, cancel it on the GitHub UI [here](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) with the "Cancel Workflow" button, as you are going to rebuild it in a next step anyway.
 
-    **Note:** Once the Galasa mono repo's build finishes, this will trigger the `recycle-prod1` Tekton pipeline, which will then trigger the `run-tests` Tekton pipeline. The `run-tests` will fail as the CPS properties have not yet been upgraded to the new development version (unless you have already done it with galasactl) - this is okay.
-
 3. Upgrade [Helm](https://github.com/galasa-dev/helm)
 
     a. Invoke the `set-version --version {new version}` script.
