@@ -26,12 +26,7 @@ javadoc:
   deploy: false
   branch: main
   imageName: ghcr.io/galasa-dev/javadoc-maven-artefacts
-  imageTag: main
-javadocsite:
-  deploy: false
-  branch: main
-  imageName: ghcr.io/galasa-dev/javadoc-site
-  imageTag: main  
+  imageTag: main 
 restApiDocSite:
   deploy: false
   branch: main
