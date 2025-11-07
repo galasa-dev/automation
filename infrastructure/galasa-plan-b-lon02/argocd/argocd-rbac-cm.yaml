@@ -16,7 +16,6 @@ data:
   policy.default: role:readonly
   policy.csv: |
     p, role:member, applications, *, default/main-maven-repos, deny
-    p, role:member, applications, *, default/javadoc-site, deny
     p, role:member, applications, *, default/galasa-development-namespace, deny
     p, role:member, applications, create, default/*, allow
     p, role:member, applications, delete, default/*, allow
