@@ -56,7 +56,6 @@ Namespaces in which cert-installer has been installed in:
 | galasa2 | galasa2-tls | galasa2-tls-secret | Not in active use. Available for development and testing purposes |
 | galasa-development | devgalasa-tls | devgalasa-tls-secret | Used by the development.galasa.dev services |
 | galasa-ecosystem1 | ecosystem1-tls | ecosystem1-tls-secret | Used by the galasa-ecosystem1.galasa.dev service |
-| galasa-production | restapidoc-tls | restapidoc-tls-secret | This entry should be removed once rest.galasa.dev is being served as part of the galasa.dev docs |
 
 ## Issuing a certificate manually
 

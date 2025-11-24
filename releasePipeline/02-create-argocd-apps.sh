@@ -60,9 +60,6 @@ function create_maven_repos {
                     --helm-set javadocsite.branch=${release_type} \
                     --helm-set javadocsite.imageTag=${release_type} \
                     --helm-set javadocsite.deploy=true \
-                    --helm-set restApiDocSite.branch=${release_type} \
-                    --helm-set restApiDocSite.imageTag=${release_type} \
-                    --helm-set restApiDocSite.deploy=true \
                     --helm-set isolated.branch=${release_type} \
                     --helm-set isolated.imageTag=${release_type} \
                     --helm-set isolated.deploy=true \

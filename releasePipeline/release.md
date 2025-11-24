@@ -106,10 +106,6 @@ For any tests which fail, run them again individually:
 
 1. Run [34-deploy-docker-galasa.sh](./34-deploy-docker-galasa.sh) - Deploy the Container images to ICR. It finds the version number we are releasing automatically. Re-tags the current images, and uploads the new ones. Takes over 20 mins.
 
-### Update external sites
-
-1. [40-production-sites.md](./40-production-sites.md) - Follow the instructions to update the IBM Cloud Galasa external sites.
-
 ### Create version tag from release branch
 
 <!-- Will improve on this part -->
@@ -164,7 +160,6 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
    - galasa-isolated-zip
    - galasa-mvp
    - galasa-mvp-zip
-   - restapidoc-site
    - buildutils-executables
    - simplatform-maven-artefacts
 3. Repeat steps 1 and 2 but with the branch 'pre-release'

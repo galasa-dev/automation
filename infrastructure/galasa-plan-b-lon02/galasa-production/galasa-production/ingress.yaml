@@ -3,31 +3,18 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: community-ingress-resource
-  namespace: galasa-production
-  annotations:
-    kubernetes.io/ingress.class: "public-iks-k8s-nginx"
-spec:
-  tls:
-  - hosts:
-    - rest.galasa.dev
-    # - development.galasa.dev
-    secretName: restapidoc-tls-secret
-  rules:
- 
-  - host: rest.galasa.dev
-    http:
-      paths:
-      - backend:
-          service:
-            name: restapidoc-stable
-            port:
-              number: 80
-        path: /
-        pathType: ImplementationSpecific
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: community-ingress-resource
+#   namespace: galasa-production
+#   annotations:
+#     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+# spec:
+#   tls:
+#   - hosts:
+#     - development.galasa.dev
+#   rules:
 
   # Commented-out as the GitHub copyright app is not in use and is not functional at the moment.
   # Should it be re-instated in the future, this Ingress path may be useful as a reference point.

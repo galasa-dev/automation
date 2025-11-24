@@ -22,7 +22,7 @@ These are the settings currently held in the DNS table currently.
 | A | galasa-ecosystem1.galasa.dev | 169.50.192.70 ||
 | A | javadoc.galasa.dev | URL redirect to https://galasa.dev/docs/reference/javadoc/ | |
 | A | javadoc-snapshot.galasa.dev | 169.50.192.70 ||
-| A | rest.galasa.dev | 169.50.192.70 ||
+| A | rest.galasa.dev | URL redirect to https://galasa.dev/docs/reference/rest-api/ ||
 | A | triggers.galasa.dev | 169.50.192.70 ||
 | ALIAS | galasa.dev | galasa-dev.github.io | Main documentation site. See galasa-dev/galasa-docs repo |
 | CNAME | www.galasa.dev | galasa-dev.github.io | Main documentation site. See galasa-dev/galasa-docs repo |
