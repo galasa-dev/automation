@@ -1,0 +1,32 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inttests-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.ingress.externalHostname }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: inttests-{{ .Values.branch }}
+            port:
+              number: 80
+        path: /{{ .Values.branch }}/maven-repo/{{ .Values.ingress.pathSuffix }}
+        pathType: Prefix

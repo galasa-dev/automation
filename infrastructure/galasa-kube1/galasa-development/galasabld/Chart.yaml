@@ -1,0 +1,12 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: v2
+name: galasabld
+description: Configuration for galasabld binary downloadable site
+type: application
+version: 0.1.0
+appVersion: "0.20.0"
