@@ -1,0 +1,31 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simplatform-{{ .Values.branch }}
+  namespace: {{ .Values.namespace }}
+    
+spec:
+  ingressClassName: public-iks-k8s-nginx
+  tls:
+  - hosts:
+    # - development.galasa.dev
+    - development.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+    secretName: devgalasa-tls-secret
+  rules:
+  # - host: development.galasa.dev
+  - host: development.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+    http:
+      paths:
+      - backend:
+          service:
+            name: simplatform-{{ .Values.branch }}
+            port:
+              number: 80
+        path: /{{ .Values.branch }}/maven-repo/simplatform
+        pathType: Prefix
