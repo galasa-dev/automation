@@ -1,0 +1,52 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # url: https://argocd.galasa.dev
+  url: https://argocd.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+#
+#
+#
+  accounts.galasa: "apiKey,login"
+  accounts.galasa.enabled: "true"
+
+  accounts.temp: "apiKey,login"
+  accounts.temp.enabled: "false"
+#
+#
+#
+  resource.customizations: |
+    networking.k8s.io/Ingress:
+        health.lua: |
+          hs = {}
+          hs.status = "Healthy"
+          return hs
+#
+#
+#
+  dex.config: |
+    connectors:
+    - type: github
+      id: github
+      name: github.com
+      config:
+        clientID: $argocd-secret:dex.github.clientid
+        clientSecret: $argocd-secret:dex.github.clientsecret
+        orgs:
+        - name: galasa-dev
+          teams:
+          - code-admin
+          - code-committers
+        # Flag which indicates that all user groups and teams should be loaded.
+        loadAllGroups: false
+        useLoginAsID: true
