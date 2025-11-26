@@ -18,8 +18,7 @@
 # The external hostname that the Galasa services can be accessed on via Ingress,
 # must be a valid DNS hostname without a URL scheme (i.e. without "https://").
 #
-# externalHostname: "galasa-service1.galasa.dev"
-externalHostname: "galasa-service1.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud"
+externalHostname: "galasa-service1.galasa.dev"
 #
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
@@ -76,8 +75,7 @@ ingress:
   #     secretName: mysecret
   tls:
     - hosts:
-      # - "galasa-service1.galasa.dev"
-      - "galasa-service1.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud"
+      - "galasa-service1.galasa.dev"
       secretName: service1-tls-secret
 
   # The name of the Secret containing root and intermediate CA certificates in a single .pem file
@@ -130,8 +128,7 @@ dex:
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
-    # issuer: "https://galasa-service1.galasa.dev/dex"
-    issuer: "https://galasa-service1.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud/dex"
+    issuer: "https://galasa-service1.galasa.dev/dex"
 
     connectors:
     - type: github
@@ -140,8 +137,7 @@ dex:
       config:
         clientID: $githubOAuthAppClientId
         clientSecret: $githubOAuthAppClientSecret
-        # redirectURI: https://galasa-service1.galasa.dev/dex/callback
-        redirectURI: https://galasa-service1.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud/dex/callback
+        redirectURI: https://galasa-service1.galasa.dev/dex/callback
         orgs:
         - name: galasa-dev
           teams:

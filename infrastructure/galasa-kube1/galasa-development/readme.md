@@ -17,8 +17,7 @@ Note: Files in this folder are deployed to the cluster by ArgoCD.
 For this you will use the ArgoCD CLI, so you will need to get the CLI token you configured for ArgoCD and set it as an environment variable in your terminal.
 
 1. Look up the value of the `kube1-argocd-cli-token` secret and put it into the `ARGOCD_CLI_TOKEN` environment variable: `export ARGOCD_CLI_TOKEN=<TOKEN>`
-<!-- 2. Set the ArgoCD server as an environment variable: `export ARGOCD_SERVER="argocd.galasa.dev"` -->
-2. Set the ArgoCD server as an environment variable: `export ARGOCD_SERVER=argocd.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud`
+2. Set the ArgoCD server as an environment variable: `export ARGOCD_SERVER="argocd.galasa.dev"`
 3. Log into the ArgoCD server with the CLI: `argocd login $ARGOCD_SERVER --auth-token $ARGOCD_CLI_TOKEN --grpc-web --sso`
 
 ```

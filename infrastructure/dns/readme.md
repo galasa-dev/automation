@@ -14,37 +14,39 @@ These are the settings currently held in the DNS table currently.
 
 | Record Type | subdomain | target | Notes |
 |-------------|-----------|--------|-------|
-| A | argocd.galasa.dev | | 169.50.192.70 ||
-| A | argocd-b.galasa.dev | 169.50.192.70 ||
-| A | copyright.galasa.dev | 169.50.192.70 ||
-| A | development.galasa.dev | 169.50.192.70 ||
-| A | galasa2.galasa.dev | 169.50.192.66 | Created to try out cert-manager for a Galasa service. Maps to the IP of the ingress-nginx-controller LoadBalancer in the ingress-nginx namespace |
 | A | galasa-ecosystem1.galasa.dev | 169.50.192.70 ||
-| A | javadoc.galasa.dev | URL redirect to https://galasa.dev/docs/reference/javadoc/ | |
-| A | javadoc-snapshot.galasa.dev | 169.50.192.70 ||
-| A | rest.galasa.dev | URL redirect to https://galasa.dev/docs/reference/rest-api/ ||
-| A | triggers.galasa.dev | 169.50.192.70 ||
+| CNAME | vnext.galasa.dev | galasa-dev.github.io | Preview of documentation. See galasa-dev/galasa-docs-preview repo |
 | ALIAS | galasa.dev | galasa-dev.github.io | Main documentation site. See galasa-dev/galasa-docs repo |
 | CNAME | www.galasa.dev | galasa-dev.github.io | Main documentation site. See galasa-dev/galasa-docs repo |
-| CNAME | vnext.galasa.dev | galasa-dev.github.io | Preview of documentation. See galasa-dev/galasa-docs-preview repo |
+| URL | javadoc.galasa.dev | URL redirect to https://galasa.dev/docs/reference/javadoc/ ||
 | URL | resources.galasa.dev | URL redirect to https://github.com/galasa-dev/isolated/releases ||
+| URL | rest.galasa.dev | URL redirect to https://galasa.dev/docs/reference/rest-api ||
+| URL | www.rest.galasa.dev | URL redirect to https://galasa.dev/docs/reference/rest-api ||
+| CNAME | argocd-2.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | development-2.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | galasa-service1.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | triggers-2.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | argocd.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | development.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | copyright.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | triggers.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 
-As of 9th July, the DNS records look like this:
+<!-- To be deleted -->
+| A | argocd-b.galasa.dev | 169.50.192.70 ||
+| A | galasa2.galasa.dev | 169.50.192.66 | Created to try out cert-manager for a Galasa service. Maps to the IP of the ingress-nginx-controller LoadBalancer in the ingress-nginx namespace |
+| A | javadoc-snapshot.galasa.dev | 169.50.192.70 ||
+
+As of 26th November, the DNS records look like this:
 ```
 $ORIGIN galasa.dev.
 $TTL 1h
-galasa.dev. 3600 IN SOA ns1.dnsimple.com. admin.dnsimple.com. 1736533337 86400 7200 604800 300
+galasa.dev. 3600 IN SOA ns1.dnsimple.com. admin.dnsimple.com. 1736533392 86400 7200 604800 300
 galasa.dev. 3600 IN NS ns1.dnsimple.com.
 galasa.dev. 3600 IN NS ns2.dnsimple.com.
 galasa.dev. 3600 IN NS ns3.dnsimple.com.
 galasa.dev. 3600 IN NS ns4.dnsimple.com.
 argocd-b.galasa.dev. 60 IN A 169.50.192.70
-argocd.galasa.dev. 60 IN A 169.50.192.70
-copyright.galasa.dev. 60 IN A 169.50.192.70
-development.galasa.dev. 60 IN A 169.50.192.70
 galasa-ecosystem1.galasa.dev. 60 IN A 169.50.192.70
-rest.galasa.dev. 60 IN A 169.50.192.70
-triggers.galasa.dev. 60 IN A 169.50.192.70
 vnext.galasa.dev. 600 IN CNAME galasa-dev.github.io.
 galasa.dev. 3600 IN TXT "forward-email-site-verification=dgUt5B5ttd"
 galasa.dev. 3600 IN MX 10 mx1.forwardemail.net.
@@ -53,6 +55,18 @@ _acme-challenge.galasa.dev. 60 IN TXT "30K3xObf-mVa_KpFPF2vbxi55QinL96LgdtxE7J-B
 _acme-challenge.galasa.dev. 60 IN TXT "rhxkoqbYmUGGRPI8zZoLAeYk7sTsi_KjRfsxG4WK67Y"
 ; galasa.dev. 60 IN ALIAS galasa-dev.github.io.
 www.galasa.dev. 60 IN CNAME galasa-dev.github.io.
-_acme-challenge.javadoc.galasa.dev. 1 IN TXT "FUVCa09SxH_DtVTFoV9f3RRQktj5vJm7yimT7BzZsJs"
 ; javadoc.galasa.dev. 60 IN URL https://galasa.dev/docs/reference/javadoc/
+; resources.galasa.dev. 60 IN URL https://github.com/galasa-dev/isolated/releases
+galasa2.galasa.dev. 60 IN A 169.50.192.66
+_acme-challenge.galasa.dev. 60 IN TXT "vxYXQd3Wb8geJi1_S30rlrlfz9j-Jje5NaDmzwQWp9E"
+; rest.galasa.dev. 60 IN URL https://galasa.dev/docs/reference/rest-api/
+; www.rest.galasa.dev. 60 IN URL https://galasa.dev/docs/reference/rest-api/
+argocd-2.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+development-2.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+galasa-service1.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+triggers-2.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+argocd.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+development.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+copyright.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+triggers.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
 ```
