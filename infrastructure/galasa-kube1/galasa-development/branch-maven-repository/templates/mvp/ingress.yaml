@@ -17,12 +17,10 @@ spec:
   ingressClassName: public-iks-k8s-nginx
   tls:
   - hosts:
-    # - development.galasa.dev
-    - development.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+    - development.galasa.dev
     secretName: devgalasa-tls-secret
   rules:
-  # - host: development.galasa.dev
-  - host: development.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+  - host: development.galasa.dev
     http:
       paths:
       - backend:

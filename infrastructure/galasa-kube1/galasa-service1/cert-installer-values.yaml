@@ -11,8 +11,7 @@
 #   - myservice.galasa.dev
 #
 dnsNames:
-  # - galasa-service1.galasa.dev
-  - galasa-service1.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+  - galasa-service1.galasa.dev
 
 # The name of the ingress class that you are using for your exposed Ingress resources.
 # Different cloud providers may offer their own ingress classes. For example, IBM Cloud

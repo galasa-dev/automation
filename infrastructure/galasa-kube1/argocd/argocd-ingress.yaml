@@ -16,12 +16,10 @@ spec:
   ingressClassName: public-iks-k8s-nginx
   tls:
   - hosts:
-    # - argocd.galasa.dev
-    - argocd.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+    - argocd.galasa.dev
     secretName: argocd-tls-secret
   rules:
-  # - host: argocd.galasa.dev
-  - host: argocd.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+  - host: argocd.galasa.dev
     http:
       paths:
       - backend:

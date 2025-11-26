@@ -12,8 +12,7 @@ metadata:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd
 data:
-  # url: https://argocd.galasa.dev
-  url: https://argocd.galasa-kube1-d2e8765deb38dddd0aa1b649462cf87f-0000.eu-gb.containers.appdomain.cloud
+  url: https://argocd.galasa.dev
 #
 #
 #
