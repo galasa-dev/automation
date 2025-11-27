@@ -35,7 +35,7 @@ jobs:
       - name: Run the 'CoreManagerIVT'
         env:
           GALASA_HOME: /galasa
-          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE1 }}
           GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
         run: |
           docker run --rm \

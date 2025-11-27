@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-name: Helm build (ecosystem1)
+name: Helm build (galasa-service1)
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
   build-helm:
     # Skip this job for forks
     if: ${{ github.repository_owner == 'galasa-dev' }}
-    name: Build Helm chart for ecosystem1
+    name: Build Helm chart for galasa-service1
     runs-on: ubuntu-latest
 
     steps:
@@ -42,19 +42,19 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ env.KUBE_CONFIG_PLAN_B_CLUSTER }}" >> $HOME/.kube/config
       
-      - name: Uninstall ecosystem1
+      - name: Uninstall galasa-service1
         run: |
-          helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
+          helm uninstall main-service --ignore-not-found --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
       
       # Default timeout is 5m0s. Stating that explicitly so we can change it easily.
       # The install takes a long time because we are waiting for all the pods to start up.
-      - name: Install ecosystem1
+      - name: Install galasa-service1
         run: |
-          helm install main-ecosystem ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-service1 --values ${{ github.workspace }}/infrastructure/galasa-kube1/galasa-service1/helm-values.yaml --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
+          helm install main-service ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-service1 --values ${{ github.workspace }}/infrastructure/galasa-kube1/galasa-service1/helm-values.yaml --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
 
-      - name: Test ecosystem1
+      - name: Test galasa-service1
         run: |
-          helm test main-ecosystem --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
+          helm test main-service --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
 
   trigger-next-workflow:
     # Skip this job for forks

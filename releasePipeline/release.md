@@ -62,7 +62,7 @@ The steps below are to ensure the MVP zip works as described in the documentatio
 
 #### Tests that run from GitHub Actions
 
-Each of these scripts starts a GitHub Actions workflow. These test suites run tests from the GitHub Actions runner either locally in the runner, or they submit tests to run remotely on ecosystem1.
+Each of these scripts starts a GitHub Actions workflow. These test suites run tests from the GitHub Actions runner either locally in the runner, or they submit tests to run remotely on galasa-service1.
 
 The script will give you the URL of the workflow run. You will have to monitor the workflow run in GitHub Actions and ensure it finishes successfully and all tests pass.
 
@@ -70,7 +70,7 @@ The script will give you the URL of the workflow run. You will have to monitor t
 
 1. Run [23-run-isolated-tests.sh](./23-run-isolated-tests.sh). This tests that the Simbank, Core and Artifact Managers work offline using just the Isolated/MVP zips.
 2. Run [24-run-simbank-ivts.sh](./24-run-simbank-ivts.sh). This tests that the Simbank Managers work online.
-3. Run [25-run-ecosystem1-ivts.sh](./25-run-ecosystem1-ivts.sh). This tests the Core, Artifact and HTTP Managers work online.
+3. Run [25-run-ivts.sh](./25-run-ivts.sh). This tests the Core, Artifact and HTTP Managers work online.
 
 #### Tests that run from Tekton
 

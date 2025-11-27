@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-name: Apply Galasa Resources for 'ecosystem1'
+name: Apply Galasa Resources for 'galasa-service1'
 
 on:
   push:
@@ -15,7 +15,7 @@ env:
   BRANCH: ${{ github.ref_name }}
 
 jobs:
-  # This workflow applies the Galasa resources YAML file used by the 'ecosystem1' Galasa service.
+  # This workflow applies the Galasa resources YAML file used by the 'galasa-service1' Galasa service.
   apply-galasa-resources:
     name: Apply Galasa resources YAML file
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
       - name: Run the 'galasactl resources apply' command
         env:
           GALASA_HOME: /galasa
-          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE1 }}
           GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
         run: |
           docker run --rm \
