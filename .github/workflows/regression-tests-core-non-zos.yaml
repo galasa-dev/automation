@@ -35,13 +35,14 @@ jobs:
           ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
           rm -rf /galasa/*
 
-      # Only include the non-zos tests that can run on ecosystem1.
+      # Only include the non-zos tests that can run on galasa-service1.
       # This currently excludes the `dev.galasa.ivts.docker` and `dev.galasa.ivts.compilation` tests
       # as they require a remote Docker engine to be available.
       - name: Prepare test portfolio for 'ivts' test stream
         env:
           GALASA_HOME: /galasa
-          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE1 }}
+          GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
         run: |
           docker run --rm \
           --env GALASA_HOME=${{ env.GALASA_HOME }} \
@@ -50,7 +51,7 @@ jobs:
           -v ${{ github.workspace }}/galasa:/galasa:rw \
           ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
           galasactl runs prepare \
-          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
+          --bootstrap ${{ env.GALASA_SERVICE_BOOTSTRAP_URL }} \
           --stream ivts \
           --package artifact \
           --package core \
@@ -61,7 +62,8 @@ jobs:
       - name: Submit test portfolio for 'ivts' test stream
         env:
           GALASA_HOME: /galasa
-          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE1 }}
+          GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
         run: |
           docker run --rm \
           --env GALASA_HOME=${{ env.GALASA_HOME }} \
@@ -70,7 +72,7 @@ jobs:
           -v ${{ github.workspace }}/galasa:/galasa:rw \
           ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
           galasactl runs submit \
-          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
+          --bootstrap ${{ env.GALASA_SERVICE_BOOTSTRAP_URL }} \
           --portfolio /galasa/tests.yaml \
           --throttle "10" \
           --throttlefile throttle \
@@ -91,6 +93,6 @@ jobs:
           ghcr.io/${{ env.NAMESPACE }}/galasabld-ibm:main \
           slackpost tests \
           --path /galasa/test.json \
-          --name "Core tests - ecosystem1" \
+          --name "Core tests - galasa-service1" \
           --desc "Core, HTTP, Artifact etc" \
           --hook ${{ env.SLACK_WEBHOOK }}

@@ -7,7 +7,7 @@
 #
 #-----------------------------------------------------------------------------------------                   
 #
-# Objectives: Run Core IVTs in ecosystem1.
+# Objectives: Run Core IVTs in galasa-service1.
 #
 # Environment variable over-rides:
 # 
