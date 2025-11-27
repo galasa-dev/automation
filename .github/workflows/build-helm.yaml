@@ -44,17 +44,17 @@ jobs:
       
       - name: Uninstall ecosystem1
         run: |
-          helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
+          helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
       
       # Default timeout is 5m0s. Stating that explicitly so we can change it easily.
       # The install takes a long time because we are waiting for all the pods to start up.
       - name: Install ecosystem1
         run: |
-          helm install main-ecosystem ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{ github.workspace }}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
+          helm install main-ecosystem ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-service1 --values ${{ github.workspace }}/infrastructure/galasa-kube1/galasa-service1/helm-values.yaml --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
 
       - name: Test ecosystem1
         run: |
-          helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
+          helm test main-ecosystem --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
 
   trigger-next-workflow:
     # Skip this job for forks

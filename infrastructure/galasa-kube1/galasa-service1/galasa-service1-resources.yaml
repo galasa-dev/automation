@@ -4,7 +4,14 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 # The Galasa resources defined in this file are applied to the 'service1' service.
-# TODO: No need to apply these until the DNS records have been sorted and development.galasa.dev points to the correct place.
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.streams
+data:
+    value: ivts
+---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
 metadata:

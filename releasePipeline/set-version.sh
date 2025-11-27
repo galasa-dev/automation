@@ -121,7 +121,7 @@ function update_property_version {
 function upgrade_test_stream_ivts_location_version {
     property_name="test.stream.ivts.location"
     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    ecosystem1_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml"
+    ecosystem1_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-kube1/galasa-service1/galasa-service1-resources.yaml"
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/dev[.]galasa[.]ivts[.]obr-[0-9.]+-testcatalog[.]json"
     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/dev.galasa.ivts.obr-${galasa_version}-testcatalog.json"
 
@@ -133,7 +133,7 @@ function upgrade_test_stream_ivts_location_version {
 function upgrade_test_stream_ivts_obr_version {
     property_name="test.stream.ivts.obr"
     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    ecosystem1_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml"
+    ecosystem1_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-kube1/galasa-service1/galasa-service1-resources.yaml"
     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/obr"
     new_value="mvn:dev.galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/obr"
 

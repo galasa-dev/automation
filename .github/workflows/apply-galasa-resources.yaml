@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml
+            infrastructure/galasa-kube1/galasa-service1/galasa-service1-resources.yaml
           sparse-checkout-cone-mode: false
 
       - name: Ensure permissions for mounted /galasa directory
@@ -48,15 +48,16 @@ jobs:
         env:
           GALASA_HOME: /galasa
           GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_ECOSYSTEM1 }}
+          GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
         run: |
           docker run --rm \
           --env GALASA_HOME=${{ env.GALASA_HOME }} \
           --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
           --user galasa:galasa \
-          -v ${{ github.workspace }}/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/galasa-ecosystem1-resources.yaml:/var/workspace/galasa-ecosystem1-resources.yaml \
+          -v ${{ github.workspace }}/infrastructure/galasa-kube1/galasa-service1/galasa-service1-resources.yaml:/var/workspace/galasa-service1-resources.yaml \
           -v ${{ github.workspace }}/galasa:/galasa:rw \
           ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
           galasactl resources apply \
-          --bootstrap https://galasa-ecosystem1.galasa.dev/api/bootstrap \
-          --file /var/workspace/galasa-ecosystem1-resources.yaml \
+          --bootstrap ${{ env.GALASA_SERVICE_BOOTSTRAP_URL }} \
+          --file /var/workspace/galasa-service1-resources.yaml \
           --log -
