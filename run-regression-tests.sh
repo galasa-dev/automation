@@ -154,7 +154,7 @@ if [[ "${targetBranch}" != "main" ]]; then
                     --sync-option Prune=true \
                     --repo https://github.com/galasa-dev/automation \
                     --revision HEAD \
-                    --path infrastructure/galasa-plan-b-lon02/galasa-development/branch-maven-repository \
+                    --path infrastructure/galasa-kube1/galasa-development/branch-maven-repository \
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace galasa-development \
                     --grpc-web

@@ -59,7 +59,7 @@ cicsk8s:
 * All Tekton build pipelines are run on the internal cluster.
 * The ArgoCD instance which controls all resources for the pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
 
-galasa-plan-b-lon02: 
+galasa-kube1: 
 * All Deployments, Services and Ingresses which make up our Maven artifact repositories are hosted on the external cluster.
 * The [ArgoCD](argocd.galasa.dev) instance which controls the above resources is hosted on the external cluster.
 
