@@ -182,7 +182,7 @@ dex:
 #   "admin"       - A user with access to all the functionality provided by Galasa.
 #                   We recommend only using this setting if you want every user to be an administrator
 #                   (unlikely).
-galasaDefaultUserRole: "admin"
+galasaDefaultUserRole: "tester"
 #
 #
 # Values related to the encryption of Galasa secrets
