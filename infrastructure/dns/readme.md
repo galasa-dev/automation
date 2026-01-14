@@ -28,11 +28,11 @@ These are the settings currently held in the DNS table currently.
 | CNAME | copyright.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 | CNAME | triggers.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 
-As of 26th November, the DNS records look like this:
+As of 2nd December, the DNS records look like this:
 ```
 $ORIGIN galasa.dev.
 $TTL 1h
-galasa.dev. 3600 IN SOA ns1.dnsimple.com. admin.dnsimple.com. 1736533392 86400 7200 604800 300
+galasa.dev. 3600 IN SOA ns1.dnsimple.com. admin.dnsimple.com. 1736533401 86400 7200 604800 300
 galasa.dev. 3600 IN NS ns1.dnsimple.com.
 galasa.dev. 3600 IN NS ns2.dnsimple.com.
 galasa.dev. 3600 IN NS ns3.dnsimple.com.
