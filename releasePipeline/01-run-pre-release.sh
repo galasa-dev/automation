@@ -69,10 +69,5 @@ $RELEASE_BASEDIR/05-helm-charts.sh --prerelease
 h1 "run 10-build-galasa-mono-repo.sh"
 $RELEASE_BASEDIR/10-build-galasa-mono-repo.sh --prerelease --wait
 
-# This will need to be removed once the webui is built as part of the main build chain
-# (see https://github.com/galasa-dev/projectmanagement/issues/1960)
-h1 "run 11-build-webui.sh"
-$RELEASE_BASEDIR/11-build-webui.sh --prerelease
-
 h1 "run 20-check-artifacts-signed.sh"
 $RELEASE_BASEDIR/20-check-artifacts-signed.sh
