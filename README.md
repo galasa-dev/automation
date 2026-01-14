@@ -3,6 +3,7 @@
 This repository is the single location for all the automation and CI/CD that occurs in Galasa. 
 
 Find out more about:
+1. [.github](#github-actions): GitHub Actions workflows
 1. [build-images](#build-images): Custom images required for the build process
 1. [dockerfiles](#dockerfiles): The organised Dockerfiles for all the images built for Galasa
 1. [docs](#docs): Documentation pages and images
@@ -10,6 +11,49 @@ Find out more about:
 1. [offline-tools](#offline-tools): Source code for the copyright checker tool
 1. [pipelines](#pipelines): The CustomResourceDefinitions used in our Tekton build pipelines, ClusterRoles, EventListeners, Pipelines, Roles, ServiceAccounts and Tasks
 1. [releasePipeline](#release-pipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
+
+# GitHub-Actions
+
+This directory contains GitHub Actions workflows. Runs of these workflows can be found in the [Actions tab](https://github.com/galasa-dev/automation/actions) of this repository.
+
+apply-galasa-resources:
+Uses `galasactl resources apply` to apply changes to the file [galasa-service1-resources.yaml](./infrastructure/galasa-kube1/galasa-service1/galasa-service1-resources.yaml) to galasa-service1's CPS properties.
+
+base-image:
+Builds and pushes the Galasa base httpd image to GHCR. Should be triggered if changes are made to the [base Dockerfile](./dockerfiles/base/base.Dockerfile).
+
+build-automation:
+This workflow runs when code changes are merged into the main branch of this repository. It builds the custom Docker images whose Dockerfiles can be found in the [dockerfiles/common](./dockerfiles/common/) directory, and pushes these to GHCR. More information about these images can be found [below](#dockerfiles).
+
+build-helm:
+Uses the Helm CLI to uninstall, install and test galasa-service1.
+
+pr-build-automation:
+This workflow runs if a Pull Request is opened on this reposutory. It builds the custom Docker images whose Dockerfiles can be found in the [dockerfiles/common](./dockerfiles/common/) directory to make sure they build successfully.
+
+regression-tests-core-non-zos:
+This workflow runs daily and regression tests a selection of the Galasa Managers that do not exercise z/OS so these tests can be run on the external galasa-service1.
+
+run-core-test:
+Runs the test CoreManagerIVT on galasa-service1 for the purpose of verifying the service health.
+
+sync-docker-proxy:
+Runs weekly to sync images stored in Galasa's [GitHub Packages](https://github.com/orgs/galasa-dev/packages) with any updates from Docker Hub.
+
+
+## Release Process Workflows
+
+release-branch-create:
+Creates a new branch on a selection of repositories from a source branch.
+
+release-branch-delete:
+Deletes a branch on a selection of repositories.
+
+release-branch-tag:
+Tags a branch with a `vx.xx.x` tag on a selection of repositories.
+
+release-central-publisher-portal:
+Bundles all dev.galasa artifacts into a zip and uses the Central Publisher Portal API to publish them to the staging repository, before releasing to Maven Central.
 
 
 # Build-images
@@ -39,16 +83,9 @@ This directory is the single location for all Dockerfiles needed to build the im
 
 | Category | Dockerfiles |
 |----------|-------------|
-| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, githubmonitor, githubreceiver, gpg, kubectl, openapi, openjdk17ibmgradle, swagger, tkn | 
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, githubmonitor, githubreceiver, gpg, helm, kubectl, openapi, openjdk17ibmgradle, swagger, tkn | 
 | Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
-
-
-# Docs
-
-This directory contains images for the documentation and instructions for:
-* How to contribute to the project
-* How to authenticate a Pull Request to build
 
 
 # Infrastructure
@@ -56,10 +93,12 @@ This directory contains images for the documentation and instructions for:
 Galasa's infrastructure is currently spread across two Kubernetes clusters - an internal cluster and an external cluster. 
 
 cicsk8s:
-* All Tekton build pipelines are run on the internal cluster.
-* The ArgoCD instance which controls all resources for the pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
+* Galasa Service prod1 on which runs all tests that require internal infrastructure (z/OS, CICS). The ELK stack is also installed on this service for extra monitoring.
+* Tekton build pipelines are run on the internal cluster.
+* The ArgoCD instance which controls all resources for the Tekton pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
 
-galasa-kube1: 
+galasa-kube1:
+* Galasa Service service-1 on which runs all remaining tests.
 * All Deployments, Services and Ingresses which make up our Maven artifact repositories are hosted on the external cluster.
 * The [ArgoCD](argocd.galasa.dev) instance which controls the above resources is hosted on the external cluster.
 
@@ -67,6 +106,8 @@ galasa-kube1:
 # Offline Tools
 
 The offline-tools directory contains the source code for the GitHub Copyright Checker tool. Read more [here](./offline-tools/copyrighter/README.md)
+
+_The GitHub Copyright Checker tool is currently disabled, we plan to reinstate this in the future._
 
 
 # Pipelines
@@ -91,11 +132,21 @@ This EventListener is triggered via webhook when code is pushed into the main br
 branch-automation:
 The pipeline applies changes to the prod1 Galasa service's CPS properties using `galasactl resources apply` if changes have been made to the [cps.properties](./infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file.
 
-codecoverage (**this pipeline is inactive and due to be converted into a GitHub Actions workflow**): 
+codecoverage (_this pipeline is inactive and due to be converted into a GitHub Actions workflow_): 
 This pipeline generates and deploys a [code coverage report](https://development.galasa.dev/codecoverage) for Galasa based on data from Jacoco.
 
 update-prod1:
 This pipeline runs a `helm upgrade` to update the prod1 service using the [latest Galasa service Helm chart](https://github.com/galasa-dev/helm). This is triggered after code is promoted to production so that the service has the latest Galasa code.
+
+
+### How to manually trigger a pipeline?
+
+Use the `trigger-pipeline.sh` script to trigger one of the above pipelines.
+
+For example, to kick off the update-prod1 pipeline:
+```
+./trigger-pipeline.sh --update-prod1
+```
 
 
 ## Roles
@@ -237,31 +288,8 @@ Parameters:
 This task uses the custom [tkn image](https://github.com/galasa-dev/automation/pkgs/container/tkn).
 
 
-## How to manually trigger a pipeline
-Use the `trigger-pipeline.sh` script to trigger one of the main-line build pipelines.
-The tool may not support all the pipelines yet, feel free to add ones which are missing.
-
-For example: To kick-off the extensions pipeline...
-```
-./trigger-pipeline.sh --extensions
-```
-
-> Note: The pipelines kicked off are the mainline pipelines, not pull-request pipelines,
-so be careful as this will cause things to be published to the public repositories.
-
-This tool is useful if there is a glitch in the 'chain' or builds kicked off when 
-something on a `main` branch builds, but fails to kick-off the next build in the 'chain'.
-So you can re-start the chain of builds without resorting to submitting empty change-sets
-and another pull request. 
-
-ie: If the main builds fail and you want to re-start a build.
-
-This can be the case if we get environmental failures, for examople when argocd fails to 
-re-deploy one of the docker images from the build.
-
-## How are the IBM build machines protected from malicious code in a fork-pull-request ?
-There are built-in protections to prevent malicious code being executed as part of a build process
-on the IBM build hardware. The mechanism is described [here](./docs/pull-request-build-authentication.md).
+## How are the IBM build machines protected from malicious code in a fork's Pull Request?
+There are built-in protections to prevent malicious code being executed as part of a build process on the IBM build hardware. The mechanism is described [here](./docs/pull-request-build-authentication.md).
 
 
 # Release Pipeline
