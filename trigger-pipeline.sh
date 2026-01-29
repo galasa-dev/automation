@@ -87,7 +87,9 @@ while [ "$1" != "" ]; do
     case $1 in
         --automation )              pipeline="branch-automation"
                                     ;;
-        --update-prod1 )           pipeline="update-prod1"
+        --update-prod1 )            pipeline="update-prod1"
+                                    ;;
+        --internal-tests )          pipeline="build-internal-integratedtests"
                                     ;;
         -p | --pipeline )           shift
                                     pipeline=$1

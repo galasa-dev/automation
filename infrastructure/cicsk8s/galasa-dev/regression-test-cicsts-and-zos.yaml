@@ -62,7 +62,17 @@ spec:
             - internal-inttests
             - --test
             - ceci.CECIManagerIVT
-            # Use a SEM provisioned region for the CECIManagerIVT.
+            - --test
+            - cemt.CEMTManagerIVT
+            - --test
+            - ceda.CedaManagerIVT
+            - --test
+            - cicsts.CICSTSManagerIVT
+            - --test
+            - sdv.SdvManagerIVT
+            - --test
+            - zos3270.Zos3270IVT
+            # Use a SEM provisioned region.
             - --override
             - cicsts.provision.type=sem
             - --log
@@ -84,47 +94,50 @@ spec:
             - mountPath: /galasa
               name: static-files
 
-          - name: run-prepare-cicsts-ivts
-            command:
-            - galasactl
-            - runs
-            - prepare
-            - --bootstrap
-            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
-            - --portfolio
-            - /galasa/tests.yaml
-            - --append
-            - --stream
-            - ivts
-            - --test
-            - cicsts.CICSTSManagerIVT
-            - --test
-            - cemt.CEMTManagerIVT
-            - --test
-            - ceda.CedaManagerIVT
-            - --test
-            - sdv.SdvManagerIVT
-            # Use DSE region for the remaining CICS TS tests.
-            - --override
-            - cicsts.provision.type=dse
-            - --log
-            - "-"
-            image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
-            imagePullPolicy: IfNotPresent
-            resources: {}
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: File
-            env:
-            - name: GALASA_HOME
-              value: /galasa
-            - name: GALASA_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: galasa-prod1-token
-                  key: token
-            volumeMounts:
-            - mountPath: /galasa
-              name: static-files
+          # TEMPORARY - The DSE Region is broken so will temporarily run all
+          # CICS tests with the SEM provisioned region on the internal stream.
+
+          # - name: run-prepare-cicsts-ivts
+          #   command:
+          #   - galasactl
+          #   - runs
+          #   - prepare
+          #   - --bootstrap
+          #   - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+          #   - --portfolio
+          #   - /galasa/tests.yaml
+          #   - --append
+          #   - --stream
+          #   - ivts
+          #   - --test
+          #   - cicsts.CICSTSManagerIVT
+          #   - --test
+          #   - cemt.CEMTManagerIVT
+          #   - --test
+          #   - ceda.CedaManagerIVT
+          #   - --test
+          #   - sdv.SdvManagerIVT
+          #   # Use DSE region for the remaining CICS TS tests.
+          #   - --override
+          #   - cicsts.provision.type=dse
+          #   - --log
+          #   - "-"
+          #   image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
+          #   imagePullPolicy: IfNotPresent
+          #   resources: {}
+          #   terminationMessagePath: /dev/termination-log
+          #   terminationMessagePolicy: File
+          #   env:
+          #   - name: GALASA_HOME
+          #     value: /galasa
+          #   - name: GALASA_TOKEN
+          #     valueFrom:
+          #       secretKeyRef:
+          #         name: galasa-prod1-token
+          #         key: token
+          #   volumeMounts:
+          #   - mountPath: /galasa
+          #     name: static-files
 
           - name: run-prepare-zos-ivts
             command:
@@ -138,8 +151,8 @@ spec:
             - --append
             - --stream
             - ivts
-            - --test
-            - zos3270.Zos3270IVT
+            # - --test
+            # - zos3270.Zos3270IVT
             - --test
             - zos.ZosManagerIVT
             - --test

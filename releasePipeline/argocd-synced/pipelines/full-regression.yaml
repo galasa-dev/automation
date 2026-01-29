@@ -27,6 +27,10 @@ spec:
 #
 #
 #
+# This just runs DockerLocalJava17Ubuntu now...
+# 
+# 
+# 
   - name: regression-run
     taskRef: 
       name: galasactl
