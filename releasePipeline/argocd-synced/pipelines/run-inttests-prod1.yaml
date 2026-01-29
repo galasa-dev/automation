@@ -1,0 +1,67 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: run-inttests-prod1
+  namespace: galasa-build
+spec:
+#
+#
+#
+  params:
+  - name: distBranch
+    type: string
+  - name: version
+    type: string
+  - name: bootVersion
+    type: string
+#
+#
+#
+  tasks:
+#
+#
+#
+  - name: run-cicsts-and-3270-tests
+    taskRef: 
+      name: galasactl
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
+    - name: command
+      value: 
+        - runs
+        - submit
+        - --bootstrap
+        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+        - --stream
+        - internal-inttests
+        # Select the tests with the --class flag.
+        - --class
+        - dev.galasa.internal.inttests/dev.galasa.internal.inttests.cicsts.CICSTSManagerIVT
+        - --class
+        - dev.galasa.internal.inttests/dev.galasa.internal.inttests.cemt.CEMTManagerIVT
+        - --class
+        - dev.galasa.internal.inttests/dev.galasa.internal.inttests.ceda.CedaManagerIVT
+        - --class
+        - dev.galasa.internal.inttests/dev.galasa.internal.inttests.ceci.CECIManagerIVT
+        - --class
+        - dev.galasa.internal.inttests/dev.galasa.internal.inttests.zos3270.Zos3270IVT
+        - --class
+        - dev.galasa.internal.inttests/dev.galasa.internal.inttests.sdv.SdvManagerIVT
+        - --throttle
+        - '10'
+        - --poll
+        - '10'
+        - --progress
+        - '1'
+        - --trace
+        - --log # Otherwise there is no output
+        - "-"

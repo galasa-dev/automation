@@ -27,50 +27,51 @@ spec:
 #
 #
 #
-  - name: run-cicsts-tests
-    taskRef: 
-      name: galasactl
-    params:
-    - name: context
-      value: $(context.pipelineRun.name)
-    - name: galasaHome
-      value: /workspace/git/$(context.pipelineRun.name)
-    - name: command
-      value: 
-        - runs
-        - submit
-        - --bootstrap
-        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
-        - --stream
-        - ivts
-        # Overrides the current CPS property which says to use SEM.
-        - --override
-        - cicsts.provision.type=dse
-        # Select the CICS tests with the --class flag.
-        - --class
-        - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cicsts.CICSTSManagerIVT
-        - --class
-        - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cemt.CEMTManagerIVT
-        - --class
-        - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceda.CedaManagerIVT
-        # Currently not set up - will add in when it is...
-        # - --class
-        # - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceci.CECIManagerIVT
-        - --throttle
-        - '10'
-        - --poll
-        - '10'
-        - --progress
-        - '1'
-        - --trace
-        - --log # Otherwise there is no output
-        - "-"
+# TEMPORARILY MOVED TO THE INTERNAL-INTTESTS STREAM TO USE SEM PROVISIONING.
+  # - name: run-cicsts-tests
+  #   taskRef: 
+  #     name: galasactl
+  #   params:
+  #   - name: context
+  #     value: $(context.pipelineRun.name)
+  #   - name: galasaHome
+  #     value: /workspace/git/$(context.pipelineRun.name)
+  #   - name: command
+  #     value: 
+  #       - runs
+  #       - submit
+  #       - --bootstrap
+  #       - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+  #       - --stream
+  #       - ivts
+  #       # Overrides the current CPS property which says to use SEM.
+  #       - --override
+  #       - cicsts.provision.type=dse
+  #       # Select the CICS tests with the --class flag.
+  #       - --class
+  #       - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cicsts.CICSTSManagerIVT
+  #       - --class
+  #       - dev.galasa.zos.ivts/dev.galasa.zos.ivts.cemt.CEMTManagerIVT
+  #       - --class
+  #       - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceda.CedaManagerIVT
+  #       # Currently not set up - will add in when it is...
+  #       # - --class
+  #       # - dev.galasa.zos.ivts/dev.galasa.zos.ivts.ceci.CECIManagerIVT
+  #       - --throttle
+  #       - '10'
+  #       - --poll
+  #       - '10'
+  #       - --progress
+  #       - '1'
+  #       - --trace
+  #       - --log # Otherwise there is no output
+  #       - "-"
 # 
 # 
 # 
   - name: run-zos-tests
-    runAfter:
-      - run-cicsts-tests
+    # runAfter:
+    #   - run-cicsts-tests
     taskRef: 
       name: galasactl
     params:
@@ -87,8 +88,8 @@ spec:
         - --stream
         - ivts
         # Select the z/OS tests with the --class flag.
-        - --class
-        - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos3270.Zos3270IVT
+        # - --class
+        # - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos3270.Zos3270IVT
         - --class
         - dev.galasa.zos.ivts/dev.galasa.zos.ivts.zos.ZosManagerIVT
         - --class

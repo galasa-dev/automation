@@ -158,7 +158,60 @@ EOF
     note "If any fail, you will need to re-run these tests."
 }
 
+
+function run_inttests_prod1 {
+    h1 "Trying to kick off CICS and z/OS IVTs on prod1..."
+
+    yaml_file="run_inttests_prod1.yaml"
+
+    rm -f temp/${yaml_file}
+    cat << EOF > temp/${yaml_file}
+#
+# Copyright contributors to the Galasa project 
+#
+kind: PipelineRun
+apiVersion: tekton.dev/v1beta1
+metadata:
+  generateName: run-inttests-prod1-
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
+#
+spec:
+  params:
+  - name: distBranch
+    value: release
+  - name: version
+    value: "${galasa_version}"
+  - name: bootVersion
+    value: "${boot_version}"
+#
+#
+#
+  pipelineRef:
+    name: run-inttests-prod1
+
+
+EOF
+
+    output=$(kubectl -n galasa-build create -f temp/${yaml_file})
+    # Outputs a line of text like this: 
+    # pipelinerun.tekton.dev/delete-branches-galasa-8cbj8 created
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to run inttests on prod1. rc=$?"
+        exit 1
+    fi
+    info "kubectl create pipeline run output: $output"
+
+
+    success "run-inttests-prod1 kicked off."
+    bold "Now use the Tekton dashboard to monitor it to see that they all work."
+    note "If any fail, you will need to re-run these tests."
+}
+
 set_kubernetes_context
 get_galasa_version_to_be_released
 get_current_boot_version
 run_ivts_prod1
+run_inttests_prod1
