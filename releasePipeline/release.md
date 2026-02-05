@@ -110,7 +110,6 @@ For any tests which fail, run them again individually:
 ### Create version tag from release branch
 
 <!-- Will improve on this part -->
-1. Ensure the 'release' branch on the automation repository is up to date with 'main' - it will be one commit behind as it won't have the updates to the galasa-production sites' image versions.
 1. Ensure the 'release' branch on the galasa-docs-preview repository is up to date with 'main', in case any Main builds in Galasa ran and re-updated 'main'.
 1. Publish the Galasa docs preview to the production site. Start the [Publish site to production workflow](https://github.com/galasa-dev/galasa-docs-preview/actions/workflows/publish.yaml) by clicking "Run workflow".
 1. Ensure the 'release' branch on the galasa-docs repository is up to date with 'main'.
