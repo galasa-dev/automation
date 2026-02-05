@@ -26,7 +26,7 @@ metadata:
     namespace: framework
     name: test.stream.ivts.location
 data:
-    value: https://development.galasa.dev/main/maven-repo/ivts/dev/galasa/dev.galasa.ivts.obr/0.46.1/dev.galasa.ivts.obr-0.46.1-testcatalog.json
+    value: https://development.galasa.dev/main/maven-repo/ivts/dev/galasa/dev.galasa.ivts.obr/0.47.0/dev.galasa.ivts.obr-0.47.0-testcatalog.json
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -34,7 +34,7 @@ metadata:
     namespace: framework
     name: test.stream.ivts.obr
 data:
-    value: mvn:dev.galasa/dev.galasa.ivts.obr/0.46.1/obr
+    value: mvn:dev.galasa/dev.galasa.ivts.obr/0.47.0/obr
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
