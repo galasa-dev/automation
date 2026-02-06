@@ -162,5 +162,6 @@ docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
    - galasa-mvp-zip
    - buildutils-executables
    - simplatform-maven-artefacts
+   - galasa-docs-site
 3. Repeat steps 1 and 2 but with the branch 'pre-release'
 4. [92-delete-argocd-apps.sh](./92-delete-argocd-apps.sh) - Remove the ArgoCD applications, and therefore the Kubernetes resources.
