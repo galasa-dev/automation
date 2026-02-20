@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-apiVersion: v1
-kind: Namespace
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
 metadata:
-  name: secrets-manager
+  name: alb-internal-ca
+spec:
+  selfSigned: {}

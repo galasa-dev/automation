@@ -7,7 +7,7 @@
 ### Installation instructions
 
 1. Follow the instructions on the ArgoCD [docs](https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#1-register-the-application-in-the-identity-provider) and create a new OAuth application on GitHub [here](https://github.com/organizations/galasa-dev/settings/applications/new). Ensure to take note of the Client ID and Client Secret.
-2. Use the Client ID and Client Secret from the OAuth app to create a Kubernetes Secret with two fields: `dex.github.clientid` and `dex.github.clientsecret`. See [secret-argocd.yaml](secret-argocd.yaml).
+2. Use the Client ID and Client Secret from the OAuth app to create a Kubernetes Secret with two fields: `dex.github.clientid` and `dex.github.clientsecret`.
 3. Create a namespace `argocd`: `kubectl create namespace argocd`
 4. Apply [argocd.yaml](./argocd.yaml) **once** into the `argocd` namespace: `kubectl apply -f argocd.yaml -n argocd`
 5. Apply [argocd-cm.yaml](./argocd-cm.yaml) into the `argocd` namespace: `kubectl apply -f argocd-cm.yaml -n argocd`
@@ -32,20 +32,6 @@
 
 
 ## Useful commands 
-
-If you need to refresh the secret files, you have to delete them first:
-
-```
-kubectl delete -f infrastructure/galasa-kube1/argocd/secret-argocd.yaml
-kubectl delete -f infrastructure/galasa-kube1/argocd/secrets-manager.yaml
-
-kubectl apply -f infrastructure/galasa-kube1/argocd/secrets-manager.yaml
-kubectl apply -f infrastructure/galasa-kube1/argocd/secret-argocd.yaml
-```
-
-```
-kubectl get ExternalSecrets  
-```
 
 ```
 kubectl rollout restart -n argocd deployments argocd-applicationset-controller argocd-dex-server argocd-notifications-controller argocd-redis argocd-repo-server argocd-server

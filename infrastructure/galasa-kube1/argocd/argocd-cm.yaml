@@ -39,8 +39,8 @@ data:
       id: github
       name: github.com
       config:
-        clientID: $argocd-secret:dex.github.clientid
-        clientSecret: $argocd-secret:dex.github.clientsecret
+        clientID: $dex.github.clientid
+        clientSecret: $dex.github.clientsecret
         orgs:
         - name: galasa-dev
           teams:
