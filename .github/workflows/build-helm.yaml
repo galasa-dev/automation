@@ -8,6 +8,12 @@ name: Helm build (galasa-service1)
 on:
   workflow_dispatch:
 
+# Only allow one of this workflow to run at once
+# Do not cancel in progress workflow runs if another is queued
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 env:
   NAMESPACE: galasa-dev
   BRANCH: ${{ github.ref_name }}
