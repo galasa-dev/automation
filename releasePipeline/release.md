@@ -63,7 +63,7 @@ The steps below are to ensure the MVP zip works as described in the documentatio
 
 #### Tests that run from GitHub Actions
 
-Each of these scripts starts a GitHub Actions workflow. These test suites run tests from the GitHub Actions runner either locally in the runner, or they submit tests to run remotely on galasa-service1.
+Each of these scripts starts a GitHub Actions workflow. These test suites run tests from the GitHub Actions runner either locally in the runner, or they submit tests to run remotely on galasa-service-main.
 
 The script will give you the URL of the workflow run. You will have to monitor the workflow run in GitHub Actions and ensure it finishes successfully and all tests pass.
 

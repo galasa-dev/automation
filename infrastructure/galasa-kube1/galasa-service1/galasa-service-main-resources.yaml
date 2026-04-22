@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-# The Galasa resources defined in this file are applied to the 'service1' service.
+# The Galasa resources defined in this file are applied to the 'service-main' service.
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
 metadata:
