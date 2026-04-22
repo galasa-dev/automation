@@ -1,0 +1,72 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# This file contains the configuration for the Galasa service's parent Gateway API resources, including:
+# - galasa-service-gateway: A Gateway for the Galasa service (creates a load balancer with its own hostname)
+# - galasa-blue-green-httproute: A HTTPRoute to enable blue/green deployments (redirects traffic to the "production" Galasa service used in automation)
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: galasa-service-gateway
+spec:
+  gatewayClassName: istio
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+  - name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      mode: Terminate
+      certificateRefs:
+        - name: parent-gateway-tls-secret
+          kind: Secret
+          group: ""
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: galasa-blue-green-httproute
+spec:
+  hostnames:
+  - galasa-service-main.galasa.dev
+  parentRefs:
+  - name: galasa-service-gateway
+  rules:
+  - backendRefs:
+    # Update this service name if switching to a new Galasa service
+    - name: service2-api
+      port: 8080
+    matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    filters:
+      - type: URLRewrite
+        urlRewrite:
+          path:
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /
+  - backendRefs:
+    # Update this service name if switching to a new Galasa service
+    - name: service2-dex
+      port: 5556
+    matches:
+    - path:
+        type: PathPrefix
+        value: /dex
+  - matches:
+    - path:
+        type: Exact
+        value: /
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        # Update this hostname if switching to a new Galasa service
+        hostname: galasa-service2.galasa.dev
+        scheme: https
+        statusCode: 307

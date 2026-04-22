@@ -1,3 +1,28 @@
+# Galasa services
+
+The Galasa services installed on the galasa-kube1 cluster are deployed via a blue/green deployment strategy.
+
+## Blue/Green Kubernetes Resources
+
+The following resources are in place to support blue/green deployments:
+
+- `galasa-service-gateway` - A Kubernetes Gateway resource that is used to access the "main" Galasa service that is currently being served.
+- `galasa-blue-green-httproute` - A Kubernetes HTTPRoute resource that is used to route traffic to the blue or green Galasa service.
+
+## Switching between Blue and Green Deployments
+
+To switch between blue and green deployments, you will need to update the [`galasa-blue-green-httproute` resource](./galasa-service-parent-gateway.yaml) to point to the desired Galasa service using the following steps:
+
+1. Update the service name for the `/dex` path to point to the Dex service for your new deployment.
+2. Update the service name for the `/api` path to point to the API service for your new deployment.
+3. Update the hostname for the web UI redirect to point to the web UI for your new deployment.
+
+To get the names of your new deployment's Kubernetes services, run:
+
+```
+kubectl get svc
+```
+
 ## How to install a Galasa service
 
 Follow these steps if we ever need to migrate `galasa-service1` to a new Kubernetes cluster.
