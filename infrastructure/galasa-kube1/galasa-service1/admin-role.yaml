@@ -61,6 +61,19 @@ rules:
   - "externalsecrets"
   verbs:
   - "*"
+- apiGroups:
+  - "gateway.networking.k8s.io"
+  resources:
+  - "httproutes"
+  verbs:
+  - "*"
+  - "*"
+- apiGroups:
+  - "security.istio.io"
+  resources:
+  - "peerauthentications"
+  verbs:
+  - "*"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
