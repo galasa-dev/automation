@@ -17,7 +17,7 @@ Find out more about:
 This directory contains GitHub Actions workflows. Runs of these workflows can be found in the [Actions tab](https://github.com/galasa-dev/automation/actions) of this repository.
 
 apply-galasa-resources:
-Uses `galasactl resources apply` to apply changes to the file [galasa-service1-resources.yaml](./infrastructure/galasa-kube1/galasa-service1/galasa-service1-resources.yaml) to galasa-service1's CPS properties.
+Uses `galasactl resources apply` to apply changes to the file [galasa-service-main-resources.yaml](./infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml) to galasa-service-main's CPS properties.
 
 base-image:
 Builds and pushes the Galasa base httpd image to GHCR. Should be triggered if changes are made to the [base Dockerfile](./dockerfiles/base/base.Dockerfile).
@@ -32,10 +32,10 @@ pr-build-automation:
 This workflow runs if a Pull Request is opened on this reposutory. It builds the custom Docker images whose Dockerfiles can be found in the [dockerfiles/common](./dockerfiles/common/) directory to make sure they build successfully.
 
 regression-tests-core-non-zos:
-This workflow runs daily and regression tests a selection of the Galasa Managers that do not exercise z/OS so these tests can be run on the external galasa-service1.
+This workflow runs daily and regression tests a selection of the Galasa Managers that do not exercise z/OS so these tests can be run on the external galasa-service-main.
 
 run-core-test:
-Runs the test CoreManagerIVT on galasa-service1 for the purpose of verifying the service health.
+Runs the test CoreManagerIVT on galasa-service-main for the purpose of verifying the service health.
 
 sync-docker-proxy:
 Runs weekly to sync images stored in Galasa's [GitHub Packages](https://github.com/orgs/galasa-dev/packages) with any updates from Docker Hub.

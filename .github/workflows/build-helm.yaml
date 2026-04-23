@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-name: Helm build (galasa-service1)
+name: Helm build
 
 on:
   workflow_dispatch:
@@ -11,12 +11,14 @@ on:
 env:
   NAMESPACE: galasa-dev
   BRANCH: ${{ github.ref_name }}
+  GALASA_SERVICE_HELM_NAME: ${{ vars.GALASA_SERVICE_HELM_NAME }}
+  GALASA_SERVICE_VALUES_FILE_PATH: ${{ vars.GALASA_SERVICE_VALUES_FILE_PATH }}
 
 jobs:
   build-helm:
     # Skip this job for forks
     if: ${{ github.repository_owner == 'galasa-dev' }}
-    name: Build Helm chart for galasa-service1
+    name: Install Helm chart for the external Galasa service
     runs-on: ubuntu-latest
 
     steps:
@@ -42,19 +44,19 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ env.KUBE_CONFIG_PLAN_B_CLUSTER }}" >> $HOME/.kube/config
       
-      - name: Uninstall galasa-service1
+      - name: Uninstall existing Galasa service
         run: |
-          helm uninstall main-service --ignore-not-found --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
+          helm uninstall ${{ env.GALASA_SERVICE_HELM_NAME }} --ignore-not-found --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
       
       # Default timeout is 5m0s. Stating that explicitly so we can change it easily.
       # The install takes a long time because we are waiting for all the pods to start up.
-      - name: Install galasa-service1
+      - name: Install Galasa service
         run: |
-          helm install main-service ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-service1 --values ${{ github.workspace }}/infrastructure/galasa-kube1/galasa-service1/helm-values.yaml --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
+          helm install ${{ env.GALASA_SERVICE_HELM_NAME }} ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-service1 --values ${{ github.workspace }}/${{ env.GALASA_SERVICE_VALUES_FILE_PATH }} --kubeconfig $HOME/.kube/config --timeout 10m0s --wait
 
-      - name: Test galasa-service1
+      - name: Test Galasa service
         run: |
-          helm test main-service --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
+          helm test ${{ env.GALASA_SERVICE_HELM_NAME }} --namespace=galasa-service1 --kubeconfig $HOME/.kube/config
 
   trigger-next-workflow:
     # Skip this job for forks
