@@ -1,0 +1,286 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+#
+# The external hostname that the Galasa services can be accessed on via Ingress,
+# must be a valid DNS hostname without a URL scheme (i.e. without "https://").
+#
+externalHostname: "galasa-service2.galasa.dev"
+#
+# The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
+# all the components are running the same version and a controlled upgrade can be performed
+#
+galasaVersion: "main"
+#
+#
+#
+# Name of the galasa service which will be shown as the title of the web user interface page.
+# Any bookmarks taken by users in their browsers will also receive this name.
+# Making this name distict helps users identify which Galasa service they are using.
+# If they are all called the same thing, users with access to multiple systems may find that
+# confusing.
+# It is RECOMMENDED that this value is changed to be unique,
+# For example: Galasa Service XYZ
+#
+galasaServiceName: Galasa Service
+#
+#
+#
+# The container registry the Galasa images can be found in
+#
+galasaRegistry: "ghcr.io/galasa-dev"
+#
+#
+# The name of the Docker image that contains Galasa's boot.jar file to launch ecosystem services
+#
+galasaBootImage: "galasa-boot-embedded"
+#
+#
+# The name of the Docker image that launches Galasa's web UI
+#
+galasaWebUiImage: "webui"
+#
+#
+# The pull policy to be used for the Galasa images, only useful for Galasa development purposes
+# Values:
+# "Always" - used by Galasa development
+# "IfNotPresent" - normal running user.
+pullPolicy: "Always"
+#
+#
+# The architecture the pods will be run on, at the moment, only amd64 is supported
+#
+architecture: amd64
+#
+#
+# New users logging into the system get a user record created and that user is assigned a role
+# by default. It should be the name of one of the roles on the system.
+# Suggested values are:
+#   "deactivated" - After initial logon, an administrator will need to set their most appropriate role
+#                   before this new user can access any function within the Galasa service.
+#   "tester"      - After initial logon, the user is classified as a tester, so can launch tests and
+#                   see test results, but cannot administer the system.
+#   "admin"       - A user with access to all the functionality provided by Galasa.
+#                   We recommend only using this setting if you want every user to be an administrator
+#                   (unlikely).
+galasaDefaultUserRole: "tester"
+#
+#
+# The list of login ids of the Galasa service owner(s), comma-separated.
+# If a user login id appears in this list, the user will appear to have the 'owner' role, rather than
+# their normal role.
+#
+# Roles of owner user records cannot be changed. Without changing the configuration at the Kubernetes level.
+#
+# The users nominated here will always have a role of 'owner'.
+#
+# If the Galasa service owners leave the organisation, or are otherwise unable to administer the system any longer,
+# someone with access to kubernetes can change this value and the user specified will then appear to have the role
+# of owner.
+#
+# Multiple owners can be specified. eg: "user1, user2". All users mentioned will have the 'owner' role until they are
+# removed from the list.
+galasaOwnersLoginIds: ""
+
+#
+# Values to configure the use of Gateway API resources to access the Galasa service.
+# Note: The externalHostname value must be a valid DNS name for Gateway API to be used.
+#
+gatewayApi:
+  # A true/false value that determines whether to create Gateway API resources for accessing the Galasa service.
+  enabled: true
+
+  # The name of an existing Gateway resource that you would like to re-use for this Galasa service
+  # If no value is provided, a new Gateway resource will be created.
+  gatewayName: "service2-gateway"
+
+  # The namespace where the existing Gateway resource referenced in the "gatewayName" value is located
+  gatewayNamespace: ""
+
+  # The name of the GatewayClass to use for the Gateway API resources.
+  gatewayClassName: "istio"
+
+  # Annotations to be added to the service's Gateway resource. For example:
+  # gatewayAnnotations:
+  #   cert-manager.io/issuer: my-issuer
+  gatewayAnnotations: {}
+
+  # Annotations to be added to the service's HTTPRoute resource. For example:
+  # httpRouteAnnotations:
+  #   annotationKey: annotationValue
+  httpRouteAnnotations: {}
+
+  # Optional - Configures the use of TLS in Gateway API resources.
+  # tls:
+  #   # References to one or more Kubernetes resources containing TLS certificates. For example:
+  #   # certificateRefs:
+  #   #   - kind: Secret
+  #   #     group: ""
+  #   #     name: my-certificate-secret
+  #   certificateRefs:
+  #     - kind: Secret
+  #       group: ""
+  #       namespace: istio-system
+  #       name: istio-tls-secret
+  tls: {}
+
+#
+# IMPORTANT: Kubernetes Ingress API has been frozen as of March 2026 and is no longer being developed.
+# The Kubernetes project recommends using the Gateway API instead.
+#
+# Values to configure global settings applied to all ingresses
+# Note: The externalHostname value must be a valid DNS name for ingress to be used.
+#
+ingress:
+  # A true/false value that determines whether to create Ingress resources for accessing the Galasa service.
+  enabled: false
+
+  # The IngressClass to use for ingresses
+  ingressClassName: "nginx"
+
+  # Values to configure the use of TLS in ingresses. For example:
+  # tls:
+  #   - hosts:
+  #     - "galasa-service2.galasa.dev"
+  #     secretName: istio-tls-secret
+  tls: {}
+
+  # Optional - The name of the Secret containing root and intermediate CA certificates in a single .pem file.
+  caCertSecretName: ""
+
+  # Annotations to be added to all ingresses. For example:
+  # annotations:
+  #   nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  annotations: {}
+#
+#
+# Values to configure the ecosystem's use of Dex
+#
+dex:
+  # `configSecret` contains values as to whether a new Kubernetes Secret containing the Dex configuration
+  # should be created, or if an existing Secret containing should be used.
+  configSecret:
+    # Enables the creation of a Kubernetes Secret using the values provided in `config` if set to true.
+    # If set to false, you must provide a value for `secretName` that corresponds to an existing Secret.
+    create: true
+
+    # The name of the Kubernetes Secret containing the Dex configuration to mount within the Dex deployment.
+    # `secretName` must point to a Secret containing a "config.yaml" key and a valid Dex configuration in YAML format.
+    # If `secretName` is provided and `create` is set to true, then the given name will be ignored and a new Secret
+    # named "<release-name>-dex-config" will be created.
+    secretName: ""
+
+  # Optional - `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps
+  # into the Dex Deployment.
+  # If you would like to mount an additional environment variable from a Secret or ConfigMap, provide the name of the
+  # resource in the `envFrom` list. For example:
+  # envFrom:
+  #   - secretRef:
+  #       name: github-oauth-app-secret
+  #   - configMapRef:
+  #       name: my-env-configmap
+  envFrom:
+    - secretRef:
+        name: galasa-service2-github-oauth-app-for-dex
+
+  # An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
+  # The first JWT claim that is matched will be used as the requestor of a test.
+  #
+  # For example, given a JWT that includes the following claims:
+  # {
+  #   "iss": "https://example.com/dex",
+  #   "sub": "my-user-id",
+  #   "aud": "my-client",
+  #   "exp": 1234567890,
+  #   "iat": 1234567890,
+  #   "name": "John Doe",
+  #   "preferred_username": "johndoe"
+  # }
+  #
+  # If the `usernameClaims` value is set to:
+  #
+  # usernameClaims:
+  #   - name
+  #   - preferred_username
+  #   - sub
+  #
+  # then the "name" claim will be matched first, and the value "John Doe" will be taken as the requestor of a test.
+  #
+  # By default, the order that will be applied is as follows:
+  # 1. "preferred_username"
+  # 2. "name"
+  # 3. "sub"
+  #
+  # Different Dex connectors may return different claims within issued JWTs. For details on which JWT claims are
+  # supported by Dex, refer to the [Dex documentation](https://dexidp.io/docs/custom-scopes-claims-clients).
+  usernameClaims:
+    - "preferred_username"
+    - "name"
+    - "sub"
+
+  # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
+  # By default, etcd is used as the storage option for the Galasa Ecosystem.
+  config:
+    issuer: "https://galasa-service2.galasa.dev/dex"
+
+    # Connectors to upstream identity providers that users can authenticate with.
+    # See the [Dex documentation](https://dexidp.io/docs/connectors) for a list
+    # of connectors supported by Dex.
+    connectors:
+    - type: github
+      id: github
+      name: GitHub
+      config:
+        clientID: $GITHUB_CLIENT_ID
+        clientSecret: $GITHUB_CLIENT_SECRET
+        redirectURI: https://galasa-service2.galasa.dev/dex/callback
+        orgs:
+        - name: galasa-dev
+          teams:
+          - galasa-service1-users
+
+    # OAuth 2.0 configuration values. By default, Dex has been configured to skip the additional
+    # access approval screen after logging in to the Galasa Ecosystem.
+    oauth2:
+      skipApprovalScreen: true
+
+    # Token expiry configuration
+    expiry:
+      idTokens: 24h
+      refreshTokens:
+        reuseInterval: 8760h # 1 year
+        validIfNotUsedFor: 8760h # 1 year
+
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      memory: "300Mi"
+    limits:
+      memory: "500Mi"
+
+# Optional. Values to configure the use of Istio for Galasa services.
+# Istio provides automatic mutual TLS (mTLS) encryption for all pod-to-pod
+# communication within the cluster, enhancing security without requiring
+# application code changes.
+#
+# Istio must be installed in your Kubernetes cluster.
+#
+istio:
+  # Enable or disable Istio integration.
+  # When enabled, all Galasa service pods will receive an Istio sidecar proxy
+  # that automatically encrypts traffic between services using mTLS.
+  enabled: true
+  
+  # The mTLS enforcement mode. Valid values:
+  # - "STRICT": Only mTLS traffic is allowed. Recommended for production.
+  # - "PERMISSIVE": Both mTLS and plaintext traffic are allowed. Useful for
+  #                 gradual migration from non-Istio to Istio deployments.
+  # - "DISABLE": mTLS is disabled (not recommended if Istio is enabled).
+  mtlsMode: "STRICT"

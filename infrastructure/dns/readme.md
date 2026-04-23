@@ -23,12 +23,14 @@ These are the settings currently held in the DNS table currently.
 | URL | rest.galasa.dev | URL redirect to https://galasa.dev/docs/reference/rest-api ||
 | URL | www.rest.galasa.dev | URL redirect to https://galasa.dev/docs/reference/rest-api ||
 | CNAME | galasa-service1.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
+| CNAME | galasa-service2.galasa.dev | 73f1bd2f-eu-gb.lb.appdomain.cloud ||
+| CNAME | galasa-service-main.galasa.dev | 6626c869-eu-gb.lb.appdomain.cloud ||
 | CNAME | argocd.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 | CNAME | development.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 | CNAME | copyright.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 | CNAME | triggers.galasa.dev | c0505e90-eu-gb.lb.appdomain.cloud ||
 
-As of 2nd December, the DNS records look like this:
+As of 22nd April, the DNS records look like this:
 ```
 $ORIGIN galasa.dev.
 $TTL 1h
@@ -52,6 +54,8 @@ _acme-challenge.galasa.dev. 60 IN TXT "vxYXQd3Wb8geJi1_S30rlrlfz9j-Jje5NaDmzwQWp
 ; rest.galasa.dev. 60 IN URL https://galasa.dev/docs/reference/rest-api/
 ; www.rest.galasa.dev. 60 IN URL https://galasa.dev/docs/reference/rest-api/
 galasa-service1.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
+galasa-service2.galasa.dev. 60 IN CNAME 73f1bd2f-eu-gb.lb.appdomain.cloud.
+galasa-service-main.galasa.dev. 60 IN CNAME 6626c869-eu-gb.lb.appdomain.cloud.
 argocd.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
 development.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
 copyright.galasa.dev. 60 IN CNAME c0505e90-eu-gb.lb.appdomain.cloud.
