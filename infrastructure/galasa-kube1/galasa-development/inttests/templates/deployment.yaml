@@ -21,6 +21,8 @@ spec:
       labels:
         app: inttests-{{ .Values.branch }}
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - image: {{ .Values.imageName }}:{{ .Values.imageTag }}
           imagePullPolicy: Always
