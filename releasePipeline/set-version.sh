@@ -161,6 +161,16 @@ function upgrade_test_stream_inttests_obr_version {
     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
+#bumping version for the value of property test.stream.simbank.obr
+function upgrade_test_stream_simbank_obr_version {
+    property_name="test.stream.simbank.obr"
+    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+    value_regex="mvn:dev.galasa\\/dev[.]galasa[.]simbank[.]obr\\/[0-9.]+\\/obr"
+    new_value="mvn:dev.galasa\\/dev.galasa.simbank.obr\\/${galasa_version}\\/obr"
+
+    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+}
+
 #bumping version for the value of property isolated.full.zip
 function upgrade_isolated_full_zip_version {
     property_name="isolated.full.zip"
@@ -246,6 +256,7 @@ upgrade_test_stream_ivts_location_version
 upgrade_test_stream_ivts_obr_version
 upgrade_test_stream_inttests_location_version
 upgrade_test_stream_inttests_obr_version
+upgrade_test_stream_simbank_obr_version
 upgrade_isolated_full_zip_version
 upgrade_isolated_mvp_zip_version
 upgrade_galasa_versions
