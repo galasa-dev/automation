@@ -141,7 +141,7 @@ metadata:
     namespace: framework
     name: test.stream.simbank.obr
 data:
-    value: mvn:dev.galasa/dev.galasa.simbank.obr/0.41.0/obr
+    value: mvn:dev.galasa/dev.galasa.simbank.obr/0.48.0/obr
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
