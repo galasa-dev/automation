@@ -59,6 +59,22 @@ apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
 metadata:
     namespace: framework
+    name: test.stream.inttests.description
+data:
+    value: Galasa Integration tests
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
+    name: test.stream.inttests.repo
+data:
+    value: https://development.galasa.dev/main/maven-repo/inttests/
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: framework
     name: resource.management.dead.heartbeat.timeout
 data:
     value: "40"
@@ -94,30 +110,6 @@ metadata:
     name: resource.management.finished.timeout
 data:
     value: "40"
----
-apiVersion: galasa-dev/v1alpha1
-kind: GalasaProperty
-metadata:
-    namespace: framework
-    name: test.stream.cics-prod.description
-data:
-    value: CICS TS Tests - Production (New)
----
-apiVersion: galasa-dev/v1alpha1
-kind: GalasaProperty
-metadata:
-    namespace: framework
-    name: test.stream.inttests.description
-data:
-    value: Galasa Integration tests
----
-apiVersion: galasa-dev/v1alpha1
-kind: GalasaProperty
-metadata:
-    namespace: framework
-    name: test.stream.inttests.repo
-data:
-    value: https://development.galasa.dev/main/maven-repo/inttests/
 ---
 apiVersion: galasa-dev/v1alpha1
 kind: GalasaProperty
@@ -181,7 +173,7 @@ metadata:
     namespace: framework
     name: test.streams
 data:
-    value: inttests,cip,simbank,resourcebuilder,pong,zosk8s,galasa-vtp-demo
+    value: ivts,internal-inttests,inttests,simbank
 ---
 # Galasa Ecosystem properties
 apiVersion: galasa-dev/v1alpha1
@@ -279,3 +271,12 @@ metadata:
     name: simplatform.version
 data:
     value: 0.48.0
+---
+apiVersion: galasa-dev/v1alpha1
+kind: GalasaProperty
+metadata:
+    namespace: galasaecosystem
+    name: docker.registry
+data:
+    value: ghcr.io/galasa-dev
+
