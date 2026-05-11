@@ -17,7 +17,8 @@ spec:
   - name: context
     type: string
   - name: buildArgs
-    type: array   
+    type: array
+    default: [""]
   - name: command
     type: array
   - name: image
@@ -53,8 +54,8 @@ spec:
       - --no-daemon 
       - --console
       - plain
-      - $(params.buildArgs[*])
       - $(params.command[*])
+      - $(params.buildArgs[*])
     volumeMounts:
     - name: gpg-key
       mountPath: /home/gradle/.gradle/galasa.gpg
