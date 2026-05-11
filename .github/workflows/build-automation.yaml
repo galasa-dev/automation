@@ -292,6 +292,45 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  build-openjdk17-ibm-gradle-galasactl-image:
+    name: Build the 'openjdk17-ibm-gradle-galasactl' image
+    runs-on: ubuntu-latest
+    needs: [check-required-secrets-configured, build-openjdk17-ibm-gradle-image]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dockerfiles/certs
+            dockerfiles/common
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle-galasactl
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        env: 
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Build and push 'openjdk17-ibm-gradle-galasactl' Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: dockerfiles/certs
+          file: dockerfiles/common/openjdk17ibmgradlegalasactl.Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
   build-tkn-image:
     name: Build the 'tkn' image
     runs-on: ubuntu-latest
