@@ -81,9 +81,10 @@ The script will give you the pipeline run name. You will have to monitor the pip
 
 **These three steps should be done one after the other.**
 
-1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip.
-2. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
-3. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
+<!-- Temporarily removing this step as these tests require a DSE CICS Region which is currently down, so these will always fail -->
+<!-- 1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip. -->
+1. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
+2. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
 
 Some tests may fail on the first run due to the lack of system resource availability. Rerunning the test should hopefully result in a pass. Make sure that external systems the tests connect to are active and healthy (for example, @hobbit1983's CICS Region).
 
