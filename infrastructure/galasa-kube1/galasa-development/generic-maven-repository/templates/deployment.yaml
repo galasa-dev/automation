@@ -1,0 +1,32 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}-{{ .Values.branch }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}-{{ .Values.branch }}
+  template:
+    metadata:
+      name: {{ .Values.name }}-{{ .Values.branch }}
+      labels:
+        app: {{ .Values.name }}-{{ .Values.branch }}
+    spec:
+      containers:
+        - image: {{ .Values.imageName }}:{{ .Values.imageTag }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          name: {{ .Values.name }}-{{ .Values.branch }}
+          env:
+          - name: CONTEXTROOT
+            value: {{ .Values.branch }}/maven-repo/{{ .Values.ingress.pathSuffix }}
+          ports:
+            - containerPort: 80

@@ -1,0 +1,39 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+# Name of the application/repository (e.g., "ivts", "inttests", "simplatform")
+# This will be used as a prefix for resource names
+name: ""
+
+# Git branch name (e.g., "main", "feature-branch")
+# Used in the context root path
+branch: main
+
+# Full image name including registry (e.g., "ghcr.io/galasa-dev/ivts-maven-artefacts")
+imageName: ""
+# Image tag (e.g., "main", "v1.0.0")
+imageTag: main
+# Image pull policy
+imagePullPolicy: Always
+
+# Ingress configuration
+ingress:
+  # Enable or disable ingress
+  enabled: true
+  # External hostname for the ingress (e.g., "development.galasa.dev")
+  externalHostname: development.galasa.dev
+  # Ingress class name (e.g., "public-iks-k8s-nginx")
+  ingressClassName: public-iks-k8s-nginx
+  # Path suffix for the maven repository (e.g., "ivts", "inttests")
+  # This is appended to the base path: /{branch}/maven-repo/{pathSuffix}
+  pathSuffix: ""
+  # Additional annotations for the ingress
+  annotations: {}
+  # TLS configuration
+  tls:
+  - hosts:
+      - development.galasa.dev
+    secretName: devgalasa-tls-secret
