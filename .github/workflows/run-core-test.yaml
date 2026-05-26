@@ -24,10 +24,8 @@ jobs:
         include:
           - test-type: 'service-ivts'
             stream: 'ivts'
-            test-mode: 'service'
           - test-type: 'service-secure-ivts'
             stream: 'secure-ivts'
-            test-mode: 'service'
 
     steps:
       - name: Setup Galasa workspace
