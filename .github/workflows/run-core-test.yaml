@@ -52,3 +52,24 @@ jobs:
           --poll "10" \
           --progress "1" \
           --log -
+
+      - name: Run the 'CoreManagerIVT' on the secure stream
+        env:
+          GALASA_HOME: /galasa
+          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE_MAIN }}
+          GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
+        run: |
+          docker run --rm \
+          --env GALASA_HOME=${{ env.GALASA_HOME }} \
+          --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
+          --user galasa:galasa \
+          -v ${{ github.workspace }}/galasa:/galasa:rw \
+          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          galasactl runs submit \
+          --bootstrap ${{ env.GALASA_SERVICE_BOOTSTRAP_URL }} \
+          --stream secure-ivts \
+          --class dev.galasa.ivts/dev.galasa.ivts.core.CoreManagerIVT \
+          --throttle "10" \
+          --poll "10" \
+          --progress "1" \
+          --log -
