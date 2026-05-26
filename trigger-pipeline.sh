@@ -54,6 +54,7 @@ Options are:
 (from the 'main' build chain)
 --automation
 --update-prod1
+--install-prod1
 --test-cli
 -p | --pipeline xxx : Set the name of pipeline to run explicitly
 
@@ -88,6 +89,8 @@ while [ "$1" != "" ]; do
         --automation )              pipeline="branch-automation"
                                     ;;
         --update-prod1 )            pipeline="update-prod1"
+                                    ;;
+        --install-prod1 )           pipeline="install-prod1"
                                     ;;
         --internal-tests )          pipeline="build-internal-integratedtests"
                                     ;;
