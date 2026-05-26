@@ -11,30 +11,37 @@ on:
 env:
   NAMESPACE: ${{ github.repository_owner }}
   BRANCH: ${{ github.ref_name }}
+  GALASA_CLI_IMAGE: ghcr.io/${{ github.repository_owner }}/galasactl-x86_64:main
+  GALASA_HOME: /galasa
 
 jobs:
-  # This workflow runs a single test the CoreManagerIVT to verify the health of the Galasa service.
   run-core-test:
-    name: Run CoreManagerIVT to verify Galasa service health
+    name: Run CoreManagerIVT - ${{ matrix.test-type }}
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        include:
+          - test-type: 'service-ivts'
+            stream: 'ivts'
+            test-mode: 'service'
+          - test-type: 'service-secure-ivts'
+            stream: 'secure-ivts'
+            test-mode: 'service'
 
     steps:
-      - name: Ensure permissions for mounted /galasa directory
+      - name: Setup Galasa workspace
         run: |
           sudo mkdir -p ${{ github.workspace }}/galasa
           sudo chown -R 999:999 ${{ github.workspace }}/galasa
-
-      - name: Clean /galasa workspace in CLI image
-        run: |
           docker run --rm \
           --user galasa:galasa \
           -v ${{ github.workspace }}/galasa:/galasa \
-          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          ${{ env.GALASA_CLI_IMAGE }} \
           rm -rf /galasa/*
 
-      - name: Run the 'CoreManagerIVT'
+      - name: Run CoreManagerIVT on a Galasa service
         env:
-          GALASA_HOME: /galasa
           GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE_MAIN }}
           GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
         run: |
@@ -43,31 +50,10 @@ jobs:
           --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
           --user galasa:galasa \
           -v ${{ github.workspace }}/galasa:/galasa:rw \
-          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
+          ${{ env.GALASA_CLI_IMAGE }} \
           galasactl runs submit \
           --bootstrap ${{ env.GALASA_SERVICE_BOOTSTRAP_URL }} \
-          --stream ivts \
-          --class dev.galasa.ivts/dev.galasa.ivts.core.CoreManagerIVT \
-          --throttle "10" \
-          --poll "10" \
-          --progress "1" \
-          --log -
-
-      - name: Run the 'CoreManagerIVT' on the secure stream
-        env:
-          GALASA_HOME: /galasa
-          GALASA_TOKEN: ${{ secrets.GALASA_TOKEN_SERVICE_MAIN }}
-          GALASA_SERVICE_BOOTSTRAP_URL: ${{ vars.GALASA_SERVICE_BOOTSTRAP_URL }}
-        run: |
-          docker run --rm \
-          --env GALASA_HOME=${{ env.GALASA_HOME }} \
-          --env GALASA_TOKEN=${{ env.GALASA_TOKEN }} \
-          --user galasa:galasa \
-          -v ${{ github.workspace }}/galasa:/galasa:rw \
-          ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:main \
-          galasactl runs submit \
-          --bootstrap ${{ env.GALASA_SERVICE_BOOTSTRAP_URL }} \
-          --stream secure-ivts \
+          --stream ${{ matrix.stream }} \
           --class dev.galasa.ivts/dev.galasa.ivts.core.CoreManagerIVT \
           --throttle "10" \
           --poll "10" \
