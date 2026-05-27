@@ -191,6 +191,34 @@ function upgrade_isolated_mvp_zip_version {
     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
+#bumping version for the secure-ivts GalasaStream resource
+function upgrade_secure_ivts_stream_version {
+    h1 "Bumping up the version in the secure-ivts GalasaStream resource"
+    
+    service_main_resources_file="${WORKSPACE_DIR}/infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml"
+    
+    # Update the version field in the obrs section
+    version_regex="version: [0-9.]+"
+    version_new_value="version: ${galasa_version}"
+    
+    # Update the testCatalog URL
+    testcatalog_regex="url: https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/ivts-auth\\/dev\\/galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/dev[.]galasa[.]ivts[.]obr-[0-9.]+-testcatalog[.]json"
+    testcatalog_new_value="url: https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/ivts-auth\\/dev\\/galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/dev.galasa.ivts.obr-${galasa_version}-testcatalog.json"
+    
+    mkdir -p ${BASEDIR}/temp
+    temp_file="${BASEDIR}/temp/galasa-service-main-resources.yaml"
+    
+    # Apply both replacements
+    cat ${service_main_resources_file} | sed -E "s/${version_regex}/${version_new_value}/1" | sed -E "s/${testcatalog_regex}/${testcatalog_new_value}/1" > ${temp_file}
+    rc=$?; if [[ "${rc}" != "0" ]]; then error "Failed to bump version in secure-ivts GalasaStream resource."; exit 1; fi
+    
+    cp ${temp_file} ${service_main_resources_file}
+    if ! grep -q -E "${version_new_value}" ${service_main_resources_file}; then error "Failed to replace version field in secure-ivts GalasaStream resource."; exit 1; fi
+    if ! grep -q -E "dev.galasa.ivts.obr\\/${galasa_version}\\/dev.galasa.ivts.obr-${galasa_version}-testcatalog.json" ${service_main_resources_file}; then error "Failed to replace testCatalog URL in secure-ivts GalasaStream resource."; exit 1; fi
+    
+    success "secure-ivts GalasaStream version bumped successfully"
+}
+
 #bumping version for the value of property runtime.version
 function upgrade_galasa_versions {
     runtime_version_prop="runtime.version"
@@ -260,3 +288,4 @@ upgrade_test_stream_simbank_obr_version
 upgrade_isolated_full_zip_version
 upgrade_isolated_mvp_zip_version
 upgrade_galasa_versions
+upgrade_secure_ivts_stream_version
