@@ -49,9 +49,7 @@ Ensure you have completed either the [automated](#pre-release-steps---automated)
 
 ### MEND scan
 
-1. Follow instructions from the internal [developer-docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp) on how to do this.
-
-**Note:**
+1. Follow instructions from the internal [developer-docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp) on how to do this. **Note:** the bundles `dev.galasa.wrapping.com.auth0.jwt` and `dev.galasa.wrapping.kafka.clients` are not included in the MVP, therefore if vulnerabilities are found only in these bundles, they will not affect any IBM scans. However, they should still be remediated before starting the proper release if possible.
 
 ### Test the MVP
 
