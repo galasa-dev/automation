@@ -219,7 +219,7 @@ function delete_pre_release_helm_charts {
         release_tag=$chart-$galasa_version
 
         # Delete pre-release github release
-        delete_command="gh release delete galasa-dev/helm/$release_tag --cleanup-tag"
+        delete_command="gh release delete $release_tag --repo galasa-dev/helm --cleanup-tag --yes"
         info "Delete release for $release_tag using the command $delete_command."
         $delete_command
         rc=$?

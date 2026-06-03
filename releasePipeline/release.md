@@ -52,7 +52,7 @@ The steps below are to ensure the MVP zip works as described in the documentatio
 2. Unpack the zip and go to the folder in the command line.
 3. Run `docker load -i isolated.tar` and confirm that the output is `Loaded image: ghcr.io/galasa-dev/galasa-mvp:release`. This is to ensure that the isolated.tar can be successfully untarred and loads a Docker image. 
 4. If the last step was successful, run the provided Docker image by running `docker run -d -p 8080:80 --name galasa ghcr.io/galasa-dev/galasa-mvp:release`. Navigate to `localhost:8080` in a browser and confirm that the hosted version of the MVP zip appears. 
-5. Follow the instructions on the [Exploring Galasa SimBank offline](https://galasa.dev/docs/running-simbank-tests/simbank-cli-offline) page of the documentation to ensure that a 3270 emulator can connect to the Simplatform application.
+5. Follow the instructions on the [Launching the SimBank application offline](https://vnext.galasa.dev/docs/using-galasa-offline/simbank-cli-offline/) page of the documentation to ensure that a 3270 emulator can connect to the Simplatform application.
     - After starting the Simplatform application by running the `run-simplatform.sh` script, you can start your 3270 emulator pointing it to port 2023 of localhost by running `c3270 localhost -port 2023` (you will need the x3270 tool installed)
 
 ### MEND scan
@@ -81,9 +81,10 @@ The script will give you the pipeline run name. You will have to monitor the pip
 
 **These three steps should be done one after the other.**
 
-1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip.
-2. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
-3. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
+<!-- Temporarily removing this step as these tests require a DSE CICS Region which is currently down, so these will always fail -->
+<!-- 1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip. -->
+1. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
+2. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
 
 Some tests may fail on the first run due to the lack of system resource availability. Rerunning the test should hopefully result in a pass. Make sure that external systems the tests connect to are active and healthy (for example, @hobbit1983's CICS Region).
 
