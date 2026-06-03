@@ -121,9 +121,9 @@ For any tests which fail, run them again individually:
 1. [42-upload-cli-release.md](./42-upload-cli-release.md) - Follow instructions to upload the CLI binaries to the repository under a new release.
 1. [43-upload-isolated-release.md](./43-upload-isolated-release.md) - Follow instructions to upload the Isolated and MVP zips to the repository under a new release.
 
-### Update Homebrew installed for the CLI
+### Update Homebrew and scoop installed for the CLI
 
-1. [44-update-homebrew.md](./44-update-homebrew.md) - Follow the manual steps in this file to make the new version of the CLI available for the homebrew installer.
+1. [44-update-homebrew-and-scoop.md](./44-update-homebrew-and-scoop.md) - Follow the manual steps in this file to make the new version of the CLI available for the homebrew and scoop installers.
 
 ### Bump to new version for development
 
