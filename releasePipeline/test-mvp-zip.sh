@@ -42,13 +42,15 @@ function usage {
     echo "Options:"
     echo "  --release       Download from release repository (default)"
     echo "  --prerelease    Download from prerelease repository"
+    echo "  --main          Download from main repository"
     echo "  --version       Specify Galasa version (optional, will detect from build.properties if not provided)"
-    echo "  --work-dir      Specify working directory (default: ./mvp-test-<timestamp>)"
+    echo "  --work-dir      Specify working directory (default: ./temp/mvp-test-<timestamp>)"
     echo "  --help          Display this help message"
     echo ""
     echo "Examples:"
     echo "  $0 --release"
     echo "  $0 --prerelease --version 0.36.0"
+    echo "  $0 --main"
     exit 1
 }
 
@@ -130,14 +132,7 @@ function get_galasa_version {
 }
 
 function download_mvp_zip {
-    local base_url
-    
-    if [ "${REPO_TYPE}" = "release" ]; then
-        base_url="https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp"
-    else
-        base_url="https://development.galasa.dev/main/maven-repo/mvp/dev/galasa/galasa-isolated-mvp"
-    fi
-    
+    local base_url="https://development.galasa.dev/${REPO_TYPE}/maven-repo/mvp/dev/galasa/galasa-isolated-mvp"
     local zip_url="${base_url}/${GALASA_VERSION}/galasa-isolated-mvp-${GALASA_VERSION}.zip"
     
     log_info "Downloading MVP zip from ${REPO_TYPE} repository..."
@@ -484,6 +479,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --prerelease)
             REPO_TYPE="prerelease"
+            shift
+            ;;
+        --main)
+            REPO_TYPE="main"
             shift
             ;;
         --version)
