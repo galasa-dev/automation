@@ -30,27 +30,29 @@ REPO_TYPE="release"
 WORK_DIR="$(pwd)/temp/mvp-test-$(date +%s)"
 CONTAINER_NAME="galasa-mvp-test"
 DOCKER_IMAGE=""
-GALASA_VERSION=""
 
 #-----------------------------------------------------------------------------
 # Functions
 #-----------------------------------------------------------------------------
 
 function usage {
-    echo "Usage: $0 [OPTIONS]"
-    echo ""
-    echo "Options:"
-    echo "  --release       Download from release repository (default)"
-    echo "  --prerelease    Download from prerelease repository"
-    echo "  --main          Download from main repository"
-    echo "  --version       Specify Galasa version (optional, will detect from build.properties if not provided)"
-    echo "  --work-dir      Specify working directory (default: ./temp/mvp-test-<timestamp>)"
-    echo "  --help          Display this help message"
-    echo ""
-    echo "Examples:"
-    echo "  $0 --release"
-    echo "  $0 --prerelease --version 0.36.0"
-    echo "  $0 --main"
+    echo "Syntax: $0 [OPTIONS]"
+    cat << EOF
+Options are:
+  --release       Download from release repository (default)
+  --prerelease    Download from prerelease repository
+  --main          Download from main repository
+  --work-dir      Specify working directory (default: ./temp/mvp-test-<timestamp>)
+  --help          Display this help message
+
+Examples:
+  $0 --release
+  $0 --prerelease
+  $0 --main
+
+Environment variables:
+None
+EOF
     exit 1
 }
 
@@ -97,11 +99,6 @@ function cleanup {
 }
 
 function get_galasa_version {
-    if [ -n "${GALASA_VERSION}" ]; then
-        log_info "Using provided Galasa version: ${GALASA_VERSION}"
-        return
-    fi
-    
     log_info "Detecting Galasa version from galasa repository..."
     
     # Download build.properties directly from GitHub
@@ -484,10 +481,6 @@ while [[ $# -gt 0 ]]; do
         --main)
             REPO_TYPE="main"
             shift
-            ;;
-        --version)
-            GALASA_VERSION="$2"
-            shift 2
             ;;
         --work-dir)
             WORK_DIR="$2"
