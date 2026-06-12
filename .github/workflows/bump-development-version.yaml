@@ -1,0 +1,593 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# This workflow automates the "Bump to new version for development" process.
+#
+# REQUIRED SECRET:
+# - GALASA_AUTOMATION_TOKEN: A Personal Access Token (PAT) with permissions to:
+#   - Push to branches in galasa, helm, simplatform, webui, integratedtests, isolated, and automation repositories
+#   - Create pull requests in these repositories
+#   - Read and write packages (for Docker operations)
+#
+# The token should have 'repo' and 'write:packages' scopes.
+#
+
+name: Bump Development Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: 'New development version (e.g., 0.42.0)'
+        required: true
+        type: string
+      released_version:
+        description: 'Version that was just released (e.g., 0.41.0)'
+        required: true
+        type: string
+      branch_name:
+        description: 'Branch name for version bump (e.g., version-bump-0.42.0)'
+        required: true
+        type: string
+        default: 'version-bump'
+  workflow_call:
+    inputs:
+      new_version:
+        description: 'New development version (e.g., 0.42.0)'
+        required: true
+        type: string
+      released_version:
+        description: 'Version that was just released (e.g., 0.41.0)'
+        required: true
+        type: string
+      branch_name:
+        description: 'Branch name for version bump (e.g., version-bump-0.42.0)'
+        required: true
+        type: string
+        default: 'version-bump'
+
+env:
+  TERM: xterm-256color
+  REGISTRY: ghcr.io
+
+jobs:
+  validate-inputs:
+    name: Validate inputs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version format
+        run: |
+          if ! [[ "${{ inputs.new_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: new_version must be in format X.Y.Z (e.g., 0.42.0)"
+            exit 1
+          fi
+          if ! [[ "${{ inputs.released_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: released_version must be in format X.Y.Z (e.g., 0.41.0)"
+            exit 1
+          fi
+          if [[ "${{ inputs.branch_name }}" == "release" ]]; then
+            echo "Error: branch_name cannot be 'release'"
+            exit 1
+          fi
+
+  bump-galasa:
+    name: Bump Galasa version
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    steps:
+      - name: Checkout Galasa repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/galasa
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'semeru'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 9.0.0
+          cache-disabled: true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.10'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run set-version script
+        run: |
+          chmod +x ./tools/set-version.sh
+          ./tools/set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Run build-locally script
+        env:
+          SOURCE_MAVEN: file:///home/runner/.m2/repository
+        run: |
+          chmod +x ./tools/build-locally.sh
+          ./tools/build-locally.sh
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump version to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Galasa PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+
+  bump-helm:
+    name: Bump Helm version
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    steps:
+      - name: Checkout Helm repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/helm
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run set-version script
+        run: |
+          chmod +x set-version.sh
+          ./set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump version to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Helm PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+
+  bump-simplatform:
+    name: Bump Simplatform version
+    runs-on: ubuntu-latest
+    needs: [validate-inputs, bump-galasa]
+    steps:
+      - name: Checkout Simplatform repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/simplatform
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run set-version script
+        run: |
+          chmod +x set-version.sh
+          ./set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump version to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}\n\n⚠️ Note: This depends on Galasa OBR being rebuilt and deployed to development.galasa.dev" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Simplatform PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+
+  bump-webui:
+    name: Bump Web UI version
+    runs-on: ubuntu-latest
+    needs: [validate-inputs, bump-galasa]
+    steps:
+      - name: Checkout Web UI repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/webui
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run set-version script
+        run: |
+          chmod +x set-version.sh
+          ./set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump version to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Web UI PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+
+  bump-integratedtests:
+    name: Bump Integratedtests version
+    runs-on: ubuntu-latest
+    needs: [validate-inputs, bump-galasa]
+    steps:
+      - name: Checkout Integratedtests repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/integratedtests
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run set-version script
+        run: |
+          chmod +x set-version.sh
+          ./set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump version to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Integratedtests PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+
+  bump-isolated:
+    name: Bump Isolated version
+    runs-on: ubuntu-latest
+    needs: [validate-inputs, bump-simplatform]
+    steps:
+      - name: Checkout Isolated repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/isolated
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run set-version script
+        run: |
+          chmod +x set-version.sh
+          ./set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump version to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Isolated PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+
+  update-automation-cps:
+    name: Update automation CPS properties
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GALASA_AUTOMATION_TOKEN }}
+          ref: main
+
+      - name: Run set-version.sh script
+        run: |
+          cd releasePipeline
+          chmod +x set-version.sh
+          ./set-version.sh --version ${{ inputs.new_version }}
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes detected"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infrastructure/cicsk8s/galasa-dev/cps-properties.yaml
+          git add infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml
+          git commit -m "Bump CPS properties to version ${{ inputs.new_version }}"
+          git push
+
+  retag-docker-images:
+    name: Retag Docker images
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        env:
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Retag galasactl-ibm-x86_64 image
+        run: |
+          echo "Pulling release image..."
+          docker pull ghcr.io/galasa-dev/galasactl-ibm-x86_64:release
+          
+          echo "Tagging as stable..."
+          docker image tag ghcr.io/galasa-dev/galasactl-ibm-x86_64:release ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
+          
+          echo "Pushing stable image..."
+          docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
+          
+          echo "Successfully retagged galasactl-ibm-x86_64:release to stable"
+
+  create-summary:
+    name: Create workflow summary
+    runs-on: ubuntu-latest
+    needs: 
+      - bump-galasa
+      - bump-helm
+      - bump-simplatform
+      - bump-webui
+      - bump-integratedtests
+      - bump-isolated
+      - update-automation-cps
+      - retag-docker-images
+    if: always()
+    steps:
+      - name: Create summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## Development Version Bump Complete
+          
+          ### Version Information
+          - **Released Version**: ${{ inputs.released_version }}
+          - **New Development Version**: ${{ inputs.new_version }}
+          - **Branch Name**: ${{ inputs.branch_name }}
+          
+          ### Pull Requests Created
+          
+          The following PRs have been created and need to be reviewed and merged:
+          
+          1. **Galasa**: ${{ needs.bump-galasa.outputs.pr_url }}
+          2. **Helm**: ${{ needs.bump-helm.outputs.pr_url }}
+          3. **Simplatform**: ${{ needs.bump-simplatform.outputs.pr_url }}
+             - ⚠️ Depends on Galasa OBR being rebuilt and deployed
+          4. **Web UI**: ${{ needs.bump-webui.outputs.pr_url }}
+          5. **Integratedtests**: ${{ needs.bump-integratedtests.outputs.pr_url }}
+          6. **Isolated**: ${{ needs.bump-isolated.outputs.pr_url }}
+          
+          ### Automation Repository Updates
+          - ✅ Updated CPS properties in `infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`
+          - ✅ Updated GalasaStream resources in `infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`
+          - ✅ Changes committed and pushed to main branch
+          
+          ### Docker Images
+          - ✅ Retagged `galasactl-ibm-x86_64:release` to `stable`
+          
+          ### Manual Steps Required
+          
+          ⚠️ The following steps still need to be completed manually:
+          
+          1. **Review and merge all PRs** in the order listed above
+             - Wait for each PR build to pass before merging
+             - Wait for each Main build to complete after merging
+             - When Isolated Main build is triggered after Galasa CLI module build, cancel it (you'll rebuild it later)
+          
+          2. **Update internal integrated tests** (github.ibm.com/galasa/internal-integratedtests):
+             - Create branch `${{ inputs.branch_name }}`
+             - Run `./set-version.sh --version ${{ inputs.new_version }}`
+             - Create PR, merge, and wait for Main build
+          
+          3. **Update internal test CPS properties** using galasactl:
+             ```bash
+             galasactl properties set \
+               --namespace framework \
+               --name test.stream.internal-inttests.location \
+               --value https://development.galasa.dev/main/maven-repo/internal-inttests/dev/galasa/dev.galasa.internal-inttests.obr/${{ inputs.new_version }}/dev.galasa.internal-inttests.obr-${{ inputs.new_version }}-testcatalog.json \
+               --bootstrap <bootstrap-url>
+             
+             galasactl properties set \
+               --namespace framework \
+               --name test.stream.internal-inttests.obr \
+               --value mvn:dev.galasa/dev.galasa.internal-inttests.obr/${{ inputs.new_version }}/obr \
+               --bootstrap <bootstrap-url>
+             ```
+          
+          4. **Verify CPS properties** were applied correctly in the cluster
+          
+          5. **Monitor ArgoCD** to ensure the changes are synced properly
+          
+          ### Notes
+          - CPS properties are automatically applied by ArgoCD when changes are pushed to the automation repository
+          - The `galasactl-ibm-x86_64:stable` image is now using version ${{ inputs.released_version }} for regression testing
+          - Simplatform version bump may fail if Galasa OBR hasn't been deployed yet - merge Galasa PR first and wait for deployment
+          EOF
+
+      - name: Workflow complete
+        run: |
+          echo "Development version bump workflow completed"
+          echo "New development version: ${{ inputs.new_version }}"
+          echo "Please review the summary above for next steps"
