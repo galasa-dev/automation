@@ -469,20 +469,49 @@ jobs:
       - name: Checkout automation repository
         uses: actions/checkout@v4
 
+      - name: Delete existing branch if it exists
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: |
+          git checkout -b ${{ inputs.branch_name }}
+
       - name: Run set-version.sh script
         run: |
           cd releasePipeline
           chmod +x set-version.sh
           ./set-version.sh --version ${{ inputs.new_version }}
 
-      - name: Commit and push changes
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infrastructure/cicsk8s/galasa-dev/cps-properties.yaml
           git add infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml
           git commit -m "Bump CPS properties to version ${{ inputs.new_version }}"
-          git push
+          git push origin ${{ inputs.branch_name }}
+          
+          gh pr create \
+            --title "Bump CPS properties to version ${{ inputs.new_version }}" \
+            --body "Automated CPS properties update from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+          echo "Automation CPS PR created: ${PR_URL}"
+
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
 
   retag-docker-images:
     name: Retag Docker images
@@ -549,9 +578,9 @@ jobs:
           6. **Isolated**: ${{ needs.bump-isolated.outputs.pr_url }}
           
           ### Automation Repository Updates
-          - ✅ Updated CPS properties in `infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`
-          - ✅ Updated GalasaStream resources in `infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`
-          - ✅ Changes committed and pushed to main branch
+          7. **Automation CPS**: ${{ needs.update-automation-cps.outputs.pr_url }}
+             - Updates CPS properties in `infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`
+             - Updates GalasaStream resources in `infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`
           
           ### Docker Images
           - ✅ Retagged `galasactl-ibm-x86_64:release` to `stable`
