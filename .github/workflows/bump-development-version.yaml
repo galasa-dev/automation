@@ -152,6 +152,12 @@ jobs:
           echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
           echo "Galasa PR created: ${PR_URL}"
 
+      - name: Upload Maven Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-artifacts
+          path: /home/runner/.m2/repository/dev/galasa
+
     outputs:
       pr_url: ${{ steps.pr_url.outputs.pr_url }}
 
@@ -238,6 +244,12 @@ jobs:
         run: |
           git checkout -b ${{ inputs.branch_name }}
 
+      - name: Download All 'dev.galasa' Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: all-artifacts
+          path: /home/runner/.m2/repository/dev/galasa
+
       - name: Run set-version script
         run: |
           chmod +x set-version.sh
@@ -265,6 +277,12 @@ jobs:
           PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
           echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
           echo "Simplatform PR created: ${PR_URL}"
+
+      - name: Upload Maven Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: simplatform-artifacts
+          path: /home/runner/.m2/repository/dev/galasa
 
     outputs:
       pr_url: ${{ steps.pr_url.outputs.pr_url }}
@@ -406,6 +424,12 @@ jobs:
         run: |
           git checkout -b ${{ inputs.branch_name }}
 
+      - name: Download All 'dev.galasa' Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: all-artifacts
+          path: /home/runner/.m2/repository/dev/galasa
+
       - name: Run set-version script
         run: |
           chmod +x set-version.sh
@@ -444,9 +468,6 @@ jobs:
     steps:
       - name: Checkout automation repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-          ref: main
 
       - name: Run set-version.sh script
         run: |
@@ -454,19 +475,7 @@ jobs:
           chmod +x set-version.sh
           ./set-version.sh --version ${{ inputs.new_version }}
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          if git diff --quiet; then
-            echo "No changes detected"
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "Changes detected"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: Commit and push changes
-        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
