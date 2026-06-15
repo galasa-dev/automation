@@ -231,7 +231,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'semeru'
 
       - name: Delete existing branch if it exists
         run: |
@@ -411,7 +411,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'semeru'
 
       - name: Delete existing branch if it exists
         run: |
