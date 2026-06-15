@@ -44,16 +44,20 @@ ibmcloud cr region-set global
 
 ### Test the MVP zip
 
-The steps below are to ensure the MVP zip works as described in the documentation.
+Run the automated MVP testing script to verify the MVP zip works as described in the documentation:
 
-**Note:** A [story](https://github.com/galasa-dev/projectmanagement/issues/2108) exists to automate this manual process for future releases.
+```bash
+./test-mvp-zip.sh --release
+```
 
-1. Download the [MVP zip](https://development.galasa.dev/release/maven-repo/mvp/dev/galasa/galasa-isolated-mvp).
-2. Unpack the zip and go to the folder in the command line.
-3. Run `docker load -i isolated.tar` and confirm that the output is `Loaded image: ghcr.io/galasa-dev/galasa-mvp:release`. This is to ensure that the isolated.tar can be successfully untarred and loads a Docker image. 
-4. If the last step was successful, run the provided Docker image by running `docker run -d -p 8080:80 --name galasa ghcr.io/galasa-dev/galasa-mvp:release`. Navigate to `localhost:8080` in a browser and confirm that the hosted version of the MVP zip appears. 
-5. Follow the instructions on the [Launching the SimBank application offline](https://vnext.galasa.dev/docs/using-galasa-offline/simbank-cli-offline/) page of the documentation to ensure that a 3270 emulator can connect to the Simplatform application.
-    - After starting the Simplatform application by running the `run-simplatform.sh` script, you can start your 3270 emulator pointing it to port 2023 of localhost by running `c3270 localhost -port 2023` (you will need the x3270 tool installed)
+This script will:
+1. Download the MVP zip from the release repository
+2. Extract and validate the isolated.tar Docker image
+3. Load and run the Docker image, verifying the web interface at http://localhost:8080
+4. Start the SimPlatform application
+5. Run all SimBank tests using the extracted maven repository
+
+If all tests pass, the MVP zip is ready for release.
 
 ### MEND scan
 

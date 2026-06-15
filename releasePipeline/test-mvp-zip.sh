@@ -1,0 +1,534 @@
+#!/usr/bin/env bash
+
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+set -e
+
+#-----------------------------------------------------------------------------
+# Script to automate testing of the Galasa MVP zip
+#
+# This script:
+# 1. Downloads the MVP zip from the specified repository (release or prerelease)
+# 2. Extracts the zip and validates the isolated.tar Docker image
+# 3. Loads and runs the Docker image, verifying the web interface
+# 4. Runs SimBank tests using the extracted maven repository
+#-----------------------------------------------------------------------------
+
+# Set TERM if not already set
+if [ -z "${TERM}" ]; then
+    export TERM="xterm-256color"
+fi
+
+#-----------------------------------------------------------------------------
+# Set Colors
+#-----------------------------------------------------------------------------
+bold=$(tput bold)
+underline=$(tput sgr 0 1)
+reset=$(tput sgr0)
+
+red=$(tput setaf 1)
+green=$(tput setaf 76)
+white=$(tput setaf 7)
+tan=$(tput setaf 202)
+blue=$(tput setaf 25)
+
+#-----------------------------------------------------------------------------
+# Headers and Logging
+#-----------------------------------------------------------------------------
+underline() { printf "${underline}${bold}%s${reset}\n" "$@" ;}
+h1() { printf "\n${underline}${bold}${blue}%s${reset}\n" "$@" ;}
+h2() { printf "\n${underline}${bold}${white}%s${reset}\n" "$@" ;}
+debug() { printf "${white}%s${reset}\n" "$@" ;}
+info() { printf "${white}➜ %s${reset}\n" "$@" ;}
+success() { printf "${green}✔ %s${reset}\n" "$@" ;}
+error() { printf "${red}✖ %s${reset}\n" "$@" ;}
+warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
+bold() { printf "${bold}%s${reset}\n" "$@" ;}
+note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
+
+# Default values
+REPO_TYPE="release"
+WORK_DIR="$(pwd)/temp/mvp-test-$(date +%s)"
+CONTAINER_NAME="galasa-mvp-test"
+DOCKER_IMAGE=""
+
+#-----------------------------------------------------------------------------
+# Functions
+#-----------------------------------------------------------------------------
+
+function usage {
+    echo "Syntax: $0 [OPTIONS]"
+    cat << EOF
+Options are:
+  --release       Download from release repository (default)
+  --prerelease    Download from prerelease repository
+  --main          Download from main repository
+  --work-dir      Specify working directory (default: ./temp/mvp-test-<timestamp>)
+  --help          Display this help message
+
+Examples:
+  $0 --release
+  $0 --prerelease
+  $0 --main
+
+Environment variables:
+None
+EOF
+    exit 1
+}
+
+
+function cleanup {
+    info "Cleaning up..."
+    
+    # Kill any running SimPlatform processes
+    if pgrep -f "galasa-simplatform.*\.jar" >/dev/null 2>&1; then
+        info "Stopping SimPlatform processes..."
+        pkill -f "galasa-simplatform.*\.jar" || true
+        sleep 2
+    fi
+    
+    # Stop and remove Docker container if running
+    if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        info "Stopping and removing Docker container: ${CONTAINER_NAME}"
+        docker stop "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+        docker rm "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+    fi
+    
+    # Remove Docker image if it exists
+    if [ -n "${DOCKER_IMAGE}" ] && docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "^${DOCKER_IMAGE}$"; then
+        info "Removing Docker image: ${DOCKER_IMAGE}"
+        docker rmi "${DOCKER_IMAGE}" >/dev/null 2>&1 || true
+    fi
+    
+    success "Cleanup complete"
+}
+
+function get_galasa_version {
+    info "Detecting Galasa version from galasa repository..."
+    
+    # Download build.properties directly from GitHub
+    local build_props_url="https://raw.githubusercontent.com/galasa-dev/galasa/main/build.properties"
+    local temp_file=$(mktemp)
+    
+    if ! curl -f -s -o "${temp_file}" "${build_props_url}"; then
+        error "Failed to download build.properties from ${build_props_url}"
+        rm -f "${temp_file}"
+        exit 1
+    fi
+    
+    if [ -f "${temp_file}" ]; then
+        GALASA_VERSION=$(grep "GALASA_VERSION=" "${temp_file}" | cut -d'=' -f2)
+        if [ -z "${GALASA_VERSION}" ]; then
+            error "Could not extract GALASA_VERSION from build.properties"
+            rm -f "${temp_file}"
+            exit 1
+        fi
+        success "Detected Galasa version: ${GALASA_VERSION}"
+    else
+        error "Could not find build.properties file"
+        rm -f "${temp_file}"
+        exit 1
+    fi
+    
+    rm -f "${temp_file}"
+}
+
+function download_mvp_zip {
+    local base_url="https://development.galasa.dev/${REPO_TYPE}/maven-repo/mvp/dev/galasa/galasa-isolated-mvp"
+    local zip_url="${base_url}/${GALASA_VERSION}/galasa-isolated-mvp-${GALASA_VERSION}.zip"
+    
+    info "Downloading MVP zip from ${REPO_TYPE} repository..."
+    info "URL: ${zip_url}"
+    
+    mkdir -p "${WORK_DIR}"
+    cd "${WORK_DIR}"
+    
+    if ! curl -f -L -o "galasa-isolated-mvp-${GALASA_VERSION}.zip" "${zip_url}"; then
+        error "Failed to download MVP zip from ${zip_url}"
+        exit 1
+    fi
+    
+    success "Downloaded MVP zip successfully"
+}
+
+function extract_mvp_zip {
+    info "Extracting MVP zip..."
+    
+    cd "${WORK_DIR}"
+    
+    if ! unzip -q "galasa-isolated-mvp-${GALASA_VERSION}.zip"; then
+        error "Failed to extract MVP zip"
+        exit 1
+    fi
+    
+    success "Extracted MVP zip successfully"
+    
+    # Verify expected structure - files extract directly to work directory
+    if [ ! -f "isolated.tar" ]; then
+        error "Expected 'isolated.tar' file not found after extraction"
+        exit 1
+    fi
+    
+    if [ ! -f "run-simplatform.sh" ]; then
+        error "Expected 'run-simplatform.sh' file not found after extraction"
+        exit 1
+    fi
+    
+    if [ ! -d "maven" ]; then
+        error "Expected 'maven' directory not found after extraction"
+        exit 1
+    fi
+    
+    if [ ! -d "galasactl" ]; then
+        error "Expected 'galasactl' directory not found after extraction"
+        exit 1
+    fi
+    
+    success "Verified MVP zip structure"
+}
+
+function load_docker_image {
+    info "Loading Docker image from isolated.tar..."
+    
+    cd "${WORK_DIR}"
+    
+    local output
+    output=$(docker load -i isolated.tar 2>&1)
+    
+    echo "${output}"
+    
+    # Extract the actual image name from the output
+    if echo "${output}" | grep -q "Loaded image:"; then
+        DOCKER_IMAGE=$(echo "${output}" | grep "Loaded image:" | sed 's/Loaded image: //')
+        success "Docker image loaded successfully: ${DOCKER_IMAGE}"
+    else
+        error "Failed to load Docker image"
+        error "Output: ${output}"
+        exit 1
+    fi
+}
+
+function run_docker_container {
+    info "Starting Docker container..."
+    
+    # Check if port 8080 is already in use
+    if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1; then
+        error "Port 8080 is already in use. Please free the port and try again."
+        exit 1
+    fi
+    
+    if ! docker run -d -p 8080:80 --name "${CONTAINER_NAME}" "${DOCKER_IMAGE}"; then
+        error "Failed to start Docker container"
+        exit 1
+    fi
+    
+    success "Docker container started: ${CONTAINER_NAME}"
+    
+    # Wait for container to be ready
+    info "Waiting for container to be ready..."
+    sleep 5
+    
+    # Verify container is running
+    if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        error "Container is not running"
+        docker logs "${CONTAINER_NAME}"
+        exit 1
+    fi
+    
+    success "Container is running"
+}
+
+function verify_web_interface {
+    info "Verifying web interface at http://localhost:8080..."
+    
+    local max_attempts=10
+    local attempt=1
+    
+    while [ ${attempt} -le ${max_attempts} ]; do
+        if curl -f -s http://localhost:8080 >/dev/null 2>&1; then
+            success "Web interface is accessible at http://localhost:8080"
+            return 0
+        fi
+        
+        warn "Attempt ${attempt}/${max_attempts}: Web interface not yet accessible, retrying..."
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    
+    error "Web interface is not accessible after ${max_attempts} attempts"
+    exit 1
+}
+
+function setup_galasactl {
+    info "Setting up galasactl from MVP zip..."
+    
+    cd "${WORK_DIR}"
+    
+    if [ ! -d "galasactl" ]; then
+        error "galasactl directory not found"
+        exit 1
+    fi
+    
+    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
+    local arch=$(uname -m)
+    
+    # Map architecture names
+    if [ "${arch}" = "x86_64" ]; then
+        arch="x86_64"
+    elif [ "${arch}" = "arm64" ] || [ "${arch}" = "aarch64" ]; then
+        arch="arm64"
+    fi
+    
+    local galasactl_binary="galasactl/galasactl-${os}-${arch}"
+    
+    if [ ! -f "${galasactl_binary}" ]; then
+        error "galasactl binary not found: ${galasactl_binary}"
+        info "Available files in galasactl directory:"
+        ls -la galasactl/
+        exit 1
+    fi
+    
+    # Create symlink for easier access
+    mkdir -p "${WORK_DIR}/bin"
+    ln -sf "${WORK_DIR}/${galasactl_binary}" "${WORK_DIR}/bin/galasactl"
+    chmod +x "${WORK_DIR}/bin/galasactl"
+    
+    # Remove quarantine attribute on macOS
+    if [ "${os}" = "darwin" ]; then
+        xattr -dr com.apple.quarantine "${WORK_DIR}/bin/galasactl" 2>/dev/null || true
+    fi
+    
+    success "galasactl set up successfully from MVP zip"
+}
+
+function initialize_galasa {
+    info "Initializing Galasa environment..."
+    
+    cd "${WORK_DIR}"
+    export GALASA_HOME="${WORK_DIR}/.galasa"
+    
+    if ! ./bin/galasactl local init --log -; then
+        error "Failed to initialize Galasa environment"
+        exit 1
+    fi
+    
+    success "Galasa environment initialized"
+    
+    # Create cps.properties
+    info "Creating cps.properties..."
+    cat > "${GALASA_HOME}/cps.properties" << 'EOF'
+#
+# File: cps.properties
+#
+# Purpose:
+#   To provide properties to the Galasa runtime when running tests in a local JVM.
+#
+
+simbank.dse.instance.name=SIMBANK
+simbank.instance.SIMBANK.zos.image=SIMBANK
+simbank.instance.SIMBANK.credentials.id=SIMBANK
+
+zos.dse.tag.SIMBANK.imageid=SIMBANK
+zos.image.SIMBANK.ipv4.hostname=127.0.0.1
+zos.image.SIMBANK.telnet.tls=false
+zos.image.SIMBANK.telnet.port=2023
+zos.image.SIMBANK.webnet.port=2080
+zos.image.SIMBANK.credentials=SIMBANK
+
+zosmf.server.SIMBANK.images=SIMBANK
+zosmf.server.SIMBANK.hostname=127.0.0.1
+zosmf.server.SIMBANK.port=2040
+zosmf.server.SIMBANK.https=false
+EOF
+    
+    success "Created cps.properties"
+    
+    # Create credentials.properties
+    info "Creating credentials.properties..."
+    cat > "${GALASA_HOME}/credentials.properties" << 'EOF'
+#
+# File: credentials.properties
+#
+# Purpose:
+#   To provide credentials to the Galasa runtime when running tests in a local JVM.
+#   These credentials are for the demo Simplatform application.
+#
+
+secure.credentials.SIMBANK.username=IBMUSER
+secure.credentials.SIMBANK.password=SYS1
+EOF
+    
+    success "Created credentials.properties"
+}
+
+function start_simplatform {
+    info "Starting SimPlatform application..."
+    
+    # Check if SimPlatform is already running
+    if pgrep -f "galasa-simplatform.*\.jar" >/dev/null 2>&1; then
+        warn "SimPlatform appears to be already running. Stopping existing processes..."
+        pkill -f "galasa-simplatform.*\.jar" >/dev/null 2>&1 || true
+        sleep 3
+    fi
+    
+    cd "${WORK_DIR}"
+    
+    if [ ! -f "run-simplatform.sh" ]; then
+        error "run-simplatform.sh not found"
+        exit 1
+    fi
+    
+    chmod +x run-simplatform.sh
+    
+    # Start SimPlatform in background using the --server flag and --location
+    # Redirect stderr to filter out the expected exit code 143 message from previous runs
+    ./run-simplatform.sh --server --location "${WORK_DIR}/maven/dev/galasa" > "${WORK_DIR}/simplatform.log" 2>&1 &
+    local simplatform_pid=$!
+    
+    info "SimPlatform started with PID: ${simplatform_pid}"
+    info "SimPlatform logs: ${WORK_DIR}/simplatform.log"
+    
+    # Wait for SimPlatform to be ready
+    info "Waiting for SimPlatform to be ready..."
+    sleep 10
+    
+    # Verify SimPlatform is still running
+    if ! kill -0 ${simplatform_pid} 2>/dev/null; then
+        error "SimPlatform process is not running"
+        error "Last 20 lines of SimPlatform log:"
+        tail -20 "${WORK_DIR}/simplatform.log"
+        exit 1
+    fi
+    
+    success "SimPlatform is running"
+}
+
+function run_simbank_tests {
+    info "Running SimBank tests..."
+    
+    cd "${WORK_DIR}"
+    export GALASA_HOME="${WORK_DIR}/.galasa"
+    
+    local maven_repo="${WORK_DIR}/maven"
+    
+    if [ ! -d "${maven_repo}" ]; then
+        error "Maven repository not found at: ${maven_repo}"
+        exit 1
+    fi
+    
+    info "Using local maven repository: ${maven_repo}"
+    
+    local tests=(
+        "dev.galasa.simbank.tests.SimBankIVT"
+        "dev.galasa.simbank.tests.BasicAccountCreditTest"
+        "dev.galasa.simbank.tests.ProvisionedAccountCreditTests"
+        "dev.galasa.simbank.tests.BatchAccountsOpenTest"
+    )
+    
+    local test_num=1
+    local failed_tests=()
+    
+    for test_class in "${tests[@]}"; do
+        info "Running test ${test_num}/${#tests[@]}: ${test_class}"
+        
+        if ./bin/galasactl runs submit local \
+            --obr mvn:dev.galasa/dev.galasa.simbank.obr/${GALASA_VERSION}/obr \
+            --obr mvn:dev.galasa/dev.galasa.uber.obr/${GALASA_VERSION}/obr \
+            --class "dev.galasa.simbank.tests/${test_class}" \
+            --localMaven "file://${maven_repo}" \
+            --reportjson "${GALASA_HOME}/test-${test_num}.json" \
+            --log -; then
+            success "Test passed: ${test_class}"
+        else
+            error "Test failed: ${test_class}"
+            failed_tests+=("${test_class}")
+        fi
+        
+        test_num=$((test_num + 1))
+    done
+    
+    # Report results
+    echo ""
+    info "=========================================="
+    info "Test Results Summary"
+    info "=========================================="
+    info "Total tests: ${#tests[@]}"
+    info "Passed: $((${#tests[@]} - ${#failed_tests[@]}))"
+    info "Failed: ${#failed_tests[@]}"
+    
+    if [ ${#failed_tests[@]} -gt 0 ]; then
+        error "Failed tests:"
+        for test in "${failed_tests[@]}"; do
+            error "  - ${test}"
+        done
+        return 1
+    else
+        success "All tests passed!"
+        return 0
+    fi
+}
+
+#-----------------------------------------------------------------------------
+# Main script
+#-----------------------------------------------------------------------------
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --release)
+            REPO_TYPE="release"
+            shift
+            ;;
+        --prerelease)
+            REPO_TYPE="prerelease"
+            shift
+            ;;
+        --main)
+            REPO_TYPE="main"
+            shift
+            ;;
+        --work-dir)
+            WORK_DIR="$2"
+            shift 2
+            ;;
+        --help)
+            usage
+            ;;
+        *)
+            error "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+# Trap to cleanup on exit
+trap cleanup EXIT
+
+info "=========================================="
+info "Galasa MVP Zip Test Script"
+info "=========================================="
+info "Repository type: ${REPO_TYPE}"
+info "Working directory: ${WORK_DIR}"
+echo ""
+
+# Execute test steps
+mkdir -p temp
+get_galasa_version
+download_mvp_zip
+extract_mvp_zip
+load_docker_image
+run_docker_container
+verify_web_interface
+setup_galasactl
+initialize_galasa
+start_simplatform
+run_simbank_tests
+
+success "=========================================="
+success "MVP zip testing completed successfully!"
+success "=========================================="
