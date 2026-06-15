@@ -623,9 +623,3 @@ jobs:
           - The `galasactl-ibm-x86_64:stable` image is now using version ${{ inputs.released_version }} for regression testing
           - Simplatform version bump may fail if Galasa OBR hasn't been deployed yet - merge Galasa PR first and wait for deployment
           EOF
-
-      - name: Workflow complete
-        run: |
-          echo "Development version bump workflow completed"
-          echo "New development version: ${{ inputs.new_version }}"
-          echo "Please review the summary above for next steps"
