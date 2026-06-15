@@ -265,7 +265,7 @@ jobs:
           
           gh pr create \
             --title "Bump version to ${{ inputs.new_version }}" \
-            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}\n\n⚠️ Note: This depends on Galasa OBR being rebuilt and deployed to development.galasa.dev" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }} \
             --base main \
             --head ${{ inputs.branch_name }}
 
