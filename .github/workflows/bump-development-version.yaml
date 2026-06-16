@@ -49,6 +49,8 @@ on:
         default: 'version-bump'
 
 env:
+  # Set TERM to xterm-256color to fix errors in set-version scripts that use tput.
+  # GitHub Actions doesn't set TERM by default, causing tput commands to fail.
   TERM: xterm-256color
   REGISTRY: ghcr.io
 
@@ -244,6 +246,9 @@ jobs:
         run: |
           git checkout -b ${{ inputs.branch_name }}
 
+      # The simplatform set-version script runs a build that requires the built dev.galasa artifacts
+      # to be present in the local Maven repository. These artifacts were built and uploaded by the
+      # bump-galasa job, so we download them here before running set-version.
       - name: Download All 'dev.galasa' Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -424,6 +429,9 @@ jobs:
         run: |
           git checkout -b ${{ inputs.branch_name }}
 
+      # The isolated set-version script runs a build that requires the built dev.galasa artifacts
+      # to be present in the local Maven repository. These artifacts were built and uploaded by the
+      # bump-galasa job, so we download them here before running set-version.
       - name: Download All 'dev.galasa' Artifacts
         uses: actions/download-artifact@v4
         with:
