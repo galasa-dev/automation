@@ -14,6 +14,11 @@ name: Pre-Release Process
 on:
   workflow_dispatch:
 
+env:
+  # Set TERM to xterm-256color to fix errors in set-version scripts that use tput.
+  # GitHub Actions doesn't set TERM by default, causing tput commands to fail.
+  TERM: xterm-256color
+
 jobs:
   pre-release:
     name: Run Pre-Release Automation
