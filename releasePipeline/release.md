@@ -131,18 +131,18 @@ For any tests which fail, run them again individually:
 
 ### Bump to new version for development
 
-1. [95-move-to-new-version.md](./95-move-to-new-version.md) - Follow the manual steps in this file to upgrade the development version of Galasa to the next one up.
-2. Run the [set-version.sh](./set-version.sh) script which updates all CPS properties in the [`../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`](../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file that contain the version that was just released to the new development version. Deliver the changes to the automation repository and the CPS properties will be applied automatically.
-
-3. If the above fails and you need to update the CPS properties manually for some reason, run the [99-update-development-version.sh](./99-update-development-version.sh) script.
-
-4. Update the CPS properties for the internal integrated tests using galasactl:
+1. Run the [Bump Development Version GitHub Actions workflow](https://github.com/galasa-dev/automation/actions/workflows/bump-development-version.yaml) to upgrade the development version of Galasa to the next one up.
+2. Update the CPS properties for the internal integrated tests using galasactl:
 
    a. framework.test.stream.internal-inttests.location
 
    b. framework.test.stream.internal-inttests.obr
 
-5. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasactl-ibm-x86_64 to 'stable' (regression testing uses galasactl-ibm-x86_64:stable):
+If the workflow fails:
+1. Follow the manual steps in [95-move-to-new-version.md](./95-move-to-new-version.md) to upgrade the development version of Galasa.
+2. Run the [set-version.sh](./set-version.sh) script which updates all CPS properties in the [`../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`](../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file that contain the version that was just released to the new development version. Deliver the changes to the automation repository and the CPS properties will be applied automatically.
+   1. If the above fails and you need to update the CPS properties manually for some reason, run the [99-update-development-version.sh](./99-update-development-version.sh) script.
+3. Upgrade the version of the CLI we use for our regression testing to this released version. Retag the 'release' image of galasactl-ibm-x86_64 to 'stable' (regression testing uses galasactl-ibm-x86_64:stable):
 
 ``` shell
 docker pull ghcr.io/galasa-dev/galasactl-ibm-x86_64:release
