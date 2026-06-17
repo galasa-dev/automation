@@ -53,9 +53,9 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
 bold() { printf "${bold}%s${reset}\n" "$@" ;}
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------
 # Main logic.
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------
 
 mkdir -p temp
 
@@ -77,6 +77,43 @@ function ask_user_for_release_type {
         esac
     done
     echo "Chosen type of release process: ${release_type}"
+}
+
+function parse_args {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --release)
+                export release_type="release"
+                shift
+                ;;
+            --prerelease)
+                export release_type="prerelease"
+                shift
+                ;;
+            *)
+                error "Unknown option: $1"
+                usage
+                exit 1
+                ;;
+        esac
+    done
+    
+    # If no release type was provided via flags, ask the user
+    if [[ -z "${release_type}" ]]; then
+        ask_user_for_release_type
+    fi
+    
+    info "Release type: ${release_type}"
+}
+
+function usage {
+    h1 "Usage: $0 [--release|--prerelease]"
+    echo ""
+    echo "Options:"
+    echo "  --release      Check artifacts for release build"
+    echo "  --prerelease   Check artifacts for pre-release build"
+    echo ""
+    echo "If no option is provided, you will be prompted to select one."
 }
 
 
@@ -140,7 +177,7 @@ function check_maven_repo_for_jar_asc {
     success "The .pom.asc file for artifact ${artifact_name} was found."
 }
 
-ask_user_for_release_type
+parse_args "$@"
 
 declare -a artifact_list=(
     "dev.galasa.platform"\
