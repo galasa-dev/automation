@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 # Required secrets:
-#   - GITHUB_TOKEN: Automatically provided by GitHub Actions
+#   ARGOCD_AUTH_TOKEN - Authentication token for ArgoCD CLI
 #
 name: Release Cleanup
 
@@ -93,10 +93,22 @@ jobs:
             --name "Pre-release branch deletion" \
             --sleep 10 \
             --max-iterations 30
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o /tmp/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          sudo install -m 555 /tmp/argocd /usr/local/bin/argocd
+          argocd version --client
       
       - name: Delete ArgoCD apps
+        env:
+          ARGOCD_SERVER: argocd.galasa.dev
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_OPTS: --grpc-web
+        working-directory: ${{ github.workspace }}/releasePipeline
         run: |
-          ./releasePipeline/92-delete-argocd-apps.sh
+          chmod +x 92-delete-argocd-apps.sh
+          ./92-delete-argocd-apps.sh
       
       - name: Delete GHCR images with release and prerelease tags
         env:

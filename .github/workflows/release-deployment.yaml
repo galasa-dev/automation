@@ -288,10 +288,10 @@ jobs:
   upload-releases:
     name: Upload GitHub Releases
     runs-on: ubuntu-latest
-    needs: [detect-version, create-version-tags]
+    needs: [get-galasa-version, create-version-tags]
 
     env:
-      GALASA_VERSION: ${{ needs.detect-version.outputs.galasa-version }}
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
 
     steps:
       - name: Trigger CLI release workflow
@@ -372,10 +372,10 @@ jobs:
   update-package-managers:
     name: Update Package Managers
     runs-on: ubuntu-latest
-    needs: [detect-version, upload-releases]
+    needs: [get-galasa-version, upload-releases]
 
     env:
-      GALASA_VERSION: ${{ needs.detect-version.outputs.galasa-version }}
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
 
     steps:
       - name: Trigger Homebrew tap update
@@ -454,10 +454,10 @@ jobs:
   bump-development-version:
     name: Bump Development Version
     runs-on: ubuntu-latest
-    needs: [detect-version, update-package-managers]
+    needs: [get-galasa-version, update-package-managers]
 
     env:
-      GALASA_VERSION: ${{ needs.detect-version.outputs.galasa-version }}
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
 
     steps:
       - name: Trigger Bump Development Version workflow
@@ -487,7 +487,7 @@ jobs:
   cleanup:
     name: Cleanup Release Resources
     runs-on: ubuntu-latest
-    needs: [detect-version, bump-development-version]
+    needs: [get-galasa-version, bump-development-version]
 
     steps:
       - name: Trigger Release Cleanup workflow
