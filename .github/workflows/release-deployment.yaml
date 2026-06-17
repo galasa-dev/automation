@@ -5,9 +5,8 @@
 #
 # Required secrets:
 #   - IBM_CLOUD_API_KEY: API key for IBM Cloud Container Registry authentication
-#   - GITHUB_TOKEN: Automatically provided by GitHub Actions
 #
-name: Release Deployment
+name: Deploy new Galasa version
 
 on:
   workflow_dispatch:
