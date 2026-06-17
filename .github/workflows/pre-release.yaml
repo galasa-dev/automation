@@ -1,0 +1,98 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# This workflow automates the Galasa pre-release process.
+#
+# Required Secrets:
+#   ARGOCD_AUTH_TOKEN         - Authentication token for ArgoCD CLI
+#   GALASA_TEAM_GITHUB_TOKEN  - GitHub token with repo and workflow permissions
+#
+name: Pre-Release Process
+
+on:
+  workflow_dispatch:
+
+env:
+  TERM: xterm-256color
+
+jobs:
+  pre-release:
+    name: Run Pre-Release Automation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o /tmp/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          sudo install -m 555 /tmp/argocd /usr/local/bin/argocd
+          argocd version --client
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl unzip
+          echo "Tools installed successfully"
+
+      - name: Authenticate GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "GALASA_TEAM_GITHUB_TOKEN secret is not set"
+            exit 1
+          fi
+          gh auth status
+          echo "GitHub CLI authentication successful"
+
+      - name: Clean up existing ArgoCD apps
+        env:
+          ARGOCD_SERVER: argocd.galasa.dev
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_OPTS: --grpc-web
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          chmod +x 92-delete-argocd-apps.sh
+          ./92-delete-argocd-apps.sh
+
+      - name: Run pre-release script
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+          ARGOCD_SERVER: argocd.galasa.dev
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_OPTS: --grpc-web
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          # Verify ArgoCD authentication is configured
+          if [[ -z "$ARGOCD_AUTH_TOKEN" ]]; then
+            echo "ARGOCD_AUTH_TOKEN secret is not set"
+            exit 1
+          fi
+          
+          chmod +x 01-run-pre-release.sh
+          ./01-run-pre-release.sh --prerelease
+
+      - name: Test MVP zip
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          chmod +x test-mvp-zip.sh
+          ./test-mvp-zip.sh --prerelease
+
+      - name: Upload MVP test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-test-results-prerelease
+          path: |
+            ${{ github.workspace }}/releasePipeline/temp/mvp-test-*/
+            !${{ github.workspace }}/releasePipeline/temp/mvp-test-*/galasa-isolated-mvp-*.zip
+            !${{ github.workspace }}/releasePipeline/temp/mvp-test-*/isolated.tar
+            !${{ github.workspace }}/releasePipeline/temp/mvp-test-*/maven/
+          retention-days: 7

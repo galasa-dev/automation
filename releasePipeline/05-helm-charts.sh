@@ -63,6 +63,7 @@ function usage {
 Options are:
 --prerelease : Checks the Galasa helm charts can be released for the pre-release process.
 --release : Checks the Galasa helm charts have been released for the release process.
+--start-time <timestamp> : ISO 8601 timestamp to use for filtering workflow runs (optional, defaults to current time)
 EOF
 }
 
@@ -111,7 +112,7 @@ function clone_helm_repository {
     h1 "Cloning the '${release_type}' branch of the 'helm' repository into the 'temp' directory..."
 
     cd ${WORKSPACE_DIR}/temp
-    git clone --branch ${release_type} git@github.com:galasa-dev/helm.git
+    git clone --branch ${release_type} https://github.com/galasa-dev/helm.git
     
     success "'${release_type}' branch of the 'helm' repository cloned."
 
@@ -149,29 +150,73 @@ function check_helm_charts_released {
 
     h1 "Checking the Helm charts were released..."
 
-    info "First, checking that the GitHub Actions workflow to release them, is no longer active..."
+    info "Waiting for Helm chart release workflow to start and complete..."
 
+    # Use the provided start time or default to current time
+    if [[ -z "${start_time}" ]]; then
+        start_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        info "No start time provided, using current time: ${start_time}"
+    fi
+    
+    info "Looking for workflow runs created after: ${start_time}"
+
+    workflow_found="false"
     workflow_finished="false"
     retries=0
     max=100
-    target_line=""
+    run_id=""
 
     while [[ "${workflow_finished}" == "false" ]]; do
 
-        url=https://api.github.com/repos/galasa-dev/helm/actions/runs?status=in_progress
-        curl $url > temp/workflows_in_progress.txt -s
+        # Get recent workflow runs for the release branch
+        url="https://api.github.com/repos/galasa-dev/helm/actions/workflows/release.yaml/runs?branch=${release_type}&per_page=5"
+        curl -s "$url" > temp/helm_workflow_runs.json
 
-        target_line=$(cat temp/workflows_in_progress.txt | grep "\"total_count\": 0")
+        # Find the most recent run created after our branch creation time
+        if [[ "${workflow_found}" == "false" ]]; then
+            # Look for a workflow run that started after we created the branch
+            run_id=$(cat temp/helm_workflow_runs.json | jq -r --arg start_time "$start_time" '.workflow_runs[] | select(.created_at > $start_time) | .id' | head -1)
+            
+            if [[ -n "$run_id" ]]; then
+                workflow_found="true"
+                info "Found Helm release workflow run: ${run_id}"
+                info "View at: https://github.com/galasa-dev/helm/actions/runs/${run_id}"
+            else
+                info "Waiting for Helm release workflow to start... (attempt $((retries+1))/${max})"
+            fi
+        fi
 
-        if [[ "$target_line" != "" ]]; then
-            success "Target line is found - the workflow is now finished."
-            workflow_finished="true"
-        fi    
-        sleep 5
-        ((retries++))
-        if (( $retries > $max )); then 
-            error "Too many retries."
-            exit 1
+        # If we found the workflow, check its status
+        if [[ "${workflow_found}" == "true" ]]; then
+            status=$(cat temp/helm_workflow_runs.json | jq -r --arg run_id "$run_id" '.workflow_runs[] | select(.id == ($run_id | tonumber)) | .status')
+            conclusion=$(cat temp/helm_workflow_runs.json | jq -r --arg run_id "$run_id" '.workflow_runs[] | select(.id == ($run_id | tonumber)) | .conclusion')
+            
+            if [[ "$status" == "completed" ]]; then
+                if [[ "$conclusion" == "success" ]]; then
+                    success "Helm release workflow completed successfully."
+                    workflow_finished="true"
+                else
+                    error "Helm release workflow failed with conclusion: ${conclusion}"
+                    error "Check https://github.com/galasa-dev/helm/actions/runs/${run_id}"
+                    exit 1
+                fi
+            else
+                info "Helm release workflow status: ${status}"
+            fi
+        fi
+
+        if [[ "${workflow_finished}" == "false" ]]; then
+            sleep 5
+            ((retries++))
+            if (( $retries > $max )); then
+                error "Timed out waiting for Helm release workflow."
+                if [[ -n "$run_id" ]]; then
+                    error "Check https://github.com/galasa-dev/helm/actions/runs/${run_id}"
+                else
+                    error "Check https://github.com/galasa-dev/helm/actions"
+                fi
+                exit 1
+            fi
         fi
     done
 
@@ -235,11 +280,15 @@ function delete_pre_release_helm_charts {
 # Process parameters
 #-----------------------------------------------------------------------------------------
 release_type=""
+start_time=""
 while [ "$1" != "" ]; do
     case $1 in
         --prerelease )          release_type="prerelease"
                                 ;;
         --release )             release_type="release"
+                                ;;
+        --start-time )          shift
+                                start_time="$1"
                                 ;;
         -h | --help )           usage
                                 exit
