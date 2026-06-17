@@ -13,6 +13,11 @@
 # 
 #-----------------------------------------------------------------------------------------     
 
+# Set TERM if not already set
+if [ -z "${TERM}" ]; then
+    export TERM="xterm-256color"
+fi
+
 # Where is this script executing from ?
 RELEASE_BASEDIR=$(dirname "$0");pushd $RELEASE_BASEDIR 2>&1 >> /dev/null ;RELEASE_BASEDIR=$(pwd);popd 2>&1 >> /dev/null
 export ORIGINAL_DIR=$(pwd)

@@ -14,9 +14,6 @@ name: Pre-Release Process
 on:
   workflow_dispatch:
 
-env:
-  TERM: xterm-256color
-
 jobs:
   pre-release:
     name: Run Pre-Release Automation
