@@ -8,9 +8,6 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 
 1. Run the [Pre-release GitHub Actions workflow](https://github.com/galasa-dev/automation/actions/workflows/pre-release.yaml). If the process fails at any stage, you can continue by re-running the script that failed from the manual steps and finish using the [manual steps below](#pre-release-steps---manual).
 2. Run a MEND scan for the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by following the instructions in the internal [Developer docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp) to check for any vulnerabilities before moving onto the release process.
-3. Make sure that no Releases or Tags for the Helm charts were left behind during the GitHub Actions workflow run.
-    1. Delete all Releases that were created: [Releases](https://github.com/galasa-dev/helm/releases) - Next to a Release, click the Delete icon and 'Delete this release'.
-    2. Delete all Tags that were created: [Tags](https://github.com/galasa-dev/helm/tags) - Next to a Tag, click the three dots, then 'Delete Tag' then 'Delete this Tag'.
 
 ## Pre-release steps - Manual
 
@@ -27,7 +24,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 ### Steps
 
 1. Ensure you have completed the [set up](#set-up) before continuing.
-2.  Run [02-create-argocd-apps.sh](./02-create-argocd-apps.sh). When prompted, choose the '`pre-release`' option.
+2. Run [02-create-argocd-apps.sh](./02-create-argocd-apps.sh). When prompted, choose the '`pre-release`' option.
 3. Run [03-repo-branches-delete.sh](./03-repo-branches-delete.sh). When prompted, choose the '`pre-release`' option.
 This script kicks off a pipeline to delete all branches called `prerelease` in all the github repositories, so we know they are clean.
 4. Run [04-repo-branches-create.sh](./04-repo-branches-create.sh).  When prompted, choose the '`pre-release`' option.  This script creates
@@ -41,7 +38,7 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
     - Watch the [Isolated Main build workflow](https://github.com/galasa-dev/isolated/actions/workflows/build.yaml) for the `prerelease` ref back in GitHub
 9. The build of the Web UI will also be triggered automatically as part of the build chain, so monitor this build and make sure it finishes successfully.
    - Watch the [Web UI Main build workflow](https://github.com/galasa-dev/webui/actions/workflows/build.yaml) for the `prerelease` ref back in GitHub
-10.  Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
+10. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
 ## Test and scan the MVP
