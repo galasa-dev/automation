@@ -40,10 +40,6 @@ This workflow will automatically:
 6. Test the MVP zip
 7. Run GitHub Actions regression tests in parallel (Isolated, Simbank IVTs, Core IVTs)
 
-**Required Secrets**:
-- `ARGOCD_AUTH_TOKEN` - Authentication token for ArgoCD CLI
-- `GALASA_TEAM_GITHUB_TOKEN` - GitHub token with repo and workflow permissions
-
 Monitor the workflow run at: https://github.com/galasa-dev/automation/actions/workflows/release.yaml
 
 ### Part 2: Manual Steps
@@ -99,8 +95,6 @@ This workflow will automatically:
 9. Bump development version
 10. Clean up release resources
 
-**Required Secrets**:
-- `IBM_CLOUD_API_KEY` - API key for IBM Cloud Container Registry
 
 **Manual actions required**:
 1. Approve Maven Central publication in Portal UI - see [31-publish-to-maven-central.md](./31-publish-to-maven-central.md)
