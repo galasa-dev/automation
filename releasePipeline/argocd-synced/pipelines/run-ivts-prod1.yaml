@@ -10,19 +10,6 @@ metadata:
   name: run-ivts-prod1
   namespace: galasa-build
 spec:
-#
-#
-#
-  params:
-  - name: distBranch
-    type: string
-  - name: version
-    type: string
-  - name: bootVersion
-    type: string
-#
-#
-#
   tasks:
 #
 #

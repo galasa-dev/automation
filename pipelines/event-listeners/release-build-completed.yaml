@@ -1,0 +1,98 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+# This EventListener triggers the Tekton regression tests that require
+# internal mainframe resources (CICS, z/OS) during a Galasa release.
+#
+# It fires when the 'Release Build Orchestrator' workflow completes
+# successfully on the 'release' branch of the 'galasa' repository
+# (started by release script 10-build-galasa-mono-repo.sh).
+#
+# It creates a single 'run-release-regression-tests' PipelineRun which
+# runs the following test stages sequentially:
+#   1. z/OS Manager IVTs (ZosManager, ZosMF, RSEAPI)
+#   2. Internal integration tests (CICS-TS, CEMT, CEDA, CECI, 3270, SDV)
+#
+# The EventListener is routed to by the github-webhook-monitor deployment.
+# See build-images/github-webhook-monitor/config.yaml for the routing config.
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-release-build-completed-listener
+  annotations:
+    tekton.dev/payload-validation: "false"
+spec:
+  serviceAccountName: tekton-trigger
+  triggers:
+    - name: release-build-completed-trigger
+      interceptors:
+        - name: "validate GitHub payload and filter on eventType"
+          ref:
+            name: "github"
+          params:
+          - name: "eventTypes"
+            value: ["workflow_run"]
+
+        - name: "CEL filter: only when the workflow run is completed"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.action in ['completed']"
+
+        - name: "CEL filter: only when the workflow run is successful"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.conclusion in ['success']"
+
+        - name: "CEL filter: only for the 'Release Build Orchestrator' workflow"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.name in ['Release Build Orchestrator']"
+
+        - name: "CEL filter: only for the 'galasa' repository"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.repository.name in ['galasa']"
+
+        - name: "CEL filter: only when the workflow branch is 'release'"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.head_branch in ['release']"
+
+      template:
+        spec:
+          resourcetemplates:
+            - apiVersion: tekton.dev/v1beta1
+              kind: PipelineRun
+              metadata:
+                generateName: run-release-regression-tests-
+                annotations:
+                  argocd.argoproj.io/compare-options: IgnoreExtraneous
+                  argocd.argoproj.io/sync-options: Prune=false
+              spec:
+                pipelineRef:
+                  name: run-release-regression-tests
+                serviceAccountName: galasa-build-bot
+                workspaces:
+                - name: git-workspace
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 1Gi

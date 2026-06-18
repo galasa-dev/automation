@@ -126,13 +126,6 @@ metadata:
     argocd.argoproj.io/sync-options: Prune=false
 #
 spec:
-  params:
-  - name: distBranch
-    value: release
-  - name: version
-    value: "${galasa_version}"
-  - name: bootVersion
-    value: "${boot_version}"
 #
 #
 #
@@ -178,13 +171,6 @@ metadata:
     argocd.argoproj.io/sync-options: Prune=false
 #
 spec:
-  params:
-  - name: distBranch
-    value: release
-  - name: version
-    value: "${galasa_version}"
-  - name: bootVersion
-    value: "${boot_version}"
 #
 #
 #

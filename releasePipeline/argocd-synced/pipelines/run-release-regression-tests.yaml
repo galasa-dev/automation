@@ -1,0 +1,128 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+# This pipeline orchestrates the Tekton-based regression tests that run during
+# a Galasa release. These tests require internal mainframe resources (CICS, z/OS).
+#
+# It first reads the Galasa version from build.properties in the galasa-dev/galasa
+# repository, then triggers run-ivts-prod1 and run-inttests-prod1 in parallel,
+# blocking until both complete before the pipeline finishes.
+#
+# This pipeline is triggered by the EventListener in
+# pipelines/event-listeners/release-build-completed.yaml once the
+# 'Release Build Orchestrator' workflow completes successfully on the
+# 'release' branch of the 'galasa' repository.
+
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: run-release-regression-tests
+  namespace: galasa-build
+spec:
+  params:
+  - name: branch
+    type: string
+    default: release
+
+  workspaces:
+  - name: git-workspace
+
+  tasks:
+
+  - name: clone-galasa-build-properties
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/galasa-dev/galasa
+    - name: revision
+      value: $(params.branch)
+    - name: depth
+      value: "1"
+    - name: sparseCheckoutDirectories
+      value: build.properties
+    - name: subdirectory
+      value: $(context.pipelineRun.name)/galasa
+    workspaces:
+    - name: output
+      workspace: git-workspace
+
+  - name: get-galasa-version
+    runAfter:
+    - clone-galasa-build-properties
+    taskRef:
+      name: script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)/galasa
+    - name: script
+      value: |
+        version=$(grep "^GALASA_VERSION=" build.properties | cut -d'=' -f2)
+        echo "Galasa version is: ${version}"
+        printf "%s" "${version}" > /workspace/git/$(context.pipelineRun.name)/galasa-version.txt
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+
+  - name: run-ivts-prod1
+    runAfter:
+    - get-galasa-version
+    taskRef:
+      name: tkn-cli
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - pipeline
+        - start
+        - run-ivts-prod1
+        - --namespace
+        - galasa-build
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+
+  - name: run-inttests-prod1
+    runAfter:
+    - get-galasa-version
+    taskRef:
+      name: tkn-cli
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: command
+      value:
+        - pipeline
+        - start
+        - run-inttests-prod1
+        - --namespace
+        - galasa-build
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+
+  - name: run-full-regression
+    runAfter:
+    - get-galasa-version
+    taskRef:
+      name: script
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: image
+      value: ghcr.io/galasa-dev/tkn:main
+    - name: script
+      value: |
+        version=$(cat /workspace/git/$(context.pipelineRun.name)/galasa-version.txt)
+        tkn pipeline start full-regression \
+          --namespace galasa-build \
+          --param distBranch=$(params.branch) \
+          --param version=${version} \
+          --param bootVersion=${version}
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace

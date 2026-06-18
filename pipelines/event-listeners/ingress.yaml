@@ -46,3 +46,13 @@ spec:
               number: 8080
         path: /galasa-monorepo-workflow
         pathType: Prefix
+  - host: triggers.galasa.dev
+    http:
+      paths:
+      - backend:
+          service:
+            name: el-github-release-build-completed-listener
+            port:
+              number: 8080
+        path: /release-build
+        pathType: Prefix
