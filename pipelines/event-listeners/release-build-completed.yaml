@@ -1,0 +1,135 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+# This EventListener triggers release automation when the 'Main build'
+# workflow completes successfully on the 'release' or 'pre-release' branch
+# of the 'isolated' repository. This workflow is triggered automatically as
+# part of the release build chain after the main Galasa mono repo
+# build completes.
+#
+# The branch name from the webhook payload is extracted and passed as a
+# parameter to each PipelineRun so pipelines can use the correct branch.
+#
+# It creates two PipelineRuns in parallel:
+#   1. 'run-release-regression-tests' — runs z/OS Manager IVTs then
+#      internal integration tests (CICS-TS, CEMT, CEDA, CECI, 3270, SDV)
+#   2. 'copy-galasa-mvp-to-internal-repo' — prepares and pushes the MVP content to the
+#      distribution-for-galasa GitHub Enterprise repository so the
+#      Mend GitHub bot can scan it for new vulnerabilities
+#
+# The EventListener is routed to by the github-webhook-monitor deployment.
+# See build-images/github-webhook-monitor/config.yaml for the routing config.
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-release-build-completed-listener
+  annotations:
+    tekton.dev/payload-validation: "false"
+spec:
+  serviceAccountName: tekton-trigger
+  triggers:
+    - name: release-build-completed-trigger
+      bindings:
+        - name: branch
+          value: $(body.workflow_run.head_branch)
+      interceptors:
+        - name: "validate GitHub payload and filter on eventType"
+          ref:
+            name: "github"
+          params:
+          - name: "eventTypes"
+            value: ["workflow_run"]
+
+        - name: "CEL filter: only when the workflow run is completed"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.action in ['completed']"
+
+        - name: "CEL filter: only when the workflow run is successful"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.conclusion in ['success']"
+
+        - name: "CEL filter: only for the 'Main build' workflow"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.name in ['Main build']"
+
+        - name: "CEL filter: only for the 'isolated' repository"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.repository.name in ['isolated']"
+
+        - name: "CEL filter: only when the workflow branch is 'release' or 'prerelease'"
+          ref:
+            name: "cel"
+          params:
+          - name: "filter"
+            value: "body.workflow_run.head_branch in ['release', 'prerelease']"
+
+      template:
+        spec:
+          params:
+            - name: branch
+          resourcetemplates:
+            - apiVersion: tekton.dev/v1beta1
+              kind: PipelineRun
+              metadata:
+                generateName: run-release-regression-tests-
+                annotations:
+                  argocd.argoproj.io/compare-options: IgnoreExtraneous
+                  argocd.argoproj.io/sync-options: Prune=false
+              spec:
+                pipelineRef:
+                  name: run-release-regression-tests
+                serviceAccountName: galasa-build-bot
+                params:
+                - name: branch
+                  value: $(tt.params.branch)
+                workspaces:
+                - name: git-workspace
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 1Gi
+
+            - apiVersion: tekton.dev/v1beta1
+              kind: PipelineRun
+              metadata:
+                generateName: copy-galasa-mvp-to-internal-repo-
+                annotations:
+                  argocd.argoproj.io/compare-options: IgnoreExtraneous
+                  argocd.argoproj.io/sync-options: Prune=false
+              spec:
+                pipelineRef:
+                  name: copy-galasa-mvp-to-internal-repo
+                serviceAccountName: galasa-build-bot
+                params:
+                - name: branch
+                  value: $(tt.params.branch)
+                workspaces:
+                - name: git-workspace
+                  volumeClaimTemplate:
+                    spec:
+                      storageClassName: longhorn-temp
+                      accessModes:
+                        - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 20Gi
