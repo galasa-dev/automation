@@ -53,9 +53,27 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@" ;}
 bold() { printf "${bold}%s${reset}\n" "$@" ;}
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@" ;}
 
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------
+# Process parameters
+#-----------------------------------------------------------------------------------------
+release_type=""
+
+while [ "$1" != "" ]; do
+    case $1 in
+        --release )             release_type="release"
+                                ;;
+        --prerelease | --pre-release )
+                                release_type="prerelease"
+                                ;;
+        * )                     error "Unexpected argument $1"
+                                exit 1
+    esac
+    shift
+done
+
+#-----------------------------------------------------------------------------------------
 # Main logic.
-#-----------------------------------------------------------------------------------------   
+#-----------------------------------------------------------------------------------------
 
 mkdir -p temp
 
@@ -103,7 +121,16 @@ function run_simbank_ivts {
     
     bold "Now watch the workflow run to make sure it finishes successfully at https://github.com/galasa-dev/simplatform/actions/runs/${run_id}"
 
+    # Return the run_id for automation
+    echo "${run_id}"
 }
 
-ask_user_for_release_type
-run_simbank_ivts
+# If no release type specified, ask the user
+if [[ -z "$release_type" ]]; then
+    ask_user_for_release_type
+    run_simbank_ivts
+else
+    # If called with a flag, suppress interactive output and return only run_id
+    run_id=$(run_simbank_ivts 2>&1 | tail -n 1)
+    echo "${run_id}"
+fi

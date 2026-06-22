@@ -1,0 +1,189 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Required secrets:
+#   ARGOCD_AUTH_TOKEN - Authentication token for ArgoCD CLI
+#   DELETE_GITHUB_PACKAGES_TOKEN - Token for deleting packages from GHCR
+#
+name: Release Cleanup
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  NAMESPACE: ${{ github.repository_owner }}
+
+jobs:
+  delete-release-branches:
+    name: Delete Release Branches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Delete release branches
+        id: delete-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Deleting release branches..."
+
+          gh workflow run "Branch Delete" \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --ref main \
+            --field distBranch=release
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --workflow "Branch Delete" \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Branch delete workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+
+      - name: Wait for release branch deletion
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --run-id ${{ steps.delete-release.outputs.run-id }} \
+            --name "Release branch deletion" \
+            --sleep 10 \
+            --max-iterations 30
+
+  delete-prerelease-branches:
+    name: Delete Pre-release Branches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Delete pre-release branches
+        id: delete-prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Deleting pre-release branches..."
+
+          gh workflow run "Branch Delete" \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --ref main \
+            --field distBranch=prerelease
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --workflow "Branch Delete" \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Branch delete workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+
+      - name: Wait for pre-release branch deletion
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --run-id ${{ steps.delete-prerelease.outputs.run-id }} \
+            --name "Pre-release branch deletion" \
+            --sleep 10 \
+            --max-iterations 30
+
+  delete-argocd-apps:
+    name: Delete ArgoCD Apps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o /tmp/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          sudo install -m 555 /tmp/argocd /usr/local/bin/argocd
+          argocd version --client
+
+      - name: Delete ArgoCD apps
+        env:
+          ARGOCD_SERVER: argocd.galasa.dev
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_OPTS: --grpc-web
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          chmod +x 92-delete-argocd-apps.sh
+          ./92-delete-argocd-apps.sh
+
+  delete-ghcr-images:
+    name: Delete GHCR Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete GHCR images with release and prerelease tags
+        env:
+          GH_TOKEN: ${{ secrets.DELETE_GITHUB_PACKAGES_TOKEN }}
+        run: |
+          echo "Deleting GHCR images tagged 'release' and 'prerelease'..."
+
+          # List of images to clean up
+          images=(
+            "obr-maven-artefacts"
+            "obr-generic"
+            "galasa-boot-embedded"
+            "galasa-ibm-boot-embedded"
+            "galasactl-x86_64"
+            "galasactl-ibm-x86_64"
+            "galasactl-executables"
+            "galasa-isolated"
+            "galasa-isolated-zip"
+            "galasa-mvp"
+            "galasa-mvp-zip"
+            "buildutils-executables"
+            "simplatform-maven-artefacts"
+            "galasa-docs-site"
+          )
+
+          tags=("release" "prerelease")
+
+          for image in "${images[@]}"; do
+            for tag in "${tags[@]}"; do
+              echo "Attempting to delete ghcr.io/${{ env.NAMESPACE }}/${image}:${tag}..."
+
+              # Get the version ID for the specific tag using gh api
+              version_id=$(gh api \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "/orgs/${{ env.NAMESPACE }}/packages/container/${image}/versions" \
+                --jq ".[] | select(.metadata.container.tags[] == \"${tag}\") | .id" 2>/dev/null) || version_id=""
+
+              if [[ -n "$version_id" ]]; then
+                echo "Found version ID: $version_id for ${image}:${tag}"
+
+                # Delete the package version using gh api
+                gh api \
+                  --method DELETE \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "/orgs/${{ env.NAMESPACE }}/packages/container/${image}/versions/${version_id}" \
+                  && echo "Deleted ${image}:${tag}" \
+                  || echo "Failed to delete ${image}:${tag}"
+              else
+                echo "No ${tag} tag found for ${image}, skipping..."
+              fi
+            done
+          done
+
+          echo "GHCR image cleanup completed"
