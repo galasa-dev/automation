@@ -1,0 +1,529 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Required secrets:
+#   - IBM_CLOUD_API_KEY: API key for IBM Cloud Container Registry authentication
+#   - GALASA_TEAM_GITHUB_TOKEN: Token for triggering workflows in other GitHub repositories
+#   - WRITE_GITHUB_PACKAGES_TOKEN: Token for pushing images to GitHub Container Registry
+# Required vars:
+#   - WRITE_GITHUB_PACKAGES_USERNAME: Username for pushing images to GitHub Container Registry
+#
+name: Deploy new Galasa version
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_maven_central:
+        description: 'Skip Maven Central deployment (for testing/reruns)'
+        required: false
+        type: boolean
+        default: false
+      skip_docker_deploy:
+        description: 'Skip Docker image deployment (for testing/reruns)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NAMESPACE: galasa-dev
+  REGISTRY: ghcr.io
+
+jobs:
+  get-galasa-version:
+    name: Get Galasa Version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 'galasa' repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.NAMESPACE }}/galasa
+          path: ${{ github.workspace }}/galasa
+          sparse-checkout: |
+            build.properties
+
+      - name: Get Galasa Version from build.properties file
+        id: get-galasa-version
+        run: |
+          cat ${{ github.workspace }}/galasa/build.properties | grep "=" >> $GITHUB_OUTPUT
+
+    outputs:
+      galasa-version: ${{ steps.get-galasa-version.outputs.GALASA_VERSION }}
+
+  publish-to-maven-central:
+    name: Publish to Maven Central
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version]
+    if: ${{ !inputs.skip_maven_central }}
+
+    env:
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Trigger Maven Central Publisher Portal workflow
+        id: trigger-workflow
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Publishing Galasa artifacts version ${{ env.GALASA_VERSION }} to Maven Central Publisher Portal"
+
+          gh workflow run release-central-publisher-portal.yaml \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --ref main \
+            --field version=${{ env.GALASA_VERSION }}
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --workflow release-central-publisher-portal.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/automation/actions/runs/$run_id"
+
+      - name: Wait for Maven Central Publisher Portal workflow
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --run-id ${{ steps.trigger-workflow.outputs.run-id }} \
+            --name "Maven Central Publisher Portal" \
+            --sleep 60 \
+            --max-iterations 20
+
+      - name: Manual approval required
+        run: |
+          echo "::notice::⏸️ MANUAL APPROVAL REQUIRED"
+          echo "::notice::1. Log into Maven Central Publisher Portal: https://central.sonatype.com/"
+          echo "::notice::2. Navigate to 'View Deployments'"
+          echo "::notice::3. Find bundle: dev-galasa-bundle-${{ env.GALASA_VERSION }}.zip"
+          echo "::notice::4. Validate all checks passed"
+          echo "::notice::5. Click 'Publish' to release to Maven Central"
+          echo "::notice::6. After publishing, this workflow will continue automatically"
+          echo ""
+          echo "Waiting for manual approval in Maven Central Portal..."
+          echo "This step will pause for 10 minutes to allow time for manual approval."
+          echo "The workflow will then poll Maven Central for artifact availability."
+
+      - name: Poll Maven Central for artifact availability
+        run: |
+          ./releasePipeline/32-wait-maven.sh \
+            --version ${{ env.GALASA_VERSION }} \
+            --sleep 120 \
+            --max-iterations 50
+
+  deploy-docker-images:
+    name: Deploy Docker Images to IBM Cloud
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version, publish-to-maven-central]
+    if: ${{ !inputs.skip_docker_deploy }}
+
+    env:
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Log into IBM Cloud Container Registry
+        env:
+          IBM_CLOUD_API_KEY: ${{ secrets.GALASA_TEAM_ICR_API_KEY }}
+        run: |
+          echo "Logging into IBM Cloud Container Registry..."
+          echo "$IBM_CLOUD_API_KEY" | docker login -u iamapikey --password-stdin icr.io
+
+          # Set region to global
+          ibmcloud cr region-set global
+
+      - name: Deploy Web UI image
+        run: |
+          echo "Deploying Web UI image..."
+          docker pull ghcr.io/${{ env.NAMESPACE }}/webui:release
+
+          docker tag ghcr.io/${{ env.NAMESPACE }}/webui:release \
+            icr.io/galasadev/galasa-ui:${{ env.GALASA_VERSION }}
+          docker tag ghcr.io/${{ env.NAMESPACE }}/webui:release \
+            icr.io/galasadev/galasa-ui:latest
+
+          docker push icr.io/galasadev/galasa-ui:${{ env.GALASA_VERSION }}
+          docker push icr.io/galasadev/galasa-ui:latest
+
+      - name: Deploy Boot Embedded AMD64 image
+        run: |
+          echo "Deploying Boot Embedded AMD64 image..."
+          docker pull --platform linux/amd64 ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release
+
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
+            icr.io/galasadev/galasa-boot-embedded-amd64:${{ env.GALASA_VERSION }}
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
+            icr.io/galasadev/galasa-boot-embedded-amd64:latest
+
+          docker push icr.io/galasadev/galasa-boot-embedded-amd64:${{ env.GALASA_VERSION }}
+          docker push icr.io/galasadev/galasa-boot-embedded-amd64:latest
+
+      - name: Deploy Boot Embedded ARM64 image
+        run: |
+          echo "Deploying Boot Embedded ARM64 image..."
+          docker pull --platform linux/arm64 ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release
+
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
+            icr.io/galasadev/galasa-boot-embedded-arm64:${{ env.GALASA_VERSION }}
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
+            icr.io/galasadev/galasa-boot-embedded-arm64:latest
+
+          docker push icr.io/galasadev/galasa-boot-embedded-arm64:${{ env.GALASA_VERSION }}
+          docker push icr.io/galasadev/galasa-boot-embedded-arm64:latest
+
+      - name: Deploy CLI AMD64 image
+        run: |
+          echo "Deploying CLI AMD64 image..."
+          docker pull ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release
+
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release \
+            icr.io/galasadev/galasa-cli-amd64:${{ env.GALASA_VERSION }}
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release \
+            icr.io/galasadev/galasa-cli-amd64:latest
+
+          docker push icr.io/galasadev/galasa-cli-amd64:${{ env.GALASA_VERSION }}
+          docker push icr.io/galasadev/galasa-cli-amd64:latest
+
+  create-version-tags:
+    name: Create Version Tags
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version, deploy-docker-images]
+
+    env:
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
+
+    steps:
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Trigger Publish site to production workflow
+        id: trigger-docs
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Publishing Galasa docs to production site..."
+
+          gh workflow run publish.yaml \
+            --repo ${{ env.NAMESPACE }}/galasa-docs-preview \
+            --ref main
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/galasa-docs-preview \
+            --workflow publish.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Docs publish workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+
+      - name: Wait for docs publication
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/galasa-docs-preview \
+            --run-id ${{ steps.trigger-docs.outputs.run-id }} \
+            --name "Docs publication" \
+            --sleep 30 \
+            --max-iterations 20
+
+      - name: Trigger Branch Tag workflow
+        id: trigger-tag
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Creating version tags for v${{ env.GALASA_VERSION }}..."
+
+          gh workflow run "Branch Tag" \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --ref main \
+            --field distBranch=release \
+            --field tag=v${{ env.GALASA_VERSION }}
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --workflow "Branch Tag" \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Branch Tag workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+
+      - name: Wait for tagging to complete
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --run-id ${{ steps.trigger-tag.outputs.run-id }} \
+            --name "Branch tagging" \
+            --sleep 10 \
+            --max-iterations 30
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        env:
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+
+      - name: Update CLI stable image tags
+        run: |
+          echo "Updating CLI stable image tags..."
+          docker pull ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:release
+          docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:release \
+            ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:stable
+          docker push ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:stable
+
+          echo "CLI stable image updated"
+
+  upload-releases:
+    name: Upload GitHub Releases
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version, create-version-tags]
+
+    env:
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
+
+    steps:
+      - name: Trigger CLI release workflow
+        id: trigger-cli
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Triggering CLI release workflow..."
+
+          gh workflow run release-cli.yaml \
+            --repo ${{ env.NAMESPACE }}/galasa \
+            --ref main \
+            --field releaseBranch=release
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/galasa \
+            --workflow release-cli.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "CLI release workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/galasa/actions/runs/$run_id"
+
+      - name: Trigger Isolated/MVP release workflow
+        id: trigger-isolated
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Triggering Isolated/MVP release workflow..."
+
+          gh workflow run release.yaml \
+            --repo ${{ env.NAMESPACE }}/isolated \
+            --ref main \
+            --field releaseBranch=release
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/isolated \
+            --workflow release.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Isolated release workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/isolated/actions/runs/$run_id"
+
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Wait for CLI release
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/galasa \
+            --run-id ${{ steps.trigger-cli.outputs.run-id }} \
+            --name "CLI release" \
+            --sleep 30 \
+            --max-iterations 20
+
+      - name: Wait for Isolated/MVP release
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/isolated \
+            --run-id ${{ steps.trigger-isolated.outputs.run-id }} \
+            --name "Isolated/MVP release" \
+            --sleep 30 \
+            --max-iterations 20
+
+  update-package-managers:
+    name: Update Package Managers
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version, upload-releases]
+
+    env:
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
+
+    steps:
+      - name: Trigger Homebrew tap update
+        id: trigger-homebrew
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Triggering Homebrew tap update..."
+
+          gh workflow run release.yaml \
+            --repo ${{ env.NAMESPACE }}/homebrew-tap \
+            --ref main
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/homebrew-tap \
+            --workflow release.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Homebrew update workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/homebrew-tap/actions/runs/$run_id"
+
+      - name: Trigger Scoop bucket update
+        id: trigger-scoop
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Triggering Scoop bucket update..."
+
+          gh workflow run release.yaml \
+            --repo ${{ env.NAMESPACE }}/scoop-bucket \
+            --ref main
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/scoop-bucket \
+            --workflow release.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Scoop update workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/scoop-bucket/actions/runs/$run_id"
+
+      - name: Checkout automation repository
+        uses: actions/checkout@v4
+
+      - name: Wait for Homebrew update
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/homebrew-tap \
+            --run-id ${{ steps.trigger-homebrew.outputs.run-id }} \
+            --name "Homebrew tap update" \
+            --sleep 30 \
+            --max-iterations 20
+
+      - name: Wait for Scoop update
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          ./releasePipeline/wait-for-workflow.sh \
+            --repo ${{ env.NAMESPACE }}/scoop-bucket \
+            --run-id ${{ steps.trigger-scoop.outputs.run-id }} \
+            --name "Scoop bucket update" \
+            --sleep 30 \
+            --max-iterations 20
+
+  bump-development-version:
+    name: Bump Development Version
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version, update-package-managers]
+
+    env:
+      GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
+
+    steps:
+      - name: Trigger Bump Development Version workflow
+        id: trigger-bump
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Triggering development version bump..."
+
+          gh workflow run bump-development-version.yaml \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --ref main
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --workflow bump-development-version.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Bump version workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/automation/actions/runs/$run_id"
+
+  cleanup:
+    name: Cleanup Release Resources
+    runs-on: ubuntu-latest
+    needs: [get-galasa-version, bump-development-version]
+
+    steps:
+      - name: Trigger Release Cleanup workflow
+        id: trigger-cleanup
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          echo "Triggering release cleanup workflow..."
+
+          gh workflow run release-cleanup.yaml \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --ref main
+
+          sleep 5
+
+          run_id=$(gh run list \
+            --repo ${{ env.NAMESPACE }}/automation \
+            --workflow release-cleanup.yaml \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+
+          echo "Cleanup workflow started with run ID: $run_id"
+          echo "run-id=$run_id" >> $GITHUB_OUTPUT
+          echo "View at: https://github.com/${{ env.NAMESPACE }}/automation/actions/runs/$run_id"
