@@ -39,6 +39,8 @@ This workflow will automatically:
 5. Check artifacts are signed
 6. Test the MVP zip
 7. Run GitHub Actions regression tests in parallel (Isolated, Simbank IVTs, Core IVTs)
+8. Trigger the internal Tekton regression tests after the Isolated build finishes
+9. Trigger the Tekton pipeline to copy the MVP to an internal repo and open a PR for Mend scanning.
 
 Monitor the workflow run at: https://github.com/galasa-dev/automation/actions/workflows/release.yaml
 
@@ -48,20 +50,11 @@ After the automated workflow completes:
 
 #### MEND scan
 
-1. Follow instructions from the internal [developer-docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp).
+1. When the Isolated release build finishes, a Tekton pipeline to copy the MVP to an internal repo should start. Watch that pipeline and review the Mend scan results in the PR that gets opened. Then merge that PR.
 
 #### Tekton regression tests
 
-Each of these scripts starts a Tekton pipeline on our internal cluster. This is because these tests require mainframe resource which we don't currently have available externally. These test suites run tests either locally on the Tekton runner, or submit tests to run from Tekton to prod1.
-
-The script will give you the pipeline run name. You will have to monitor the pipeline run in Tekton and ensure it finishes successfully and all tests pass.
-
-**These three steps should be done one after the other.**
-
-<!-- Temporarily removing this step as these tests require a DSE CICS Region which is currently down, so these will always fail -->
-<!-- 1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip. -->
-1. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
-2. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
+When the Isolated release build finishes, a Tekton pipeline to run the internal regression tests should start. 
 
 Some tests may fail on the first run due to the lack of system resource availability. Rerunning the test should hopefully result in a pass. Make sure that external systems the tests connect to are active and healthy (for example, @hobbit1983's CICS Region).
 
@@ -92,15 +85,21 @@ This workflow will automatically:
 6. Create version tags across all repositories
 7. Upload CLI and Isolated/MVP releases to GitHub
 8. Trigger Homebrew and Scoop update workflows (creates PRs)
-9. Bump development version
+9. Bump development version (creates PRs)
 10. Clean up release resources
 
 
 **Manual actions required**:
 1. Approve Maven Central publication in Portal UI - see [31-publish-to-maven-central.md](./31-publish-to-maven-central.md)
-2. Review and merge Homebrew/Scoop PRs:
+2. Review and merge PRs:
    - [Homebrew tap PR](https://github.com/galasa-dev/homebrew-tap/pulls)
    - [Scoop bucket PR](https://github.com/galasa-dev/scoop-bucket/pulls)
+   - [Galasa PR](https://github.com/galasa-dev/galasa/pulls)
+   - [Helm PR](https://github.com/galasa-dev/helm/pulls)
+   - [Simplatform PR](https://github.com/galasa-dev/simplatform/pulls)
+   - [Web UI PR](https://github.com/galasa-dev/webui/pulls)
+   - [Integratedtests PR](https://github.com/galasa-dev/integratedtests/pulls)
+   - [Isolated PR](https://github.com/galasa-dev/isolated/pulls)
 
 ---
 
@@ -152,6 +151,11 @@ If you need to run steps individually or the automated workflows fail, follow th
 #### Tekton regression tests
 
 **These steps should be done one after the other:**
+
+<!-- Temporarily removing this step as these tests require a DSE CICS Region which is currently down, so these will always fail -->
+<!-- 1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip. -->
+1. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
+2. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
 
 **All tests must pass before moving on.**
 
