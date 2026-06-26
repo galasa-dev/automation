@@ -7,7 +7,7 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 ## Pre-release steps - Automated
 
 1. Run the [Pre-release GitHub Actions workflow](https://github.com/galasa-dev/automation/actions/workflows/pre-release.yaml). If the process fails at any stage, you can continue by re-running the script that failed from the manual steps and finish using the [manual steps below](#pre-release-steps---manual).
-2. Run a MEND scan for the [MVP zip](https://development.galasa.dev/prerelease/maven-repo/mvp/dev/galasa/galasa-isolated-mvp) by following the instructions in the internal [Developer docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp) to check for any vulnerabilities before moving onto the release process.
+2. When the Isolated pre-release build finishes, a Tekton pipeline to copy the MVP to an internal repo should start. Watch that pipeline and review the Mend scan results in the PR that gets opened. Then merge that PR.
 
 ## Pre-release steps - Manual
 

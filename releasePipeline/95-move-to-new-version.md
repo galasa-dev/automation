@@ -42,13 +42,7 @@ These are manual steps to bump the version of Galasa to the next version.
     
     b. Push the changes to your branch, open a PR, wait for the PR build to pass, then merge in the PR, and wait for the Main build to pass and finish.
 
-7. Upgrade the [internal integrated tests](https://github.ibm.com/galasa/internal-integratedtests) (not a released component)
-
-    a. Invoke the `set-version --version {new version}` script.
-    
-    b. Push the changes to your branch, open a PR, then merge in the PR, and wait for the Main build to pass and finish.
-
-8. Upgrade [Isolated](https://github.com/galasa-dev/isolated)
+7. Upgrade [Isolated](https://github.com/galasa-dev/isolated)
 
     a. Invoke the `set-version --version {new version}` script.
 
