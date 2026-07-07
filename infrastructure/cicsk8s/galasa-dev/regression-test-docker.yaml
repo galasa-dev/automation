@@ -49,7 +49,7 @@ spec:
             - mountPath: /galasa
               name: static-files
 
-          - name: run-prepare
+          - name: run-prepare-docker
             command:
             - galasactl
             - runs
@@ -62,6 +62,42 @@ spec:
             - inttests
             - --test
             - local.DockerLocalJava17Ubuntu
+            - --log
+            - '-'
+            image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
+            imagePullPolicy: IfNotPresent
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            env:
+            - name: GALASA_HOME
+              value: /galasa
+            - name: GALASA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: galasa-prod1-token
+                  key: token
+            volumeMounts:
+            - mountPath: /galasa
+              name: static-files
+
+          - name: run-prepare-jmeter
+            command:
+            - galasactl
+            - runs
+            - prepare
+            - --bootstrap
+            - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+            - --portfolio
+            - /galasa/tests.yaml
+            - --append
+            - --stream
+            - ivts
+            - --test
+            - jmeter.JMeterManagerIVT
+            # Override the default engine property in CPS for this test.
+            - --override
+            - docker.default.engines=PRIMARY
             - --log
             - '-'
             image: ghcr.io/galasa-dev/galasactl-ibm-x86_64:main
