@@ -103,8 +103,12 @@ run_command docker pull ghcr.io/galasa-dev/webui:$FROM
 
 
 run_command docker tag ghcr.io/galasa-dev/webui:$FROM \
+           icr.io/galasa/galasa-ui:$TO
+run_command docker tag ghcr.io/galasa-dev/webui:$FROM \
            icr.io/galasadev/galasa-ui:$TO
 
+run_command docker tag ghcr.io/galasa-dev/webui:$FROM \
+           icr.io/galasa/galasa-ui:latest
 run_command docker tag ghcr.io/galasa-dev/webui:$FROM \
            icr.io/galasadev/galasa-ui:latest
 
@@ -113,8 +117,12 @@ run_command docker tag ghcr.io/galasa-dev/webui:$FROM \
 run_command docker pull --platform linux/amd64 ghcr.io/galasa-dev/galasa-boot-embedded:$FROM
 
 run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
+           icr.io/galasa/galasa-boot-embedded-amd64:$TO
+run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
            icr.io/galasadev/galasa-boot-embedded-amd64:$TO
 
+run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
+           icr.io/galasa/galasa-boot-embedded-amd64:latest
 run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
            icr.io/galasadev/galasa-boot-embedded-amd64:latest
 
@@ -122,29 +130,45 @@ run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
 run_command docker pull --platform linux/arm64 ghcr.io/galasa-dev/galasa-boot-embedded:$FROM
 
 run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
+           icr.io/galasa/galasa-boot-embedded-arm64:$TO
+run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
            icr.io/galasadev/galasa-boot-embedded-arm64:$TO
 
+run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
+           icr.io/galasa/galasa-boot-embedded-arm64:latest
 run_command docker tag ghcr.io/galasa-dev/galasa-boot-embedded:$FROM \
            icr.io/galasadev/galasa-boot-embedded-arm64:latest
 
 
+run_command docker push icr.io/galasa/galasa-boot-embedded-amd64:$TO
 run_command docker push icr.io/galasadev/galasa-boot-embedded-amd64:$TO
+run_command docker push icr.io/galasa/galasa-boot-embedded-arm64:$TO
 run_command docker push icr.io/galasadev/galasa-boot-embedded-arm64:$TO
+run_command docker push icr.io/galasa/galasa-ui:$TO
 run_command docker push icr.io/galasadev/galasa-ui:$TO
 
 
 
+run_command docker push icr.io/galasa/galasa-boot-embedded-amd64:latest
 run_command docker push icr.io/galasadev/galasa-boot-embedded-amd64:latest
+run_command docker push icr.io/galasa/galasa-boot-embedded-arm64:latest
 run_command docker push icr.io/galasadev/galasa-boot-embedded-arm64:latest
+run_command docker push icr.io/galasa/galasa-ui:latest
 run_command docker push icr.io/galasadev/galasa-ui:latest
 
 # And now for the CLI images...
 run_command docker pull ghcr.io/galasa-dev/galasactl-x86_64:$FROM
 run_command docker tag ghcr.io/galasa-dev/galasactl-x86_64:$FROM \
+           icr.io/galasa/galasa-cli-amd64:$TO
+run_command docker tag ghcr.io/galasa-dev/galasactl-x86_64:$FROM \
            icr.io/galasadev/galasa-cli-amd64:$TO
 run_command docker tag ghcr.io/galasa-dev/galasactl-x86_64:$FROM \
+           icr.io/galasa/galasa-cli-amd64:latest
+run_command docker tag ghcr.io/galasa-dev/galasactl-x86_64:$FROM \
            icr.io/galasadev/galasa-cli-amd64:latest
+run_command docker push icr.io/galasa/galasa-cli-amd64:$TO
 run_command docker push icr.io/galasadev/galasa-cli-amd64:$TO
+run_command docker push icr.io/galasa/galasa-cli-amd64:latest
 run_command docker push icr.io/galasadev/galasa-cli-amd64:latest
 
 success "Completed. Updated the IBM container registry images from verison $FROM to version $TO"
