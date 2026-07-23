@@ -120,7 +120,7 @@ jobs:
       - name: Delete ArgoCD apps
         env:
           ARGOCD_SERVER: argocd.galasa.dev
-          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
           ARGOCD_OPTS: --grpc-web
         working-directory: ${{ github.workspace }}/releasePipeline
         run: |
