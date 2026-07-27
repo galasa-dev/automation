@@ -151,11 +151,16 @@ $RELEASE_BASEDIR/02-create-argocd-apps.sh --release
 h1 "Step 2: Delete old release branches"
 $RELEASE_BASEDIR/03-repo-branches-delete.sh --release
 
+# Capture timestamp before creating branches
+# This ensures we can identify workflows triggered by the branch creation
+BRANCH_CREATE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+info "Branch creation time: ${BRANCH_CREATE_TIME}"
+
 h1 "Step 3: Create new release branches"
 $RELEASE_BASEDIR/04-repo-branches-create.sh --release
 
 h1 "Step 4: Check Helm charts released"
-$RELEASE_BASEDIR/05-helm-charts.sh --release
+$RELEASE_BASEDIR/05-helm-charts.sh --release --start-time "${BRANCH_CREATE_TIME}"
 
 h1 "Step 5: Build Galasa mono repo"
 $RELEASE_BASEDIR/10-build-galasa-mono-repo.sh --release --wait
