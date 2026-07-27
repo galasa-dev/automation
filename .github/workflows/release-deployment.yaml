@@ -25,6 +25,10 @@ on:
         required: false
         type: boolean
         default: false
+      new_galasa_version:
+        description: 'New development version to pass to Bump Development Version workflow (e.g., 1.0.2)'
+        required: true
+        type: string
 
 env:
   NAMESPACE: galasa-dev
@@ -508,7 +512,9 @@ jobs:
 
           gh workflow run bump-development-version.yaml \
             --repo ${{ env.NAMESPACE }}/automation \
-            --ref main
+            --ref main \
+            --field released_version=${{ env.GALASA_VERSION }} \
+            --field new_version=${{ inputs.new_galasa_version }}
 
           sleep 5
 
