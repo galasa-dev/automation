@@ -332,6 +332,10 @@ jobs:
     name: Upload GitHub Releases
     runs-on: ubuntu-latest
     needs: [get-galasa-version, create-version-tags]
+    if: |
+      always() && 
+      (needs.get-galasa-version.result) == 'success' &&
+      (needs.create-version-tags.result) == 'success'
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -416,6 +420,10 @@ jobs:
     name: Update Package Managers
     runs-on: ubuntu-latest
     needs: [get-galasa-version, upload-releases]
+    if: |
+      always() && 
+      (needs.get-galasa-version.result) == 'success' &&
+      (needs.upload-releases.result) == 'success'
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -498,6 +506,10 @@ jobs:
     name: Bump Development Version
     runs-on: ubuntu-latest
     needs: [get-galasa-version, update-package-managers]
+    if: |
+      always() && 
+      (needs.get-galasa-version.result) == 'success' &&
+      (needs.update-package-managers.result) == 'success'
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -533,6 +545,10 @@ jobs:
     name: Cleanup Release Resources
     runs-on: ubuntu-latest
     needs: [get-galasa-version, bump-development-version]
+    if: |
+      always() && 
+      (needs.get-galasa-version.result) == 'success' &&
+      (needs.bump-development-version.result) == 'success'
 
     steps:
       - name: Trigger Release Cleanup workflow
