@@ -602,12 +602,7 @@ jobs:
              - Wait for each Main build to complete after merging
              - When Isolated Main build is triggered after Galasa CLI module build, cancel it (you'll rebuild it later)
           
-          2. **Update internal integrated tests** (github.ibm.com/galasa/internal-integratedtests):
-             - Create branch `${{ inputs.branch_name }}`
-             - Run `./set-version.sh --version ${{ inputs.new_version }}`
-             - Create PR, merge, and wait for Main build
-          
-          3. **Update internal test CPS properties** using galasactl:
+          2. **Update internal test CPS properties** using galasactl:
              ```bash
              galasactl properties set \
                --namespace framework \
@@ -622,9 +617,9 @@ jobs:
                --bootstrap <bootstrap-url>
              ```
           
-          4. **Verify CPS properties** were applied correctly in the cluster
+          3. **Verify CPS properties** were applied correctly in the cluster
           
-          5. **Monitor ArgoCD** to ensure the changes are synced properly
+          4. **Monitor ArgoCD** to ensure the changes are synced properly
           
           ### Notes
           - CPS properties are automatically applied by ArgoCD when changes are pushed to the automation repository
