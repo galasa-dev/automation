@@ -27,11 +27,11 @@ spec:
 #
 #
 #
-# This just runs DockerLocalJava17Ubuntu now...
+# This pipeline runs DockerLocalJava17Ubuntu and JMeterManagerIVT
 # 
 # 
 # 
-  - name: regression-run
+  - name: runs-prepare-docker
     taskRef: 
       name: galasactl
     params:
@@ -42,18 +42,70 @@ spec:
     - name: command
       value: 
         - runs
-        - submit
-        - --stream
-        - inttests
-        - --package
-        - local
-        - --package
-        - kubernetes
-        - --package
-        - compilation
-        - --trace
+        - prepare
         - --bootstrap
         - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+        - --portfolio
+        - /galasa/tests.yaml
+        - --stream
+        - inttests
+        - --test
+        - local.DockerLocalJava17Ubuntu
+        - --log # Otherwise there is no output
+        - "-"
+# 
+# 
+# 
+  - name: runs-prepare-jmeter
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - runs-prepare-docker
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
+    - name: command
+      value: 
+        - runs
+        - prepare
+        - --bootstrap
+        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+        - --portfolio
+        - /galasa/tests.yaml
+        - --append
+        - --stream
+        - ivts
+        - --test
+        - jmeter.JMeterManagerIVT
+        # Override the default engine property in CPS for this test.
+        - --override
+        - docker.default.engines=PRIMARY
+        - --log # Otherwise there is no output
+        - "-"
+# 
+# 
+# 
+
+  - name: runs-submit
+    taskRef: 
+      name: galasactl
+    runAfter:
+    - runs-prepare-jmeter
+    params:
+    - name: context
+      value: $(context.pipelineRun.name)
+    - name: galasaHome
+      value: /workspace/git/$(context.pipelineRun.name)
+    - name: command
+      value: 
+        - runs
+        - submit
+        - --bootstrap
+        - https://prod1-galasa-dev.cicsk8s.hursley.ibm.com/api/bootstrap
+        - --portfolio
+        - /galasa/tests.yaml
         - --throttle
         - '10'
         - --poll
