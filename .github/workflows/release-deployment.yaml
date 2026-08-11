@@ -105,20 +105,6 @@ jobs:
             --sleep 60 \
             --max-iterations 20
 
-      - name: Manual approval required
-        run: |
-          echo "::notice::⏸️ MANUAL APPROVAL REQUIRED"
-          echo "::notice::1. Log into Maven Central Publisher Portal: https://central.sonatype.com/"
-          echo "::notice::2. Navigate to 'View Deployments'"
-          echo "::notice::3. Find bundle: dev-galasa-bundle-${{ env.GALASA_VERSION }}.zip"
-          echo "::notice::4. Validate all checks passed"
-          echo "::notice::5. Click 'Publish' to release to Maven Central"
-          echo "::notice::6. After publishing, this workflow will continue automatically"
-          echo ""
-          echo "Waiting for manual approval in Maven Central Portal..."
-          echo "This step will pause for 10 minutes to allow time for manual approval."
-          echo "The workflow will then poll Maven Central for artifact availability."
-
       - name: Poll Maven Central for artifact availability
         run: |
           ./releasePipeline/32-wait-maven.sh \
@@ -145,9 +131,6 @@ jobs:
         run: |
           echo "Logging into IBM Cloud Container Registry..."
           echo "$IBM_CLOUD_API_KEY" | docker login -u iamapikey --password-stdin icr.io
-
-          # Set region to global
-          ibmcloud cr region-set global
 
       - name: Deploy Web UI image
         run: |
@@ -229,7 +212,10 @@ jobs:
     name: Create Version Tags
     runs-on: ubuntu-latest
     needs: [get-galasa-version, deploy-docker-images]
-    if: ${{ always() && (needs.deploy-docker-images.result == 'success' || needs.deploy-docker-images.result == 'skipped') }}
+    if: |
+      always() &&
+      (needs.publish-to-maven-central.result == 'success' || needs.publish-to-maven-central.result == 'skipped') &&
+      (needs.deploy-docker-images.result == 'success' || needs.deploy-docker-images.result == 'skipped')
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -331,11 +317,13 @@ jobs:
   upload-releases:
     name: Upload GitHub Releases
     runs-on: ubuntu-latest
-    needs: [get-galasa-version, create-version-tags]
+    needs: [get-galasa-version, publish-to-maven-central, deploy-docker-images, create-version-tags]
     if: |
-      always() && 
-      (needs.get-galasa-version.result) == 'success' &&
-      (needs.create-version-tags.result) == 'success'
+      always() &&
+      (needs.get-galasa-version.result == 'success') &&
+      (needs.publish-to-maven-central.result == 'success' || needs.publish-to-maven-central.result == 'skipped') &&
+      (needs.deploy-docker-images.result == 'success' || needs.deploy-docker-images.result == 'skipped') &&
+      (needs.create-version-tags.result == 'success')
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -419,11 +407,13 @@ jobs:
   update-package-managers:
     name: Update Package Managers
     runs-on: ubuntu-latest
-    needs: [get-galasa-version, upload-releases]
+    needs: [get-galasa-version, publish-to-maven-central, deploy-docker-images, upload-releases]
     if: |
-      always() && 
-      (needs.get-galasa-version.result) == 'success' &&
-      (needs.upload-releases.result) == 'success'
+      always() &&
+      (needs.get-galasa-version.result == 'success') &&
+      (needs.publish-to-maven-central.result == 'success' || needs.publish-to-maven-central.result == 'skipped') &&
+      (needs.deploy-docker-images.result == 'success' || needs.deploy-docker-images.result == 'skipped') &&
+      (needs.upload-releases.result == 'success')
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -505,11 +495,13 @@ jobs:
   bump-development-version:
     name: Bump Development Version
     runs-on: ubuntu-latest
-    needs: [get-galasa-version, update-package-managers]
+    needs: [get-galasa-version, publish-to-maven-central, deploy-docker-images, update-package-managers]
     if: |
-      always() && 
-      (needs.get-galasa-version.result) == 'success' &&
-      (needs.update-package-managers.result) == 'success'
+      always() &&
+      (needs.get-galasa-version.result == 'success') &&
+      (needs.publish-to-maven-central.result == 'success' || needs.publish-to-maven-central.result == 'skipped') &&
+      (needs.deploy-docker-images.result == 'success' || needs.deploy-docker-images.result == 'skipped') &&
+      (needs.update-package-managers.result == 'success')
 
     env:
       GALASA_VERSION: ${{ needs.get-galasa-version.outputs.galasa-version }}
@@ -544,11 +536,13 @@ jobs:
   cleanup:
     name: Cleanup Release Resources
     runs-on: ubuntu-latest
-    needs: [get-galasa-version, bump-development-version]
+    needs: [get-galasa-version, publish-to-maven-central, deploy-docker-images, bump-development-version]
     if: |
-      always() && 
-      (needs.get-galasa-version.result) == 'success' &&
-      (needs.bump-development-version.result) == 'success'
+      always() &&
+      (needs.get-galasa-version.result == 'success') &&
+      (needs.publish-to-maven-central.result == 'success' || needs.publish-to-maven-central.result == 'skipped') &&
+      (needs.deploy-docker-images.result == 'success' || needs.deploy-docker-images.result == 'skipped') &&
+      (needs.bump-development-version.result == 'success')
 
     steps:
       - name: Trigger Release Cleanup workflow

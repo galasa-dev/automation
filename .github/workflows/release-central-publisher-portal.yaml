@@ -88,4 +88,4 @@ jobs:
             --verbose \
             --header 'Authorization: Bearer ${{ env.PAT }}' \
             --form bundle=@dev-galasa-bundle-${{ env.RELEASE_VERSION }}.zip \
-            https://central.sonatype.com/api/v1/publisher/upload?publishType=USER_MANAGED
+            https://central.sonatype.com/api/v1/publisher/upload?publishType=AUTOMATIC
