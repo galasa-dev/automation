@@ -140,16 +140,10 @@ jobs:
           docker tag ghcr.io/${{ env.NAMESPACE }}/webui:release \
             icr.io/galasa/galasa-ui:${{ env.GALASA_VERSION }}
           docker tag ghcr.io/${{ env.NAMESPACE }}/webui:release \
-            icr.io/galasadev/galasa-ui:${{ env.GALASA_VERSION }}
-          docker tag ghcr.io/${{ env.NAMESPACE }}/webui:release \
             icr.io/galasa/galasa-ui:latest
-          docker tag ghcr.io/${{ env.NAMESPACE }}/webui:release \
-            icr.io/galasadev/galasa-ui:latest
 
           docker push icr.io/galasa/galasa-ui:${{ env.GALASA_VERSION }}
-          docker push icr.io/galasadev/galasa-ui:${{ env.GALASA_VERSION }}
           docker push icr.io/galasa/galasa-ui:latest
-          docker push icr.io/galasadev/galasa-ui:latest
 
       - name: Deploy Boot Embedded AMD64 image
         run: |
@@ -159,16 +153,10 @@ jobs:
           docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
             icr.io/galasa/galasa-boot-embedded-amd64:${{ env.GALASA_VERSION }}
           docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
-            icr.io/galasadev/galasa-boot-embedded-amd64:${{ env.GALASA_VERSION }}
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
             icr.io/galasa/galasa-boot-embedded-amd64:latest
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
-            icr.io/galasadev/galasa-boot-embedded-amd64:latest
 
           docker push icr.io/galasa/galasa-boot-embedded-amd64:${{ env.GALASA_VERSION }}
-          docker push icr.io/galasadev/galasa-boot-embedded-amd64:${{ env.GALASA_VERSION }}
           docker push icr.io/galasa/galasa-boot-embedded-amd64:latest
-          docker push icr.io/galasadev/galasa-boot-embedded-amd64:latest
 
       - name: Deploy Boot Embedded ARM64 image
         run: |
@@ -178,16 +166,10 @@ jobs:
           docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
             icr.io/galasa/galasa-boot-embedded-arm64:${{ env.GALASA_VERSION }}
           docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
-            icr.io/galasadev/galasa-boot-embedded-arm64:${{ env.GALASA_VERSION }}
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
             icr.io/galasa/galasa-boot-embedded-arm64:latest
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasa-boot-embedded:release \
-            icr.io/galasadev/galasa-boot-embedded-arm64:latest
 
           docker push icr.io/galasa/galasa-boot-embedded-arm64:${{ env.GALASA_VERSION }}
-          docker push icr.io/galasadev/galasa-boot-embedded-arm64:${{ env.GALASA_VERSION }}
           docker push icr.io/galasa/galasa-boot-embedded-arm64:latest
-          docker push icr.io/galasadev/galasa-boot-embedded-arm64:latest
 
       - name: Deploy CLI AMD64 image
         run: |
@@ -197,16 +179,10 @@ jobs:
           docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release \
             icr.io/galasa/galasa-cli-amd64:${{ env.GALASA_VERSION }}
           docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release \
-            icr.io/galasadev/galasa-cli-amd64:${{ env.GALASA_VERSION }}
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release \
             icr.io/galasa/galasa-cli-amd64:latest
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-x86_64:release \
-            icr.io/galasadev/galasa-cli-amd64:latest
 
           docker push icr.io/galasa/galasa-cli-amd64:${{ env.GALASA_VERSION }}
-          docker push icr.io/galasadev/galasa-cli-amd64:${{ env.GALASA_VERSION }}
           docker push icr.io/galasa/galasa-cli-amd64:latest
-          docker push icr.io/galasadev/galasa-cli-amd64:latest
 
   create-version-tags:
     name: Create Version Tags
