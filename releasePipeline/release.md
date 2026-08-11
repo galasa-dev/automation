@@ -79,19 +79,17 @@ gh workflow run release-deployment.yaml --repo galasa-dev/automation --ref main
 This workflow will automatically:
 1. Detect the Galasa version from `galasa/build.properties`
 2. Publish artifacts to Maven Central Publisher Portal
-3. **PAUSE for manual approval** - You must log into the Portal and click "Publish"
-4. Poll Maven Central for artifact availability
-5. Deploy Docker images to IBM Cloud Container Registry
-6. Create version tags across all repositories
-7. Upload CLI and Isolated/MVP releases to GitHub
-8. Trigger Homebrew and Scoop update workflows (creates PRs)
-9. Bump development version (creates PRs)
-10. Clean up release resources
+3. Poll Maven Central for artifact availability
+4. Deploy Docker images to IBM Cloud Container Registry
+5. Create version tags across all repositories
+6. Upload CLI and Isolated/MVP releases to GitHub
+7. Trigger Homebrew and Scoop update workflows (creates PRs)
+8. Bump development version (creates PRs)
+9. Clean up release resources
 
 
 **Manual actions required**:
-1. Approve Maven Central publication in Portal UI - see [31-publish-to-maven-central.md](./31-publish-to-maven-central.md)
-2. Review and merge PRs:
+1. Review and merge PRs:
    - [Homebrew tap PR](https://github.com/galasa-dev/homebrew-tap/pulls)
    - [Scoop bucket PR](https://github.com/galasa-dev/scoop-bucket/pulls)
    - [Galasa PR](https://github.com/galasa-dev/galasa/pulls)
