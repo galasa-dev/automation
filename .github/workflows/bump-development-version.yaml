@@ -601,26 +601,7 @@ jobs:
              - Wait for each PR build to pass before merging
              - Wait for each Main build to complete after merging
              - When Isolated Main build is triggered after Galasa CLI module build, cancel it (you'll rebuild it later)
-          
-          2. **Update internal test CPS properties** using galasactl:
-             ```bash
-             galasactl properties set \
-               --namespace framework \
-               --name test.stream.internal-inttests.location \
-               --value https://development.galasa.dev/main/maven-repo/internal-inttests/dev/galasa/dev.galasa.internal-inttests.obr/${{ inputs.new_version }}/dev.galasa.internal-inttests.obr-${{ inputs.new_version }}-testcatalog.json \
-               --bootstrap <bootstrap-url>
-             
-             galasactl properties set \
-               --namespace framework \
-               --name test.stream.internal-inttests.obr \
-               --value mvn:dev.galasa/dev.galasa.internal-inttests.obr/${{ inputs.new_version }}/obr \
-               --bootstrap <bootstrap-url>
-             ```
-          
-          3. **Verify CPS properties** were applied correctly in the cluster
-          
-          4. **Monitor ArgoCD** to ensure the changes are synced properly
-          
+                    
           ### Notes
           - CPS properties are automatically applied by ArgoCD when changes are pushed to the automation repository
           - The `galasactl-ibm-x86_64:stable` image is now using version ${{ inputs.released_version }} for regression testing
