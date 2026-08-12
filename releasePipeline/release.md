@@ -94,10 +94,11 @@ This workflow will automatically:
    - [Scoop bucket PR](https://github.com/galasa-dev/scoop-bucket/pulls)
    - [Galasa PR](https://github.com/galasa-dev/galasa/pulls)
    - [Helm PR](https://github.com/galasa-dev/helm/pulls)
-   - [Simplatform PR](https://github.com/galasa-dev/simplatform/pulls)
    - [Web UI PR](https://github.com/galasa-dev/webui/pulls)
    - [Integratedtests PR](https://github.com/galasa-dev/integratedtests/pulls)
+   - [Simplatform PR](https://github.com/galasa-dev/simplatform/pulls)
    - [Isolated PR](https://github.com/galasa-dev/isolated/pulls)
+   - [Automation PR](https://github.com/galasa-dev/automation/pulls)
 
 ---
 
