@@ -1,0 +1,146 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Reusable workflow: checkout a repository, import GPG, run its set-version.sh,
+# commit (signed), push, and open a PR.
+#
+# Callers that need Maven artifacts downloaded before set-version.sh runs should
+# pass download_artifacts: true. Callers that produce artifacts to share with
+# later jobs should pass upload_artifacts: true.
+#
+
+name: Bump repository version
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        description: 'Repository to bump (e.g. galasa-dev/helm)'
+        required: true
+        type: string
+      new_version:
+        required: true
+        type: string
+      released_version:
+        required: true
+        type: string
+      branch_name:
+        required: true
+        type: string
+      set_version_script:
+        description: 'Path to set-version.sh relative to the repo root'
+        required: false
+        type: string
+        default: 'set-version.sh'
+      commit_message:
+        description: 'Commit message'
+        required: false
+        type: string
+        default: 'Bump version to'
+      download_artifacts:
+        description: 'Download dev.galasa Maven artifacts before running set-version.sh'
+        required: false
+        type: boolean
+        default: false
+      upload_artifacts:
+        description: 'Upload dev.galasa Maven artifacts after running set-version.sh'
+        required: false
+        type: boolean
+        default: false
+      artifact_name:
+        description: 'Name for the uploaded artifact (required when upload_artifacts is true)'
+        required: false
+        type: string
+        default: 'artifacts'
+    secrets:
+      GALASA_TEAM_GITHUB_TOKEN:
+        required: true
+      GPG_KEY:
+        required: true
+      GPG_KEYID:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+    outputs:
+      pr_url:
+        description: 'URL of the pull request that was created'
+        value: ${{ jobs.bump.outputs.pr_url }}
+
+jobs:
+  bump:
+    name: Bump ${{ inputs.repository }}
+    runs-on: ubuntu-latest
+    outputs:
+      pr_url: ${{ steps.pr_url.outputs.pr_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository }}
+          token: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+          ref: main
+
+      - name: Import GPG key and configure git identity
+        env:
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+          GPG_KEYID: ${{ secrets.GPG_KEYID }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_KEY" | base64 --decode | gpg --batch --import
+          GPG_NAME=$(gpg --list-keys --with-colons "$GPG_KEYID" | awk -F: '/^uid/{print $10}' | sed 's/ (.*//' | sed 's/ <.*//' | head -1)
+          GPG_EMAIL=$(gpg --list-keys --with-colons "$GPG_KEYID" | awk -F: '/^uid/{print $10}' | sed 's/.*<//;s/>//' | head -1)
+          git config user.name "$GPG_NAME"
+          git config user.email "$GPG_EMAIL"
+          git config user.signingkey "$GPG_KEYID"
+          git config commit.gpgsign true
+          echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --output /dev/null --sign /dev/null
+
+      - name: Delete existing branch if it exists
+        run: |
+          git push origin --delete ${{ inputs.branch_name }} || true
+          git branch -D ${{ inputs.branch_name }} || true
+
+      - name: Create version bump branch
+        run: git checkout -b ${{ inputs.branch_name }}
+
+      - name: Download dev.galasa Maven artifacts
+        if: inputs.download_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: all-artifacts
+          path: /home/runner/.m2/repository/dev/galasa
+
+      - name: Run set-version script
+        run: |
+          chmod +x ./${{ inputs.set_version_script }}
+          ./${{ inputs.set_version_script }} --version ${{ inputs.new_version }}
+
+      - name: Push changes and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          git add .
+          git commit -s -m "${{ inputs.commit_message }} ${{ inputs.new_version }}"
+          git push origin ${{ inputs.branch_name }}
+          gh pr create \
+            --title "${{ inputs.commit_message }} ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --base main \
+            --head ${{ inputs.branch_name }}
+
+      - name: Output PR URL
+        id: pr_url
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view ${{ inputs.branch_name }} --json url -q .url)
+          echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
+
+      - name: Upload dev.galasa Maven artifacts
+        if: inputs.upload_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: /home/runner/.m2/repository/dev/galasa
