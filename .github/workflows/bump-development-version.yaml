@@ -319,33 +319,33 @@ jobs:
           echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
           echo "Automation CPS PR created: ${PR_URL}"
 
-  # retag-docker-images:
-  #   name: Retag Docker images
-  #   runs-on: ubuntu-latest
-  #   needs: validate-inputs
-  #   steps:
-  #     - name: Log in to GitHub Container Registry
-  #       uses: docker/login-action@v3
-  #       env:
-  #         WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
-  #         WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
-  #       with:
-  #         registry: ${{ env.REGISTRY }}
-  #         username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
-  #         password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
+  retag-docker-images:
+    name: Retag Docker images
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        env:
+          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
+          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
 
-  #     - name: Retag galasactl-ibm-x86_64 image
-  #       run: |
-  #         echo "Pulling release image..."
-  #         docker pull ghcr.io/galasa-dev/galasactl-ibm-x86_64:release
+      - name: Retag galasactl-ibm-x86_64 image
+        run: |
+          echo "Pulling release image..."
+          docker pull ghcr.io/galasa-dev/galasactl-ibm-x86_64:release
 
-  #         echo "Tagging as stable..."
-  #         docker image tag ghcr.io/galasa-dev/galasactl-ibm-x86_64:release ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
+          echo "Tagging as stable..."
+          docker image tag ghcr.io/galasa-dev/galasactl-ibm-x86_64:release ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
 
-  #         echo "Pushing stable image..."
-  #         docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
+          echo "Pushing stable image..."
+          docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
 
-  #         echo "Successfully retagged galasactl-ibm-x86_64:release to stable"
+          echo "Successfully retagged galasactl-ibm-x86_64:release to stable"
 
   create-summary:
     name: Create workflow summary
