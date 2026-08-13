@@ -65,7 +65,11 @@ jobs:
           chmod +x 92-delete-argocd-apps.sh
           ./92-delete-argocd-apps.sh
 
-      - name: Run release script
+      - name: Capture release start timestamp
+        id: release-timestamp
+        run: echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+
+      - name: Create ArgoCD apps
         env:
           GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
           ARGOCD_SERVER: argocd.galasa.dev
@@ -73,15 +77,110 @@ jobs:
           ARGOCD_OPTS: --grpc-web
         working-directory: ${{ github.workspace }}/releasePipeline
         run: |
-          # Verify ArgoCD authentication is configured
           if [[ -z "$ARGOCD_AUTH_TOKEN" ]]; then
             echo "ARGOCD_AUTH_TOKEN secret is not set"
             exit 1
           fi
-          
           chmod +x 01-run-release.sh wait-for-workflow.sh
           chmod +x 23-run-isolated-tests.sh 24-run-simbank-ivts.sh 25-run-ivts.sh
-          ./01-run-release.sh
+          ./01-run-release.sh --step create-argocd-apps
+
+      - name: Delete release branches
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step delete-branches
+
+      - name: Capture branch creation timestamp
+        id: branch-timestamp
+        run: echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+
+      - name: Create release branches
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step create-branches
+
+      - name: Update Helm charts
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step helm-charts --start-time "${{ steps.branch-timestamp.outputs.timestamp }}"
+
+      - name: Build Galasa monorepo
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step build-mono-repo
+
+      - name: Wait for Isolated build
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step wait-isolated --start-time "${{ steps.release-timestamp.outputs.timestamp }}"
+
+      - name: Wait for Web UI build
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step wait-webui --start-time "${{ steps.release-timestamp.outputs.timestamp }}"
+
+      - name: Check artifacts are signed
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step check-artifacts-signed
+
+      - name: Test MVP zip
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step test-mvp-zip
+
+      - name: Start Isolated regression tests
+        id: isolated-tests
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          run_id=$(./01-run-release.sh --step run-isolated-tests)
+          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
+
+      - name: Start Simbank IVTs
+        id: simbank-ivts
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          run_id=$(./01-run-release.sh --step run-simbank-ivts)
+          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
+
+      - name: Start Core IVTs
+        id: core-ivts
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: |
+          run_id=$(./01-run-release.sh --step run-core-ivts)
+          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for Isolated regression tests
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step wait-regression-isolated --run-id "${{ steps.isolated-tests.outputs.run-id }}"
+
+      - name: Wait for Simbank IVTs
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step wait-regression-simbank --run-id "${{ steps.simbank-ivts.outputs.run-id }}"
+
+      - name: Wait for Core IVTs
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-release.sh --step wait-regression-core --run-id "${{ steps.core-ivts.outputs.run-id }}"
 
       - name: Upload MVP test results on failure
         if: failure()
