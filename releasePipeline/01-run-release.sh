@@ -106,21 +106,6 @@ function step_test_mvp_zip {
     $RELEASE_BASEDIR/test-mvp-zip.sh --release
 }
 
-function step_run_isolated_tests {
-    h1 "Step 10a: Start Isolated tests workflow"
-    $RELEASE_BASEDIR/23-run-isolated-tests.sh --release 2>&1 | tail -n 1
-}
-
-function step_run_simbank_ivts {
-    h1 "Step 10b: Start Simbank IVTs workflow"
-    $RELEASE_BASEDIR/24-run-simbank-ivts.sh --release 2>&1 | tail -n 1
-}
-
-function step_run_core_ivts {
-    h1 "Step 10c: Start Core IVTs workflow"
-    $RELEASE_BASEDIR/25-run-ivts.sh --release 2>&1 | tail -n 1
-}
-
 function wait_for_regression_workflow {
     local repo=$1
     local run_id=$2
@@ -161,22 +146,33 @@ function wait_for_regression_workflow {
     exit 1
 }
 
-function step_wait_regression_isolated {
-    local run_id=$1
-    h1 "Step 10d: Wait for Isolated regression tests"
-    wait_for_regression_workflow "galasa-dev/isolated" "${run_id}" "Isolated tests"
+function launch_workflow_and_wait {
+    local script=$1
+    local repo=$2
+    local workflow_name=$3
+    local output
+    if ! output=$($script --release); then
+        error "Failed to start ${workflow_name}"
+        exit 1
+    fi
+    local run_id
+    run_id=$(echo "${output}" | tail -n 1)
+    wait_for_regression_workflow "${repo}" "${run_id}" "${workflow_name}"
 }
 
-function step_wait_regression_simbank {
-    local run_id=$1
-    h1 "Step 10e: Wait for Simbank IVTs"
-    wait_for_regression_workflow "galasa-dev/simplatform" "${run_id}" "Simbank IVTs"
+function step_run_isolated_tests {
+    h1 "Step 10a: Isolated tests"
+    launch_workflow_and_wait "$RELEASE_BASEDIR/23-run-isolated-tests.sh" "galasa-dev/isolated" "Isolated tests"
 }
 
-function step_wait_regression_core {
-    local run_id=$1
-    h1 "Step 10f: Wait for Core IVTs"
-    wait_for_regression_workflow "galasa-dev/automation" "${run_id}" "Core IVTs"
+function step_run_simbank_ivts {
+    h1 "Step 10b: Simbank IVTs"
+    launch_workflow_and_wait "$RELEASE_BASEDIR/24-run-simbank-ivts.sh" "galasa-dev/simplatform" "Simbank IVTs"
+}
+
+function step_run_core_ivts {
+    h1 "Step 10c: Core IVTs"
+    launch_workflow_and_wait "$RELEASE_BASEDIR/25-run-ivts.sh" "galasa-dev/automation" "Core IVTs"
 }
 
 #-----------------------------------------------------------------------------------------
@@ -184,7 +180,6 @@ function step_wait_regression_core {
 #-----------------------------------------------------------------------------------------
 STEP=""
 START_TIME=""
-RUN_ID=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -194,10 +189,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --start-time)
             START_TIME="$2"
-            shift 2
-            ;;
-        --run-id)
-            RUN_ID="$2"
             shift 2
             ;;
         *)
@@ -232,12 +223,9 @@ if [[ -z "${STEP}" ]]; then
     step_test_mvp_zip
 
     h1 "Step 10: Run GitHub Actions regression tests"
-    isolated_run_id=$(step_run_isolated_tests)
-    simbank_run_id=$(step_run_simbank_ivts)
-    core_run_id=$(step_run_core_ivts)
-    step_wait_regression_isolated "${isolated_run_id}"
-    step_wait_regression_simbank "${simbank_run_id}"
-    step_wait_regression_core "${core_run_id}"
+    step_run_isolated_tests
+    step_run_simbank_ivts
+    step_run_core_ivts
 
     success "Automated release steps completed. Manual steps remain."
     bold ""
@@ -296,27 +284,6 @@ case "${STEP}" in
         ;;
     run-core-ivts)
         step_run_core_ivts
-        ;;
-    wait-regression-isolated)
-        if [[ -z "${RUN_ID}" ]]; then
-            error "--run-id is required for step: wait-regression-isolated"
-            exit 1
-        fi
-        step_wait_regression_isolated "${RUN_ID}"
-        ;;
-    wait-regression-simbank)
-        if [[ -z "${RUN_ID}" ]]; then
-            error "--run-id is required for step: wait-regression-simbank"
-            exit 1
-        fi
-        step_wait_regression_simbank "${RUN_ID}"
-        ;;
-    wait-regression-core)
-        if [[ -z "${RUN_ID}" ]]; then
-            error "--run-id is required for step: wait-regression-core"
-            exit 1
-        fi
-        step_wait_regression_core "${RUN_ID}"
         ;;
     *)
         error "Unknown step: '${STEP}'"

@@ -131,56 +131,30 @@ jobs:
         working-directory: ${{ github.workspace }}/releasePipeline
         run: ./01-run-release.sh --step check-artifacts-signed
 
-      - name: Test MVP zip
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: ./01-run-release.sh --step test-mvp-zip
+      - parallel:
+        - name: Test MVP zip
+          env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+          working-directory: ${{ github.workspace }}/releasePipeline
+          run: ./01-run-release.sh --step test-mvp-zip
 
-      - name: Start Isolated regression tests
-        id: isolated-tests
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: |
-          run_id=$(./01-run-release.sh --step run-isolated-tests)
-          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
+        - name: Run Isolated regression tests
+          env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+          working-directory: ${{ github.workspace }}/releasePipeline
+          run: ./01-run-release.sh --step run-isolated-tests
 
-      - name: Start Simbank IVTs
-        id: simbank-ivts
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: |
-          run_id=$(./01-run-release.sh --step run-simbank-ivts)
-          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
+        - name: Run Simbank IVTs
+          env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+          working-directory: ${{ github.workspace }}/releasePipeline
+          run: ./01-run-release.sh --step run-simbank-ivts
 
-      - name: Start Core IVTs
-        id: core-ivts
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: |
-          run_id=$(./01-run-release.sh --step run-core-ivts)
-          echo "run-id=${run_id}" >> "$GITHUB_OUTPUT"
-
-      - name: Wait for Isolated regression tests
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: ./01-run-release.sh --step wait-regression-isolated --run-id "${{ steps.isolated-tests.outputs.run-id }}"
-
-      - name: Wait for Simbank IVTs
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: ./01-run-release.sh --step wait-regression-simbank --run-id "${{ steps.simbank-ivts.outputs.run-id }}"
-
-      - name: Wait for Core IVTs
-        env:
-          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-        working-directory: ${{ github.workspace }}/releasePipeline
-        run: ./01-run-release.sh --step wait-regression-core --run-id "${{ steps.core-ivts.outputs.run-id }}"
+        - name: Run Core IVTs
+          env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+          working-directory: ${{ github.workspace }}/releasePipeline
+          run: ./01-run-release.sh --step run-core-ivts
 
       - name: Upload MVP test results on failure
         if: failure()
