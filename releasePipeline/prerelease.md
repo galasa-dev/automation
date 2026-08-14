@@ -7,7 +7,6 @@ It may be beneficial to complete a pre-release before starting a vx.xx.x release
 ## Pre-release steps - Automated
 
 1. Run the [Pre-release GitHub Actions workflow](https://github.com/galasa-dev/automation/actions/workflows/pre-release.yaml). If the process fails at any stage, you can continue by re-running the script that failed from the manual steps and finish using the [manual steps below](#pre-release-steps---manual).
-2. When the Isolated pre-release build finishes, a Tekton pipeline to copy the MVP to an internal repo should start. Watch that pipeline and review the Mend scan results in the PR that gets opened. Then merge that PR.
 
 ## Pre-release steps - Manual
 
@@ -41,15 +40,9 @@ a new branch called `prerelease` in every github repo we need to build. **Note:*
 10. Run [20-check-artifacts-signed.sh](./20-check-artifacts-signed.sh). When prompted, choose the '`pre-release`' option.
     - This will search and check that one artifact from each Galasa module (platform, wrapping, gradle, maven, framework, extensions, managers and obr) contains a file called *.jar.asc which shows the artifacts have been signed. If the .asc files aren't present, debug and diagnose why the artifacts have not been signed.
 
-## Test and scan the MVP
+## Test the MVP
 
 Ensure you have completed either the [automated](#pre-release-steps---automated) or [manual](#pre-release-steps---manual) pre-release steps first.
-
-### MEND scan
-
-1. Follow instructions from the internal [developer-docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp) on how to do this. **Note:** the bundles `dev.galasa.wrapping.com.auth0.jwt` and `dev.galasa.wrapping.kafka.clients` are not included in the MVP, therefore if vulnerabilities are found only in these bundles, they will not affect any IBM scans. However, they should still be remediated before starting the proper release if possible.
-
-### Test the MVP
 
 Run the automated MVP testing script to verify the MVP zip works as described in the documentation:
 
