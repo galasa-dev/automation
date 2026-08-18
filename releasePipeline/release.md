@@ -1,24 +1,5 @@
 # RELEASE PROCESS
 
-## Set up
-
-1. Clone the 'automation' repository, main branch. All the yaml and scripts you will be using can be found in the releasePipeline folder.
-2. Ensure the ArgoCD CLI is installed. The argocd cli can be downloaded [here]( https://argo-cd.readthedocs.io/en/stable/cli_installation/).
-3. Log into ArgoCD `argocd login --sso argocd.galasa.dev --grpc-web`
-4. Ensure GitHub CLI is istalled. It can be installed using the guide [here](https://github.com/cli/cli?tab=readme-ov-file#installation)
-5. Authenticate github cli using `gh auth login --web`
-6. You will need to log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
-7. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
-8. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
-9. watch needs to be installed.
-10. The ibmcloud CLI container registry service needs to be configured to the global region:
-
-``` shell
-ibmcloud cr region-set global
-```
-
-## Release steps
-
 **Option 1: Automated Release Process (Recommended)**
 
 The release process is split into two automated workflows:
@@ -40,17 +21,12 @@ This workflow will automatically:
 6. Test the MVP zip
 7. Run GitHub Actions regression tests in parallel (Isolated, Simbank IVTs, Core IVTs)
 8. Trigger the internal Tekton regression tests after the Isolated build finishes
-9. Trigger the Tekton pipeline to copy the MVP to an internal repo and open a PR for Mend scanning.
 
 Monitor the workflow run at: https://github.com/galasa-dev/automation/actions/workflows/release.yaml
 
 ### Part 2: Manual Steps
 
 After the automated workflow completes:
-
-#### MEND scan
-
-1. When the Isolated release build finishes, a Tekton pipeline to copy the MVP to an internal repo should start. Watch that pipeline and review the Mend scan results in the PR that gets opened. Then merge that PR.
 
 #### Tekton regression tests
 
@@ -106,6 +82,23 @@ This workflow will automatically:
 
 If you need to run steps individually or the automated workflows fail, follow these manual steps:
 
+### Set up
+
+1. Clone the 'automation' repository, main branch. All the yaml and scripts you will be using can be found in the releasePipeline folder.
+2. Ensure the ArgoCD CLI is installed. The argocd cli can be downloaded [here]( https://argo-cd.readthedocs.io/en/stable/cli_installation/).
+3. Log into ArgoCD `argocd login --sso argocd.galasa.dev --grpc-web`
+4. Ensure GitHub CLI is istalled. It can be installed using the guide [here](https://github.com/cli/cli?tab=readme-ov-file#installation)
+5. Authenticate github cli using `gh auth login --web`
+6. You will need to log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
+7. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
+8. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
+9. watch needs to be installed.
+10. The ibmcloud CLI container registry service needs to be configured to the global region:
+
+``` shell
+ibmcloud cr region-set global
+```
+
 ### Set up the ArgoCD apps and GitHub branches for the release
 
 1. Ensure you have completed the [set up](#set-up) before continuing.
@@ -132,10 +125,6 @@ If you need to run steps individually or the automated workflows fail, follow th
 ```bash
 ./test-mvp-zip.sh --release
 ```
-
-### MEND scan
-
-1. Follow instructions from the internal [developer-docs wiki](https://github.ibm.com/galasa/developer-docs/wiki/how-to-mend-scan-galasa-mvp).
 
 ### Run the regression tests
 

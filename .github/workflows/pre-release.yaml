@@ -64,7 +64,7 @@ jobs:
           chmod +x 92-delete-argocd-apps.sh
           ./92-delete-argocd-apps.sh
 
-      - name: Run pre-release script
+      - name: Create ArgoCD apps
         env:
           GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
           ARGOCD_SERVER: argocd.galasa.dev
@@ -72,14 +72,62 @@ jobs:
           ARGOCD_OPTS: --grpc-web
         working-directory: ${{ github.workspace }}/releasePipeline
         run: |
-          # Verify ArgoCD authentication is configured
           if [[ -z "$ARGOCD_AUTH_TOKEN" ]]; then
             echo "ARGOCD_AUTH_TOKEN secret is not set"
             exit 1
           fi
-          
           chmod +x 01-run-pre-release.sh
-          ./01-run-pre-release.sh --prerelease
+          ./01-run-pre-release.sh --step create-argocd-apps
+
+      - name: Delete release branches
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step delete-branches
+
+      - name: Capture branch creation timestamp
+        id: branch-timestamp
+        run: echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+
+      - name: Create release branches
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step create-branches
+
+      - name: Update Helm charts
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step helm-charts --start-time "${{ steps.branch-timestamp.outputs.timestamp }}"
+
+      - name: Capture build start timestamp
+        id: build-timestamp
+        run: echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+
+      - name: Build Galasa monorepo
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step build-mono-repo
+
+      - name: Wait for isolated build
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step wait-isolated --start-time "${{ steps.build-timestamp.outputs.timestamp }}"
+
+      - name: Wait for web UI build
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step wait-webui --start-time "${{ steps.build-timestamp.outputs.timestamp }}"
+
+      - name: Check artifacts are signed
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}/releasePipeline
+        run: ./01-run-pre-release.sh --step check-artifacts-signed
 
       - name: Test MVP zip
         working-directory: ${{ github.workspace }}/releasePipeline

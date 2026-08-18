@@ -130,7 +130,5 @@ if [[ -z "$release_type" ]]; then
     ask_user_for_release_type
     run_simbank_ivts
 else
-    # If called with a flag, suppress interactive output and return only run_id
-    run_id=$(run_simbank_ivts 2>&1 | tail -n 1)
-    echo "${run_id}"
+    run_simbank_ivts
 fi
