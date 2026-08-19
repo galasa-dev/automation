@@ -57,11 +57,11 @@ on:
     secrets:
       GALASA_TEAM_GITHUB_TOKEN:
         required: true
-      GPG_KEY:
+      GALASA_TEAM_GPG_KEY:
         required: true
-      GPG_KEYID:
+      GALASA_TEAM_GPG_KEYID:
         required: true
-      GPG_PASSPHRASE:
+      GALASA_TEAM_GPG_PASSPHRASE:
         required: true
     outputs:
       pr_url:
