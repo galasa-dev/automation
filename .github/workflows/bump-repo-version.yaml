@@ -84,9 +84,9 @@ jobs:
 
       - name: Import GPG key and configure git identity
         env:
-          GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
-          GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
-          GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+          GPG_KEYID: ${{ secrets.GPG_KEYID }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_KEY" | base64 --decode | gpg --batch --import
           GPG_NAME=$(gpg --list-keys --with-colons "$GPG_KEYID" | awk -F: '/^uid/{print $10}' | sed 's/ (.*//' | sed 's/ <.*//' | head -1)
