@@ -117,9 +117,9 @@ jobs:
 
       - name: Import GPG key and configure git identity
         env:
-          GPG_KEY: ${{ secrets.GPG_KEY }}
-          GPG_KEYID: ${{ secrets.GPG_KEYID }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+          GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+          GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
         run: |
           echo "$GPG_KEY" | base64 --decode | gpg --batch --import
           GPG_NAME=$(gpg --list-keys --with-colons "$GPG_KEYID" | awk -F: '/^uid/{print $10}' | sed 's/ (.*//' | sed 's/ <.*//' | head -1)
@@ -189,9 +189,9 @@ jobs:
       branch_name: ${{ inputs.branch_name }}
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_KEYID: ${{ secrets.GPG_KEYID }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+      GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
 
   bump-simplatform:
     name: Bump Simplatform version
@@ -207,9 +207,9 @@ jobs:
       artifact_name: simplatform-artifacts
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_KEYID: ${{ secrets.GPG_KEYID }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+      GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
 
   bump-webui:
     name: Bump Web UI version
@@ -222,9 +222,9 @@ jobs:
       branch_name: ${{ inputs.branch_name }}
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_KEYID: ${{ secrets.GPG_KEYID }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+      GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
 
   bump-integratedtests:
     name: Bump Integratedtests version
@@ -237,9 +237,9 @@ jobs:
       branch_name: ${{ inputs.branch_name }}
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_KEYID: ${{ secrets.GPG_KEYID }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+      GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
 
   bump-isolated:
     name: Bump Isolated version
@@ -253,9 +253,9 @@ jobs:
       download_artifacts: true
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_KEYID: ${{ secrets.GPG_KEYID }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+      GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
 
   update-automation-cps:
     name: Update automation CPS properties
@@ -269,9 +269,9 @@ jobs:
 
       - name: Import GPG key and configure git identity
         env:
-          GPG_KEY: ${{ secrets.GPG_KEY }}
-          GPG_KEYID: ${{ secrets.GPG_KEYID }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GALASA_TEAM_GPG_KEY }}
+          GPG_KEYID: ${{ secrets.GALASA_TEAM_GPG_KEYID }}
+          GPG_PASSPHRASE: ${{ secrets.GALASA_TEAM_GPG_PASSPHRASE }}
         run: |
           echo "$GPG_KEY" | base64 --decode | gpg --batch --import
           GPG_NAME=$(gpg --list-keys --with-colons "$GPG_KEYID" | awk -F: '/^uid/{print $10}' | sed 's/ (.*//' | sed 's/ <.*//' | head -1)
