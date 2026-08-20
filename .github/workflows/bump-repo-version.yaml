@@ -95,7 +95,17 @@ jobs:
           git config user.email "$GPG_EMAIL"
           git config user.signingkey "$GPG_KEYID"
           git config commit.gpgsign true
-          echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --output /dev/null --sign /dev/null
+
+          # Store the passphrase in a file and point git at a gpg wrapper that
+          # reads it, so git commit can sign without a pinentry dialog in CI.
+          echo "$GPG_PASSPHRASE" > ~/.gnupg/passphrase.txt
+          chmod 600 ~/.gnupg/passphrase.txt
+          cat > /usr/local/bin/gpg-passphrase-wrapper <<'WRAPPER'
+          #!/bin/sh
+          gpg --batch --yes --passphrase-file "$HOME/.gnupg/passphrase.txt" --pinentry-mode loopback "$@"
+          WRAPPER
+          chmod +x /usr/local/bin/gpg-passphrase-wrapper
+          git config gpg.program /usr/local/bin/gpg-passphrase-wrapper
 
       - name: Delete existing branch if it exists
         run: |
