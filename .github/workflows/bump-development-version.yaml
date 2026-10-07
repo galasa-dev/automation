@@ -35,6 +35,11 @@ on:
         required: true
         type: string
         default: 'version-bump'
+      skip_retag_docker_images:
+        description: 'Skip the "Retag Docker images" job'
+        required: false
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       new_version:
@@ -50,6 +55,11 @@ on:
         required: true
         type: string
         default: 'version-bump'
+      skip_retag_docker_images:
+        description: 'Skip the "Retag Docker images" job'
+        required: false
+        type: boolean
+        default: false
 
 env:
   # Set TERM to xterm-256color to fix errors in set-version scripts that use tput.
@@ -343,6 +353,7 @@ jobs:
     name: Retag Docker images
     runs-on: ubuntu-latest
     needs: validate-inputs
+    if: ${{ !inputs.skip_retag_docker_images }}
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -378,7 +389,6 @@ jobs:
       - bump-integratedtests
       - bump-isolated
       - update-automation-cps
-      - retag-docker-images
     if: always()
     steps:
       - name: Create summary
@@ -409,7 +419,11 @@ jobs:
              - Updates GalasaStream resources in `infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`
 
           ### Docker Images
+          ${{ if inputs.skip_retag_docker_images }}
+          - ⏭️ Skipped retagging Docker images (user opted out)
+          ${{ else }}
           - ✅ Retagged `galasactl-ibm-x86_64:release` to `stable`
+          ${{ endif }}
 
           ### Manual Steps Required
 
