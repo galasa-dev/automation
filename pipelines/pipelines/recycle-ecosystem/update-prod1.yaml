@@ -38,9 +38,50 @@ spec:
 #
 #
 #
+  - name: wait-for-running-pipelines
+    taskRef:
+      name: script
+    params:
+    - name: context
+      value: .
+    - name: image
+      value: ghcr.io/galasa-dev/tkn:main
+    - name: script
+      value: |
+        while true; do
+          running=$(tkn pipelinerun list \
+            --label tekton.dev/pipeline=update-prod1 \
+            --namespace $(context.pipelineRun.namespace) \
+            --output jsonpath='{.items[*].metadata.name}' 2>/dev/null)
+          other_running=""
+          for run in $running; do
+            if [ "$run" != "$(context.pipelineRun.name)" ]; then
+              status=$(tkn pipelinerun describe "$run" \
+                --namespace $(context.pipelineRun.namespace) \
+                --output jsonpath='{.status.conditions[0].reason}' 2>/dev/null)
+              if [ "$status" = "Running" ]; then
+                other_running="$other_running $run"
+              fi
+            fi
+          done
+          if [ -z "$other_running" ]; then
+            echo "No other running instances of update-prod1 found. Proceeding."
+            break
+          fi
+          echo "Waiting for pipeline run(s):$other_running"
+          sleep 30
+        done
+    workspaces:
+    - name: git-workspace
+      workspace: git-workspace
+#
+#
+#
   - name: clone-galasa-config
     taskRef:
       name: git-clone
+    runAfter:
+    - wait-for-running-pipelines
     params:
     - name: url
       value: https://github.ibm.com/galasa/internal-config
@@ -61,6 +102,8 @@ spec:
   - name: clone-helm
     taskRef:
       name: git-clone
+    runAfter:
+    - wait-for-running-pipelines
     params:
     - name: url
       value: https://github.com/galasa-dev/helm
@@ -81,6 +124,8 @@ spec:
   - name: clone-automation
     taskRef:
       name: git-clone
+    runAfter:
+    - wait-for-running-pipelines
     params:
     - name: url
       value: https://github.com/galasa-dev/automation
