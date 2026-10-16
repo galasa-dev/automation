@@ -26,8 +26,8 @@ on:
         description: 'New development version (e.g., 0.42.0)'
         required: true
         type: string
-      released_version:
-        description: 'Version that was just released (e.g., 0.41.0)'
+      previous_version:
+        description: 'Previous version (e.g., 0.41.0)'
         required: true
         type: string
       branch_name:
@@ -46,8 +46,8 @@ on:
         description: 'New development version (e.g., 0.42.0)'
         required: true
         type: string
-      released_version:
-        description: 'Version that was just released (e.g., 0.41.0)'
+      previous_version:
+        description: 'Previous version (e.g., 0.41.0)'
         required: true
         type: string
       branch_name:
@@ -78,8 +78,8 @@ jobs:
             echo "Error: new_version must be in format X.Y.Z (e.g., 0.42.0)"
             exit 1
           fi
-          if ! [[ "${{ inputs.released_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Error: released_version must be in format X.Y.Z (e.g., 0.41.0)"
+          if ! [[ "${{ inputs.previous_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: previous_version must be in format X.Y.Z (e.g., 0.41.0)"
             exit 1
           fi
           if [[ "${{ inputs.branch_name }}" == "release" ]]; then
@@ -179,7 +179,7 @@ jobs:
           git push origin ${{ inputs.branch_name }}
           gh pr create \
             --title "Bump version to ${{ inputs.new_version }}" \
-            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.previous_version }} to ${{ inputs.new_version }}" \
             --base main \
             --head ${{ inputs.branch_name }}
 
@@ -205,7 +205,7 @@ jobs:
     with:
       repository: ${{ github.repository_owner }}/helm
       new_version: ${{ inputs.new_version }}
-      released_version: ${{ inputs.released_version }}
+      previous_version: ${{ inputs.previous_version }}
       branch_name: ${{ inputs.branch_name }}
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
@@ -220,7 +220,7 @@ jobs:
     with:
       repository: ${{ github.repository_owner }}/simplatform
       new_version: ${{ inputs.new_version }}
-      released_version: ${{ inputs.released_version }}
+      previous_version: ${{ inputs.previous_version }}
       branch_name: ${{ inputs.branch_name }}
       download_artifacts: true
       upload_artifacts: true
@@ -238,7 +238,7 @@ jobs:
     with:
       repository: ${{ github.repository_owner }}/webui
       new_version: ${{ inputs.new_version }}
-      released_version: ${{ inputs.released_version }}
+      previous_version: ${{ inputs.previous_version }}
       branch_name: ${{ inputs.branch_name }}
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
@@ -253,7 +253,7 @@ jobs:
     with:
       repository: ${{ github.repository_owner }}/integratedtests
       new_version: ${{ inputs.new_version }}
-      released_version: ${{ inputs.released_version }}
+      previous_version: ${{ inputs.previous_version }}
       branch_name: ${{ inputs.branch_name }}
     secrets:
       GALASA_TEAM_GITHUB_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
@@ -268,7 +268,7 @@ jobs:
     with:
       repository: ${{ github.repository_owner }}/isolated
       new_version: ${{ inputs.new_version }}
-      released_version: ${{ inputs.released_version }}
+      previous_version: ${{ inputs.previous_version }}
       branch_name: ${{ inputs.branch_name }}
       download_artifacts: true
     secrets:
@@ -336,7 +336,7 @@ jobs:
           git push origin ${{ inputs.branch_name }}
           gh pr create \
             --title "Bump CPS properties to version ${{ inputs.new_version }}" \
-            --body "Automated CPS properties update from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --body "Automated CPS properties update from ${{ inputs.previous_version }} to ${{ inputs.new_version }}" \
             --base main \
             --head ${{ inputs.branch_name }}
 
@@ -397,7 +397,7 @@ jobs:
           ## Development Version Bump Complete
 
           ### Version Information
-          - **Released Version**: ${{ inputs.released_version }}
+          - **Previous Version**: ${{ inputs.previous_version }}
           - **New Development Version**: ${{ inputs.new_version }}
           - **Branch Name**: ${{ inputs.branch_name }}
 
@@ -436,6 +436,6 @@ jobs:
 
           ### Notes
           - CPS properties are automatically applied by ArgoCD when changes are pushed to the automation repository
-          - The `galasactl-ibm-x86_64:stable` image is now using version ${{ inputs.released_version }} for regression testing
+          - The `galasactl-ibm-x86_64:stable` image is now using version ${{ inputs.previous_version }} for regression testing
           - Simplatform version bump may fail if Galasa OBR hasn't been deployed yet - merge Galasa PR first and wait for deployment
           EOF

@@ -48,6 +48,14 @@ For any tests which fail, run them again individually:
 
 After all tests pass, run the [Release Deployment workflow](https://github.com/galasa-dev/automation/actions/workflows/release-deployment.yaml):
 
+> [!NOTE]
+> **Semantic versioning:** Galasa follows [semantic versioning](https://semver.org/) (`major.minor.patch`). Version numbers are decided as follows:
+> - **major** - incremented for incompatible API changes
+> - **minor** - incremented when new functionality is added in a backwards-compatible manner
+> - **patch** - incremented for backwards-compatible bug fixes
+>
+> When the workflow prompts for the new development version to bump to, you should bump to the **next patch release** (e.g. if the release version was `1.2.0`, enter `1.2.1`).
+
 ```bash
 gh workflow run release-deployment.yaml --repo galasa-dev/automation --ref main
 ```

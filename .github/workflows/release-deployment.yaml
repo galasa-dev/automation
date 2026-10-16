@@ -9,7 +9,7 @@
 # Required vars:
 #   - WRITE_GITHUB_PACKAGES_USERNAME: Username for pushing images to GitHub Container Registry
 #
-name: Deploy new Galasa version
+name: Deploy new Galasa version and bump development version
 
 on:
   workflow_dispatch:
@@ -492,7 +492,7 @@ jobs:
           gh workflow run bump-development-version.yaml \
             --repo ${{ env.NAMESPACE }}/automation \
             --ref main \
-            --field released_version=${{ env.GALASA_VERSION }} \
+            --field previous_version=${{ env.GALASA_VERSION }} \
             --field new_version=${{ inputs.new_galasa_version }}
 
           sleep 5

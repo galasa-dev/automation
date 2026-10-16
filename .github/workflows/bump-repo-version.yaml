@@ -23,7 +23,7 @@ on:
       new_version:
         required: true
         type: string
-      released_version:
+      previous_version:
         required: true
         type: string
       branch_name:
@@ -136,7 +136,7 @@ jobs:
           git push origin ${{ inputs.branch_name }}
           gh pr create \
             --title "${{ inputs.commit_message }} ${{ inputs.new_version }}" \
-            --body "Automated version bump from ${{ inputs.released_version }} to ${{ inputs.new_version }}" \
+            --body "Automated version bump from ${{ inputs.previous_version }} to ${{ inputs.new_version }}" \
             --base main \
             --head ${{ inputs.branch_name }}
 
