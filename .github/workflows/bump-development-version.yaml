@@ -419,11 +419,7 @@ jobs:
              - Updates GalasaStream resources in `infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`
 
           ### Docker Images
-          ${{ if inputs.skip_retag_docker_images }}
-          - ⏭️ Skipped retagging Docker images (user opted out)
-          ${{ else }}
-          - ✅ Retagged `galasactl-ibm-x86_64:release` to `stable`
-          ${{ endif }}
+          ${{ inputs.skip_retag_docker_images && '- ⏭️ Skipped retagging Docker images (user opted out)' || '- ✅ Retagged `galasactl-ibm-x86_64:release` to `stable`' }}
 
           ### Manual Steps Required
 
