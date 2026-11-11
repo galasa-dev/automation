@@ -48,27 +48,37 @@ spec:
       value: ghcr.io/galasa-dev/tkn:main
     - name: script
       value: |
+        my_creation_time=$(tkn pipelinerun describe $(context.pipelineRun.name) \
+          --namespace $(context.pipelineRun.namespace) \
+          --output jsonpath='{.metadata.creationTimestamp}' 2>/dev/null)
+        echo "This pipeline run: $(context.pipelineRun.name) created at $my_creation_time"
         while true; do
           running=$(tkn pipelinerun list \
             --label tekton.dev/pipeline=update-prod1 \
             --namespace $(context.pipelineRun.namespace) \
             --output jsonpath='{.items[*].metadata.name}' 2>/dev/null)
-          other_running=""
+          blocking=""
           for run in $running; do
             if [ "$run" != "$(context.pipelineRun.name)" ]; then
               status=$(tkn pipelinerun describe "$run" \
                 --namespace $(context.pipelineRun.namespace) \
                 --output jsonpath='{.status.conditions[0].reason}' 2>/dev/null)
               if [ "$status" = "Running" ]; then
-                other_running="$other_running $run"
+                other_creation_time=$(tkn pipelinerun describe "$run" \
+                  --namespace $(context.pipelineRun.namespace) \
+                  --output jsonpath='{.metadata.creationTimestamp}' 2>/dev/null)
+                if [ "$other_creation_time" \< "$my_creation_time" ] || \
+                   ([ "$other_creation_time" = "$my_creation_time" ] && [ "$run" \< "$(context.pipelineRun.name)" ]); then
+                  blocking="$blocking $run"
+                fi
               fi
             fi
           done
-          if [ -z "$other_running" ]; then
-            echo "No other running instances of update-prod1 found. Proceeding."
+          if [ -z "$blocking" ]; then
+            echo "No earlier running instances of update-prod1 found. Proceeding."
             break
           fi
-          echo "Waiting for pipeline run(s):$other_running"
+          echo "Waiting for pipeline run(s):$blocking"
           sleep 30
         done
     workspaces:
