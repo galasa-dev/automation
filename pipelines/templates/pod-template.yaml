@@ -17,11 +17,6 @@ volumes:
 - name: gpg-key
   secret:
     secretName: gpg-key
-# Used to provide a githubcreds.yaml file to `galasabld` with a GitHub username
-# and Personal Access Token to use when communicating with the GitHub API.
-- name: githubcreds
-  secret:
-    secretName: github-token
 # Used to provide a cps.properties and credentials.properties file that contains
 # secret information from Vault, to the Pipeline cicsts-isolated-tests.
 - name: test-cps-and-creds
