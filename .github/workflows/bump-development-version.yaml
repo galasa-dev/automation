@@ -9,12 +9,13 @@
 # - GALASA_TEAM_GITHUB_TOKEN: A Personal Access Token (PAT) with permissions to:
 #   - Push to branches in galasa, helm, simplatform, webui, integratedtests, isolated, and automation repositories
 #   - Create pull requests in these repositories
-#   - Read and write packages (for Docker operations)
-# - GPG_KEY: Base64-encoded GPG private key (gpg --export-secret-keys | base64 -w0)
-# - GPG_KEYID: GPG key ID
-# - GPG_PASSPHRASE: Passphrase for the GPG key
+# - WRITE_GITHUB_PACKAGES_TOKEN: A PAT used for Docker operations (see the workflow steps)
+# - GALASA_TEAM_GPG_KEY: Base64-encoded GPG private key (gpg --export-secret-keys | base64 -w0)
+# - GALASA_TEAM_GPG_KEYID: GPG key ID
+# - GALASA_TEAM_GPG_PASSPHRASE: Passphrase for the GPG key
 #
-# The token should have 'repo' and 'write:packages' scopes.
+# GALASA_TEAM_GITHUB_TOKEN needs the 'repo' scope.
+# WRITE_GITHUB_PACKAGES_TOKEN needs the 'write:packages' scope.
 #
 
 name: Bump Development Version

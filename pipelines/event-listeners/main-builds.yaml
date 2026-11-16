@@ -66,9 +66,6 @@ spec:
                   - name: gpg-key
                     secret:
                       secretName: gpg-key
-                  - name: githubcreds
-                    secret:
-                      secretName: github-token
                 workspaces:
                 - name: git-workspace
                   volumeClaimTemplate:

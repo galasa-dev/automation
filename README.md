@@ -60,21 +60,9 @@ Bundles all dev.galasa artifacts into a zip and uses the Central Publisher Porta
 
 This directory holds the Go code for custom build images.
 
-## github-status:
-
-This image provides the status of a pull request build - whether it passed or failed - and updates the pull request on GitHub with this status.
-
-## github-verify:
-
-This image is used to verify that a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build.
-
 ## github-webhook-monitor:
 
 This image is used to monitor the galasa-dev organisation-wide webhook for any new deliveries, every 2 minutes. It will then trigger the appropriate EventListener for each delivery to then trigger the corresponding build pipeline.
-
-## github-webhook-receiver: 
-
-This image is used to receive requests from the webhook and responds with a 200 response to avoid the appearance of unsuccessful deliveries.
 
 
 # Dockerfiles
@@ -83,8 +71,8 @@ This directory is the single location for all Dockerfiles needed to build the im
 
 | Category | Dockerfiles |
 |----------|-------------|
-| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, ghstatus, ghverify, gitcli, githubmonitor, githubreceiver, gpg, helm, kubectl, openapi, openjdk17ibmgradle, swagger, tkn | 
-| Go programs | ghstatus, ghverify, github-webhook-monitor, github-webhook-receiver |
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, gitcli, githubmonitor, gpg, helm, kubectl, openapi, openjdk17ibmgradle, swagger, tkn |
+| Go programs | github-webhook-monitor |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
 
 
@@ -132,9 +120,6 @@ This EventListener is triggered via webhook when code is pushed into the main br
 branch-automation:
 The pipeline applies changes to the prod1 Galasa service's CPS properties using `galasactl resources apply` if changes have been made to the [cps.properties](./infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file.
 
-codecoverage (_this pipeline is inactive and due to be converted into a GitHub Actions workflow_): 
-This pipeline generates and deploys a [code coverage report](https://development.galasa.dev/codecoverage) for Galasa based on data from Jacoco.
-
 update-prod1:
 This pipeline runs a `helm upgrade` to update the prod1 service using the [latest Galasa service Helm chart](https://github.com/galasa-dev/helm). This is triggered after code is promoted to production so that the service has the latest Galasa code.
 
@@ -161,18 +146,6 @@ Definitions for the ServiceAccounts used during pipelines.
 
 ## Tasks
 
-### galasabld-command
-
-This task uses the galasabld CLI to perform galasabld commands, such as galasabld template.
-
-Parameters:
-* context: The directory to perform the command in.
-* command: An array of all of the parts of the command.
-* galasabldImageTag: The image tag to use, defaults to main.
-
-This task uses the custom [galasabld image](https://github.com/galasa-dev/galasa/pkgs/container/galasabld-amd64).
-
-
 ### galasactl-command
 
 This task uses the galasactl CLI to perform galasactl commands, such as galasactl runs submit.
@@ -190,48 +163,7 @@ This task uses the custom [galasactl image](https://github.com/galasa-dev/cli/pk
 This task clones a GitHub repository from the provided URL into the workspace.
 
 
-### git-status
-
-This task calls the github-status Go program with parameters extracted from the GitHub webhook payload, and sends the status of a PR build pipeline from Tekton to the pull request on GitHub. The status is updated and a comment is posted to the pull request.
-
-Parameters:
-* status: The status of the Tasks from the Tekton pipeline. It is only a Success if all Tasks passed.
-* prUrl: The URL of the pull request on GitHub.
-* statusesUrl: The URL to return the status of the build to the pull request via a POST request.
-* issueUrl: The URL to return comments to the pull request via a POST request.
-* pipelineRunName: The PipelineRun name triggered by the PR.
-
-This task uses the custom [ghstatus image](https://github.com/galasa-dev/automation/pkgs/container/ghstatus).
-
-
-### git-verify
-
-This task calls the github-verify Go program with parameters extracted from the GitHub webhook payload, to verify if a user who opens a pull request into a repository, is an approved code-committer or code-admin, before proceeding with a build. If the user is an approved user, the PR build proceeds, if not, a comment is posted to the pull request informing the author that the PR needs to be approved for building.
-
-Parameters:
-* userId: The user ID of the GitHub user who has opened the pull request.
-* prUrl: The URL of the pull request on GitHub.
-* action: Describes whether the pull request is opened, closed, synchronized etc.
-
-This task uses the custom [ghverify image](https://github.com/galasa-dev/automation/pkgs/container/ghverify).
-
-
-### kaniko-builder
-
-This task allows you to build and push Docker images within a Kubernetes cluster or container. This is needed as Docker virtualisation cannot be performed inside a containerised environment.
-
-Parameters:
-* pipelineRunName: The PipelineRun name to use for the working directory.
-* imageName: The name to give the image after it is built, including the tag.
-* context: The Docker build context
-* noPush: Allows you to choose whether you want to push the image built to the given destination (dockerRegistry/imageName).
-* dockerfilePath: The path to the Dockerfile needed for the build.
-* buildArgs: An array used to pass any build arguments needed into the Dockerfile.
-
-The task uses [kaniko-executor image](https://console.cloud.google.com/gcr/images/kaniko-project/GLOBAL/executor@sha256:23ae6ccaba2b0f599966dbc5ecf38aa4404f4cd799add224167eaf285696551a/details?tag=latest), from gcr.io (Google Container Registry).
-
-
-### kubectl 
+### kubectl
 
 This task allows you to execute kubectl commands on the cluster the pipeline runs on.
 
@@ -240,30 +172,6 @@ Parameters:
 
 The task uses the [kubectl image](https://github.com/galasa-dev/automation/pkgs/container/kubectl).
 
-
-### make-with-params
-
-This task is used to perform the shell command 'make all' to execute a Makefile.
-
-Parameters:
-* directory: The directory to perform the command in.
-* params: An array of commands, defaults to all.
-
-This task uses the [golang image](https://github.com/orgs/galasa-dev/packages/container/package/golang).
-
-
-### maven-build
-
-This task performs a Maven build. It is generic and allows for parameters to dictate the exact type of build.
-
-Parameters:
-* context: The directory where you want the Maven build to take place (where the pom.xml file is).
-* settingsLocation: The location of the settings.xml produced by the maven-gpg task. This will normally be /workspace/git/PIPELINE_RUN_NAME/REPO/gpg/settings.xml. For the OBR builds, as two Maven builds occur in two different contexts, to avoid doing maven-gpg twice, the settingsLocation is set.
-* buildArgs: An array used for any additional arguments to pass to Maven.
-* command: An array of commands to use in the build such as 'deploy' or 'install'.
-* image: The Maven image to use for the task, defaults to Maven version 3.8.6 with the IBM Semeru Java 17.
-
-This task uses the [Maven 3.8.6 with the IBM Semeru Java 17 image](https://github.com/orgs/galasa-dev/packages/container/package/maven) unless overridden.
 
 ### script
 
@@ -287,9 +195,6 @@ Parameters:
 
 This task uses the custom [tkn image](https://github.com/galasa-dev/automation/pkgs/container/tkn).
 
-
-## How are the IBM build machines protected from malicious code in a fork's Pull Request?
-There are built-in protections to prevent malicious code being executed as part of a build process on the IBM build hardware. The mechanism is described [here](./docs/pull-request-build-authentication.md).
 
 
 # Release Pipeline
