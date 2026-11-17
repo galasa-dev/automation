@@ -182,7 +182,7 @@ spec:
     taskRef:
       name: helm
     runAfter:
-    - upgrade-prod1
+    - install-prod1
     params:
     - name: context
       value: $(context.pipelineRun.name)
