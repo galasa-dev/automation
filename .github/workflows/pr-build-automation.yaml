@@ -15,33 +15,6 @@ env:
   NAMESPACE: ${{ github.repository_owner }}
 
 jobs:
-  build-kubectl-image:
-    name: Build the 'kubectl' image
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/common
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/kubectl
-
-      - name: Build 'kubectl' Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: dockerfiles/common
-          file: dockerfiles/common/kubectl.Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
   build-argocdcli-image:
     name: Build the 'argocdcli' image
     runs-on: ubuntu-latest
@@ -174,77 +147,6 @@ jobs:
         with:
           context: dockerfiles/certs
           file: dockerfiles/common/openjdk17ibmgradle.Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  build-tkn-image:
-    name: Build the 'tkn' image
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/common
-            pipelines/templates
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/tkn
-
-      - name: Build 'tkn' Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: pipelines/templates
-          file: dockerfiles/common/tkn.Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  build-ghmonitor-image:
-    name: Build the 'ghmonitor' image
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/common
-            build-images
-            offline-tools/copyrighter
-
-      - name: Setup up Go
-        uses: actions/setup-go@v5
-        with: 
-          go-version: 1.22
-
-      - name: Go build 'ghmonitor'
-        working-directory: build-images/github-webhook-monitor
-        run: |
-          export CGO_ENABLED=0
-          export GOOS=linux
-          export GOARCH=amd64
-          export GO111MODULE=auto
-          go build -o bin/ghmonitor cmd/main.go
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ghmonitor
-
-      - name: Build 'ghmonitor' Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: build-images/github-webhook-monitor
-          file: dockerfiles/common/githubmonitor.Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -120,76 +120,80 @@ function update_property_version {
 # bumping version for the value of property test.stream.ivts.location
 function upgrade_test_stream_ivts_location_version {
     property_name="test.stream.ivts.location"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+    # cps-properties.yaml has moved to another repo
+    # prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
     service_main_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml"
     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/dev[.]galasa[.]ivts[.]obr-[0-9.]+-testcatalog[.]json"
     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/ivts\\/dev\\/galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/dev.galasa.ivts.obr-${galasa_version}-testcatalog.json"
 
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+    # update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
     update_property_version "${service_main_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
 # bumping version for the value of property test.stream.ivts.obr
 function upgrade_test_stream_ivts_obr_version {
     property_name="test.stream.ivts.obr"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+    # cps-properties.yaml has moved to another repo
+    # prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
     service_main_properties_file="${WORKSPACE_DIR}/infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml"
     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]ivts[.]obr\\/[0-9.]+\\/obr"
     new_value="mvn:dev.galasa\\/dev.galasa.ivts.obr\\/${galasa_version}\\/obr"
 
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+    # update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
     update_property_version "${service_main_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
 }
 
-#bumping version for the value of property test.stream.inttests.location
-function upgrade_test_stream_inttests_location_version {
-    property_name="test.stream.inttests.location"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/dev[.]galasa[.]inttests[.]obr-[0-9.]+-testcatalog[.]json"
-    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/dev.galasa.inttests.obr-${galasa_version}-testcatalog.json"
+# The following functions only edited cps-properties.yaml, which has moved to another repo.
 
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
-}
+# #bumping version for the value of property test.stream.inttests.location
+# function upgrade_test_stream_inttests_location_version {
+#     property_name="test.stream.inttests.location"
+#     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+#     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/dev[.]galasa[.]inttests[.]obr-[0-9.]+-testcatalog[.]json"
+#     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/inttests\\/dev\\/galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/dev.galasa.inttests.obr-${galasa_version}-testcatalog.json"
+#
+#     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+# }
 
-#bumping version for the value of property test.stream.inttests.obr
-function upgrade_test_stream_inttests_obr_version {
-    property_name="test.stream.inttests.obr"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    value_regex="mvn:dev.galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/obr"
-    new_value="mvn:dev.galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/obr"
+# #bumping version for the value of property test.stream.inttests.obr
+# function upgrade_test_stream_inttests_obr_version {
+#     property_name="test.stream.inttests.obr"
+#     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+#     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]inttests[.]obr\\/[0-9.]+\\/obr"
+#     new_value="mvn:dev.galasa\\/dev.galasa.inttests.obr\\/${galasa_version}\\/obr"
+#
+#     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+# }
 
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
-}
+# #bumping version for the value of property test.stream.simbank.obr
+# function upgrade_test_stream_simbank_obr_version {
+#     property_name="test.stream.simbank.obr"
+#     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+#     value_regex="mvn:dev.galasa\\/dev[.]galasa[.]simbank[.]obr\\/[0-9.]+\\/obr"
+#     new_value="mvn:dev.galasa\\/dev.galasa.simbank.obr\\/${galasa_version}\\/obr"
+#
+#     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+# }
 
-#bumping version for the value of property test.stream.simbank.obr
-function upgrade_test_stream_simbank_obr_version {
-    property_name="test.stream.simbank.obr"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    value_regex="mvn:dev.galasa\\/dev[.]galasa[.]simbank[.]obr\\/[0-9.]+\\/obr"
-    new_value="mvn:dev.galasa\\/dev.galasa.simbank.obr\\/${galasa_version}\\/obr"
+# #bumping version for the value of property isolated.full.zip
+# function upgrade_isolated_full_zip_version {
+#     property_name="isolated.full.zip"
+#     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+#     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/[0-9.]+\\/galasa-isolated-[0-9.]+.zip"
+#     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/${galasa_version}\\/galasa-isolated-${galasa_version}.zip"
+#
+#     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+# }
 
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
-}
-
-#bumping version for the value of property isolated.full.zip
-function upgrade_isolated_full_zip_version {
-    property_name="isolated.full.zip"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/[0-9.]+\\/galasa-isolated-[0-9.]+.zip"
-    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/isolated\\/dev\\/galasa\\/galasa-isolated\\/${galasa_version}\\/galasa-isolated-${galasa_version}.zip"
-
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
-}
-
-#bumping version for the value of property isolated.mvp.zip
-function upgrade_isolated_mvp_zip_version {
-    property_name="isolated.mvp.zip"
-    prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
-    value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/[0-9.]+\\/galasa-isolated-mvp-[0-9.]+[.]zip"
-    new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/${galasa_version}\\/galasa-isolated-mvp-${galasa_version}.zip"
-
-    update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
-}
+# #bumping version for the value of property isolated.mvp.zip
+# function upgrade_isolated_mvp_zip_version {
+#     property_name="isolated.mvp.zip"
+#     prod1_properties_file="${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev/cps-properties.yaml"
+#     value_regex="https:\\/\\/development[.]galasa[.]dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/[0-9.]+\\/galasa-isolated-mvp-[0-9.]+[.]zip"
+#     new_value="https:\\/\\/development.galasa.dev\\/main\\/maven-repo\\/mvp\\/dev\\/galasa\\/galasa-isolated-mvp\\/${galasa_version}\\/galasa-isolated-mvp-${galasa_version}.zip"
+#
+#     update_property_version "${prod1_properties_file}" "${property_name}" "${value_regex}" "${new_value}"
+# }
 
 #bumping version for the secure-ivts GalasaStream resource
 function upgrade_secure_ivts_stream_version {
@@ -220,61 +224,60 @@ function upgrade_secure_ivts_stream_version {
 }
 
 #bumping version for the value of property runtime.version
-function upgrade_galasa_versions {
-    runtime_version_prop="runtime.version"
-    galasaboot_version_prop="galasaboot.version"
-    simbanktests_version_prop="simbanktests.version"
-    simplatform_version_prop="simplatform.version"
+# function upgrade_galasa_versions {
+#     runtime_version_prop="runtime.version"
+#     galasaboot_version_prop="galasaboot.version"
+#     simbanktests_version_prop="simbanktests.version"
+#     simplatform_version_prop="simplatform.version"
 
-    h1 "Bumping up the versions for properties that point to the Galasa boot version"
+#     h1 "Bumping up the versions for properties that point to the Galasa boot version"
     
-    #create a temp file
-    temp_file="${BASEDIR}/temp/cps-properties.yaml"
-    >$temp_file
+#     #create a temp file
+#     temp_file="${BASEDIR}/temp/cps-properties.yaml"
+#     >$temp_file
 
-    #count variavle to find the 'value: X.XX.X' line
-    count=0
+#     #count variavle to find the 'value: X.XX.X' line
+#     count=0
+#     cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
+#     source_file="cps-properties.yaml"
 
-    cd ${WORKSPACE_DIR}/infrastructure/cicsk8s/galasa-dev
-    source_file="cps-properties.yaml"
+#     info "Updating file $source_file"
+#     # Note: There are several matches for value: X.XX.X so we need to find the correct one...
+#     rm -f $temp_file
+#     found_property_name="false"
+#     #[ -n "$line" ] prevents the last line from being deleted if it's not a new line
+#     while IFS= read -r line || [ -n "$line" ]; do 
+#         outputLine="$line"
+#         if [[ "$found_property_name" == "false" ]]; then
+#             if [[ "$line" =~ \s*${runtime_version_prop}\s* ]] || \
+#                [[ "$line" =~ \s*${galasaboot_version_prop}\s* ]] || \
+#                [[ "$line" =~ \s*${simbanktests_version_prop}\s* ]] || \
+#                [[ "$line" =~ \s*${simplatform_version_prop}\s* ]]; then
+#                 found_property_name="true"
+#                 ((count++))
+#             fi
+#         else
+#             # the line containing the value of the property will always be 
+#             # the 2nd line after we find the line containing the property name
+#             if ((count == 2)); then
+#                 info "Before: $line"
+#                 outputLine=$(echo "$line" | sed -E "s/[0-9.]+/${galasa_version}/1")
+#                 info "After: $outputLine"
+#                 found_property_name="false"
+#                 count=0
+#             else
+#                 #increment count if we've not yet reached the second line
+#                 ((count++))
+#             fi
+#         fi
+#         echo "$outputLine" >> $temp_file
+#     done < $source_file
 
-    info "Updating file $source_file"
-    # Note: There are several matches for value: X.XX.X so we need to find the correct one...
-    rm -f $temp_file
-    found_property_name="false"
-    #[ -n "$line" ] prevents the last line from being deleted if it's not a new line
-    while IFS= read -r line || [ -n "$line" ]; do 
-        outputLine="$line"
-        if [[ "$found_property_name" == "false" ]]; then
-            if [[ "$line" =~ \s*${runtime_version_prop}\s* ]] || \
-               [[ "$line" =~ \s*${galasaboot_version_prop}\s* ]] || \
-               [[ "$line" =~ \s*${simbanktests_version_prop}\s* ]] || \
-               [[ "$line" =~ \s*${simplatform_version_prop}\s* ]]; then
-                found_property_name="true"
-                ((count++))
-            fi
-        else
-            # the line containing the value of the property will always be 
-            # the 2nd line after we find the line containing the property name
-            if ((count == 2)); then
-                info "Before: $line"
-                outputLine=$(echo "$line" | sed -E "s/[0-9.]+/${galasa_version}/1")
-                info "After: $outputLine"
-                found_property_name="false"
-                count=0
-            else
-                #increment count if we've not yet reached the second line
-                ((count++))
-            fi
-        fi
-        echo "$outputLine" >> $temp_file
-    done < $source_file
+#     #copy newly-updated temp file into source file with
+#     cat $temp_file > $source_file
 
-    #copy newly-updated temp file into source file with
-    cat $temp_file > $source_file
-
-    success "'${property_name}' version bumped successfully"
-}
+#     success "'${property_name}' version bumped successfully"
+# }
 
 #-----------------------------------------------------------------------------------------
 # Main logic.
@@ -282,10 +285,10 @@ function upgrade_galasa_versions {
 
 upgrade_test_stream_ivts_location_version
 upgrade_test_stream_ivts_obr_version
-upgrade_test_stream_inttests_location_version
-upgrade_test_stream_inttests_obr_version
-upgrade_test_stream_simbank_obr_version
-upgrade_isolated_full_zip_version
-upgrade_isolated_mvp_zip_version
-upgrade_galasa_versions
+# upgrade_test_stream_inttests_location_version
+# upgrade_test_stream_inttests_obr_version
+# upgrade_test_stream_simbank_obr_version
+# upgrade_isolated_full_zip_version
+# upgrade_isolated_mvp_zip_version
+# upgrade_galasa_versions
 upgrade_secure_ivts_stream_version

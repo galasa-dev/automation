@@ -1,6 +1,5 @@
 go 1.19
 
 use (
-	./build-images/github-webhook-monitor
 	./offline-tools/copyrighter
 )
