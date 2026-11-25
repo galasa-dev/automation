@@ -6,7 +6,7 @@ The release process is split into two automated workflows:
 
 ### Part 1: Build and Test (Automated)
 
-Run the [Release Process workflow](https://github.com/galasa-dev/automation/actions/workflows/release.yaml) to automate steps 1-10:
+Run the [Release Process workflow](https://github.com/galasa-dev/automation/actions/workflows/release.yaml) to automate the build and test steps:
 
 ```bash
 gh workflow run release.yaml --repo galasa-dev/automation --ref main
@@ -20,31 +20,12 @@ This workflow will automatically:
 5. Check artifacts are signed
 6. Test the MVP zip
 7. Run GitHub Actions regression tests in parallel (Isolated, Simbank IVTs, Core IVTs)
-8. Trigger the internal Tekton regression tests after the Isolated build finishes
 
 Monitor the workflow run at: https://github.com/galasa-dev/automation/actions/workflows/release.yaml
 
-### Part 2: Manual Steps
+**All regression tests must pass before moving on to deployment.**
 
-After the automated workflow completes:
-
-#### Tekton regression tests
-
-When the Isolated release build finishes, a Tekton pipeline to run the internal regression tests should start. 
-
-Some tests may fail on the first run due to the lack of system resource availability. Rerunning the test should hopefully result in a pass. Make sure that external systems the tests connect to are active and healthy (for example, @hobbit1983's CICS Region).
-
-For any tests which fail, run them again individually:
-
-   b. Amend [29-regression-reruns.yaml](./29-regression-reruns.yaml) to supply the correct version and [regression-reruns.yaml](./argocd-synced/pipelines/regression-reruns.yaml). Add the tests that failed as shown in the example, to run them again.
-
-   c. Run `kubectl apply -f argocd-synced/pipelines/regression-reruns.yaml` and `kubectl -n galasa-build create -f 29-regression-reruns.yaml`.
-
-   d. Repeat as required.
-
-**All Tekton tests must pass before moving on to deployment.**
-
-### Part 3: Deploy and Release (Automated)
+### Part 2: Deploy and Release (Automated)
 
 After all tests pass, run the [Release Deployment workflow](https://github.com/galasa-dev/automation/actions/workflows/release-deployment.yaml):
 
@@ -64,7 +45,7 @@ This workflow will automatically:
 1. Detect the Galasa version from `galasa/build.properties`
 2. Publish artifacts to Maven Central Publisher Portal
 3. Poll Maven Central for artifact availability
-4. Deploy Docker images to IBM Cloud Container Registry
+4. Deploy Docker images to GitHub Container Registry
 5. Create version tags across all repositories
 6. Upload CLI and Isolated/MVP releases to GitHub
 7. Trigger Homebrew and Scoop update workflows (creates PRs)
@@ -97,15 +78,9 @@ If you need to run steps individually or the automated workflows fail, follow th
 3. Log into ArgoCD `argocd login --sso argocd.galasa.dev --grpc-web`
 4. Ensure GitHub CLI is istalled. It can be installed using the guide [here](https://github.com/cli/cli?tab=readme-ov-file#installation)
 5. Authenticate github cli using `gh auth login --web`
-6. You will need to log into both the internal cicsk8s and external ibmcloud Kubernetes clusters.
-7. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
-8. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
-9. watch needs to be installed.
-10. The ibmcloud CLI container registry service needs to be configured to the global region:
-
-``` shell
-ibmcloud cr region-set global
-```
+6. Ensure you have the latest galasabld program. It can be downloaded [here](https://development.galasa.dev/main/binary/bld/). Add it on the path.
+7. jq needs to be installed. It can be downloaded [here](https://jqlang.github.io/jq/download/).
+8. watch needs to be installed.
 
 ### Set up the ArgoCD apps and GitHub branches for the release
 
@@ -136,22 +111,11 @@ ibmcloud cr region-set global
 
 ### Run the regression tests
 
-#### GitHub Actions regression tests
-
 **These three steps can be done at the same time:**
 
 1. Run [23-run-isolated-tests.sh](./23-run-isolated-tests.sh).
 2. Run [24-run-simbank-ivts.sh](./24-run-simbank-ivts.sh).
 3. Run [25-run-ivts.sh](./25-run-ivts.sh).
-
-#### Tekton regression tests
-
-**These steps should be done one after the other:**
-
-<!-- Temporarily removing this step as these tests require a DSE CICS Region which is currently down, so these will always fail -->
-<!-- 1. Run [26-run-cicsts-isolated-tests.sh](./26-run-cicsts-isolated-tests.sh). This tests that the CICS, CEMT, CEDA and SDV Managers work offline using just the Isolated zip. -->
-1. Run [27-run-prod1-ivts.sh](./27-run-prod1-ivts.sh). This tests that the CICS, CEMT, CEDA, SDV and z/OS Managers work online.
-2. Run [28-run-prod1-integration-tests.sh](./28-run-prod1-integration-tests.sh).
 
 **All tests must pass before moving on.**
 
@@ -161,9 +125,9 @@ ibmcloud cr region-set global
 2. Log into the Central Publisher Portal and publish the 'dev.galasa' artifacts by following [31-publish-to-maven-central.md](./31-publish-to-maven-central.md).
 3. Run [32-wait-maven.sh](./32-wait-maven.sh) with `--version <version>` to wait for the artifacts to reach Maven Central (20-40 minutes).
 
-### Deploy images to IBM Cloud Container Registry
+### Deploy images to GitHub Container Registry
 
-1. Run [34-deploy-docker-galasa.sh](./34-deploy-docker-galasa.sh) - Deploy the Container images to ICR. Re-tags and uploads images. Takes over 20 mins.
+1. Run [34-deploy-docker-galasa.sh](./34-deploy-docker-galasa.sh) - Deploy the Container images to GHCR. Re-tags and uploads images. Takes over 20 mins.
 
 ### Create version tag from release branch
 
@@ -186,13 +150,10 @@ ibmcloud cr region-set global
 ### Bump to new version for development
 
 1. Run the [Bump Development Version workflow](https://github.com/galasa-dev/automation/actions/workflows/bump-development-version.yaml).
-2. Update CPS properties for internal integrated tests using galasactl:
-   - framework.test.stream.internal-inttests.location
-   - framework.test.stream.internal-inttests.obr
 
 If the workflow fails:
 1. Follow manual steps in [95-move-to-new-version.md](./95-move-to-new-version.md).
-2. Run [set-version.sh](./set-version.sh) to update CPS properties in [`../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml`](../infrastructure/cicsk8s/galasa-dev/cps-properties.yaml).
+2. Run [set-version.sh](./set-version.sh) to update CPS properties in [`../infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`](../infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml).
 3. Upgrade CLI stable image:
 
 ```shell

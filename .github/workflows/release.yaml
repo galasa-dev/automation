@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 # This workflow automates the Galasa release process through Step 10 (GitHub Actions regression tests).
-# Manual steps remain for MEND scan, Tekton tests, Maven Central deployment, Docker images, tagging, and cleanup.
+# Manual steps remain for MEND scan, Maven Central deployment, Docker images, tagging, and cleanup.
 #
 # Required Secrets:
 #   ARGOCD_AUTH_TOKEN         - Authentication token for ArgoCD CLI

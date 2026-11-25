@@ -48,13 +48,6 @@ rules:
   verbs:
   - "*"
 - apiGroups:
-  - "tekton.dev"
-  - "triggers.tekton.dev"
-  resources:
-  - "*"
-  verbs:
-  - "*"
-- apiGroups:
   - "external-secrets.io"
   resources:
   - "secretstores"

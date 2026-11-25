@@ -838,14 +838,14 @@ func TestAddCopyrightWhenNoOtherCommentIsPresentYaml(t *testing.T) {
 	var input = `apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-name: galasa-build-source-pvc
-namespace: tekton
+name: example-source-pvc
+namespace: example
 	spec:
 	apiVersion: v1
 	kind: PersistentVolumeClaim
 	metadata:
-	name: galasa-build-source-pvc
-	namespace: tekton
+	name: example-source-pvc
+	namespace: example
 	spec:`
 
 	// When...
