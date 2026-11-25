@@ -4,13 +4,11 @@ This repository is the single location for all the automation and CI/CD that occ
 
 Find out more about:
 1. [.github](#github-actions): GitHub Actions workflows
-1. [build-images](#build-images): Custom images required for the build process
-1. [dockerfiles](#dockerfiles): The organised Dockerfiles for all the images built for Galasa
+1. [dockerfiles](#dockerfiles): The organised Dockerfiles for the images built for Galasa
 1. [docs](#docs): Documentation pages and images
 1. [infrastructure](#infrastructure): The Galasa infrastructure as code, including the Kubernetes set-up
 1. [offline-tools](#offline-tools): Source code for the copyright checker tool
-1. [pipelines](#pipelines): The CustomResourceDefinitions used in our Tekton build pipelines, ClusterRoles, EventListeners, Pipelines, Roles, ServiceAccounts and Tasks
-1. [releasePipeline](#release-pipeline): Scripts, instructions and CustomResourceDefinitions for a Galasa release
+1. [releasePipeline](#release-pipeline): Scripts and instructions for a Galasa release
 
 # GitHub-Actions
 
@@ -56,36 +54,20 @@ release-central-publisher-portal:
 Bundles all dev.galasa artifacts into a zip and uses the Central Publisher Portal API to publish them to the staging repository, before releasing to Maven Central.
 
 
-# Build-images
-
-This directory holds the Go code for custom build images.
-
-## github-webhook-monitor:
-
-This image is used to monitor the galasa-dev organisation-wide webhook for any new deliveries, every 2 minutes. It will then trigger the appropriate EventListener for each delivery to then trigger the corresponding build pipeline.
-
-
 # Dockerfiles
 
 This directory is the single location for all Dockerfiles needed to build the images Galasa needs.
 
 | Category | Dockerfiles |
 |----------|-------------|
-| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, gitcli, githubmonitor, gpg, helm, kubectl, openapi, openjdk17ibmgradle, swagger, tkn |
-| Go programs | github-webhook-monitor |
+| Custom images (If there is not be a Docker official image that allows us to use a tool, we have created custom images to enable this. The Dockerfiles for all of the custom images are in the _dockerfiles/common_ directory) | argocd, gitcli, gpg, openapi, openjdk17ibmgradle, swagger |
 | Base image (Most other images are built on top of this. Used to enable use of the Apache HTTP Server) | base |
 
 
 # Infrastructure
 
-Galasa's infrastructure is currently spread across two Kubernetes clusters - an internal cluster and an external cluster. 
+Galasa's infrastructure is hosted on an external Kubernetes cluster, galasa-kube1:
 
-cicsk8s:
-* Galasa Service prod1 on which runs all tests that require internal infrastructure (z/OS, CICS). The ELK stack is also installed on this service for extra monitoring.
-* Tekton build pipelines are run on the internal cluster.
-* The ArgoCD instance which controls all resources for the Tekton pipelines (Pipelines, Tasks, etc) is hosted on the internal cluster.
-
-galasa-kube1:
 * Galasa Service service-1 on which runs all remaining tests.
 * All Deployments, Services and Ingresses which make up our Maven artifact repositories are hosted on the external cluster.
 * The [ArgoCD](argocd.galasa.dev) instance which controls the above resources is hosted on the external cluster.
@@ -96,105 +78,6 @@ galasa-kube1:
 The offline-tools directory contains the source code for the GitHub Copyright Checker tool. Read more [here](./offline-tools/copyrighter/README.md)
 
 _The GitHub Copyright Checker tool is currently disabled, we plan to reinstate this in the future._
-
-
-# Pipelines
-
-## Cluster Roles
-
-A ClusterRole recycle-ecosystem has been created to recycle the Deployments in the galasa-prod ecosystem.
-
-## Event Listeners
-
-A webhook is set up for the galasa-dev organisation on GitHub. Every 2-minutes, the github-monitor checks for new events delivered to the webhook and triggers one of thee EventListeners where necessary.
-
-_Currently, payload validation has been turned off with an annotation in the metadata for these EventListeners. This is because the github-monitor currently cannot validate the payloads from GitHub. This will be turned on in the future once the github-monitor can validate payloads from GitHub._
-
-### github-main-builder-listener
-
-This EventListener is triggered via webhook when code is pushed into the main branch of the automation repository to look out for changes to the [cps.properties](./infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file. It triggers the branch-automation Pipeline.
-
-
-## Pipelines
-
-branch-automation:
-The pipeline applies changes to the prod1 Galasa service's CPS properties using `galasactl resources apply` if changes have been made to the [cps.properties](./infrastructure/cicsk8s/galasa-dev/cps-properties.yaml) file.
-
-update-prod1:
-This pipeline runs a `helm upgrade` to update the prod1 service using the [latest Galasa service Helm chart](https://github.com/galasa-dev/helm). This is triggered after code is promoted to production so that the service has the latest Galasa code.
-
-
-### How to manually trigger a pipeline?
-
-Use the `trigger-pipeline.sh` script to trigger one of the above pipelines.
-
-For example, to kick off the update-prod1 pipeline:
-```
-./trigger-pipeline.sh --update-prod1
-```
-
-
-## Roles
-
-A Role to recycle deployments on the cluster.
-
-
-## Service Accounts
-
-Definitions for the ServiceAccounts used during pipelines.
-
-
-## Tasks
-
-### galasactl-command
-
-This task uses the galasactl CLI to perform galasactl commands, such as galasactl runs submit.
-
-Parameters:
-* context: The directory to perform the command in.
-* command: An array of all of the parts of the command.
-* galasactlImageTag: The image tag to use, defaults to main.
-
-This task uses the custom [galasactl image](https://github.com/galasa-dev/cli/pkgs/container/galasactl-x86_64).
-
-
-### git-clone
-
-This task clones a GitHub repository from the provided URL into the workspace.
-
-
-### kubectl
-
-This task allows you to execute kubectl commands on the cluster the pipeline runs on.
-
-Parameters: 
-* command: An array of the parts of the command.
-
-The task uses the [kubectl image](https://github.com/galasa-dev/automation/pkgs/container/kubectl).
-
-
-### script
-
-This task is used to perform a script.
-
-Parameters:
-* context: The directory to perform the command in.
-* script: A string containing the script to be performed
-* image: By default this uses busybox to contain most commands likely needed. However if other commands are needed then a custom image can be passed here.
-
-This task, by default, uses the latest [busybox image](https://github.com/orgs/galasa-dev/packages/container/package/busybox). Unless, an image is passed as a paramter.
-
-
-### tkn-cli
-
-This task is used the Tekton CLI to communicate with Tekton.
-
-Parameters:
-* context: The directory to perform the command in.
-* command: An array with the parts of the command to perform.
-
-This task uses the custom [tkn image](https://github.com/galasa-dev/automation/pkgs/container/tkn).
-
 
 
 # Release Pipeline

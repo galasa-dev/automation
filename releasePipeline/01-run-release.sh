@@ -231,8 +231,7 @@ if [[ -z "${STEP}" ]]; then
     bold ""
     bold "Next manual steps:"
     bold "1. MEND scan (see release.md line 63)"
-    bold "2. Run Tekton regression tests (scripts 27-28)"
-    bold "3. Run the 'Deploy new Galasa version' workflow"
+    bold "2. Run the 'Deploy new Galasa version' workflow"
     exit 0
 fi
 
