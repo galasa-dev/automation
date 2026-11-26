@@ -36,11 +36,6 @@ on:
         required: true
         type: string
         default: 'version-bump'
-      skip_retag_docker_images:
-        description: 'Skip the "Retag Docker images" job'
-        required: false
-        type: boolean
-        default: false
   workflow_call:
     inputs:
       new_version:
@@ -56,11 +51,6 @@ on:
         required: true
         type: string
         default: 'version-bump'
-      skip_retag_docker_images:
-        description: 'Skip the "Retag Docker images" job'
-        required: false
-        type: boolean
-        default: false
 
 env:
   # Set TERM to xterm-256color to fix errors in set-version scripts that use tput.
@@ -349,35 +339,6 @@ jobs:
           echo "pr_url=${PR_URL}" >> $GITHUB_OUTPUT
           echo "Automation CPS PR created: ${PR_URL}"
 
-  retag-docker-images:
-    name: Retag Docker images
-    runs-on: ubuntu-latest
-    needs: validate-inputs
-    if: ${{ !inputs.skip_retag_docker_images }}
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        env:
-          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
-          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
-
-      - name: Retag galasactl-ibm-x86_64 image
-        run: |
-          echo "Pulling release image..."
-          docker pull ghcr.io/galasa-dev/galasactl-ibm-x86_64:release
-
-          echo "Tagging as stable..."
-          docker image tag ghcr.io/galasa-dev/galasactl-ibm-x86_64:release ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
-
-          echo "Pushing stable image..."
-          docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
-
-          echo "Successfully retagged galasactl-ibm-x86_64:release to stable"
-
   create-summary:
     name: Create workflow summary
     runs-on: ubuntu-latest
@@ -417,9 +378,6 @@ jobs:
           7. **Automation CPS**: ${{ needs.update-automation-cps.outputs.pr_url }}
              - Updates GalasaStream resources in `infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`
 
-          ### Docker Images
-          ${{ inputs.skip_retag_docker_images && '- ⏭️ Skipped retagging Docker images (user opted out)' || '- ✅ Retagged `galasactl-ibm-x86_64:release` to `stable`' }}
-
           ### Manual Steps Required
 
           ⚠️ The following steps still need to be completed manually:
@@ -431,6 +389,5 @@ jobs:
 
           ### Notes
           - CPS properties are automatically applied by ArgoCD when changes are pushed to the automation repository
-          - The `galasactl-ibm-x86_64:stable` image is now using version ${{ inputs.previous_version }} for regression testing
           - Simplatform version bump may fail if Galasa OBR hasn't been deployed yet - merge Galasa PR first and wait for deployment
           EOF

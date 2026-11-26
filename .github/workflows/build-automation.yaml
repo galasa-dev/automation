@@ -177,55 +177,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  build-openjdk17-ibm-gradle-image:
-    name: Build the 'openjdk17-ibm-gradle' image
-    runs-on: ubuntu-latest
-    needs: check-required-secrets-configured
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/certs
-            dockerfiles/common
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
-        env: 
-          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
-          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
-
-      - name: Build and push 'openjdk17-ibm-gradle' Docker image
-        id: build-push
-        uses: docker/build-push-action@v5
-        with:
-          context: dockerfiles/certs
-          file: dockerfiles/common/openjdk17ibmgradle.Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
   report-failure:
     # Skip this job for forks
     if: ${{ failure() && github.event_name == 'push' && github.repository_owner == 'galasa-dev' }}
     name: Report failure in workflow
     runs-on: ubuntu-latest
-    needs: [build-argocdcli-image, build-gitcli-image, build-openapi-image, build-swagger-image, build-openjdk17-ibm-gradle-image]
+    needs: [build-argocdcli-image, build-gitcli-image, build-openapi-image, build-swagger-image]
 
     steps:
       - name: Report failure in workflow to Slack
         env: 
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run : |
-          docker run --rm -v ${{ github.workspace }}:/var/workspace ghcr.io/galasa-dev/galasabld-ibm:main slackpost workflows --repo "automation" --workflowName "${{ github.workflow }}" --workflowRunNum "${{ github.run_id }}" --ref "${{ env.BRANCH }}" --hook "${{ env.SLACK_WEBHOOK }}"
+          docker run --rm -v ${{ github.workspace }}:/var/workspace ghcr.io/galasa-dev/galasabld-amd64:main slackpost workflows --repo "automation" --workflowName "${{ github.workflow }}" --workflowRunNum "${{ github.run_id }}" --ref "${{ env.BRANCH }}" --hook "${{ env.SLACK_WEBHOOK }}"

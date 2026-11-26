@@ -122,31 +122,3 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  build-openjdk17-ibm-gradle-image:
-    name: Build the 'openjdk17-ibm-gradle' image
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            dockerfiles/certs
-            dockerfiles/common
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/openjdk17-ibm-gradle
-
-      - name: Build 'openjdk17-ibm-gradle' Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: dockerfiles/certs
-          file: dockerfiles/common/openjdk17ibmgradle.Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}

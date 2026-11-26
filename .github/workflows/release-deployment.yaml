@@ -269,26 +269,6 @@ jobs:
             --sleep 10 \
             --max-iterations 30
 
-      - name: Login to Github Container Registry
-        uses: docker/login-action@v3
-        env:
-          WRITE_GITHUB_PACKAGES_USERNAME: ${{ vars.WRITE_GITHUB_PACKAGES_USERNAME }}
-          WRITE_GITHUB_PACKAGES_TOKEN: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.WRITE_GITHUB_PACKAGES_USERNAME }}
-          password: ${{ env.WRITE_GITHUB_PACKAGES_TOKEN }}
-
-      - name: Update CLI stable image tags
-        run: |
-          echo "Updating CLI stable image tags..."
-          docker pull ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:release
-          docker tag ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:release \
-            ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:stable
-          docker push ghcr.io/${{ env.NAMESPACE }}/galasactl-ibm-x86_64:stable
-
-          echo "CLI stable image updated"
-
   upload-releases:
     name: Upload GitHub Releases
     runs-on: ubuntu-latest

@@ -154,13 +154,6 @@ If you need to run steps individually or the automated workflows fail, follow th
 If the workflow fails:
 1. Follow manual steps in [95-move-to-new-version.md](./95-move-to-new-version.md).
 2. Run [set-version.sh](./set-version.sh) to update CPS properties in [`../infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml`](../infrastructure/galasa-kube1/galasa-service1/galasa-service-main-resources.yaml).
-3. Upgrade CLI stable image:
-
-```shell
-docker pull ghcr.io/galasa-dev/galasactl-ibm-x86_64:release
-docker image tag ghcr.io/galasa-dev/galasactl-ibm-x86_64:release ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
-docker image push ghcr.io/galasa-dev/galasactl-ibm-x86_64:stable
-```
 
 ### Clean up
 
