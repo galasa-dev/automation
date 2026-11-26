@@ -145,7 +145,6 @@ jobs:
             "galasa-boot-embedded"
             "galasa-ibm-boot-embedded"
             "galasactl-x86_64"
-            "galasactl-ibm-x86_64"
             "galasactl-executables"
             "galasa-isolated"
             "galasa-isolated-zip"

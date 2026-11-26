@@ -90,7 +90,7 @@ jobs:
           docker run --rm \
           --env SLACK_WEBHOOK=${{ env.SLACK_WEBHOOK }} \
           -v ${{ github.workspace }}/galasa:/galasa:rw \
-          ghcr.io/${{ env.NAMESPACE }}/galasabld-ibm:main \
+          ghcr.io/${{ env.NAMESPACE }}/galasabld-amd64:main \
           slackpost tests \
           --path /galasa/test.json \
           --name "Core tests - galasa-service-main" \
